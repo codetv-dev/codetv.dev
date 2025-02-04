@@ -9,7 +9,7 @@ export async function sendDiscordMessage({ content }: { content: string }) {
 			headers: {
 				Authorization: `Bot ${DISCORD_BOT_TOKEN}`,
 				'Content-Type': 'application/json',
-				'User-Agent': 'LWJ Bot (http://www.learnwithjason.dev, v0.1)',
+				'User-Agent': 'LWJ Bot (http://www.codetv.dev, v0.1)',
 			},
 			body: JSON.stringify({
 				content,
