@@ -338,12 +338,12 @@ if (episode.thumbnail.public_id) {
 		.wrapper {
 			margin-inline: auto;
 			max-inline-size: 1440px;
-			padding: 1rem 5cqw 4rem;
+			padding: 20px 5cqw 80px;
 
 			@media (min-width: 750px) {
 				display: grid;
-				gap: 2rem;
-				grid-template-columns: calc(62% - 0.5rem) auto;
+				gap: 30px;
+				grid-template-columns: calc(62% - 15px) auto;
 			}
 		}
 
@@ -374,13 +374,11 @@ if (episode.thumbnail.public_id) {
 		.episode-details {
 			& h1 {
 				font-weight: 500;
-				font-size: 1.5rem;
 				line-height: 1.1;
 				margin-block: 0.25rem 0.5rem;
 			}
 
 			& p {
-				font-size: 0.75rem;
 				line-height: 1.25;
 			}
 		}
@@ -389,7 +387,6 @@ if (episode.thumbnail.public_id) {
 			align-items: center;
 			display: flex;
 			flex-wrap: wrap;
-			font-size: 0.75rem;
 			gap: 1rem;
 			justify-content: center;
 			margin-block-start: 1rem;
@@ -403,8 +400,7 @@ if (episode.thumbnail.public_id) {
 
 				input {
 					display: block;
-					font-size: 16px;
-					font-weight: 400;
+					font: inherit;
 					inline-size: 300px;
 				}
 			}
@@ -414,7 +410,7 @@ if (episode.thumbnail.public_id) {
 				border: 1px solid var(--gray-300);
 				block-size: min-content;
 				color: var(--black);
-				font-size: 0.875rem;
+				font: inherit;
 				font-weight: 600;
 				margin: 0;
 				text-decoration: none;
@@ -427,7 +423,7 @@ if (episode.thumbnail.public_id) {
 
 		.episode-meta {
 			display: flex;
-			font-size: 0.75rem;
+			font-size: 0.875rem;
 			font-weight: 200;
 			gap: 0.5rem;
 			margin-block: 0.25rem;
@@ -451,7 +447,7 @@ if (episode.thumbnail.public_id) {
 		section,
 		.description {
 			h2 {
-				font-size: 1rem;
+				font-size: 1.125rem;
 				font-weight: 600;
 				line-height: 1.1;
 				margin-block: 0.25rem;
@@ -459,25 +455,16 @@ if (episode.thumbnail.public_id) {
 
 			ul:not(.resources) {
 				margin-block: 0.5rem 0;
-				padding-inline-start: 1.25rem;
+				padding-inline-start: 20px;
 			}
 
 			li {
 				margin-block-start: 0.25rem;
 			}
 
-			li,
-			p {
-				font-size: 0.75rem;
-			}
-
 			p {
 				&:not(:first-child) {
 					margin-block-start: 0.75rem;
-				}
-
-				&:first-child {
-					font-size: 0.875rem;
 				}
 			}
 		}

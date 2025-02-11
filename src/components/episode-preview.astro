@@ -143,19 +143,16 @@ const description =
 		}
 
 		.info {
+			font-size: 0.8em;
 			padding: 0.25rem 1rem 0.75rem;
 		}
 
 		& h2 {
 			font-family: var(--font-family);
-			font-size: 0.875rem;
+			font-size: 1rem;
 			font-weight: 600;
 			line-height: 1.1;
 			margin-block: 0.25rem;
-
-			.compact & {
-				font-size: 0.75rem;
-			}
 
 			& a {
 				color: inherit;
@@ -169,7 +166,6 @@ const description =
 		}
 
 		& p {
-			font-size: 0.75rem;
 			line-height: 1.25;
 		}
 
@@ -195,10 +191,9 @@ const description =
 				&::after {
 					color: var(--text-strong);
 					content: attr(data-overlay-text);
-					font-size: 0.6rem;
-					font-weight: 800;
+					font-size: 0.75rem;
+					font-weight: 600;
 					inset-block-end: 0;
-					letter-spacing: 0.1em;
 					padding: 0.325rem 0;
 					text-align: center;
 					text-transform: uppercase;
@@ -227,7 +222,6 @@ const description =
 	.episode-meta {
 		display: flex;
 		flex-wrap: wrap;
-		font-size: 0.75rem;
 		font-weight: 200;
 		gap: 0.5rem;
 		margin-block-start: 0.25rem;

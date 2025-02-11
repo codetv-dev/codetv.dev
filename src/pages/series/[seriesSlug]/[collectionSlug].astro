@@ -231,16 +231,21 @@ url.pathname = `/series/${series.slug}/${series.collection?.slug}`;
 
 		.series-info {
 			color: var(--gray-100);
-			font-size: 0.875rem;
 			font-weight: 200;
 			grid-area: info;
-			line-height: 1.45;
 
 			h1 {
 				color: var(--white);
-				font-size: 1.5rem;
 				line-height: 1.1;
 				padding-block: 0.5rem;
+			}
+
+			p {
+				line-height: 1.45;
+			}
+
+			.button {
+				font-weight: 600;
 			}
 		}
 
@@ -253,7 +258,6 @@ url.pathname = `/series/${series.slug}/${series.collection?.slug}`;
 
 			h3 {
 				color: var(--gray-100);
-				font-size: 0.75rem;
 				font-weight: 600;
 				text-transform: uppercase;
 			}
@@ -329,10 +333,6 @@ url.pathname = `/series/${series.slug}/${series.collection?.slug}`;
 			.series-info {
 				line-height: 1.25;
 				max-inline-size: 40ch;
-
-				h1 {
-					font-size: 2rem;
-				}
 			}
 
 			.sponsors {
@@ -369,7 +369,7 @@ url.pathname = `/series/${series.slug}/${series.collection?.slug}`;
 		& select {
 			background: var(--white);
 			border: none;
-			font-size: 1rem;
+			font: inherit;
 			font-weight: 500;
 		}
 	}
