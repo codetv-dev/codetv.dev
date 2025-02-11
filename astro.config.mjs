@@ -8,6 +8,8 @@ import react from '@astrojs/react';
 
 import sitemap from '@astrojs/sitemap';
 
+import expressiveCode from 'astro-expressive-code';
+
 // https://astro.build/config
 export default defineConfig({
 	site: 'https://codetv.dev',
@@ -17,6 +19,9 @@ export default defineConfig({
 		clerk({
 			afterSignInUrl: '/dashboard',
 			afterSignUpUrl: '/dashboard',
+		}),
+		expressiveCode({
+			themes: ['night-owl'],
 		}),
 		mdx(),
 		react(),

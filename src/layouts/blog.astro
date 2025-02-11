@@ -405,7 +405,11 @@ og.image = frontmatter.share?.image ?? false;
 		}
 	}
 
-	.expressive-code + :is(h2, h3) {
-		padding-block-start: 45px;
+	.expressive-code {
+		margin-block-start: 1.25rem;
+
+		+ :is(h2, h3) {
+			padding-block-start: 1.5rem;
+		}
 	}
 </style>

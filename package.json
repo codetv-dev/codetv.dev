@@ -36,6 +36,7 @@
 		"@unpic/astro": "^1.0.0",
 		"algoliasearch": "^5.6.1",
 		"astro": "^5.0.0-beta.10",
+		"astro-expressive-code": "^0.40.2",
 		"cdn-cache-control": "^1.1.0",
 		"cloudinary": "^2.4.0",
 		"date-fns": "^4.1.0",
