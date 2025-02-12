@@ -7,7 +7,6 @@ import '../styles/global.css';
 
 const nav = [
 	{ path: '/watch', label: 'Watch' },
-	// { path: '#upcoming', label: 'Upcoming' },
 	{ path: '/blog', label: 'Blog' },
 	{ path: '/newsletter', label: 'Newsletter' },
 	{ path: '/support', label: 'Support' },
@@ -52,10 +51,7 @@ const {
 			<meta property="og:image" content={image} />
 			<meta property="og:image:width" content="1600" />
 			<meta property="og:image:height" content="900" />
-			<meta
-				property="og:image:alt"
-				content={`Bold, pixelated text reading "We make stuff developers actually want to watch" over a dimmed background image of code on a monitor. There's a hand-drawn heart in the bottom-right corner.`}
-			/>
+			<meta property="og:image:alt" content={`CodeTV — tv for developers`} />
 
 			<meta name="twitter:dnt" content="on" />
 			<meta name="twitter:card" content="summary_large_image" />
@@ -70,6 +66,7 @@ const {
 	<body>
 		<header>
 			<Eyebrow />
+
 			<div>
 				<a href="/" rel="home" class="logo">
 					<Logo />
@@ -175,7 +172,7 @@ const {
 			1. Disable anchor tags from being targets of pointer events to prevent clicking links under the popover
 			2. Ensure that the anchor tags in the nav popover menu still are clickable
 		*/
-		a:not(#menu a) {
+		:not(#menu a) {
 			pointer-events: none;
 		}
 	}
@@ -206,7 +203,7 @@ const {
 			background: linear-gradient(to bottom, var(--white), transparent);
 			content: '';
 			position: fixed;
-			block-size: 0.5rem;
+			block-size: 10px;
 			inset-block-start: 0;
 			inset-inline: 0;
 			display: block;
@@ -220,10 +217,10 @@ const {
 
 		> div {
 			align-items: center;
-			backdrop-filter: blur(2rem) saturate(120%);
+			backdrop-filter: blur(30px) saturate(120%);
 			background: color-mix(in oklch, var(--gray-900) 70%, transparent);
 			display: grid;
-			gap: 0.5rem;
+			gap: 5px;
 			grid-template-areas:
 				'logo account'
 				'nav nav';
@@ -263,18 +260,16 @@ const {
 
 			.nav-toggle {
 				align-self: center;
-				background: color-mix(in oklch, var(--gray-400) 60%, transparent);
-				border: 1px solid color-mix(in oklch, var(--white) 15%, transparent);
-				border-radius: 1.5rem;
+				background: transparent;
+				border: none;
 				box-shadow: 0 1px 2px
 					color-mix(in oklch, var(--gray-500) 80%, transparent);
 				color: var(--white);
-				font-size: 0.875rem;
 				font-weight: 600;
 				justify-self: center;
 				letter-spacing: 0.1em;
 				line-height: 1.75;
-				padding: 0.5rem 1.625rem;
+				padding: 10px 30px;
 				pointer-events: all;
 				text-transform: uppercase;
 
@@ -310,21 +305,39 @@ const {
 				border: none;
 				display: flex;
 				flex-direction: column-reverse;
-				gap: 0.5rem;
+				font-size: 0.8rem;
+				gap: 10px;
 				grid-area: nav;
-				justify-content: center;
+				justify-content: start;
 				padding: 2rem;
+				padding-inline-end: 25px;
 
 				.account {
 					align-self: center;
+					margin-block-start: 20px;
+					padding-inline-end: 0;
 				}
 
 				nav {
+					align-items: center;
 					background: none;
 					backdrop-filter: none;
 					border: none;
 					box-shadow: none;
+					gap: 5px;
 					flex-direction: column;
+
+					&::before {
+						content: '× close menu';
+						display: block;
+						font-size: 0.8em;
+						margin-block-end: 20px;
+						padding: 10px;
+					}
+				}
+
+				.open-search {
+					margin-inline-start: 0;
 				}
 			}
 
@@ -333,12 +346,12 @@ const {
 				display: flex;
 				gap: 1rem;
 				grid-area: account;
+				padding-inline-end: 25px;
 
 				a {
 					align-items: center;
 					color: var(--white);
 					display: flex;
-					font-size: 0.625rem;
 					gap: 0.5rem;
 					inline-size: max-content;
 					letter-spacing: 0.1em;
@@ -369,7 +382,6 @@ const {
 				color: var(--white);
 				display: flex;
 				flex-wrap: wrap;
-				font-size: 0.75rem;
 				font-weight: 500;
 				gap: 1rem 1.5rem;
 				inline-size: min(max-content, 90dvi);
@@ -377,14 +389,13 @@ const {
 				letter-spacing: 0.1em;
 
 				@media (min-width: 1080px) {
-					gap: 0.5rem;
+					gap: 10px;
 					inline-size: max-content;
 					justify-content: start;
 					padding: 0 25px;
 				}
 
 				a {
-					block-size: 100%;
 					color: var(--white);
 					display: block;
 					line-height: 1.1;
@@ -396,13 +407,12 @@ const {
 				.open-search {
 					align-items: baseline;
 					background: var(--white);
-					border-radius: 1rem;
+					border-radius: 15px;
 					color: var(--text-muted);
 					display: flex;
-					gap: 0.375rem;
-					font-size: 0.875rem;
-					margin-inline-start: 0.75rem;
-					padding: 0.25rem 1rem;
+					gap: 8px;
+					margin-inline-start: 15px;
+					padding: 5px 20px;
 
 					svg {
 						display: block;
