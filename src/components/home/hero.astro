@@ -1,0 +1,46 @@
+---
+import { Image } from '@unpic/astro';
+---
+
+<section class="hero">
+	<h1>
+		<span class="line-1">tv for developers</span>
+		<span class="line-2">made by developers</span>
+	</h1>
+	<Image
+		src="https://res.cloudinary.com/jlengstorf/image/upload/v1746419111/codetv/codetv-heading-v1.1.png"
+		alt="Michael Chan, Jason Lengstorf, and Chance Strickland laughing on the set of Web Dev Challenge S2.E3. They're at a table with two laptops on it."
+		aspectRatio={1728 / 795}
+	/>
+</section>
+
+<style>
+	.hero {
+		position: relative;
+
+		h1 {
+			font-size: clamp(1rem, 11cqi, 11rem);
+			inline-size: min(90%, 1450px);
+			inset-block-end: 0;
+			line-height: 0.8;
+			margin: 0 max(5%, (100% - 1450px) / 2);
+			position: absolute;
+			text-box-trim: trim-both;
+
+			.line-1,
+			.line-2 {
+				display: block;
+			}
+
+			.line-2 {
+				color: var(--orange);
+				font-size: 0.92em;
+				text-align: end;
+			}
+		}
+
+		img {
+			display: block;
+		}
+	}
+</style>

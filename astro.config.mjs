@@ -16,25 +16,15 @@ export default defineConfig({
 	output: 'server',
 	trailingSlash: 'never',
 	integrations: [
-		clerk({
-			afterSignInUrl: '/dashboard',
-			afterSignUpUrl: '/dashboard',
-		}),
-		expressiveCode({
-			themes: ['night-owl'],
-		}),
+		clerk({ afterSignInUrl: '/dashboard', afterSignUpUrl: '/dashboard' }),
+		expressiveCode({ themes: ['night-owl'] }),
 		mdx(),
 		react(),
 		sitemap(),
 	],
-	image: {
-		domains: ['img.clerk.com'],
-		service: imageService(),
-	},
+	image: { domains: ['img.clerk.com'], service: imageService() },
 	adapter: netlify(),
-	security: {
-		checkOrigin: false,
-	},
+	security: { checkOrigin: false },
 	env: {
 		schema: {
 			NETLIFY_PERSONAL_ACCESS_TOKEN: envField.string({
@@ -85,10 +75,7 @@ export default defineConfig({
 			// 	access: 'secret',
 			// 	context: 'server',
 			// }),
-			MUX_TOKEN_ID: envField.string({
-				access: 'secret',
-				context: 'server',
-			}),
+			MUX_TOKEN_ID: envField.string({ access: 'secret', context: 'server' }),
 			MUX_TOKEN_SECRET: envField.string({
 				access: 'secret',
 				context: 'server',

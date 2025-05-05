@@ -1,5 +1,8 @@
 ---
 import Layout from '../layouts/default.astro';
+import Hero from '../components/home/hero.astro';
+import Series from '../components/home/series.astro';
+import Partners from '../components/home/partners.astro';
 import SeriesList from '../components/series-list.astro';
 import { getAllSeries } from '../util/sanity';
 import Heart from '../components/heart.astro';
@@ -12,14 +15,13 @@ const allSeries = await getAllSeries();
 
 <Layout title="tv for developers — CodeTV">
 	<main>
-		<section class="hero">
-			<h1>tv for developers</h1>
-			<p>
-				Watch stories about web developers overcoming challenges, learning, and
-				having fun together with a supportive community.
-			</p>
-		</section>
-		<SeriesList series={allSeries.filter((s) => s.featured)} short />
+		<Hero />
+
+		<Series />
+
+		<!-- <SeriesList series={allSeries.filter((s) => s.featured)} short /> -->
+
+		<Partners />
 
 		<section class="support">
 			<h2>Become a supporter</h2>
@@ -46,29 +48,7 @@ const allSeries = await getAllSeries();
 
 <style>
 	main {
-		inline-size: min(90dvi, calc((300px + 2rem) * 4 - 2rem));
-		margin-block-start: 3rem;
 		margin-inline: auto;
-	}
-
-	.hero {
-		h1 {
-			font-family: monaspace-argon, monospace;
-			font-feature-settings: 'calt', 'liga', 'ss01', 'ss02', 'ss03', 'ss04',
-				'ss05', 'ss06', 'ss07', 'ss08';
-			font-size: clamp(1rem, 3.5cqi + 1rem, 4rem);
-			font-weight: 800;
-			line-height: 1.1;
-			text-align: center;
-		}
-
-		p {
-			font-size: clamp(1rem, 0.5cqi + 1rem, 2.5rem);
-			font-weight: 200;
-			max-inline-size: min(46ch, 90vw);
-			margin: 0.5rem auto 0;
-			text-align: center;
-		}
 	}
 
 	.support {

@@ -1,0 +1,98 @@
+---
+import EpisodeCard from '../episode-card.astro';
+---
+
+<section class="series">
+	<h2>Early access for supporters</h2>
+	<div class="row early-access">
+		<EpisodeCard
+			thumbnail={{
+				src: 'https://res.cloudinary.com/jlengstorf/image/upload/f_auto/q_auto/w_1200/v1746395801/web-dev-challenge-s2.e3-mux_3.jpg',
+				alt: '',
+			}}
+			series="Web Dev Challenge"
+			episode_number="S2.E3"
+			publish_date="2025-05-13T06:00:00-0800"
+			title="The worst video player"
+			description="3 teams of 2 developers had 30 minutes to plan and 4 hours to build the weirdest, most Byzantine, bizarre video player UX they could dream up."
+			url="/series/web-dev-challenge/s2/e3-worst-video-player"
+		/>
+	</div>
+
+	<h2>Newly added</h2>
+	<div class="row three-up">
+		<EpisodeCard
+			thumbnail={{
+				src: 'https://res.cloudinary.com/jlengstorf/image/upload/f_auto/q_auto/w_1200/v1745192551/leet-heat-s1.e6-option_1.jpg',
+				alt: '',
+			}}
+			series="Leet Heat"
+			episode_number="S1.E6"
+			publish_date="2025-04-22T06:00:00-0800"
+			title="Fool vs. Robert"
+			description="Robert gets overheated. Fool smuggles in help."
+			url="https://codetv.link/lh/s1e6"
+		/>
+
+		<EpisodeCard
+			thumbnail={{
+				src: 'https://res.cloudinary.com/jlengstorf/image/upload/f_auto/q_auto/w_1200/v1745789929/web-dev-challenge-s2.e2-temporal_1.jpg',
+				alt: '',
+			}}
+			series="Web Dev Challenge"
+			episode_number="S2.E2"
+			publish_date="2025-04-29T06:00:00-0800"
+			title="A game for 2+ devices"
+			description="3 teams of 2 developers had 30 minutes to plan and 4 hours to build a game played on at least 2 devices."
+			url="https://codetv.link/wdc/s2e2"
+		/>
+
+		<EpisodeCard
+			thumbnail={{
+				src: 'https://res.cloudinary.com/jlengstorf/image/upload/f_auto/q_auto/w_1200/v1743396846/Episode_E9_Potch_Lua_JavaScript_devs.jpg',
+				alt: '',
+			}}
+			series="Learn With Jason"
+			episode_number="S8.E9"
+			publish_date="2025-04-17T09:30:00-0800"
+			title="Lua for JavaScript developers"
+			description="Potch teaches us what Lua is and how to use it."
+			url="/series/learn-with-jason/s8/intro-to-lua-for-people-who-know-javascript"
+		/>
+	</div>
+</section>
+
+<style>
+	.series {
+		background: var(--black);
+		display: flex;
+		flex-direction: column;
+		gap: 20px;
+		padding-block-start: 80px;
+		padding-block-end: 60px;
+	}
+
+	h2 {
+		font-family: monaspace-argon;
+		font-size: clamp(1rem, 2cqi, 1.5rem);
+		font-weight: 600;
+		margin-block-start: 40px;
+		padding-inline: max((100% - var(--max-width)) / 2, 5%);
+	}
+
+	.row {
+		display: flex;
+		gap: 20px;
+		justify-content: start;
+		padding-inline: max((100% - var(--max-width)) / 2, 5%);
+	}
+
+	.three-up {
+		display: grid;
+		grid-template-columns: 100%;
+
+		@media (min-width: 750px) {
+			grid-template-columns: repeat(3, 1fr);
+		}
+	}
+</style>

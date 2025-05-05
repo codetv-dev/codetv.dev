@@ -1,0 +1,87 @@
+---
+import { Image } from '@unpic/astro';
+
+const partners = {
+	google: 'Google',
+	aws: 'AWS',
+	github: 'GitHub',
+	// figma: 'Figma',
+	sentry: 'Sentry',
+	codepen: 'CodePen',
+	neon: 'Neon',
+	temporal: 'Temporal',
+	intuit: 'Intuit',
+	sanity: 'Sanity',
+	datastax: 'DataStax',
+	algolia: 'Algolia',
+	clerk: 'Clerk',
+	convex: 'Convex',
+	raycast: 'Raycast',
+	'fly-io': 'Fly.io',
+	wix: 'Wix',
+};
+---
+
+<section class="partners">
+	<h2>CodeTV features some of the biggest names in developer tooling:</h2>
+
+	<ul>
+		{
+			Object.entries(partners).map(([slug, label]) => (
+				<li>
+					<Image
+						src={`https://res.cloudinary.com/jlengstorf/image/upload/f_auto/q_auto/v1/codetv/sponsors/sponsor-${slug}.png`}
+						alt={label}
+						layout="fixed"
+					/>
+				</li>
+			))
+		}
+	</ul>
+</section>
+
+<style>
+	.partners {
+		--padding: 40px;
+
+		container: partners / inline-size;
+		margin-inline: auto;
+		max-inline-size: 90dvi;
+		padding: var(--padding) 0px;
+		position: relative;
+		text-align: center;
+		z-index: 10;
+
+		@media (min-width: 1600px) {
+			--padding: 100px;
+		}
+
+		h2 {
+			font-family: monaspace-argon;
+			font-size: clamp(1rem, 2.5cqi, 2rem);
+			font-weight: 600;
+		}
+
+		ul {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 4px 32px;
+			justify-content: center;
+			list-style: none;
+			margin-inline: auto;
+			max-inline-size: min(90dvi, var(--max-width));
+			padding: 0;
+		}
+
+		li {
+		}
+
+		img {
+			display: block;
+			block-size: 5.5cqi;
+			inline-size: auto;
+			max-block-size: 85px;
+			min-block-size: 35px;
+		}
+	}
+</style>
