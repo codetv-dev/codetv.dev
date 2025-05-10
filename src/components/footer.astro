@@ -33,14 +33,13 @@ import Search from './search/search.astro';
 <style>
 	footer {
 		align-items: center;
-		background: var(--gray-800);
-		color: var(--gray-200);
+		background: var(--bg);
+		color: var(--text-muted);
 		display: flex;
 		flex-direction: column;
 		font-size: 0.75rem;
 		gap: 2rem;
-		justify-content: center;
-		padding: 2rem max(calc((100cqw - 1024px) / 2), 5cqw);
+		padding: 80px max(calc((100% - var(--max-width)) / 2), 5%) 64px;
 
 		@media (min-width: 800px) {
 			display: grid;
@@ -49,7 +48,7 @@ import Search from './search/search.astro';
 
 		.mini-bio {
 			p + p {
-				margin-block-start: 1rem;
+				margin-block-start: 16px;
 			}
 		}
 
@@ -74,7 +73,7 @@ import Search from './search/search.astro';
 				color: inherit;
 
 				&:is(:hover, :focus, :active) {
-					color: var(--gray-100);
+					color: var(--text);
 				}
 			}
 		}
