@@ -1,0 +1,108 @@
+---
+import { actions } from 'astro:actions';
+---
+
+<section class="newsletter">
+	<h2>
+		The best content <strong>made for developers</strong>, delivered directly to
+		your inbox
+	</h2>
+	<p>
+		At CodeTV, we believe developers deserve to see themselves in the
+		entertainment they watch. We believe you deserve the best educational
+		materials and an excited, supportive community to learn with. And most of
+		all, we believe that <strong>you belong here.</strong>
+	</p>
+
+	<form method="POST" action={`/confirm${actions.newsletter.subscribe}`}>
+		<div class="input">
+			<label for="firstName">First Name</label>
+			<input type="text" name="firstName" id="firstName" required />
+		</div>
+
+		<div class="input">
+			<label for="email">Email</label>
+			<input type="email" name="email" id="email" required />
+		</div>
+
+		<button class="button" type="submit">Subscribe</button>
+	</form>
+</section>
+
+<style>
+	.newsletter {
+		background: var(--gray-000);
+		box-shadow: 0 0 24px 8px color-mix(in oklch, var(--white) 10%, transparent);
+		padding: 48px max((100% - 900px) / 2, 5%);
+		position: relative;
+		z-index: 100;
+	}
+
+	h2 {
+		font-size: clamp(1.75rem, 5.5cqi, 6.25rem);
+		line-height: 0.9;
+		margin: 0;
+		/* max-inline-size: 36ch; */
+
+		strong {
+			color: var(--orange);
+			font-weight: normal;
+		}
+
+		@media (min-width: 1280px) {
+			font-size: clamp(2rem, 3.5cqi, 5.25rem);
+		}
+	}
+
+	p {
+		margin: 24px 0;
+	}
+
+	form {
+		align-items: end;
+		display: grid;
+		gap: 8px;
+		grid-template-columns: 2fr 2fr 1fr;
+	}
+
+	.input {
+		display: flex;
+		flex-direction: column;
+		gap: 4px;
+
+		label {
+			color: var(--text-muted);
+			font-size: 0.75em;
+			transition: 150ms color linear;
+		}
+
+		input {
+			background: var(--bg);
+			border: 1px solid var(--text-muted);
+			border-radius: 3px;
+			color: var(--white);
+			font-family: var(--font-family);
+			font-size: 24px;
+			padding: 6px 8px;
+			transition: 150ms border-color linear;
+		}
+
+		&:focus-within {
+			label {
+				color: var(--white);
+			}
+
+			input {
+				border-color: var(--white);
+			}
+		}
+	}
+
+	.button {
+		border: 0;
+		font-size: 20px;
+		line-height: 1;
+		margin: 0;
+		padding: 12px;
+	}
+</style>

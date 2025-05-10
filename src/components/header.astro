@@ -1,0 +1,167 @@
+---
+import CodeTVLogo from '../assets/codetv-logo.svg';
+
+const nav = [
+	{ path: '/watch', label: 'Watch' },
+	{ path: '/blog', label: 'Blog' },
+	{ path: '/newsletter', label: 'Newsletter' },
+	{ path: '/support', label: 'Support' },
+	{ path: 'https://partners.codetv.dev', label: 'Partners' },
+];
+---
+
+<header>
+	<a href="/" rel="home">
+		<CodeTVLogo />
+	</a>
+
+	<nav>
+		{nav.map(({ path, label }) => <a href={path}>{label}</a>)}
+
+		<a
+			href="#search"
+			class="open-search"
+			title="open site search"
+			data-name="nav-search"
+		>
+			<svg viewBox="0 0 20 20">
+				<path
+					fill="none"
+					fill-rule="evenodd"
+					stroke="currentColor"
+					stroke-width="2"
+					stroke-linecap="round"
+					stroke-linejoin="round"
+					d="M14.386 14.386l4.088 4.088-4.088-4.088A7.533 7.533 0 113.733 3.733a7.533 7.533 0 0110.653 10.653z"
+				></path>
+			</svg>
+			⌘+K
+		</a>
+
+		<a
+			href="https://calendly.com/codetv/new-project"
+			class="button"
+			data-open="modal">Book A Call</a
+		>
+	</nav>
+</header>
+
+<script>
+	const navSearchBtn = document.querySelector('[data-name="nav-search"]');
+
+	navSearchBtn?.addEventListener('click', (event) => {
+		event.preventDefault();
+
+		const search = document.querySelector(
+			'[data-name="main-search"]',
+		) as HTMLButtonElement;
+
+		(
+			document.querySelector('#menu:popover-open') as HTMLElement
+		)?.hidePopover();
+		search.click();
+	});
+</script>
+
+<style>
+	header {
+		align-items: center;
+		background: color-mix(in oklch, var(--black) 75%, transparent);
+		backdrop-filter: blur(20px);
+		display: flex;
+		justify-content: space-between;
+		line-height: 1;
+		margin-inline: auto;
+		padding: 10px;
+		z-index: 100;
+
+		@media (min-width: 1280px) {
+			border-radius: 8px;
+			box-shadow: 0 0 20px var(--black);
+			inset-block-start: 25px;
+			inline-size: min(90dvi + 20px, var(--max-width) + 20px);
+			margin-inline: calc(
+				(100% - min(90dvi + 20px, var(--max-width) + 20px)) / 2
+			);
+			position: fixed;
+		}
+	}
+
+	nav {
+		align-items: baseline;
+		color: var(--white);
+		display: flex;
+		flex-wrap: wrap;
+		font-weight: 500;
+		gap: 1rem 1.5rem;
+		inline-size: min(max-content, 90dvi);
+		justify-content: center;
+		letter-spacing: 0.1em;
+
+		@media (min-width: 1080px) {
+			gap: 10px;
+			inline-size: max-content;
+			justify-content: start;
+			padding: 0 25px;
+		}
+
+		a {
+			color: var(--white);
+			display: block;
+			line-height: 1.1;
+			padding: 15px 10px;
+			pointer-events: all;
+			text-decoration: none;
+
+			&.button {
+				margin: 0;
+			}
+		}
+
+		.open-search {
+			align-items: baseline;
+			display: flex;
+			gap: 8px;
+			margin-inline-start: 15px;
+			padding: 5px 20px;
+
+			svg {
+				display: block;
+				inline-size: 0.875rem;
+				position: relative;
+				inset-block-start: 0.1rem;
+			}
+		}
+
+		.button {
+			color: var(--black);
+		}
+	}
+
+	a {
+		text-decoration: none;
+
+		&[rel='home'] {
+			display: block;
+			max-block-size: 10cqi;
+			max-inline-size: 33.75%;
+
+			svg {
+				aspect-ratio: 211 / 50;
+				block-size: 8cqi;
+				display: block;
+				inline-size: 100%;
+				max-block-size: 50px;
+			}
+		}
+
+		nav &:not(.button, .open-search) {
+			color: inherit;
+			display: none;
+
+			@media (min-width: 1280px) {
+				display: block;
+			}
+		}
+	}
+</style>

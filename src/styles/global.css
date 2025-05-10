@@ -1,10 +1,23 @@
 @font-face {
 	font-display: swap;
+	font-family: 'heading-font';
+	src: url('/fonts/heading-font-normal.woff2') format('woff2');
+}
+
+@font-face {
+	font-display: swap;
+	font-family: 'heading-font';
+	src: url('/fonts/heading-font-bold.woff2') format('woff2');
+	font-weight: bold;
+}
+
+@font-face {
+	font-display: swap;
 	font-family: 'monaspace-argon';
-	font-style: oblique 0deg 11deg;
-	font-weight: 200 800;
-	src: url('./fonts/MonaspaceArgonVarVF[wght,wdth,slnt].woff2')
+	src: url('/fonts/MonaspaceArgonVarVF[wght,wdth,slnt].woff2')
 		format('woff2-variations');
+	font-weight: 100 900;
+	font-style: oblique 0deg 11deg;
 }
 
 * {
@@ -51,38 +64,63 @@
 	--font-family-medium: system-ui, sans-serif;
 	--font-family-bold: system-ui, sans-serif;
 
+	/* UPDATED COLOR PALETTE */
+	--gray-000: #080217;
+	--gray-100: #18151f;
+	--gray-600: #79777e;
+	--gray-700: #b5b1be;
+	--gray-800: #ede9f6;
+	--gray-900: #fff;
+
+	--orange: #f0b525;
+
+	--black: var(--gray-000);
+	--white: var(--gray-900);
+	--bg: var(--gray-100);
+	--text: var(--gray-700);
+	--text-muted: var(--gray-600);
+	--text-emphasized: var(--gray-800);
+
+	--font-family: monaspace-argon, system-ui, sans-serif;
+	--font-family-heading: heading-font, impact, system-ui, sans-serif;
+
+	--max-width: 1600px;
+
 	color: var(--text);
 	font-family: var(--font-family);
 	line-height: 1.45;
 }
 
 body {
-	background: var(--white);
+	background: var(--bg);
 	margin: 0;
 }
 
 :is(h1, h2, h3, h4, h5, h6) {
-	color: var(--text-strong);
-	font-family: var(--font-family-bold);
+	color: var(--text-emphasized);
+	font-family: var(--font-family-heading);
 	font-weight: normal;
 	letter-spacing: -0.02em;
 }
 
 .button {
 	background: var(--white);
-	border: 0;
-	border-radius: 0.25rem;
+	border-radius: 3px;
 	color: var(--black);
 	display: inline-block;
-	font-family: var(--font-family-medium);
-	font-size: 0.875rem;
-	line-height: 1;
-	margin-block-start: 1rem;
-	padding: 4px 8px;
+	font-family: supermassive, impact;
+	font-size: clamp(0.875em, 6cqi, 1.25em);
+	font-weight: normal;
+	line-height: 0.9;
+	margin-block-start: 16px;
+	padding: 8px 12px;
 	text-decoration: none;
+	transition: 150ms background linear;
 
-	&:is(:active, :hover, :focus) {
-		background: var(--yellow-500);
+	&:is(:active, :focus, :hover) {
+		background: var(--orange);
+		color: var(--black);
+		text-decoration: none;
 	}
 }
 
