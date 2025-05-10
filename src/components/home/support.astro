@@ -1,0 +1,134 @@
+---
+import { Image } from '@unpic/astro';
+import Heart from '../heart.astro';
+import Supporters from '../supporters.astro';
+---
+
+<section class="support">
+	<div class="content">
+		<h2>Become a supporter</h2>
+		<p>
+			CodeTV is possible thanks to the support of partner companies and
+			individual supporters. We help developers learn their craft in a fun,
+			community-centered way — and with your support we can make an even bigger
+			impact. <Heart />
+		</p>
+		<p>Get more info and become a supporter today:</p>
+		<div class="support-options">
+			<a href="/support" class="button">Individual Support</a>
+			<a href="https://partners.codetv.dev" class="button">Partner Companies</a>
+		</div>
+	</div>
+
+	<Image
+		class="background"
+		src="https://res.cloudinary.com/jlengstorf/image/upload/f_auto/q_auto/v1743135626/codetv/partners/section-quality.png"
+		alt="A woman standing on a game show set behind a podium with a big smile on her face. There's a large wheel in the background with categories on it."
+	/>
+</section>
+
+<div class="supporters">
+	<h3>Current Supporters</h3>
+	<Supporters />
+</div>
+
+<style>
+	.support {
+		align-items: end;
+		display: flex;
+		flex-direction: column-reverse;
+		position: relative;
+
+		@media (min-width: 1280px) {
+			aspect-ratio: 1728 / 705;
+			flex-direction: initial;
+			padding-block-end: 50px;
+			padding-inline: max((100% - var(--max-width)) / 2, 5%);
+
+			&::after {
+				background: linear-gradient(
+					to right,
+					var(--black) 30%,
+					transparent 100%
+				);
+				content: '';
+				inset: 0;
+				position: absolute;
+				z-index: 5;
+			}
+		}
+	}
+
+	.content {
+		align-items: start;
+		display: flex;
+		flex-direction: column;
+		justify-content: end;
+		padding: 30px 5dvi;
+		position: relative;
+		z-index: 10;
+
+		@media (min-width: 1280px) {
+			inline-size: 50%;
+			padding: 0;
+		}
+
+		h2 {
+			font-size: clamp(1.75rem, 5.5cqi, 6.25rem);
+			line-height: 1;
+			margin: 0;
+
+			@media (min-width: 1280px) {
+				font-size: clamp(2rem, 4.5cqi, 6.25rem);
+			}
+		}
+
+		p {
+			margin: 1rem 0 0;
+		}
+
+		.support-options {
+			display: flex;
+			gap: 2rem;
+			justify-content: center;
+			margin-block-start: 0.25rem;
+
+			a {
+				border: 1px solid var(--gray-600);
+				font-size: clamp(1.25rem, 2.25cqi, 2rem);
+				font-weight: 400;
+			}
+		}
+	}
+
+	.background {
+		aspect-ratio: 16 / 10;
+		border-block: 0.5px solid color-mix(in oklch, var(--white) 80%, transparent);
+		block-size: 100%;
+		object-fit: cover;
+		object-position: right;
+		z-index: 1;
+
+		@media (min-width: 1280px) {
+			aspect-ratio: unset;
+			inset: 0;
+			position: absolute;
+		}
+	}
+
+	.supporters {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
+		margin: 0;
+		padding: 32px max((100% - var(--max-width)) / 2, 5%) 48px;
+
+		h3 {
+			font-size: clamp(1.75rem, 3cqi, 2.5rem);
+			inline-size: 100%;
+			line-height: 1;
+			margin: 0;
+			text-align: center;
+		}
+	}
+</style>
