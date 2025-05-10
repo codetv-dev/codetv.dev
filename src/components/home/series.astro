@@ -1,65 +1,61 @@
 ---
+import { getNextEarlyAccessEpisode, getRecentEpisodes } from '../../util/sanity';
 import EpisodeCard from '../episode-card.astro';
+
+function getTagline(date: string) {
+	const dateString = new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+
+	return `Supporters only until ${dateString}`;
+}
+
+const earlyAccess = await getNextEarlyAccessEpisode();
+const recentEps = await getRecentEpisodes();
 ---
 
 <section class="series">
-	<h2>Early access for supporters</h2>
-	<div class="row early-access">
-		<EpisodeCard
-			thumbnail={{
-				src: 'https://res.cloudinary.com/jlengstorf/image/upload/f_auto/q_auto/w_1200/v1746395801/web-dev-challenge-s2.e3-mux_3.jpg',
-				alt: '',
-			}}
-			series="Web Dev Challenge"
-			episode_number="S2.E3"
-			publish_date="2025-05-13T06:00:00-0800"
-			title="The worst video player"
-			description="3 teams of 2 developers had 30 minutes to plan and 4 hours to build the weirdest, most Byzantine, bizarre video player UX they could dream up."
-			url="/series/web-dev-challenge/s2/e3-worst-video-player"
-		/>
-	</div>
+	{earlyAccess ? (
+		<h2>Early access for supporters</h2>
+		<div class="row early-access">
+			<EpisodeCard
+				thumbnail={{
+					public_id: earlyAccess.thumbnail.public_id,
+					alt: earlyAccess.thumbnail.alt,
+				}}
+				tagline={getTagline(earlyAccess.publish_date!)}
+				series={earlyAccess.series}
+				episode_number={earlyAccess.episodeNumber}
+				publish_date={earlyAccess.publish_date}
+				title={earlyAccess.title}
+				description={earlyAccess.short_description}
+				url={earlyAccess.path}
+				width={660}
+			/>
+		</div>
+	) : null}
 
-	<h2>Newly added</h2>
-	<div class="row three-up">
-		<EpisodeCard
-			thumbnail={{
-				src: 'https://res.cloudinary.com/jlengstorf/image/upload/f_auto/q_auto/w_1200/v1745192551/leet-heat-s1.e6-option_1.jpg',
-				alt: '',
-			}}
-			series="Leet Heat"
-			episode_number="S1.E6"
-			publish_date="2025-04-22T06:00:00-0800"
-			title="Fool vs. Robert"
-			description="Robert gets overheated. Fool smuggles in help."
-			url="https://codetv.link/lh/s1e6"
-		/>
-
-		<EpisodeCard
-			thumbnail={{
-				src: 'https://res.cloudinary.com/jlengstorf/image/upload/f_auto/q_auto/w_1200/v1745789929/web-dev-challenge-s2.e2-temporal_1.jpg',
-				alt: '',
-			}}
-			series="Web Dev Challenge"
-			episode_number="S2.E2"
-			publish_date="2025-04-29T06:00:00-0800"
-			title="A game for 2+ devices"
-			description="3 teams of 2 developers had 30 minutes to plan and 4 hours to build a game played on at least 2 devices."
-			url="https://codetv.link/wdc/s2e2"
-		/>
-
-		<EpisodeCard
-			thumbnail={{
-				src: 'https://res.cloudinary.com/jlengstorf/image/upload/f_auto/q_auto/w_1200/v1743396846/Episode_E9_Potch_Lua_JavaScript_devs.jpg',
-				alt: '',
-			}}
-			series="Learn With Jason"
-			episode_number="S8.E9"
-			publish_date="2025-04-17T09:30:00-0800"
-			title="Lua for JavaScript developers"
-			description="Potch teaches us what Lua is and how to use it."
-			url="/series/learn-with-jason/s8/intro-to-lua-for-people-who-know-javascript"
-		/>
-	</div>
+	{recentEps ? (
+		<h2>Newly added</h2>
+		<div class="row three-up">
+			{recentEps.map((ep) => {
+				return (
+					<EpisodeCard
+						thumbnail={{
+							public_id: ep.thumbnail.public_id!,
+							alt: ep.thumbnail.alt!,
+						}}
+						youtube_id={ep.youtube_id}
+						series={ep.series}
+						episode_number={ep.episodeNumber}
+						publish_date={ep.publish_date}
+						title={ep.title}
+						description={ep.short_description}
+						url={ep.path}
+						width={465}
+					/>
+				)
+			})}
+		</div>
+	) : null}
 </section>
 
 <style>

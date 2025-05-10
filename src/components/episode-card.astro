@@ -1,45 +1,79 @@
 ---
 import { Image } from '@unpic/astro';
+import {
+	createImageUrl,
+	generateEpisodePoster,
+	getYouTubeThumbnail,
+} from '../util/cloudinary';
 
 export interface Props {
 	thumbnail: {
-		src: string;
-		alt: string;
+		public_id: string | null;
+		alt: string | null;
 	};
-	url: string;
-	publish_date: string;
-	series: string;
-	episode_number: string;
-	title: string;
-	description: string;
+	youtube_id?: string | null;
+	url: string | null;
+	publish_date: string | null;
+	tagline?: string | null;
+	series: string | null;
+	episode_number: string | null;
+	title: string | null;
+	description: string | null;
+	width: number | undefined;
 }
 
 const {
 	thumbnail,
+	youtube_id,
 	url,
 	publish_date,
+	tagline,
 	series,
 	episode_number,
 	title,
 	description,
+	width = 465,
 } = Astro.props;
+
+let episodeImage;
+if (thumbnail.public_id) {
+	episodeImage = createImageUrl(thumbnail.public_id, {
+		width,
+		aspect_ratio: '340:190',
+		crop: 'fill',
+	});
+} else if (youtube_id) {
+	episodeImage = getYouTubeThumbnail(youtube_id);
+} else {
+	episodeImage = generateEpisodePoster();
+}
 ---
 
 <div class="card-container">
 	<section class="card">
 		<figure
-			style={`--bg-img: url(${thumbnail.src.replace(/\/w_\d+\//, '/w_30/')})`}
+			style={`--bg-img: url(${episodeImage.replace(/\/w_\d+\//, '/w_30/')})`}
 		>
 			<a href={url}>
 				<Image
-					src={thumbnail.src}
+					src={episodeImage}
 					alt={thumbnail.alt}
-					aspectRatio={1200 / 675}
+					width={width}
+					height={width * (190 / 340)}
+					aspectRatio={340 / 190}
 				/>
 			</a>
 		</figure>
 		<div class="info">
-			<p class="tagline">Supporters only until May 13</p>
+			<p class="tagline">
+				{
+					tagline ??
+						new Date(publish_date!).toLocaleDateString('en-US', {
+							month: 'short',
+							day: 'numeric',
+						})
+				}
+			</p>
 			<h2><a href={url}>{series}</a></h2>
 			<div class="details">
 				<p class="episode-number">{episode_number}</p>
@@ -59,7 +93,7 @@ const {
 	.card-container {
 		container: card / inline-size;
 		inline-size: 100%;
-		max-inline-size: 960px;
+		max-inline-size: 1280px;
 	}
 
 	.card {
