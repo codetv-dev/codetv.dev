@@ -3,14 +3,10 @@ import Layout from '../layouts/default.astro';
 import Hero from '../components/home/hero.astro';
 import Series from '../components/home/series.astro';
 import Partners from '../components/home/partners.astro';
-import SeriesList from '../components/series-list.astro';
-import { getAllSeries } from '../util/sanity';
-import Heart from '../components/heart.astro';
-import Supporters from '../components/supporters.astro';
+import Support from '../components/home/support.astro';
+import Newsletter from '../components/home/newsletter.astro';
 
 export const prerender = true;
-
-const allSeries = await getAllSeries();
 ---
 
 <Layout title="tv for developers — CodeTV">
@@ -19,70 +15,10 @@ const allSeries = await getAllSeries();
 
 		<Series />
 
-		<!-- <SeriesList series={allSeries.filter((s) => s.featured)} short /> -->
-
 		<Partners />
 
-		<section class="support">
-			<h2>Become a supporter</h2>
-			<p>
-				CodeTV is possible thanks to the support of partner companies and
-				individual supporters. We help developers learn their craft in a fun,
-				community-centered way — and with your support we can make an even
-				bigger impact. <Heart />
-			</p>
-			<p>Get more info and become a supporter today:</p>
-			<div class="support-options">
-				<a href="/support" class="button">Individual Support</a>
-				<a href="https://partners.codetv.dev" class="button"
-					>Partner Companies</a
-				>
-			</div>
-			<div class="supporters">
-				<h3>Current Supporters</h3>
-				<Supporters />
-			</div>
-		</section>
+		<Support />
+
+		<Newsletter />
 	</main>
 </Layout>
-
-<style>
-	main {
-		margin-inline: auto;
-	}
-
-	.support {
-		inline-size: min(90dvi, 54ch);
-		margin-block-end: 4rem;
-		margin-inline: auto;
-
-		p {
-			margin: 1rem 0 0;
-		}
-
-		.support-options {
-			display: flex;
-			gap: 2rem;
-			justify-content: center;
-			margin-block-start: 0.25rem;
-
-			a {
-				border: 1px solid var(--gray-600);
-				font-size: 1rem;
-				font-weight: 400;
-			}
-		}
-	}
-
-	.supporters {
-		display: flex;
-		flex-wrap: wrap;
-		justify-content: center;
-		margin: 2rem auto 0;
-
-		h3 {
-			inline-size: 100%;
-			text-align: center;
-		}
-	}
-</style>
