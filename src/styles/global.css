@@ -17,7 +17,7 @@
 	src: url('/fonts/MonaspaceArgonVarVF[wght,wdth,slnt].woff2')
 		format('woff2-variations');
 	font-weight: 100 900;
-	font-style: oblique 0deg 11deg;
+	font-style: oblique 0deg 3deg;
 }
 
 * {
@@ -73,6 +73,7 @@
 	--gray-900: #fff;
 
 	--orange: #f0b525;
+	--blue: #647cf6;
 
 	--black: var(--gray-000);
 	--white: var(--gray-900);
@@ -101,6 +102,31 @@ body {
 	font-family: var(--font-family-heading);
 	font-weight: normal;
 	letter-spacing: -0.02em;
+	line-height: 0.9;
+
+	&:not(:first-child) {
+		margin-block-start: 40px;
+	}
+}
+
+h1 {
+	font-size: clamp(1.5em, 5cqi, 2.5em);
+}
+
+h2 {
+	font-size: clamp(1.25em, 4cqi, 2em);
+}
+
+h3 {
+	font-size: clamp(1.125em, 3cqi, 1.875em);
+}
+
+a {
+	color: var(--blue);
+}
+
+:is(strong, b) {
+	color: var(--text-emphasized);
 }
 
 .button {
