@@ -14,44 +14,28 @@ const { frontmatter } = Astro.props;
 
 <style>
 	.container {
+		font-size: 1.25rem;
 		max-inline-size: min(90dvi, 54ch);
-		margin: 80px auto;
+		margin: 200px auto;
 		word-wrap: break-word;
-
-		:is(h1, h2, h3, h4, h5, h6) {
-			line-height: 1.1;
-
-			&:not(:first-child) {
-				margin-block-start: 2rem;
-			}
-		}
 
 		:is(p, ul, ol) {
 			&:not(:first-child) {
-				margin-block-start: 1rem;
+				margin-block-start: 20px;
 			}
 
 			&.lede {
-				font-size: 1.25rem;
-				margin-block-start: 0.75rem;
+				font-size: 1.25em;
+				margin-block-start: 16px;
 
 				& + p {
-					margin-block-start: 1.5rem;
+					margin-block-start: 20px;
 				}
 			}
 		}
 
-		h1 {
-			font-size: 1.5rem;
-			font-weight: 600;
-		}
-
-		h2 {
-			font-size: 1.25rem;
-		}
-
 		li {
-			margin-block-start: 0.375rem;
+			margin-block-start: 8px;
 		}
 	}
 </style>
