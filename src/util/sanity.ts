@@ -14,6 +14,7 @@ import type {
 	EarlyAccessEpisodesQueryResult,
 	EpisodeTranscriptBySlugQueryResult,
 	RecentEpisodesQueryResult,
+	FeaturedSeriesQueryResult,
 } from '../types/sanity';
 import type { UploadApiResponse } from 'cloudinary';
 
@@ -46,6 +47,20 @@ const allSeriesQuery = groq`
     'latestEpisodeDate': collections[]->episodes[@->hidden != true && (defined(@->video.youtube_id) || defined(@->video.mux_video))] | order(@->publish_date desc)[0]->publish_date,
     featured
   } | order(latestEpisodeDate desc)
+`;
+
+const featuredSeriesQuery = groq`
+  *[_type=="series" && featured == true] {
+    'slug': slug.current,
+    title,
+    description,
+    image {
+      public_id,
+      height,
+      width,
+    },
+    'path': '/series/' + slug.current + '/' + collections[-1]->slug.current,
+  }
 `;
 
 const seriesBySlugQuery = groq`
@@ -507,6 +522,16 @@ export async function getRecentEpisodes() {
 
 		return { ...ep, episodeNumber };
 	});
+}
+
+export async function getFeaturedSeries() {
+	const result = await client.fetch<FeaturedSeriesQueryResult>(
+		featuredSeriesQuery,
+		{},
+		{ useCdn: true },
+	);
+
+	return result;
 }
 
 export async function getPersonById(
