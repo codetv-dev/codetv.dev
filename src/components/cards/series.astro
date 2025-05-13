@@ -1,63 +1,40 @@
 ---
 import { Image } from '@unpic/astro';
-import {
-	createImageUrl,
-	generateEpisodePoster,
-	getYouTubeThumbnail,
-} from '../util/cloudinary';
+import { createImageUrl, generateEpisodePoster } from '../../util/cloudinary';
 
 export interface Props {
 	thumbnail: {
 		public_id: string | null;
-		alt: string | null;
 	};
-	youtube_id?: string | null;
 	url: string | null;
-	publish_date: string | null;
-	tagline?: string | null;
-	series: string | null;
-	episode_number: string | null;
 	title: string | null;
 	description: string | null;
 	width: number | undefined;
 }
 
-const {
-	thumbnail,
-	youtube_id,
-	url,
-	publish_date,
-	tagline,
-	series,
-	episode_number,
-	title,
-	description,
-	width = 465,
-} = Astro.props;
+const { thumbnail, url, title, description, width = 520 } = Astro.props;
 
-let episodeImage;
+let seriesImage;
 if (thumbnail.public_id) {
-	episodeImage = createImageUrl(thumbnail.public_id, {
+	seriesImage = createImageUrl(thumbnail.public_id, {
 		width,
 		aspect_ratio: '340:190',
 		crop: 'fill',
 	});
-} else if (youtube_id) {
-	episodeImage = getYouTubeThumbnail(youtube_id);
 } else {
-	episodeImage = generateEpisodePoster();
+	seriesImage = generateEpisodePoster();
 }
 ---
 
 <div class="card-container">
 	<section class="card">
 		<figure
-			style={`--bg-img: url(${episodeImage.replace(/\/w_\d+\//, '/w_30/')})`}
+			style={`--bg-img: url(${seriesImage.replace(/\/w_\d+\//, '/w_30/')})`}
 		>
 			<a href={url}>
 				<Image
-					src={episodeImage}
-					alt={thumbnail.alt}
+					src={seriesImage}
+					alt={title}
 					width={width}
 					height={width * (190 / 340)}
 					aspectRatio={340 / 190}
@@ -65,25 +42,12 @@ if (thumbnail.public_id) {
 			</a>
 		</figure>
 		<div class="info">
-			<p class="tagline">
-				{
-					tagline ??
-						new Date(publish_date!).toLocaleDateString('en-US', {
-							month: 'short',
-							day: 'numeric',
-						})
-				}
-			</p>
-			<h2><a href={url}>{series}</a></h2>
+			<h2><a href={url}>{title}</a></h2>
 			<div class="details">
-				<p class="episode-number">{episode_number}</p>
-				<p class="episode-title">{title}</p>
+				<p class="description">{description}</p>
 			</div>
-			<p class="description">
-				{description}
-			</p>
 			<p>
-				<a href={url} class="button"> Watch Now </a>
+				<a href={url} class="button"> See Episodes </a>
 			</p>
 		</div>
 	</section>
@@ -111,7 +75,6 @@ if (thumbnail.public_id) {
 			&::after {
 				background: var(--bg-img);
 				background-size: cover;
-				border: 1px solid red;
 				content: '';
 				filter: blur(40px);
 				position: absolute;
@@ -122,6 +85,7 @@ if (thumbnail.public_id) {
 
 		img {
 			block-size: auto;
+			border-radius: 3px;
 			display: block;
 			inline-size: 100%;
 			position: relative;
@@ -166,18 +130,6 @@ if (thumbnail.public_id) {
 			line-height: 1.1;
 		}
 
-		.episode-number {
-			color: var(--text-muted);
-		}
-
-		.description {
-			display: none;
-			font-size: clamp(0.75em, 4cqi, 1em);
-			margin-block-start: 16px;
-			text-box-trim: trim-both;
-			text-wrap: balance;
-		}
-
 		.button {
 			background: transparent;
 			color: var(--white);
@@ -205,10 +157,6 @@ if (thumbnail.public_id) {
 		.card {
 			grid-template-columns: 52cqi 48cqi;
 			grid-template-rows: 100%;
-
-			.description {
-				display: block;
-			}
 		}
 	}
 </style>

@@ -1,6 +1,7 @@
 ---
-import { getNextEarlyAccessEpisode, getRecentEpisodes } from '../../util/sanity';
-import EpisodeCard from '../episode-card.astro';
+import { getFeaturedSeries, getNextEarlyAccessEpisode, getRecentEpisodes } from '../../util/sanity';
+import EpisodeCard from '../cards/episode.astro';
+import SeriesCard from '../cards/series.astro';
 
 function getTagline(date: string) {
 	const dateString = new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
@@ -10,6 +11,7 @@ function getTagline(date: string) {
 
 const earlyAccess = await getNextEarlyAccessEpisode();
 const recentEps = await getRecentEpisodes();
+const series = await getFeaturedSeries();
 ---
 
 <section class="series">
@@ -28,7 +30,7 @@ const recentEps = await getRecentEpisodes();
 				title={earlyAccess.title}
 				description={earlyAccess.short_description}
 				url={earlyAccess.path}
-				width={660}
+				width={665}
 			/>
 		</div>
 	) : null}
@@ -50,12 +52,29 @@ const recentEps = await getRecentEpisodes();
 						title={ep.title}
 						description={ep.short_description}
 						url={ep.path}
-						width={465}
+						width={520}
 					/>
 				)
 			})}
 		</div>
 	) : null}
+
+	<h2>CodeTV original series</h2>
+	<div class="row three-up">
+		{series.map((s) => {
+			return (
+				<SeriesCard
+					thumbnail={{
+						public_id: s.image!.public_id!,
+					}}
+					title={s.title}
+					description={s.description}
+					url={s.path}
+					width={520}
+				/>
+			)
+		})}
+	</div>
 </section>
 
 <style>
