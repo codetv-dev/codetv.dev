@@ -11,6 +11,10 @@ import type {
 	AllEpisodesQueryResult,
 	UpcomingEpisodeBySeriesQueryResult,
 	PersonBySlugQueryResult,
+	EarlyAccessEpisodesQueryResult,
+	EpisodeTranscriptBySlugQueryResult,
+	RecentEpisodesQueryResult,
+	FeaturedSeriesQueryResult,
 } from '../types/sanity';
 import type { UploadApiResponse } from 'cloudinary';
 
@@ -43,6 +47,20 @@ const allSeriesQuery = groq`
     'latestEpisodeDate': collections[]->episodes[@->hidden != true && (defined(@->video.youtube_id) || defined(@->video.mux_video))] | order(@->publish_date desc)[0]->publish_date,
     featured
   } | order(latestEpisodeDate desc)
+`;
+
+const featuredSeriesQuery = groq`
+  *[_type=="series" && featured == true] {
+    'slug': slug.current,
+    title,
+    description,
+    image {
+      public_id,
+      height,
+      width,
+    },
+    'path': '/series/' + slug.current + '/' + collections[-1]->slug.current,
+  }
 `;
 
 const seriesBySlugQuery = groq`
@@ -231,6 +249,46 @@ const episodeBySlugQuery = groq`
 
 const episodeTranscriptBySlugQuery = groq`
   *[_type=="episode" && slug.current==$episode][0].video.transcript
+`;
+
+const earlyAccessEpisodesQuery = groq`
+  *[_type=="episode" && dateTime(publish_date) > dateTime(now()) && defined(video.mux_video) && hidden != true] {
+    title,
+    'slug': slug.current,
+    short_description,
+    publish_date,
+    'thumbnail': {
+      'public_id': video.thumbnail.public_id,
+      'width': video.thumbnail.width,
+      'height': video.thumbnail.height,
+      'alt': video.thumbnail_alt,
+    },
+    'youtube_id': video.youtube_id,
+    'path': "/series/" + *[_type=="collection" && references(^._id)][0].series->slug.current + "/" + *[_type=="collection" && references(^._id)][0].slug.current + "/" + slug.current,
+    'series': *[_type=="collection" && references(^._id)][0].series->title,
+    'collection_number': upper(*[_type=="collection" && references(^._id)][0].slug.current),
+    'episodes': *[_type=="collection" && references(^._id)][0].episodes[]->slug.current,
+  }
+`;
+
+const recentEpisodesQuery = groq`
+  *[_type=="episode" && dateTime(publish_date) < dateTime(now()) && (defined(video.youtube_id) || defined(video.mux_video)) && hidden != true] {
+    title,
+    'slug': slug.current,
+    short_description,
+    publish_date,
+    'thumbnail': {
+      'public_id': video.thumbnail.public_id,
+      'width': video.thumbnail.width,
+      'height': video.thumbnail.height,
+      'alt': video.thumbnail_alt,
+    },
+    'youtube_id': video.youtube_id,
+    'path': "/series/" + *[_type=="collection" && references(^._id)][0].series->slug.current + "/" + *[_type=="collection" && references(^._id)][0].slug.current + "/" + slug.current,
+    'series': *[_type=="collection" && references(^._id)][0].series->title,
+    'collection_number': upper(*[_type=="collection" && references(^._id)][0].slug.current),
+    'episodes': *[_type=="collection" && references(^._id)][0].episodes[]->slug.current,
+  } | order(publish_date desc)[0..2]
 `;
 
 const upcomingEpisodeBySeriesQuery = groq`
@@ -424,6 +482,56 @@ export async function getUpcomingEpisodeBySeries(params: {
 	);
 
 	return result.at(0)?.schedule;
+}
+
+export async function getNextEarlyAccessEpisode() {
+	const result = await client.fetch<EarlyAccessEpisodesQueryResult>(
+		earlyAccessEpisodesQuery,
+		{},
+		{
+			useCdn: true,
+		},
+	);
+
+	const ep = result.at(0);
+
+	if (!ep) {
+		return false;
+	}
+
+	const episodeNumber =
+		ep.collection_number +
+		'.E' +
+		(Number(ep?.episodes?.findIndex((epSlug) => ep.slug === epSlug)) + 1);
+
+	return { ...ep, episodeNumber };
+}
+
+export async function getRecentEpisodes() {
+	const result = await client.fetch<RecentEpisodesQueryResult>(
+		recentEpisodesQuery,
+		{},
+		{ useCdn: true },
+	);
+
+	return result.map((ep) => {
+		const episodeNumber =
+			ep.collection_number +
+			'.E' +
+			(Number(ep?.episodes?.findIndex((epSlug) => ep.slug === epSlug)) + 1);
+
+		return { ...ep, episodeNumber };
+	});
+}
+
+export async function getFeaturedSeries() {
+	const result = await client.fetch<FeaturedSeriesQueryResult>(
+		featuredSeriesQuery,
+		{},
+		{ useCdn: true },
+	);
+
+	return result;
 }
 
 export async function getPersonById(

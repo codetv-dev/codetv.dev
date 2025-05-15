@@ -42,13 +42,10 @@ if (supporters.length < 1) {
 	.supporter-list {
 		display: flex;
 		flex-wrap: wrap;
-		gap: 0.25rem;
+		gap: 4px;
 		justify-content: center;
 		margin-block-start: 1rem;
-
-		@media (min-width: 750px) {
-			justify-content: start;
-		}
+		max-inline-size: 640px;
 
 		a {
 			display: block;
@@ -56,7 +53,8 @@ if (supporters.length < 1) {
 
 		img {
 			block-size: 40px;
-			border-radius: 50%;
+			border-radius: 3px;
+			display: block;
 		}
 	}
 </style>

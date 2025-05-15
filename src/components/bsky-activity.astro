@@ -1,0 +1,214 @@
+---
+export interface Props {
+	postId: string;
+}
+// 3lmvaobmqfc22
+const { postId } = Astro.props;
+---
+
+<section data-bsky-activity data-bsky-post-id={postId} class="bluesky-activity">
+</section>
+
+<template data-name="bluesky-activity">
+	<div>
+		<h2 data-bsky-count>|LIKE_COUNT| likes on Bluesky</h2>
+		<p>
+			<a href="|POST_URL|" data-bsky-post-link
+				>Like/share this post on Bluesky</a
+			>
+		</p>
+		<div class="avatars" data-bsky-avatars></div>
+	</div>
+</template>
+
+<script>
+	interface BskyActor {
+		did: string;
+		handle: string;
+		displayName: string;
+		avatar: string;
+		createdAt: string;
+		description: string;
+		indexedAt: string;
+	}
+	interface BskyLikes {
+		likes: {
+			actor: BskyActor;
+			createdAt: string;
+			indexedAt: string;
+		}[];
+		uri: string;
+	}
+
+	interface BskyPosts {
+		posts: {
+			uri: string;
+			cid: string;
+			author: BskyActor;
+			record: {
+				$type: string;
+				createdAt: string;
+				embed: {
+					$type: string;
+					external: {
+						description: string;
+						thumb: {
+							$type: string;
+							ref: {
+								$link: string;
+							};
+							mimeType: string;
+							size: number;
+						};
+						title: string;
+						uri: string;
+					};
+				};
+				facets: unknown[];
+				langs: string[];
+				text: string;
+			};
+			embed: {
+				$type: 'app.bsky.embed.external#view';
+				external: {
+					uri: string;
+					title: string;
+					description: string;
+					thumb: string;
+				};
+			};
+			replyCount: number;
+			repostCount: number;
+			likeCount: number;
+			quoteCount: number;
+			indexedAt: string;
+			labels: [];
+		}[];
+	}
+
+	const USER_DID = 'did:plc:ga3wlji66r5mxqch6wh7nq4v'; // @jason.energy
+	// const USER_DID = 'did:plc:rwwdbpl76rghy7d5z4sd2ozp'; // @codetv.dev
+	const LIKES_LIMIT = 55;
+
+	const bskyApi = new URL('https://public.api.bsky.app');
+
+	function createFromTemplate({
+		likes,
+		posts,
+		postId,
+	}: {
+		likes: BskyLikes;
+		posts: BskyPosts;
+		postId: string;
+	}) {
+		const post = posts.posts.at(0);
+
+		if (!post) {
+			return;
+		}
+
+		const container = document.querySelector(
+			'[data-bsky-activity]',
+		) as HTMLElement;
+		const template = document.querySelector(
+			'[data-name="bluesky-activity"]',
+		) as HTMLTemplateElement;
+		const activityEl = template.content.cloneNode(true) as HTMLElement;
+
+		const heading = activityEl.querySelector(
+			'[data-bsky-count]',
+		) as HTMLHeadingElement;
+		const link = activityEl.querySelector(
+			'[data-bsky-post-link]',
+		) as HTMLAnchorElement;
+		const avatars = activityEl.querySelector(
+			'[data-bsky-avatars]',
+		) as HTMLDivElement;
+
+		heading.textContent = (heading.textContent ?? '').replace(
+			'|LIKE_COUNT|',
+			(post.likeCount ?? 0).toString(),
+		);
+
+		const postUrl = new URL('https://bsky.app');
+		postUrl.pathname = `/profile/${USER_DID}/post/${postId}`;
+
+		link.setAttribute('href', postUrl.toString());
+
+		likes.likes.forEach((like) => {
+			const img = document.createElement('img');
+			img.src = like.actor.avatar.replace('avatar', 'avatar_thumbnail');
+			img.alt = like.actor.displayName;
+			img.title = `${like.actor.displayName} (@${like.actor.handle})`;
+
+			avatars.appendChild(img);
+		});
+
+		container.appendChild(activityEl);
+	}
+
+	async function sendFetch(url: URL) {
+		const res = await fetch(url);
+
+		if (!res.ok) {
+			throw new Error(res.statusText);
+		}
+
+		return await res.json();
+	}
+
+	async function loadBlueskyLikes(postUri: string) {
+		bskyApi.pathname = '/xrpc/app.bsky.feed.getLikes';
+		bskyApi.searchParams.set('limit', LIKES_LIMIT.toString());
+		bskyApi.searchParams.set('uri', postUri);
+
+		return sendFetch(bskyApi);
+	}
+
+	async function loadBlueskyPosts(postUri: string) {
+		bskyApi.pathname = '/xrpc/app.bsky.feed.getPosts';
+		bskyApi.searchParams.set('uris', postUri);
+
+		return sendFetch(bskyApi);
+	}
+
+	async function loadBskyData() {
+		const container = document.querySelector(
+			'[data-bsky-activity]',
+		) as HTMLElement;
+		const postId = container.dataset.bskyPostId;
+
+		if (!postId) {
+			return;
+		}
+
+		const postUri = `at://${USER_DID}/app.bsky.feed.post/${postId}`;
+		const [likes, posts] = await Promise.all([
+			loadBlueskyLikes(postUri),
+			loadBlueskyPosts(postUri),
+		]);
+
+		createFromTemplate({ likes, posts, postId });
+	}
+
+	loadBskyData();
+</script>
+
+<style>
+	.bluesky-activity {
+		.avatars {
+			margin: 16px 0;
+			padding-inline-start: 8px;
+
+			img {
+				aspect-ratio: 1;
+				block-size: auto;
+				border: 1px solid var(--white);
+				border-radius: 50%;
+				inline-size: 40px;
+				margin-inline-start: -8px;
+				object-fit: cover;
+			}
+		}
+	}
+</style>

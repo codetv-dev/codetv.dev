@@ -71,6 +71,9 @@ og.image = frontmatter.share?.image ?? false;
 				<h1>{title}</h1>
 				<p>{description}</p>
 			</header>
+
+			<div class="post-content" data-section="post-content"><slot /></div>
+
 			<aside class="table-of-contents" data-section="table-of-contents">
 				<div class="toc-sticky-container">
 					<h2
@@ -102,8 +105,6 @@ og.image = frontmatter.share?.image ?? false;
 					</p>
 				</div>
 			</aside>
-
-			<div class="post-content" data-section="post-content"><slot /></div>
 
 			{frontmatter.showOptin !== false ? <OptInForm /> : null}
 		</article>
@@ -159,8 +160,8 @@ og.image = frontmatter.share?.image ?? false;
 
 <style>
 	.post-container {
-		max-width: 70ch;
-		margin: 50px auto;
+		inline-size: min(var(--max-width), 90%);
+		margin: 200px auto;
 	}
 
 	h1 {
@@ -173,7 +174,7 @@ og.image = frontmatter.share?.image ?? false;
 
 	.post header,
 	.post .post-content {
-		grid-column-start: 2;
+		grid-column-start: 1;
 	}
 
 	.post header p {
@@ -183,13 +184,12 @@ og.image = frontmatter.share?.image ?? false;
 
 	.post-content {
 		margin-inline: 0;
-		max-width: 100%;
-		width: 100%;
+		max-inline-size: 100%;
 	}
 
 	.post .table-of-contents {
 		display: none;
-		grid-column-start: 1;
+		grid-column-start: 2;
 		grid-row-start: 2;
 	}
 
@@ -197,13 +197,14 @@ og.image = frontmatter.share?.image ?? false;
 		.post {
 			display: grid;
 			gap: 30px 50px;
-			grid-template-columns: 200px 1fr;
+			grid-template-columns: 60ch 200px;
+			justify-content: center;
 			padding: 0;
 		}
 
 		.post-content {
 			align-self: start;
-			max-width: 53ch;
+			max-width: 60ch;
 		}
 
 		.post .table-of-contents {
@@ -220,11 +221,8 @@ og.image = frontmatter.share?.image ?? false;
 		}
 
 		h2 {
-			font-size: 1rem;
-			font-weight: 400;
 			margin: 0 -5px;
 			padding: 0 5px;
-			text-align: left;
 		}
 
 		ol {
@@ -276,30 +274,27 @@ og.image = frontmatter.share?.image ?? false;
 <style is:global>
 	.post-content {
 		h2 {
-			font-size: 1.375rem;
-			line-height: 1.1;
 			scroll-padding-top: 30px;
-			text-align: left;
 
 			&:not(:first-child) {
-				margin-block-start: 2rem;
+				margin-block-start: 40px;
 			}
 		}
 
 		h3 {
 			&:not(:first-child) {
-				margin-block-start: 1.25rem;
+				margin-block-start: 32px;
 			}
 		}
 
 		p:not(:first-child),
 		ul,
 		ol {
-			margin-block-start: 1.25rem;
+			margin-block-start: 20px;
 		}
 
 		li {
-			margin-block-start: 0.5rem;
+			margin-block-start: 8px;
 		}
 
 		strong {
@@ -332,8 +327,9 @@ og.image = frontmatter.share?.image ?? false;
 	}
 
 	code {
-		font-family: 'monaspace-argon', 'Operator Mono', Consolas, Monaco,
-			'Andale Mono', 'Ubuntu Mono', monospace;
+		font-family:
+			'monaspace-argon', 'Operator Mono', Consolas, Monaco, 'Andale Mono',
+			'Ubuntu Mono', monospace;
 	}
 
 	.post-figure {
