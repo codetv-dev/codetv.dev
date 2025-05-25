@@ -8,10 +8,7 @@ export interface Props {
 	disclaimer?: string;
 }
 
-const {
-	heading = 'Learn from experts. Build something new. Grow your career. Let’s do it together.',
-	disclaimer,
-} = Astro.props;
+const { heading = 'tv for developers in your inbox', disclaimer } = Astro.props;
 ---
 
 <aside class="opt-in">
@@ -19,17 +16,13 @@ const {
 		<slot>
 			<h2>{heading}</h2>
 			<p>
-				My life got way better when I stopped worrying about picking the “right”
-				thing and focused on finding the fun in learning instead.{' '}
-				<strong>
-					I learn as much I can, build things often, and share what I’m learning
-					with my friends.
-				</strong>
+				Learning web dev can be fun, if we let it be. CodeTV creates playful,
+				entertaining originals for developers who want to leave the stress,
+				FoMO, and hot takes behind.
 			</p>
 			<p>
-				I consider the folks on my newsletter to be my friends — subscribe and
-				I’ll share what I’m learning and building. Let’s grow our careers
-				together!
+				Join thousands of developers on the CodeTV newsletter and get new
+				content delivered directly to your inbox.
 			</p>
 		</slot>
 
@@ -50,17 +43,17 @@ const {
 		background: var(--black);
 		color: var(--white);
 		container: newsletter / inline-size;
-		grid-column-start: 2;
-		margin: 3rem max(-5vw, -2rem) 0;
-		padding: 2rem min(5vw, 2rem) 2.25rem;
+		grid-column-start: 1;
+		margin: 40px max(-5vw, -40px) 0;
+		padding: 40px min(5vw, 40px) 48px;
 
 		&.constrained {
 			margin-inline: 0;
-			padding-inline: 2rem;
+			padding-inline: 40px;
 		}
 
 		&:has(.disclaimer) {
-			padding-block-end: 1.5rem;
+			padding-block-end: 16px;
 		}
 
 		h2 {
@@ -74,7 +67,7 @@ const {
 		}
 
 		p {
-			margin-block-start: 1rem;
+			margin-block-start: 20px;
 		}
 
 		strong {
@@ -90,56 +83,56 @@ const {
 		}
 
 		label {
-			margin-block-start: 0.5rem;
+			margin-block-start: 8px;
 		}
 
 		p + label {
-			margin-block-start: 1.5rem;
+			margin-block-start: 20px;
 		}
 
 		input {
-			background: var(--white);
-			border: 1px solid var(--text);
-			border-radius: 0.25rem;
+			background: var(--bg);
+			border: 1px solid var(--text-muted);
+			border-radius: 3px;
 			color: var(--text);
-			padding: 0.5rem;
+			padding: 8px;
 			width: 100%;
 		}
 
 		button {
 			background: var(--purple-600);
 			border: none;
-			border-radius: 0.25rem;
+			border-radius: 3px;
 			color: var(--white);
 			font-size: 1.25rem;
 			font-weight: 800;
-			margin-block-start: 1rem;
+			margin-block-start: 20px;
 			max-width: 300px;
-			padding: 0.25rem;
+			padding: 8px;
 			text-transform: uppercase;
 			width: 100%;
 		}
 
 		@media (min-width: 716px) {
-			border-radius: 0.25rem;
+			border-radius: 3px;
 			margin-block-start: 0;
 
 			&:not(:first-child) {
-				margin-block-start: 4rem;
+				margin-block-start: 64px;
 			}
 		}
 
 		p.disclaimer {
 			color: var(--gray-200);
-			font-size: 0.75rem;
+			font-size: 0.75em;
 			font-style: italic;
-			margin-block-start: 2rem;
+			margin-block-start: 20px;
 			max-width: 54ch;
 		}
 	}
 
 	:global(.post-content) .opt-in {
-		margin-top: 2rem;
+		margin-top: 40px;
 
 		strong {
 			color: #d4d0da;

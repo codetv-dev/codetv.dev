@@ -3,7 +3,7 @@ import { Image } from '@unpic/astro';
 import { format } from 'date-fns';
 import {
 	createImageUrl,
-	generateEpisodePoster,
+	generateDefaultImage,
 	getYouTubeThumbnail,
 } from '../util/cloudinary';
 
@@ -26,7 +26,7 @@ if (episode.thumbnail.public_id) {
 } else if (episode.video.youtube_id) {
 	episodeImage = getYouTubeThumbnail(episode.video.youtube_id);
 } else {
-	episodeImage = generateEpisodePoster();
+	episodeImage = generateDefaultImage({ text: episode.title });
 }
 
 // if there's a YouTube ID, it's public

@@ -60,6 +60,8 @@ const featuredSeriesQuery = groq`
       width,
     },
     'path': '/series/' + slug.current + '/' + collections[-1]->slug.current,
+    'total_episode_count': count(collections[]->episodes[@->hidden != true && (defined(@->video.youtube_id) || defined(@->video.mux_video))]),
+    'total_season_count': count(collections[])
   }
 `;
 

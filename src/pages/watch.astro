@@ -1,6 +1,7 @@
 ---
 import Layout from '../layouts/default.astro';
 import SeriesList from '../components/series-list.astro';
+import PageHeader from '../components/page-header.astro';
 import { getAllSeries } from '../util/sanity';
 
 export const prerender = true;
@@ -13,14 +14,14 @@ const allSeries = await getAllSeries();
 	description="Watch original programming made for developers. Rediscover the fun in web dev with CodeTV."
 >
 	<main>
+		<PageHeader
+			image={{
+				public_id: 'codetv/watch-header',
+				alt: 'Jason Lengstorf on set talking to Mark Techson surrounded by cameras, monitors, and other gear',
+			}}
+			line1="Original series"
+			line2="created by CodeTV"
+		/>
 		<SeriesList series={allSeries} />
 	</main>
 </Layout>
-
-<style>
-	main {
-		inline-size: min(90dvi, calc((300px + 2rem) * 4 - 2rem));
-		margin-block-start: 3rem;
-		margin-inline: auto;
-	}
-</style>

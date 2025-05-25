@@ -8,7 +8,7 @@ import {
 } from '../../../../util/sanity';
 import {
 	createImageUrl,
-	generateEpisodePoster,
+	generateDefaultImage,
 	getYouTubeThumbnail,
 } from '../../../../util/cloudinary';
 import Layout from '../../../../layouts/default.astro';
@@ -76,7 +76,7 @@ if (episode.thumbnail.public_id) {
 } else if (episode.video?.youtube_id) {
 	image = getYouTubeThumbnail(episode.video.youtube_id);
 } else {
-	image = generateEpisodePoster();
+	image = generateDefaultImage({ text: episode.title ?? '' });
 }
 
 const transcriptRaw = await getEpisodeTranscriptBySlug({
@@ -171,10 +171,15 @@ if (episode.video && !episode.video.youtube_id && episode.video.mux) {
 				episode.video?.youtube_id || episode.video?.mux ? (
 					<VideoPlayer
 						video={{
-							...episode.video,
-							thumbnail: episode.thumbnail,
+							youtube_id: episode.video.youtube_id,
+							mux: episode.video.mux?.map((v) => ({
+								id: v.id ?? '',
+								policy: v.policy as 'public' | 'signed',
+							})),
+							captions: episode.video.captions,
 							title: title,
 							publish_date: episode.publish_date,
+							thumbnail: episode.thumbnail,
 						}}
 						server:defer
 					>
@@ -322,8 +327,6 @@ if (episode.video && !episode.video.youtube_id && episode.video.mux) {
 									const src = createImageUrl(sponsor.logo.public_id, {
 										height: sponsor.logo.height * 2,
 										width: sponsor.logo.width * 2,
-										color: '#463963',
-										effect: 'colorize',
 									});
 
 									return (

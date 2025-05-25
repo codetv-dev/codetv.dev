@@ -1,53 +1,85 @@
 ---
 import { Image } from '@unpic/astro';
-import { createImageUrl, generateEpisodePoster } from '../../util/cloudinary';
+import {
+	createImageUrl,
+	generateDefaultImage,
+	getYouTubeThumbnail,
+} from '../../util/cloudinary';
 
 export interface Props {
-	thumbnail: {
-		public_id: string | null;
+	image: {
+		public_id?: string | null;
+		src?: string | null;
+		alt: string | null;
 	};
-	url: string | null;
+	tagline?: string | null;
 	title: string | null;
-	description: string | null;
-	width: number | undefined;
+	description?: string | null;
+	link: string | null;
+	linkText?: string;
+	youtube_id?: string | null;
+	width?: number | undefined;
 }
 
-const { thumbnail, url, title, description, width = 520 } = Astro.props;
+const {
+	image,
+	tagline,
+	link,
+	linkText = 'More info',
+	title,
+	description,
+	youtube_id,
+	width = 675,
+} = Astro.props;
 
-let seriesImage;
-if (thumbnail.public_id) {
-	seriesImage = createImageUrl(thumbnail.public_id, {
+// we use this in a few places, so put it in a variable
+const ASPECT_RATIO = {
+	w: 340,
+	h: 190,
+};
+
+let cardImage;
+if (image.src) {
+	cardImage = image.src;
+} else if (image.public_id) {
+	cardImage = createImageUrl(image.public_id, {
 		width,
-		aspect_ratio: '340:190',
+		aspect_ratio: `${ASPECT_RATIO.w}:${ASPECT_RATIO.h}`,
 		crop: 'fill',
 	});
+} else if (youtube_id) {
+	cardImage = getYouTubeThumbnail(youtube_id);
 } else {
-	seriesImage = generateEpisodePoster();
+	cardImage = generateDefaultImage({ text: title ?? '' });
 }
 ---
 
 <div class="card-container">
 	<section class="card">
 		<figure
-			style={`--bg-img: url(${seriesImage.replace(/\/w_\d+\//, '/w_30/')})`}
+			style={`--bg-img: url(${cardImage.replace(/\/w_\d+\//, '/w_30/')})`}
 		>
-			<a href={url}>
+			<a href={link}>
 				<Image
-					src={seriesImage}
-					alt={title}
+					src={cardImage}
+					alt={image.alt}
 					width={width}
-					height={width * (190 / 340)}
-					aspectRatio={340 / 190}
+					height={width * (ASPECT_RATIO.h / ASPECT_RATIO.w)}
+					aspectRatio={ASPECT_RATIO.w / ASPECT_RATIO.h}
 				/>
 			</a>
 		</figure>
 		<div class="info">
-			<h2><a href={url}>{title}</a></h2>
-			<div class="details">
-				<p class="description">{description}</p>
+			<div class="tagline">
+				{tagline ? <p>{tagline}</p> : <slot name="tagline" />}
 			</div>
+			<h2><a href={link}>{title}</a></h2>
+			<div class="details">
+				<slot name="details" />
+			</div>
+			{description ? <p class="description">{description}</p> : null}
 			<p>
-				<a href={url} class="button"> See Episodes </a>
+				<a href={link} class="button">{linkText}</a>
 			</p>
 		</div>
 	</section>
@@ -55,9 +87,15 @@ if (thumbnail.public_id) {
 
 <style>
 	.card-container {
+		border-radius: 3px;
 		container: card / inline-size;
 		inline-size: 100%;
 		max-inline-size: 1280px;
+
+		&:has(:focus-within, :active, :hover) {
+			outline: 1px solid var(--gray-600);
+			outline-offset: 8px;
+		}
 	}
 
 	.card {
@@ -67,10 +105,12 @@ if (thumbnail.public_id) {
 		grid-template-columns: 100%;
 		grid-template-rows: 1fr auto;
 		inline-size: 100cqi;
+		position: relative;
 
 		figure {
 			margin: 0;
 			position: relative;
+			z-index: 1;
 
 			&::after {
 				background: var(--bg-img);
@@ -99,22 +139,31 @@ if (thumbnail.public_id) {
 			font-size: 1rem;
 			gap: 8px;
 			line-height: 1.45;
+			position: relative;
+			z-index: 10;
 		}
 
 		.tagline {
 			color: var(--text-muted);
+			display: flex;
 			font-family: 'supermassive', impact;
 			font-size: clamp(0.75em, 4cqi, 1.125em);
 			font-weight: normal;
+			gap: 10px;
 			line-height: 0.7;
+
+			p:first-child {
+				color: var(--text);
+			}
 		}
 
 		h2 {
-			color: var(--white);
-			font-family: supermassive, impact;
-			font-size: clamp(1em, 5.5cqi, 2em);
-			font-weight: normal;
-			line-height: 0.7;
+			color: var(--text-emphasized);
+			font-family: var(--font-family);
+			font-size: clamp(1em, 4.5cqi, 1.75em);
+			font-weight: 600;
+			line-height: 1.1;
+			margin: 0;
 
 			a {
 				color: currentColor;
@@ -127,7 +176,12 @@ if (thumbnail.public_id) {
 			font-size: clamp(0.75em, 5cqi, 1.125em);
 			font-weight: 500;
 			gap: 20px;
-			line-height: 1.1;
+			line-height: 1.25;
+			text-wrap: balance;
+
+			p:first-child {
+				color: var(--text-muted);
+			}
 		}
 
 		.button {
@@ -155,7 +209,7 @@ if (thumbnail.public_id) {
 
 	@container card (min-width: 700px) {
 		.card {
-			grid-template-columns: 52cqi 48cqi;
+			grid-template-columns: 52cqi calc(48cqi - 20px);
 			grid-template-rows: 100%;
 		}
 	}

@@ -99,10 +99,10 @@ body {
 
 :is(h1, h2, h3, h4, h5, h6) {
 	color: var(--text-emphasized);
-	font-family: var(--font-family-heading);
 	font-weight: normal;
 	letter-spacing: -0.02em;
-	line-height: 0.9;
+	line-height: 1.35;
+	text-wrap: pretty;
 
 	&:not(:first-child) {
 		margin-block-start: 40px;
@@ -110,11 +110,13 @@ body {
 }
 
 h1 {
+	font-family: var(--font-family-heading);
 	font-size: clamp(1.5em, 5cqi, 2.5em);
+	line-height: 0.9;
 }
 
 h2 {
-	font-size: clamp(1.25em, 4cqi, 2em);
+	font-size: clamp(1.25em, 3.5cqi, 1.75em);
 }
 
 h3 {
@@ -127,6 +129,22 @@ a {
 
 :is(strong, b) {
 	color: var(--text-emphasized);
+}
+
+.row {
+	display: flex;
+	gap: 20px;
+	justify-content: start;
+	padding-inline: max((100% - var(--max-width)) / 2, 5%);
+}
+
+.three-up {
+	display: grid;
+	grid-template-columns: 100%;
+
+	@media (min-width: 750px) {
+		grid-template-columns: repeat(3, 1fr);
+	}
 }
 
 .button {

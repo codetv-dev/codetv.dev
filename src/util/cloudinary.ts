@@ -33,34 +33,31 @@ export function getYouTubeThumbnail(youtube_id: string) {
 	return cloudinary.url(youtube_id, { type: 'youtube' });
 }
 
-function cleanText(text: string) {
-	return encodeURIComponent(text).replace(/%(23|2C|2F|3F|5C)/g, '%25$1');
-}
-
-export function generateEpisodePoster() {
-	const url = cloudinary.url('lwj/episode-video-2023-v3-solo', {
+export function generateDefaultImage({ text }: { text: string }) {
+	const url = cloudinary.url('codetv/codetv-blog-default-dark', {
 		transformation: [
 			{
 				quality: 'auto',
 				format: 'auto',
 			},
 			{
-				width: 1920,
+				width: 1600,
 				aspect_ratio: '16:9',
 				crop: 'fill',
 			},
 			{
 				overlay: {
-					font_family: 'jwf-bold%2Eotf',
-					font_size: 80,
+					font_family: 'ctv-font%2Eotf',
+					font_size: 135,
 					line_spacing: 0,
-					text: 'This is a test title',
+					text: text,
 				},
 				crop: 'fit',
 				color: 'white',
-				width: 800,
+				height: 465,
+				width: 1472,
 			},
-			{ flags: 'layer_apply', gravity: 'north_west', x: 1035, y: 475 },
+			{ flags: 'layer_apply', gravity: 'south_west', x: 64, y: 195 },
 		],
 	});
 

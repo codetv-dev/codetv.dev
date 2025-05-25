@@ -6,9 +6,11 @@ import Layout from '../../layouts/default.astro';
 import { getUserByUsername } from '../../util/clerk';
 import { createImageUrl } from '../../util/cloudinary';
 import { getPersonBySlug } from '../../util/sanity';
-import EpisodePreview from '../../components/episode-preview.astro';
+import Card from '../../components/cards/card.astro';
 
-export const prerender = false;
+export const prerender = true;
+
+// TODO add getStaticPaths
 
 const { username } = Astro.params;
 
@@ -55,7 +57,7 @@ const bio = marked.parse(person.bio ?? '');
 ---
 
 <Layout title={`${person.name}’s profile on CodeTV`}>
-	<div class="wrapper">
+	<main class="wrapper">
 		<div class="profile-photo">
 			<Image
 				src={imgUrl}
@@ -65,13 +67,13 @@ const bio = marked.parse(person.bio ?? '');
 				height={800}
 				placeholder="blurhash"
 			/>
-		</div>
-		<div class="details">
+
 			<h1>
 				{person.name} (@{username})
 			</h1>
 			{isSubscriber ? <p class="level">{subscription.level}</p> : null}
-
+		</div>
+		<div class="details">
 			{
 				person.links && person.links?.length > 0 ? (
 					<nav class="links">
@@ -90,7 +92,7 @@ const bio = marked.parse(person.bio ?? '');
 					<section class="related-episodes">
 						<h2>Episodes featuring {person.name}</h2>
 
-						<div class="more-episodes">
+						<div class="row three-up">
 							{person.episodes.map((related) => {
 								const epIndex =
 									related.collection?.episodeSlugs?.findIndex(
@@ -99,11 +101,17 @@ const bio = marked.parse(person.bio ?? '');
 								const epNumber = epIndex + 1;
 
 								return (
-									<EpisodePreview
-										class="compact"
-										episode={related}
-										episodeNumber={`${related.collection?.slug}E${epNumber}`.toUpperCase()}
-										episodeUrl={`/series/${related.series?.slug}/${related.collection?.slug}/${related.slug}`}
+									<Card
+										image={{
+											public_id: related.thumbnail.public_id,
+											alt: related.thumbnail.alt,
+										}}
+										tagline={`${related.collection?.slug}E${epNumber}`.toUpperCase()}
+										title={related.title}
+										description={related.short_description}
+										link={`/series/${related.series?.slug}/${related.collection?.slug}/${related.slug}`}
+										linkText="Watch episode"
+										youtube_id={related.video?.youtube_id}
 									/>
 								);
 							})}
@@ -112,12 +120,12 @@ const bio = marked.parse(person.bio ?? '');
 				) : null
 			}
 		</div>
-	</div>
+	</main>
 </Layout>
 
 <style>
 	.wrapper {
-		padding: 15px 5cqw 60px;
+		padding: 200px 5cqw 60px;
 
 		@media (min-width: 750px) {
 			display: grid;
@@ -186,10 +194,7 @@ const bio = marked.parse(person.bio ?? '');
 		padding-inline: 0.25rem;
 	}
 
-	.more-episodes {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 2rem;
-		margin-block-start: 0.25rem;
+	.row {
+		padding-inline: 0;
 	}
 </style>

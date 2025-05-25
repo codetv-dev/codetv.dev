@@ -1,0 +1,72 @@
+---
+import Layout from './default.astro';
+import PageHeader from '../components/page-header.astro';
+
+export interface Props {
+	frontmatter: {
+		title: string;
+		description: string;
+		file: string;
+		url: string;
+		hero: {
+			line1: string;
+			line2: string;
+			image: {
+				public_id: string;
+				alt: string;
+			};
+			aspectRatio?: number;
+		};
+	};
+}
+
+const { frontmatter } = Astro.props;
+---
+
+<Layout title={frontmatter.title} description={frontmatter.description}>
+	<main>
+		<PageHeader
+			image={frontmatter.hero.image}
+			line1={frontmatter.hero.line1}
+			line2={frontmatter.hero.line2}
+			aspectRatio={frontmatter.hero.aspectRatio}
+		/>
+		<section class="container page">
+			<p class="lede">{frontmatter.description}</p>
+			<slot />
+		</section>
+	</main>
+
+	<style>
+		main {
+			background: var(--black);
+			padding-block: 0 120px;
+		}
+
+		.container {
+			font-size: 1.25rem;
+			max-inline-size: min(90dvi, 54ch);
+			margin: 0 auto;
+			word-wrap: break-word;
+
+			:is(p, ul, ol) {
+				&:not(:first-child) {
+					margin-block-start: 20px;
+				}
+
+				&.lede {
+					font-size: 1.25em;
+					margin-block-start: 16px;
+
+					& + p {
+						margin-block-start: 20px;
+					}
+				}
+			}
+
+			li {
+				margin-block-start: 8px;
+			}
+		}
+	</style>
+</Layout>

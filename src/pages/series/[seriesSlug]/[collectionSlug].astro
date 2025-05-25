@@ -2,7 +2,7 @@
 import { format } from 'date-fns';
 import { Image } from '@unpic/astro';
 import Layout from '../../../layouts/default.astro';
-import EpisodePreview from '../../../components/episode-preview.astro';
+import Card from '../../../components/cards/card.astro';
 import { getAllSeries, getSeriesBySlug } from '../../../util/sanity';
 import { createImageUrl } from '../../../util/cloudinary';
 
@@ -183,8 +183,8 @@ const totalEpisodes = series.collections?.reduce(
 			/>
 		</div>
 
-		<section id="episodes" class="collection">
-			<div class="collection-info">
+		<section id="episodes">
+			<div class="row collection-info">
 				<select id="collection-selector">
 					{
 						series.collections
@@ -209,26 +209,40 @@ const totalEpisodes = series.collections?.reduce(
 					Release year: {format(date, 'yyyy')}
 				</p>
 			</div>
-			<div class="episodes">
+			<div class="row three-up">
 				{
 					series.collection?.episodes?.map((episode, index) => {
 						if (!episode || !episode.slug) {
 							return null;
 						}
 
+						const date = new Date(episode.publish_date ?? '');
+
 						return (
-							<EpisodePreview
-								episode={episode}
-								episodeNumber={`${series.collection?.slug}E${index + 1}`.toUpperCase()}
-								episodeUrl={`/series/${series.slug}/${series.collection?.slug}/${episode.slug}`}
+							<Card
+								image={{
+									public_id: episode.thumbnail.public_id,
+									alt: episode.thumbnail.alt,
+								}}
+								title={episode.title}
+								description={episode.short_description}
+								link={`/series/${series.slug}/${series.collection?.slug}/${episode.slug}`}
+								linkText="Watch now"
 							>
-								<div slot="fallback" class="episode-preview-placeholder">
-									<div class="img" />
-									<div class="meta" />
-									<div class="title" />
-									<div class="description" />
-								</div>
-							</EpisodePreview>
+								<Fragment slot="tagline">
+									<p class="episode-number">
+										{`${series.collection?.slug}.E${index + 1}`.toUpperCase()}
+									</p>
+									<p class="episode-date">
+										<time datetime={date.toISOString()}>
+											{date.toLocaleDateString('en-US', {
+												month: 'short',
+												day: 'numeric',
+											})}
+										</time>
+									</p>
+								</Fragment>
+							</Card>
 						);
 					})
 				}
@@ -355,7 +369,8 @@ const totalEpisodes = series.collections?.reduce(
 			-webkit-backdrop-filter: opacity(1);
 
 			&::before {
-				background-image: linear-gradient(
+				background-image:
+					linear-gradient(
 						to bottom,
 						color-mix(in oklch, var(--gray-900), transparent) 0%,
 						color-mix(in oklch, var(--gray-900), transparent) 100%
@@ -427,6 +442,7 @@ const totalEpisodes = series.collections?.reduce(
 		display: flex;
 		font-weight: 200;
 		gap: 1rem;
+		padding-block: 32px;
 
 		& select {
 			background: var(--white);

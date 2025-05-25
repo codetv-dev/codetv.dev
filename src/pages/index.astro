@@ -1,17 +1,24 @@
 ---
 import Layout from '../layouts/default.astro';
-import Hero from '../components/home/hero.astro';
 import Series from '../components/home/series.astro';
 import Partners from '../components/home/partners.astro';
 import Support from '../components/home/support.astro';
 import Newsletter from '../components/home/newsletter.astro';
+import PageHeader from '../components/page-header.astro';
 
 export const prerender = true;
 ---
 
 <Layout title="tv for developers — CodeTV">
 	<main>
-		<Hero />
+		<PageHeader
+			image={{
+				public_id: 'codetv/codetv-heading-v1.1',
+				alt: "Michael Chan, Jason Lengstorf, and Chance Strickland laughing on the set of Web Dev Challenge S2.E3. They're at a table with two laptops on it.",
+			}}
+			line1="tv for developers"
+			line2="made by developers"
+		/>
 
 		<Series />
 
