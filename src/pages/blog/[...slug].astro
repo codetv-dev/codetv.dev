@@ -10,7 +10,7 @@ export async function getStaticPaths() {
 
 	return blogs.map((blog) => {
 		return {
-			params: { slug: blog.slug },
+			params: { slug: blog.id },
 			props: { blog },
 		};
 	});

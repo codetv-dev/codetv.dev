@@ -36,7 +36,7 @@ const blogs = (
 		<section class="row">
 			{
 				blogs.slice(0, 1).map((blog) => {
-					const url = `/blog/${blog.slug}`;
+					const url = `/blog/${blog.id}`;
 					const img =
 						blog.data.share?.image?.replace(
 							'f_auto',
@@ -69,7 +69,7 @@ const blogs = (
 		<section class="row three-up">
 			{
 				blogs.slice(1, -1).map((blog) => {
-					const url = `/blog/${blog.slug}`;
+					const url = `/blog/${blog.id}`;
 					const img =
 						blog.data.share?.image?.replace(
 							'f_auto',
