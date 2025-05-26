@@ -49,7 +49,7 @@ export function generateDefaultImage({ text }: { text: string }) {
 				overlay: {
 					font_family: 'ctv-font%2Eotf',
 					font_size: 135,
-					line_spacing: 0,
+					line_spacing: -35,
 					text: text,
 				},
 				crop: 'fit',
