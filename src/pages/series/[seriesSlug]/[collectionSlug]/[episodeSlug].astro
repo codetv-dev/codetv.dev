@@ -337,7 +337,8 @@ if (episode.video && !episode.video.youtube_id && episode.video.mux) {
 											<Image
 												src={src}
 												alt={sponsor.title}
-												height={70}
+												height={sponsor.logo.height * 2}
+												width={sponsor.logo.width * 2}
 												aspectRatio={sponsor.logo.width / sponsor.logo.height}
 											/>
 										</a>
@@ -646,9 +647,15 @@ if (episode.video && !episode.video.youtube_id && episode.video.mux) {
 		flex-wrap: wrap;
 		gap: 0 2rem;
 
+		a {
+			display: block;
+		}
+
 		img {
-			block-size: 2.5rem;
+			block-size: 40px;
+			display: block;
 			inline-size: auto;
+			margin: 0;
 		}
 	}
 
