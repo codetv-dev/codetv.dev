@@ -1,16 +1,13 @@
 ---
-import { CacheHeaders } from 'cdn-cache-control';
 import { Image } from '@unpic/astro';
 import { marked } from 'marked';
 import Layout from '../../layouts/default.astro';
-import { getUserByUsername } from '../../util/clerk';
 import { createImageUrl } from '../../util/cloudinary';
-import { getAllUsers, getPersonBySlug } from '../../util/sanity';
+import { getAllUsers } from '../../util/sanity';
 import Card from '../../components/cards/card.astro';
 
 export const prerender = true;
 
-// TODO add getStaticPaths
 export async function getStaticPaths() {
 	const users = await getAllUsers();
 
@@ -28,25 +25,6 @@ export async function getStaticPaths() {
 
 const { username } = Astro.params;
 const { user } = Astro.props;
-
-// cache profile pages for a day unless the tag gets invalidated
-const headers = new CacheHeaders()
-	.swr()
-	.ttl(86_400)
-	.tag(['profile', `profile-${username}`]);
-
-headers.forEach((value, key) => {
-	Astro.response.headers.set(key, value);
-});
-
-// const [clerkUser, person] = await Promise.all([
-// 	getUserByUsername(username as string),
-// 	getPersonBySlug({ slug: username as string }),
-// ]);
-
-// if (!person) {
-// 	throw new Error('no person with this username');
-// }
 
 const imgUrl = user.photo?.public_id
 	? createImageUrl(user.photo.public_id, {
