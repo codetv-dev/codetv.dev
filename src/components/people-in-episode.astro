@@ -69,16 +69,15 @@ headers.forEach((value, key) => {
 
 <style>
 	.people {
-		margin-block-start: 1rem;
+		margin-block-start: 20px;
 	}
 
 	.people-list {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 0.5rem;
-		justify-content: center;
-		margin-block-end: 3rem;
-		margin-block-start: 1rem;
+		display: grid;
+		gap: 16px 4px;
+		grid-template-columns: repeat(4, calc((100% - 12px) / 4));
+		margin-block-end: 40px;
+		margin-block-start: 8px;
 
 		@media (min-width: 750px) {
 			justify-content: start;
@@ -86,22 +85,22 @@ headers.forEach((value, key) => {
 	}
 
 	.person {
-		inline-size: 100px;
+		inline-size: 100%;
 
 		& img {
 			block-size: auto;
-			border-radius: 50%;
+			border-radius: 3px;
 			display: block;
-			inline-size: 90px;
+			inline-size: 100%;
 			margin-inline: auto;
 		}
 
 		& h4 {
-			color: var(--text-muted);
-			font-size: 0.675rem;
+			color: var(--text);
+			font-size: 0.75em;
 			font-weight: normal;
 			line-height: 1.1;
-			margin-block-start: 0.25rem;
+			margin-block-start: 4px;
 			text-align: center;
 
 			& a {
