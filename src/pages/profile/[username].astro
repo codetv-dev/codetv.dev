@@ -1,30 +1,33 @@
 ---
+import { getCollection } from 'astro:content';
 import { Image } from '@unpic/astro';
 import { marked } from 'marked';
 import Layout from '../../layouts/default.astro';
 import { createImageUrl } from '../../util/cloudinary';
-import { getAllUsers } from '../../util/sanity';
 import Card from '../../components/cards/card.astro';
+import { getEntry } from 'astro:content';
 
 export const prerender = true;
 
 export async function getStaticPaths() {
-	const users = await getAllUsers();
+	const users = await getCollection('profiles');
 
 	return users.map((user) => {
 		return {
 			params: {
-				username: user.slug,
-			},
-			props: {
-				user,
+				username: user.id,
 			},
 		};
 	});
 }
 
 const { username } = Astro.params;
-const { user } = Astro.props;
+const profile = await getEntry('profiles', username);
+const user = profile?.data;
+
+if (!user) {
+	throw new Error('no user found');
+}
 
 const imgUrl = user.photo?.public_id
 	? createImageUrl(user.photo.public_id, {
@@ -57,7 +60,6 @@ const bio = marked.parse(user.bio ?? '');
 				priority={true}
 				width={800}
 				height={800}
-				placeholder="blurhash"
 			/>
 
 			<h1>
@@ -95,8 +97,8 @@ const bio = marked.parse(user.bio ?? '');
 								return (
 									<Card
 										image={{
-											public_id: related.thumbnail.public_id,
-											alt: related.thumbnail.alt,
+											public_id: related.thumbnail?.public_id,
+											alt: related.thumbnail?.alt ?? '',
 										}}
 										title={related.title}
 										description={related.short_description}
