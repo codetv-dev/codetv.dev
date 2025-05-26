@@ -15,6 +15,7 @@ import type {
 	EpisodeTranscriptBySlugQueryResult,
 	RecentEpisodesQueryResult,
 	FeaturedSeriesQueryResult,
+	AllUsersQueryResult,
 } from '../types/sanity';
 import type { UploadApiResponse } from 'cloudinary';
 
@@ -347,6 +348,56 @@ const personByIdQuery = groq`
     } | order(publish_date desc)[0...4]
   }
 `;
+
+const allUsersQuery = groq`
+  *[_type=="person"] | order(name asc) | order(subscription.level asc) {
+    _id,
+    name,
+    "slug": slug.current,
+    bio,
+    photo {
+      public_id,
+      height,
+      width,
+    },
+    subscription {
+      "cus_id": customer,
+      level,
+      status,
+      date
+    },
+    user_id,
+    links[] {
+      label,
+      url
+    },
+    "episodes": *[_type == "episode" && references(^._id) && hidden != true && (defined(video.youtube_id) || defined(video.mux_video))] {
+      title,
+      'slug': slug.current,
+      short_description,
+      publish_date,
+      'thumbnail': {
+        'public_id': video.thumbnail.public_id,
+        'alt': video.thumbnail_alt,
+        'width': video.thumbnail.width,
+        'height': video.thumbnail.height,
+      },
+      video {
+        youtube_id,
+      },
+      'collection': *[_type=="collection" && references(^._id)][0] {
+        'slug': slug.current,
+        title,
+        'episodeSlugs': episodes[]->slug.current,
+      },
+      'series': *[_type=="collection" && references(^._id)][0].series->{
+        'slug': slug.current,
+        title,
+      },
+    } | order(publish_date desc)[0...6]
+  }
+`;
+
 const personBySlugQuery = groq`
   *[_type == "person" && slug.current == $slug][0] {
     _id,
@@ -543,6 +594,16 @@ export async function getPersonById(
 	return client.fetch<PersonByIdQueryResult>(personByIdQuery, params, {
 		useCdn: options?.useCdn ?? true,
 	});
+}
+
+export async function getAllUsers(options?: { useCdn: boolean }) {
+	return client.fetch<AllUsersQueryResult>(
+		allUsersQuery,
+		{},
+		{
+			useCdn: options?.useCdn ?? true,
+		},
+	);
 }
 
 export async function getPersonBySlug(

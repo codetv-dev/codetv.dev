@@ -5,14 +5,29 @@ import { marked } from 'marked';
 import Layout from '../../layouts/default.astro';
 import { getUserByUsername } from '../../util/clerk';
 import { createImageUrl } from '../../util/cloudinary';
-import { getPersonBySlug } from '../../util/sanity';
+import { getAllUsers, getPersonBySlug } from '../../util/sanity';
 import Card from '../../components/cards/card.astro';
 
 export const prerender = true;
 
 // TODO add getStaticPaths
+export async function getStaticPaths() {
+	const users = await getAllUsers();
+
+	return users.map((user) => {
+		return {
+			params: {
+				username: user.slug,
+			},
+			props: {
+				user,
+			},
+		};
+	});
+}
 
 const { username } = Astro.params;
+const { user } = Astro.props;
 
 // cache profile pages for a day unless the tag gets invalidated
 const headers = new CacheHeaders()
@@ -24,44 +39,43 @@ headers.forEach((value, key) => {
 	Astro.response.headers.set(key, value);
 });
 
-const [clerkUser, person] = await Promise.all([
-	getUserByUsername(username as string),
-	getPersonBySlug({ slug: username as string }),
-]);
+// const [clerkUser, person] = await Promise.all([
+// 	getUserByUsername(username as string),
+// 	getPersonBySlug({ slug: username as string }),
+// ]);
 
-if (!person) {
-	throw new Error('no person with this username');
-}
+// if (!person) {
+// 	throw new Error('no person with this username');
+// }
 
-const imgUrl = person.photo?.public_id
-	? createImageUrl(person.photo.public_id, {
+const imgUrl = user.photo?.public_id
+	? createImageUrl(user.photo.public_id, {
 			width: 800,
 			aspect_ratio: 1,
 			crop: 'thumb',
 			gravity: 'face',
 		})
-	: (clerkUser?.imageUrl ??
-		'https://res.cloudinary.com/jlengstorf/image/upload/f_auto/q_auto/w_150/v1732599682/lwj/v2/lwj-heart.png');
+	: 'https://res.cloudinary.com/jlengstorf/image/upload/f_auto/q_auto/w_150/v1732599682/lwj/v2/lwj-heart.png';
 
-const subscription = clerkUser?.publicMetadata.stripe ?? {
+const subscription = user.subscription ?? {
 	status: 'inactive',
 	level: 'none',
 };
 const isSubscriber = !['jlengstorf', 'jlengstorf-test'].includes(
-	person.slug ?? '',
+	user.slug ?? '',
 )
 	? subscription?.status === 'active'
 	: false;
 
-const bio = marked.parse(person.bio ?? '');
+const bio = marked.parse(user.bio ?? '');
 ---
 
-<Layout title={`${person.name}’s profile on CodeTV`}>
+<Layout title={`${user.name}’s profile on CodeTV`}>
 	<main class="wrapper">
 		<div class="profile-photo">
 			<Image
 				src={imgUrl}
-				alt={person.name}
+				alt={user.name}
 				priority={true}
 				width={800}
 				height={800}
@@ -69,16 +83,16 @@ const bio = marked.parse(person.bio ?? '');
 			/>
 
 			<h1>
-				{person.name} (@{username})
+				{user.name} (@{username})
 			</h1>
 			{isSubscriber ? <p class="level">{subscription.level}</p> : null}
 		</div>
 		<div class="details">
 			{
-				person.links && person.links?.length > 0 ? (
+				user.links && user.links?.length > 0 ? (
 					<nav class="links">
 						<span>Links:</span>
-						{person.links.map((link) => (
+						{user.links.map((link) => (
 							<a href={link.url}>{link.label}</a>
 						))}
 					</nav>
@@ -88,12 +102,12 @@ const bio = marked.parse(person.bio ?? '');
 			<div class="bio" set:html={bio} />
 
 			{
-				person.episodes.length > 0 ? (
+				user.episodes.length > 0 ? (
 					<section class="related-episodes">
-						<h2>Episodes featuring {person.name}</h2>
+						<h2>Episodes featuring {user.name}</h2>
 
 						<div class="row three-up">
-							{person.episodes.map((related) => {
+							{user.episodes.map((related) => {
 								const epIndex =
 									related.collection?.episodeSlugs?.findIndex(
 										(slug) => slug === related.slug,
@@ -106,13 +120,19 @@ const bio = marked.parse(person.bio ?? '');
 											public_id: related.thumbnail.public_id,
 											alt: related.thumbnail.alt,
 										}}
-										tagline={`${related.collection?.slug}E${epNumber}`.toUpperCase()}
 										title={related.title}
 										description={related.short_description}
 										link={`/series/${related.series?.slug}/${related.collection?.slug}/${related.slug}`}
 										linkText="Watch episode"
 										youtube_id={related.video?.youtube_id}
-									/>
+									>
+										<Fragment slot="tagline">
+											<p class="series">{related.series?.title}</p>
+											<p class="episode-number">
+												{`${related.collection?.slug}E${epNumber}`.toUpperCase()}
+											</p>
+										</Fragment>
+									</Card>
 								);
 							})}
 						</div>
@@ -143,38 +163,30 @@ const bio = marked.parse(person.bio ?? '');
 			display: block;
 			inline-size: 100%;
 		}
-	}
 
-	.details {
-		& h1 {
-			font-size: 1.5rem;
-			font-weight: 500;
-			line-height: 1.1;
-			margin-block: 0.25rem 0.5rem;
-		}
-
-		& p {
-			font-size: 0.75em;
-			line-height: 1.25;
+		h1 {
+			margin-block: 20px;
 		}
 	}
 
 	.links {
 		align-items: center;
 		display: flex;
-		font-size: 0.75rem;
+		flex-wrap: wrap;
 		gap: 1rem;
 		justify-conent: end;
 		margin-block-start: 1rem;
 	}
 
 	.bio {
-		margin-block: 1rem 2rem;
+		margin-block: 40px;
 		max-inline-size: 54ch;
 
 		p {
+			font-size: 1.25em;
+
 			+ p {
-				margin-block-start: 0.75rem;
+				margin-block-start: 12px;
 			}
 		}
 	}
@@ -183,7 +195,7 @@ const bio = marked.parse(person.bio ?? '');
 		font-size: 1.25em;
 		font-weight: 400;
 		line-height: 1.1;
-		margin-block: 30px 10px;
+		margin-block: 64px 20px;
 	}
 
 	.level {

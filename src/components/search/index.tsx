@@ -62,7 +62,7 @@ export function SearchBox({
 						},
 						{
 							label: 'Subscribe on YouTube',
-							description: 'Watch all past LWJ episodes.',
+							description: 'Watch CodeTV originals.',
 							url: 'https://www.youtube.com/channel/UCnty0z0pNRDgnuoirYXnC5A',
 							icon: () => (
 								<div className="aa-LinkPicture aa-LinkPicture--YouTube">
