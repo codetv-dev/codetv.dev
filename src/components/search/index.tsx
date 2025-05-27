@@ -3,7 +3,7 @@ import { useState } from 'react';
 
 import { searchClient } from './search-client';
 import { LinkItem, QueryEpisodeItem } from './items.jsx';
-import { GoogleCalendarLogo } from './logos/google-calendar-logo.jsx';
+import { SupportIcon } from './icons/support-icon.jsx';
 import { YouTubeLogo } from './logos/youtube-logo.jsx';
 import { SearchIcon } from './icons/search-icon.tsx';
 import { NewsletterIcon } from './icons/newsletter-icon.jsx';
@@ -41,32 +41,22 @@ export function SearchBox({
 					sourceId: 'links',
 					getItems: () => [
 						{
+							label: 'Become a CodeTV supporter',
+							description: 'Help us make more tv for developers!',
+							url: '/support',
+							icon: () => (
+								<div className="aa-LinkPicture">
+									<SupportIcon />
+								</div>
+							),
+						},
+						{
 							label: 'Subscribe to the newsletter',
 							description: 'The best way to make sure you don’t miss anything.',
 							url: '/newsletter',
 							icon: () => (
 								<div className="aa-LinkPicture">
 									<NewsletterIcon />
-								</div>
-							),
-						},
-						{
-							label: 'Add schedule to Google Calendar',
-							description: 'See upcoming shows and events in your calendar.',
-							url: '/calendar',
-							icon: () => (
-								<div className="aa-LinkPicture">
-									<GoogleCalendarLogo />
-								</div>
-							),
-						},
-						{
-							label: 'Subscribe on YouTube',
-							description: 'Watch CodeTV originals.',
-							url: 'https://www.youtube.com/channel/UCnty0z0pNRDgnuoirYXnC5A',
-							icon: () => (
-								<div className="aa-LinkPicture aa-LinkPicture--YouTube">
-									<YouTubeLogo />
 								</div>
 							),
 						},
@@ -85,7 +75,6 @@ export function SearchBox({
 						return item.url;
 					},
 					getItems({ query, ...rest }: { query: any }) {
-						console.log(rest);
 						return getAlgoliaResults({
 							searchClient,
 							queries: [
@@ -121,14 +110,6 @@ export function SearchBox({
 			noResults={({ query }: { query: any }) => (
 				<div className="aa-NoResults">
 					<div className="aa-NoResultsLabel">No results for "{query}".</div>
-					<div className="aa-NoResultsDescription">
-						Here's a consolation Corgi.
-					</div>
-					<img
-						className="aa-NoResultsImage"
-						src="https://cdn.shopify.com/s/files/1/0589/5798/8049/products/corgi-pal.png?v=1627084571"
-						alt="a cartoon corgi with rainbow colors"
-					/>
 				</div>
 			)}
 		/>

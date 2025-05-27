@@ -65,10 +65,14 @@ if (supporters.length < 1) {
 		a {
 			border-radius: 3px;
 			display: block;
-			outline-color: transparent;
-			transition: 150ms outline-color linear;
+			opacity: 0.85;
+			outline: 1px solid transparent;
+			transition-duration: 150ms;
+			transition-timing-function: linear;
+			transition-property: outline-color, opacity;
 
 			&:has(:hover, :active, :focus) {
+				opacity: 1;
 				outline: 1px solid var(--text-muted);
 			}
 

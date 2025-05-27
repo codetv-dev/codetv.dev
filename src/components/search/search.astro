@@ -9,10 +9,10 @@ import { Search as AlgoliaSearch } from './';
 	.aa-OpenButton {
 		display: flex;
 		align-items: center;
-		font-size: 0.625rem;
-		padding: 0.375rem 0.75rem 0.375rem 0.5rem;
-		border-radius: 0.5rem;
-		background: var(--yellow-500);
+		font-size: 1em;
+		padding: 16px 12px 16px 8px;
+		border-radius: 3px;
+		background: var(--orange);
 		border: none;
 		color: var(--black);
 		font-family: var(--font-family);
@@ -22,8 +22,8 @@ import { Search as AlgoliaSearch } from './';
 	.aa-OpenButton svg {
 		display: block;
 		height: auto;
-		margin-right: 0.25rem;
-		width: 0.75rem;
+		margin-right: 4px;
+		width: 12px;
 	}
 
 	.aa-OpenButtonText[data-viewport='small'] {
@@ -46,61 +46,62 @@ import { Search as AlgoliaSearch } from './';
 
 	.aa-Backdrop {
 		position: fixed;
-		background: rgb(0 0 0 / 80%);
+		background: color-mix(in oklch, var(--bg) 95%, transparent);
 		inset: 0;
-		padding: 2rem;
+		padding: 40px;
 		z-index: 1000;
 	}
 
 	.aa-Autocomplete {
-		position: relative;
-		color: var(--gray-text);
+		background: var(--black);
+		block-size: 100%;
+		border: 1px solid color-mix(in oklch, var(--text-muted), var(--black));
+		border-radius: 3px;
+		box-shadow:
+			color-mix(in oklch, var(--black) 10%, transparent) 0 1px 0,
+			color-mix(in oklch, var(--black) 10%, transparent) 0 8px 24px,
+			color-mix(in oklch, var(--black) 10%, transparent) 0 16px 48px;
+		color: var(--text);
 		display: flex;
 		flex-direction: column;
-		max-width: 840px;
-		max-height: 630px;
-		min-height: 200px;
-		width: 100%;
-		height: 100%;
-		background: var(--white);
+		inline-size: 100%;
 		margin: 0 auto;
-		border-radius: 0.5rem;
-		box-shadow:
-			rgb(17 17 26 / 10%) 0 1px 0,
-			rgb(17 17 26 / 10%) 0 8px 24px,
-			rgb(17 17 26 / 10%) 0 16px 48px;
+		max-block-size: 630px;
+		max-inline-size: 840px;
+		min-block-size: 200px;
+		position: relative;
 		z-index: 10000;
 	}
 
 	.aa-Form {
-		display: grid;
-		grid-template-columns: 3.2rem 1fr auto;
 		align-items: center;
-		place-items: center;
+		display: grid;
 		flex: 0;
+		grid-template-columns: 48px 1fr auto;
+		place-items: center;
 	}
 
 	.aa-InputWrapper {
-		width: 100%;
+		inline-size: 100%;
 	}
 
 	.aa-InputWrapperPrefix,
 	.aa-InputWrapperSuffix {
-		width: 100%;
-		height: 100%;
+		block-size: 100%;
+		inline-size: 100%;
 	}
 
 	.aa-Label,
 	.aa-InputWrapperSuffix {
-		display: flex;
-		height: 100%;
 		align-items: center;
+		block-size: 100%;
+		display: flex;
 		justify-content: center;
 	}
 
 	.aa-Label svg {
-		width: 1.25rem;
-		height: 1.25rem;
+		block-size: 20px;
+		inline-size: 20px;
 	}
 
 	.aa-SpinnerIcon {
@@ -122,16 +123,17 @@ import { Search as AlgoliaSearch } from './';
 	}
 
 	.aa-Input {
-		background: var(--white);
-		width: 100%;
-		margin: 0;
-		padding: 1.25rem 0;
-		font-size: 1rem;
+		background: var(--bg);
 		border: none;
+		color: var(--text-emphasized);
+		font-family: var(--font-family);
+		font-size: 1rem;
+		inline-size: 100%;
+		margin: 0;
 		overflow: hidden;
+		padding: 20px;
 		text-overflow: ellipsis;
 		white-space: nowrap;
-		font-family: var(--font-family);
 		-webkit-appearance: textfield;
 	}
 
@@ -149,11 +151,11 @@ import { Search as AlgoliaSearch } from './';
 
 	.aa-ClearButton {
 		background: none;
+		block-size: 100%;
 		border: none;
+		color: var(--text-muted);
 		cursor: pointer;
-		padding: 0 1rem;
-		height: 100%;
-		color: var(--gray-600);
+		padding: 0 20px;
 		transition: color 0.1s linear;
 	}
 
@@ -162,9 +164,9 @@ import { Search as AlgoliaSearch } from './';
 	}
 
 	.aa-ClearButton svg {
-		width: 1rem;
-		height: 1rem;
-		margin-top: 4px;
+		block-size: 16px;
+		inline-size: 16px;
+		margin-block-start: 4px;
 	}
 
 	.aa-CancelButton {
@@ -172,12 +174,12 @@ import { Search as AlgoliaSearch } from './';
 		border: none;
 		cursor: pointer;
 		margin: 0;
-		padding: 0 1rem;
 		height: 100%;
-		color: var(--gray-600);
+		padding: 0 16px;
+		color: var(--text-muted);
 		font-size: 0.85rem;
 		transition: color 0.1s linear;
-		border-left: 1px solid var(--gray-100);
+		border-left: 1px solid color-mix(in oklch, var(--text-muted), var(--black));
 		font-family: var(--font-family);
 	}
 
@@ -189,7 +191,7 @@ import { Search as AlgoliaSearch } from './';
 		flex-grow: 1;
 		height: 100%;
 		overflow-y: scroll;
-		border-top: 1px solid var(--gray-100);
+		border-top: 1px solid color-mix(in oklch, var(--text-muted), var(--black));
 	}
 
 	.aa-Panel--stalled {
@@ -205,26 +207,26 @@ import { Search as AlgoliaSearch } from './';
 	}
 
 	.aa-Source {
-		padding: 0.5rem;
+		padding: 4px;
 	}
 
 	.aa-Source[id='autocomplete-latest'] .aa-List,
 	.aa-Source[id='autocomplete-schedule'] .aa-List {
 		display: grid;
 		grid-template-columns: repeat(2, 1fr);
-		gap: 0.5rem;
+		gap: 4px;
 	}
 
 	.aa-Header {
-		padding: 0 0.6rem;
-		margin-bottom: 0.6rem;
-		font-size: 0.85rem;
+		padding: 0 16px;
+		margin-bottom: 16px;
+		font-size: 0.85em;
 		font-weight: 600;
-		color: var(--gray-text);
+		color: var(--text);
 	}
 
 	.aa-List > :not([hidden]) ~ :not([hidden]) {
-		margin-top: 0.2rem;
+		margin-block-start: 4px;
 	}
 
 	.aa-Item {
@@ -234,83 +236,86 @@ import { Search as AlgoliaSearch } from './';
 	}
 
 	.aa-Link {
-		width: 100%;
-		display: flex;
 		align-items: center;
-		padding: 0.5rem;
-		color: var(--gray-text);
+		border-radius: 3px;
+		color: var(--text);
+		display: flex;
+		inline-size: 100%;
+		line-height: 1.3;
+		padding: 8px;
 		text-decoration: none;
-		line-height: 1.3rem;
-		border-radius: 0.5rem;
 	}
 
 	a.aa-Link {
-		color: var(--gray-text);
+		color: var(--text);
 	}
 
 	.aa-LinkItem {
-		width: 100%;
-		display: flex;
 		align-items: center;
+		display: flex;
+		inline-size: 100%;
 		justify-content: space-between;
 	}
 
 	.aa-LinkItem-Content {
-		display: flex;
 		align-items: center;
+		display: flex;
+		gap: 16px;
 	}
 
 	.aa-Item mark {
-		background: var(--yellow-500);
-		border-radius: 0.25rem;
-		padding: 0 0.15rem;
+		background: var(--orange);
+		border-radius: 3px;
+		padding: 0 4px;
 	}
 
 	.aa-Item[aria-selected='true'] .aa-Link {
-		background: var(--gray-100);
+		background: var(--bg);
 	}
 
 	.aa-Item .button {
-		margin: 0.5rem;
-		width: 100%;
+		inline-size: 100%;
+		margin: 8px;
 		transition: background 0.1s linear;
 	}
 
 	.aa-Item[aria-selected='true'] .button {
-		background: var(--purple-500);
-		border-color: var(--purple-500);
+		background: var(--orange);
+		border-color: var(--orange);
 		color: var(--white);
 	}
 
 	.aa-LinkText {
-		margin-left: 0.8rem;
+		margin-inline-start: 12px;
 	}
 
 	.aa-LinkLabel {
-		font-size: 0.9rem;
+		display: -webkit-box;
+		font-size: 1rem;
 		font-weight: 600;
 		overflow: hidden;
-		display: -webkit-box;
 		-webkit-box-orient: vertical;
 		-webkit-line-clamp: 2;
 	}
 
 	.aa-LinkDescription {
-		font-size: 0.8rem;
 		color: var(--text-muted);
-		overflow: hidden;
 		display: -webkit-box;
+		font-size: 0.875rem;
+		line-height: 1.35;
+		margin-block-start: 4px;
+		overflow: hidden;
 		-webkit-box-orient: vertical;
 		-webkit-line-clamp: 3;
 	}
 
 	.aa-LinkPicture {
-		display: flex;
 		align-items: center;
-		justify-content: center;
-		height: 100%;
-		width: 100%;
+		block-size: 100%;
+		display: flex;
 		flex: none;
+		inline-size: 100%;
+		justify-content: center;
 	}
 
 	.aa-LinkPicture--Twitch {
@@ -321,7 +326,7 @@ import { Search as AlgoliaSearch } from './';
 		position: relative;
 		top: 5px;
 		right: 2px;
-		padding: 0.2rem;
+		padding: 4px;
 	}
 
 	.aa-LinkPicture--YouTube {
@@ -329,127 +334,109 @@ import { Search as AlgoliaSearch } from './';
 	}
 
 	.aa-LinkIcon {
-		width: 1rem;
-		height: 1rem;
+		block-size: 16px;
 		color: transparent;
-		transition: color 0.1s linear;
-		margin-left: 0.5rem;
 		flex: none;
+		inline-size: 16px;
+		margin-inline-start: 8px;
+		transition: color 0.1s linear;
 	}
 
 	.aa-Item[aria-selected='true'] .aa-LinkIcon {
-		color: var(--gray-600);
+		color: var(--text);
 	}
 
 	.aa-Icon {
-		width: 2.4rem;
-		height: 2.4rem;
-		border-radius: 0.4rem;
-		overflow: hidden;
-		margin-right: 0.8rem;
+		block-size: 40px;
+		border-radius: 3px;
 		flex: none;
+		inline-size: 40px;
+		margin-inline-start: 12px;
+		overflow: hidden;
 	}
 
 	.aa-Icon svg {
-		width: 100%;
-		height: 100%;
+		block-size: 100%;
+		inline-size: 100%;
 	}
 
 	.aa-Participants {
-		display: flex;
 		align-items: center;
-		justify-content: end;
+		display: flex;
 		flex: none;
-		width: 6rem;
+		inline-size: 96px;
+		justify-content: end;
 	}
 
 	.aa-Participant {
-		width: 4rem;
-		height: 4rem;
+		block-size: 64px;
+		inline-size: 64px;
 		flex: none;
-		margin-left: -2rem;
+		margin-inline-start: -32px;
 	}
 
 	.aa-Participant--first {
-		margin-left: 0;
+		margin-inline-start: 0;
 	}
 
 	.aa-CoverImage {
-		width: 10.2rem;
-		height: auto;
+		block-size: auto;
+		border-radius: 3px;
 		flex: none;
-		margin-right: 0.8rem;
-		border-radius: 0.4rem;
+		inline-size: 160px;
+		margin-inline-start: 12px;
 	}
 
 	.aa-NoResults {
+		align-items: center;
+		block-size: 100%;
 		display: flex;
 		flex-direction: column;
+		inline-size: 100%;
 		justify-content: center;
-		padding: 0.5rem;
-		align-items: center;
+		padding: 8px;
 		text-align: center;
-		width: 100%;
-		height: 100%;
 	}
 
 	.aa-NoResultsLabel {
-		font-size: 1.1rem;
-		font-weight: 600;
-		margin-bottom: 0.5rem;
-		overflow: hidden;
 		display: -webkit-box;
+		font-size: 1.1em;
+		font-weight: 600;
+		margin-block-start: 8px;
+		overflow: hidden;
 		-webkit-box-orient: vertical;
 		-webkit-line-clamp: 1;
 	}
 
 	.aa-NoResultsDescription {
-		font-size: 0.9rem;
+		font-size: 0.9em;
 		color: var(--text-muted);
-		margin-bottom: 1rem;
+		margin-block-end: 16px;
 	}
 
 	.aa-NoResultsImage {
-		width: 10rem;
+		inline-size: 160px;
 	}
 
 	.aa-Footer {
-		position: relative;
+		border-top: 1px solid color-mix(in oklch, var(--text-muted), var(--black));
 		display: flex;
-		justify-content: end;
 		flex: none;
-		padding: 0.8rem 1rem;
-		border-top: 1px solid var(--gray-100);
-	}
-
-	.aa-Footer::before {
-		position: absolute;
-		top: -2rem;
-		left: 0;
-		display: block;
-		content: '';
-		width: 100%;
-		height: 2rem;
-		margin-top: -1px;
-		background: linear-gradient(
-			180deg,
-			rgb(255 255 255 / 0%) 0%,
-			rgb(255 255 255 / 40%) 100%
-		);
-		pointer-events: none;
-		z-index: 10000;
+		justify-content: end;
+		padding: 12px 16px;
+		position: relative;
 	}
 
 	.aa-AlgoliaLogo a {
-		display: flex;
 		align-items: center;
-		text-decoration: none;
 		color: var(--text-muted);
+		display: flex;
+		text-decoration: none;
 	}
 
 	.aa-AlgoliaLabel {
-		font-size: 0.6rem;
-		margin-right: 0.4rem;
+		font-size: 0.6em;
+		margin-inline-end: 8px;
 	}
 
 	.aa-AlgoliaLogo svg,
@@ -458,13 +445,13 @@ import { Search as AlgoliaSearch } from './';
 	}
 
 	.aa-AlgoliaLogo svg {
-		width: 4rem;
-		height: 1rem;
+		block-size: 16px;
+		inline-size: 48px;
 	}
 
 	@media (max-width: 750px) {
 		.aa-Backdrop {
-			padding: 1rem;
+			padding: 16px;
 		}
 
 		.aa-Source[id='autocomplete-latest'] .aa-List,
@@ -473,7 +460,7 @@ import { Search as AlgoliaSearch } from './';
 		}
 
 		.aa-CoverImage {
-			width: 12rem;
+			inline-size: 200px;
 		}
 	}
 
@@ -484,12 +471,12 @@ import { Search as AlgoliaSearch } from './';
 
 		.aa-Autocomplete {
 			border-radius: 0;
-			max-height: none;
+			max-block-size: none;
 		}
 
 		.aa-CoverImage {
-			width: 5rem;
-			height: 5rem;
+			block-size: 80px;
+			inline-size: 80px;
 			object-fit: cover;
 			object-position: center;
 		}
@@ -505,8 +492,8 @@ import { Search as AlgoliaSearch } from './';
 		}
 
 		.aa-CoverImage {
-			width: 4rem;
-			height: 4rem;
+			block-size: 64px;
+			inline-size: 64px;
 		}
 	}
 

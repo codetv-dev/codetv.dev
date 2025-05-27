@@ -91,10 +91,12 @@ if (image.src) {
 		container: card / inline-size;
 		inline-size: 100%;
 		max-inline-size: 1280px;
+		outline: 1px solid transparent;
+		outline-offset: 8px;
+		transition: 150ms outline-color linear;
 
 		&:has(:focus-within, :active, :hover) {
 			outline: 1px solid var(--gray-600);
-			outline-offset: 8px;
 		}
 	}
 

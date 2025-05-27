@@ -179,11 +179,13 @@ const bio = marked.parse(user.bio ?? '');
 	}
 
 	.level {
-		background: color-mix(in oklch, var(--green-500) 15%, transparent);
-		border: 0.5px solid var(--green-500);
-		border-radius: 0.125rem;
+		background: color-mix(in oklch, var(--orange) 15%, transparent);
+		border: 0.5px solid var(--orange);
+		border-radius: 3px;
+		color: color-mix(in oklch, var(--orange) 40%, var(--white));
+		font-size: 0.75em;
 		inline-size: max-content;
-		padding-inline: 0.25rem;
+		padding-inline: 4px;
 	}
 
 	.row {
