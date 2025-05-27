@@ -337,12 +337,11 @@ if (episode.video && !episode.video.youtube_id && episode.video.mux) {
 											href={sponsor.link}
 											style={`--ar: ${sponsor.logo.width / sponsor.logo.height}`}
 										>
-											<Image
+											<img
 												src={src}
 												alt={sponsor.title}
 												height={sponsor.logo.height * 2}
 												width={sponsor.logo.width * 2}
-												aspectRatio={sponsor.logo.width / sponsor.logo.height}
 											/>
 										</a>
 									);
