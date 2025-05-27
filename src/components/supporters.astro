@@ -18,20 +18,33 @@ if (supporters.length < 1) {
 			)
 			.map((supporter) => {
 				const photo = supporter.photo;
+				const level = supporter.subscription?.level;
 
 				if (!photo || !photo.public_id) {
 					return;
 				}
 
+				const isGold = level?.toLowerCase()?.includes('gold');
+				const avatarSize = isGold ? 160 : 80;
+
 				const src = createImageUrl(photo.public_id, {
-					height: 80,
-					width: 80,
+					height: avatarSize,
+					width: avatarSize,
 					crop: 'fill',
 				});
 
 				return (
-					<a href={`/profile/${supporter.username}`} title={supporter.name}>
-						<Image src={src} alt={supporter.name} width={80} aspectRatio={1} />
+					<a
+						href={`/profile/${supporter.username}`}
+						title={supporter.name}
+						class:list={{ gold: isGold }}
+					>
+						<Image
+							src={src}
+							alt={supporter.name}
+							width={avatarSize}
+							height={avatarSize}
+						/>
 					</a>
 				);
 			})
@@ -40,21 +53,37 @@ if (supporters.length < 1) {
 
 <style>
 	.supporter-list {
-		display: flex;
-		flex-wrap: wrap;
+		display: grid;
 		gap: 4px;
-		justify-content: center;
-		margin-block-start: 1rem;
-		max-inline-size: 640px;
+		grid-auto-flow: row dense;
+		grid-template-columns: repeat(auto-fill, 40px);
+		inline-size: 100%;
+		justify-content: start;
+		margin-block-start: 20px;
+		max-inline-size: 800px;
 
 		a {
+			border-radius: 3px;
 			display: block;
+			outline-color: transparent;
+			transition: 150ms outline-color linear;
+
+			&:has(:hover, :active, :focus) {
+				outline: 1px solid var(--text-muted);
+			}
+
+			&.gold {
+				grid-column: span 2;
+				grid-row: span 2;
+			}
 		}
 
 		img {
-			block-size: 40px;
+			block-size: 100%;
 			border-radius: 3px;
 			display: block;
+			inline-size: 100%;
+			margin: 0;
 		}
 	}
 </style>

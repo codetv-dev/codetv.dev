@@ -87,12 +87,20 @@ headers.forEach((value, key) => {
 	.person {
 		inline-size: 100%;
 
-		& img {
+		> a:has(:hover, :active, :focus) {
+			img {
+				outline: 1px solid var(--text-muted);
+			}
+		}
+
+		img {
 			block-size: auto;
 			border-radius: 3px;
 			display: block;
 			inline-size: 100%;
 			margin-inline: auto;
+			outline-color: transparent;
+			transition: 150ms outline-color linear;
 		}
 
 		& h4 {

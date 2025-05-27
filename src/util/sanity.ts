@@ -449,7 +449,7 @@ const personByClerkIdQuery = groq`
 
 // *[_type == "person" && subscription.status == "active"] {
 const supportersQuery = groq`
-  *[_type == "person" && subscription.status == "active"] {
+  *[_type == "person" && subscription.status == "active"] | order(subscription.date asc) {
     _id,
     name,
     photo {
@@ -462,11 +462,7 @@ const supportersQuery = groq`
       level,
       status
     }
-  } | score(
-    boost(subscription.level match "Platinum", 3),
-    boost(subscription.level match "Gold", 2),
-    boost(subscription.level match "Silver", 1),
-  ) | order(_score desc)
+  }
 `;
 
 export async function getAllSeries() {

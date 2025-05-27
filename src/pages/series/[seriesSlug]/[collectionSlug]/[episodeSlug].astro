@@ -13,11 +13,11 @@ import {
 } from '../../../../util/cloudinary';
 import Layout from '../../../../layouts/default.astro';
 import VideoPlayer from '../../../../components/video-player.astro';
-import EpisodePreview from '../../../../components/episode-preview.astro';
 import ShareInput from '../../../../components/share-input.astro';
 import BecomeASupporter from '../../../../components/supporter-button.astro';
 import PeopleInEpisode from '../../../../components/people-in-episode.astro';
 import Supporters from '../../../../components/supporters.astro';
+import Card from '../../../../components/cards/card.astro';
 
 export const prerender = true;
 
@@ -63,8 +63,8 @@ const relatedEpisodes = episode.related_episodes ?? [];
 const url = Astro.site!;
 url.pathname = `/series/${episode.series?.slug}/${episode.collection?.slug}/${episode.slug}`;
 
-const thumb_w = 1280;
-const thumb_h = 720;
+const thumb_w = 1600;
+const thumb_h = 900;
 
 let image;
 if (episode.thumbnail.public_id) {
@@ -353,6 +353,16 @@ if (episode.video && !episode.video.youtube_id && episode.video.mux) {
 				}
 
 				<PeopleInEpisode people={episode.people ?? []} server:defer />
+
+				<div class="supporters">
+					<h2>Supporters</h2>
+					<p>
+						<a href="/support">
+							Become a supporter to see yourself here on future episodes!
+						</a>
+					</p>
+					<Supporters />
+				</div>
 			</section>
 
 			{
@@ -365,7 +375,7 @@ if (episode.video && !episode.video.youtube_id && episode.video.mux) {
 							{episode.collection?.title}
 						</h2>
 
-						<div class="more-episodes">
+						<div class="row three-up">
 							{relatedEpisodes.map((related, index) => {
 								const minIndex = Math.max(0, episodeIndex - 3);
 								const maxIndex = Math.min(relatedEpisodes.length, minIndex + 6);
@@ -378,28 +388,30 @@ if (episode.video && !episode.video.youtube_id && episode.video.mux) {
 								}
 
 								return (
-									<EpisodePreview
-										class="compact"
-										episode={related}
-										episodeNumber={`${episode.collection?.slug}E${index + 1}`.toUpperCase()}
-										episodeUrl={`/series/${episode.series?.slug}/${episode.collection?.slug}/${related.slug}`}
-									/>
+									<Card
+										image={{
+											public_id: related.thumbnail?.public_id,
+											alt: related.thumbnail?.alt ?? '',
+										}}
+										title={related.title}
+										description={related.short_description}
+										link={`/series/${episode.series?.slug}/${episode.collection?.slug}/${related.slug}`}
+										linkText="Watch episode"
+										youtube_id={related.video?.youtube_id}
+									>
+										<Fragment slot="tagline">
+											<p class="series">{episode.series?.title}</p>
+											<p class="episode-number">
+												{`${episode.collection?.slug}.E${index + 1}`.toUpperCase()}
+											</p>
+										</Fragment>
+									</Card>
 								);
 							})}
 						</div>
 					</section>
 				) : null
 			}
-
-			<section class="supporters">
-				<h2>Supporters</h2>
-				<p>
-					<a href="/support">
-						Become a supporter to see yourself here on future episodes!
-					</a>
-				</p>
-				<Supporters />
-			</section>
 		</div>
 	</main>
 </Layout>
@@ -451,7 +463,7 @@ if (episode.video && !episode.video.youtube_id && episode.video.mux) {
 		@media (min-width: 750px) {
 			display: grid;
 			gap: 30px;
-			grid-template-columns: calc(62% - 15px) auto;
+			grid-template-columns: calc(62% - 15px) minmax(0, 1fr);
 		}
 	}
 
@@ -480,13 +492,13 @@ if (episode.video && !episode.video.youtube_id && episode.video.mux) {
 	}
 
 	.episode-details {
-		& h1 {
+		h1 {
 			font-weight: 500;
 			line-height: 1.1;
-			margin-block: 0.25rem 0.5rem;
+			margin-block: 4px 8px;
 		}
 
-		& p {
+		p {
 			line-height: 1.25;
 		}
 	}
@@ -560,8 +572,9 @@ if (episode.video && !episode.video.youtube_id && episode.video.mux) {
 		text-transform: uppercase;
 	}
 
-	section,
-	.description {
+	.additional-details,
+	.description,
+	.supporters {
 		h2 {
 			font-size: 1.125rem;
 			font-weight: 600;
@@ -668,39 +681,20 @@ if (episode.video && !episode.video.youtube_id && episode.video.mux) {
 			display: block;
 			inline-size: auto;
 			margin: 0;
-		}
-	}
-
-	.related-episodes,
-	.supporters {
-		@media (min-width: 1000px) {
-			grid-column: 1 / 3;
-			margin-block-end: 3rem;
+			object-fit: contain;
 		}
 	}
 
 	.related-episodes {
+		@media (min-width: 1000px) {
+			grid-column: 1 / 3;
+			margin-block-end: 3rem;
+		}
+
 		h2 {
 			font-size: 1.125rem;
 			font-weight: 600;
 			margin-block-end: 0.75rem;
-		}
-	}
-
-	.more-episodes {
-		container: more-episodes / inline-size;
-		display: flex;
-		flex-wrap: wrap;
-		gap: 2rem;
-		justify-content: center;
-		margin-block-start: 0.25rem;
-
-		@media (min-width: 1000px) {
-			justify-content: start;
-
-			.episode {
-				inline-size: calc((100cqi - 6rem) / 4);
-			}
 		}
 	}
 </style>
