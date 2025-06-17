@@ -21,6 +21,11 @@ export const STRIPE_SUBSCRIPTION_TYPES = [
 				price: 5_00,
 				priceId: TIER_SILVER_PRICE_ID,
 			},
+			{
+				period: 'yearly',
+				price: 55_00,
+				priceId: 'price_1Rb7tQJ4VGTQR05O6ICKiAgi',
+			},
 		],
 	},
 	{
@@ -32,6 +37,11 @@ export const STRIPE_SUBSCRIPTION_TYPES = [
 				period: 'monthly',
 				price: 20_00,
 				priceId: TIER_GOLD_PRICE_ID,
+			},
+			{
+				period: 'yearly',
+				price: 220_00,
+				priceId: 'price_1Rb7u0J4VGTQR05OlNNhThIx',
 			},
 		],
 	},
