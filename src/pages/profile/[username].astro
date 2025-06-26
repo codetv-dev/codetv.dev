@@ -1,82 +1,78 @@
 ---
-import { CacheHeaders } from 'cdn-cache-control';
+import { getCollection } from 'astro:content';
 import { Image } from '@unpic/astro';
 import { marked } from 'marked';
 import Layout from '../../layouts/default.astro';
-import { getUserByUsername } from '../../util/clerk';
 import { createImageUrl } from '../../util/cloudinary';
-import { getPersonBySlug } from '../../util/sanity';
-import EpisodePreview from '../../components/episode-preview.astro';
+import Card from '../../components/cards/card.astro';
+import { getEntry } from 'astro:content';
 
-export const prerender = false;
+export const prerender = true;
 
-const { username } = Astro.params;
+export async function getStaticPaths() {
+	const users = await getCollection('profiles');
 
-// cache profile pages for a day unless the tag gets invalidated
-const headers = new CacheHeaders()
-	.swr()
-	.ttl(86_400)
-	.tag(['profile', `profile-${username}`]);
-
-headers.forEach((value, key) => {
-	Astro.response.headers.set(key, value);
-});
-
-const [clerkUser, person] = await Promise.all([
-	getUserByUsername(username as string),
-	getPersonBySlug({ slug: username as string }),
-]);
-
-if (!person) {
-	throw new Error('no person with this username');
+	return users.map((user) => {
+		return {
+			params: {
+				username: user.id,
+			},
+		};
+	});
 }
 
-const imgUrl = person.photo?.public_id
-	? createImageUrl(person.photo.public_id, {
+const { username } = Astro.params;
+const profile = await getEntry('profiles', username);
+const user = profile?.data;
+
+if (!user) {
+	throw new Error('no user found');
+}
+
+const imgUrl = user.photo?.public_id
+	? createImageUrl(user.photo.public_id, {
 			width: 800,
 			aspect_ratio: 1,
 			crop: 'thumb',
 			gravity: 'face',
 		})
-	: (clerkUser?.imageUrl ??
-		'https://res.cloudinary.com/jlengstorf/image/upload/f_auto/q_auto/w_150/v1732599682/lwj/v2/lwj-heart.png');
+	: 'https://res.cloudinary.com/jlengstorf/image/upload/f_auto/q_auto/w_150/v1732599682/lwj/v2/lwj-heart.png';
 
-const subscription = clerkUser?.publicMetadata.stripe ?? {
+const subscription = user.subscription ?? {
 	status: 'inactive',
 	level: 'none',
 };
 const isSubscriber = !['jlengstorf', 'jlengstorf-test'].includes(
-	person.slug ?? '',
+	user.slug ?? '',
 )
 	? subscription?.status === 'active'
 	: false;
 
-const bio = marked.parse(person.bio ?? '');
+const bio = marked.parse(user.bio ?? '');
 ---
 
-<Layout title={`${person.name}’s profile on CodeTV`}>
-	<div class="wrapper">
+<Layout title={`${user.name}’s profile on CodeTV`}>
+	<main class="wrapper">
 		<div class="profile-photo">
 			<Image
 				src={imgUrl}
-				alt={person.name}
+				alt={user.name}
 				priority={true}
 				width={800}
 				height={800}
-				placeholder="blurhash"
 			/>
-		</div>
-		<div class="details">
+
 			<h1>
-				{person.name} (@{username})
+				{user.name} (@{username})
 			</h1>
 			{isSubscriber ? <p class="level">{subscription.level}</p> : null}
-
+		</div>
+		<div class="details">
 			{
-				person.links && person.links?.length > 0 ? (
+				user.links && user.links?.length > 0 ? (
 					<nav class="links">
 						<span>Links:</span>
-						{person.links.map((link) => (
+						{user.links.map((link) => (
 							<a href={link.url}>{link.label}</a>
 						))}
 					</nav>
@@ -86,12 +82,12 @@ const bio = marked.parse(person.bio ?? '');
 			<div class="bio" set:html={bio} />
 
 			{
-				person.episodes.length > 0 ? (
+				user.episodes.length > 0 ? (
 					<section class="related-episodes">
-						<h2>Episodes featuring {person.name}</h2>
+						<h2>Episodes featuring {user.name}</h2>
 
-						<div class="more-episodes">
-							{person.episodes.map((related) => {
+						<div class="row three-up">
+							{user.episodes.map((related) => {
 								const epIndex =
 									related.collection?.episodeSlugs?.findIndex(
 										(slug) => slug === related.slug,
@@ -99,12 +95,24 @@ const bio = marked.parse(person.bio ?? '');
 								const epNumber = epIndex + 1;
 
 								return (
-									<EpisodePreview
-										class="compact"
-										episode={related}
-										episodeNumber={`${related.collection?.slug}E${epNumber}`.toUpperCase()}
-										episodeUrl={`/series/${related.series?.slug}/${related.collection?.slug}/${related.slug}`}
-									/>
+									<Card
+										image={{
+											public_id: related.thumbnail?.public_id,
+											alt: related.thumbnail?.alt ?? '',
+										}}
+										title={related.title}
+										description={related.short_description}
+										link={`/series/${related.series?.slug}/${related.collection?.slug}/${related.slug}`}
+										linkText="Watch episode"
+										youtube_id={related.video?.youtube_id}
+									>
+										<Fragment slot="tagline">
+											<p class="series">{related.series?.title}</p>
+											<p class="episode-number">
+												{`${related.collection?.slug}E${epNumber}`.toUpperCase()}
+											</p>
+										</Fragment>
+									</Card>
 								);
 							})}
 						</div>
@@ -112,12 +120,12 @@ const bio = marked.parse(person.bio ?? '');
 				) : null
 			}
 		</div>
-	</div>
+	</main>
 </Layout>
 
 <style>
 	.wrapper {
-		padding: 15px 5cqw 60px;
+		padding: 200px 5cqw 60px;
 
 		@media (min-width: 750px) {
 			display: grid;
@@ -135,38 +143,30 @@ const bio = marked.parse(person.bio ?? '');
 			display: block;
 			inline-size: 100%;
 		}
-	}
 
-	.details {
-		& h1 {
-			font-size: 1.5rem;
-			font-weight: 500;
-			line-height: 1.1;
-			margin-block: 0.25rem 0.5rem;
-		}
-
-		& p {
-			font-size: 0.75em;
-			line-height: 1.25;
+		h1 {
+			margin-block: 20px;
 		}
 	}
 
 	.links {
 		align-items: center;
 		display: flex;
-		font-size: 0.75rem;
+		flex-wrap: wrap;
 		gap: 1rem;
 		justify-conent: end;
 		margin-block-start: 1rem;
 	}
 
 	.bio {
-		margin-block: 1rem 2rem;
+		margin-block: 40px;
 		max-inline-size: 54ch;
 
 		p {
+			font-size: 1.25em;
+
 			+ p {
-				margin-block-start: 0.75rem;
+				margin-block-start: 12px;
 			}
 		}
 	}
@@ -175,21 +175,20 @@ const bio = marked.parse(person.bio ?? '');
 		font-size: 1.25em;
 		font-weight: 400;
 		line-height: 1.1;
-		margin-block: 30px 10px;
+		margin-block: 64px 20px;
 	}
 
 	.level {
-		background: color-mix(in oklch, var(--green-500) 15%, transparent);
-		border: 0.5px solid var(--green-500);
-		border-radius: 0.125rem;
+		background: color-mix(in oklch, var(--orange) 15%, transparent);
+		border: 0.5px solid var(--orange);
+		border-radius: 3px;
+		color: color-mix(in oklch, var(--orange) 40%, var(--white));
+		font-size: 0.75em;
 		inline-size: max-content;
-		padding-inline: 0.25rem;
+		padding-inline: 4px;
 	}
 
-	.more-episodes {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 2rem;
-		margin-block-start: 0.25rem;
+	.row {
+		padding-inline: 0;
 	}
 </style>

@@ -1,6 +1,5 @@
 ---
-import { Image } from '@unpic/astro';
-import { createImageUrl } from '../util/cloudinary';
+import Card from '../components/cards/card.astro';
 import type { AllSeriesQueryResult } from '../types/sanity';
 
 export const prerender = true;
@@ -34,12 +33,6 @@ const { series, short = false } = Astro.props;
 					return null;
 				}
 
-				const imgUrl = createImageUrl(series.image.public_id, {
-					width: 600,
-					aspect_ratio: '16:9',
-					crop: 'fill',
-				});
-
 				const seasons =
 					series.collections.length === 1
 						? '1 season'
@@ -51,28 +44,21 @@ const { series, short = false } = Astro.props;
 						: series.total_episode_count + ' episodes';
 
 				return (
-					<div class="series">
-						<a href={`/series/${series.slug}/${collection.slug}`}>
-							<Image
-								src={imgUrl}
-								alt={series.title}
-								aspectRatio={16 / 9}
-								width={600}
-							/>
-						</a>
-						<div class="details">
-							<div class="title-bar">
-								<h2>
-									<a href={`/series/${series.slug}/${collection.slug}`}>
-										{series.title}
-									</a>
-								</h2>
-								<span class="season-count">{seasons}</span>
-								<span class="episode-count">{episodes}</span>
-							</div>
-							<p>{series.description}</p>
-						</div>
-					</div>
+					<Card
+						image={{
+							public_id: series.image.public_id,
+							alt: series.title,
+						}}
+						title={series.title}
+						description={series.description}
+						link={`/series/${series.slug}/${collection.slug}`}
+						linkText="See Episodes"
+					>
+						<Fragment slot="tagline">
+							<p class="season-count">{seasons}</p>
+							<p class="episode-count">{episodes}</p>
+						</Fragment>
+					</Card>
 				);
 			})
 		}
@@ -90,10 +76,11 @@ const { series, short = false } = Astro.props;
 
 <style>
 	.series-container {
-		margin-block: 2rem;
+		background: var(--black);
+		padding: 32px max((100% - var(--max-width)) / 2, 5%);
 
 		@media (min-width: 800px) {
-			margin-block: 4rem;
+			padding-block: 64px 120px;
 		}
 	}
 
@@ -105,61 +92,18 @@ const { series, short = false } = Astro.props;
 
 		@media (min-width: 800px) {
 			display: grid;
-			gap: 0.125rem;
-			grid-template-columns: repeat(auto-fit, calc(100% / 3 - 0.25rem / 3));
+			gap: 20px;
+			grid-template-columns: repeat(auto-fit, calc(100% / 3 - 40px / 3));
 			justify-content: start;
 		}
+	}
 
-		.series {
-			background: var(--white);
-			border-radius: 0.125rem;
-			transition: 200ms linear background;
+	.season-count {
+		color: var(--text-emphasized);
+	}
 
-			&:is(:focus-within, :hover) {
-				background: var(--gray-100);
-			}
-		}
-
-		img {
-			border-radius: 0.125rem;
-		}
-
-		.details {
-			padding: 0 1rem 0.75rem;
-		}
-
-		.title-bar {
-			align-items: baseline;
-			display: flex;
-			flex-wrap: wrap;
-			font-size: 0.75rem;
-			font-weight: 200;
-			gap: 0.5rem;
-			line-height: 1.1;
-			margin-block: 0.25rem;
-		}
-
-		h2 {
-			font-size: 1rem;
-			font-weight: 500;
-			line-height: 1.1;
-			margin-inline-end: auto;
-
-			a {
-				color: inherit;
-				text-decoration: none;
-
-				&:focus-visible,
-				&:hover {
-					text-decoration: underline;
-				}
-			}
-		}
-
-		& p {
-			font-size: 0.75rem;
-			line-height: 1.25;
-		}
+	.episode-count {
+		color: var(--text-muted);
 	}
 
 	.see-all {

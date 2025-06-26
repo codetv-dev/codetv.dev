@@ -1,17 +1,10 @@
 ---
 import Eyebrow from '../components/eyebrow.astro';
 import Logo from '../components/logo.astro';
+import Header from '../components/header.astro';
 import Footer from '../components/footer.astro';
 import UserButton from '../components/user-button.astro';
 import '../styles/global.css';
-
-const nav = [
-	{ path: '/watch', label: 'Watch' },
-	{ path: '/blog', label: 'Blog' },
-	{ path: '/newsletter', label: 'Newsletter' },
-	{ path: '/support', label: 'Support' },
-	{ path: 'https://partners.codetv.dev', label: 'Partners' },
-];
 
 export interface Props {
 	title?: string;
@@ -64,7 +57,7 @@ const {
 		></script>
 	</head>
 	<body>
-		<header>
+		<!-- <header>
 			<Eyebrow />
 
 			<div>
@@ -108,7 +101,8 @@ const {
 					</nav>
 				</div>
 			</div>
-		</header>
+		</header> -->
+		<Header />
 
 		<slot />
 
@@ -141,23 +135,6 @@ const {
 		</svg>
 	</body>
 </html>
-
-<script>
-	const navSearchBtn = document.querySelector('[data-name="nav-search"]');
-
-	navSearchBtn?.addEventListener('click', (event) => {
-		event.preventDefault();
-
-		const search = document.querySelector(
-			'[data-name="main-search"]',
-		) as HTMLButtonElement;
-
-		(
-			document.querySelector('#menu:popover-open') as HTMLElement
-		)?.hidePopover();
-		search.click();
-	});
-</script>
 
 <style>
 	/* When the nav popover is visible:

@@ -109,11 +109,15 @@ export function QueryEpisodeItem({ item }) {
 			? 'content'
 			: 'description';
 
+	// TODO get fallback image when no image is set
+
 	return (
 		<a className="aa-Link" href={item.url} rel="noopener noreferrer">
 			<div className="aa-LinkItem">
 				<div className="aa-LinkItem-Content">
-					<img className="aa-CoverImage" src={item.image} />
+					{item.image !== 'false' ? (
+						<img className="aa-CoverImage" src={item.image} />
+					) : null}
 					<div>
 						<div className="aa-LinkLabel">
 							<Highlight hit={item} attribute="headline" />

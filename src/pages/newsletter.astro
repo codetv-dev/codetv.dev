@@ -1,0 +1,36 @@
+---
+import Layout from '../layouts/default.astro';
+import PageHeader from '../components/page-header.astro';
+import NewsletterSection from '../components/home/newsletter.astro';
+
+export const prerender = true;
+---
+
+<Layout
+	title="All Series by CodeTV — tv for developers"
+	description="Watch original programming made for developers. Rediscover the fun in web dev with CodeTV."
+>
+	<main>
+		<PageHeader
+			image={{
+				public_id: 'codetv/newsletter-header',
+				alt: 'Sterling Chin, Michael Liendo, Dave Schwantes, Alex Riviere, Will Johnson, Brittany Ellich, and Abbey Perini laughing while sitting on risers on the set of Web Dev Challenge S2.',
+			}}
+			line1="Newsletter"
+			line2=""
+			aspectRatio={2.0329411765}
+		/>
+
+		<NewsletterSection />
+	</main>
+</Layout>
+
+<style>
+	:global(main .hero) {
+		z-index: 10;
+	}
+
+	:global(main .newsletter) {
+		z-index: 1 !important;
+	}
+</style>
