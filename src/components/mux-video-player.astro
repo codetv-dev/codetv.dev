@@ -44,7 +44,7 @@ let user;
 try {
 	user = await Astro.locals.currentUser();
 } catch (e) {
-	user = false;
+	user = undefined;
 }
 
 // @ts-ignore
@@ -170,8 +170,8 @@ const dateString = new Intl.DateTimeFormat('en-US', {
 	.subscription-required {
 		background-blend-mode: multiply, normal;
 		background-image: linear-gradient(
-				color-mix(in oklch, var(--gray-500) 40%, transparent),
-				color-mix(in oklch, var(--gray-700) 80%, transparent)
+				color-mix(in oklch, var(--text-muted) 40%, transparent),
+				color-mix(in oklch, var(--text) 80%, transparent)
 			),
 			var(--bg-img);
 		background-size: cover, cover;
@@ -186,7 +186,7 @@ const dateString = new Intl.DateTimeFormat('en-US', {
 			background: color-mix(in oklch, var(--white) 60%, transparent);
 			border-radius: 0.25rem;
 			box-shadow: 0 1px 2px
-				color-mix(in oklch, var(--gray-500) 80%, transparent);
+				color-mix(in oklch, var(--text-muted) 80%, transparent);
 			color: var(--text-strong);
 			display: flex;
 			flex-direction: column;
@@ -208,7 +208,7 @@ const dateString = new Intl.DateTimeFormat('en-US', {
 
 	.button {
 		background: var(--yellow-500);
-		border: 1px solid var(--gray-300);
+		border: 1px solid var(--text-muted);
 		block-size: min-content;
 		color: var(--black);
 		display: flex;

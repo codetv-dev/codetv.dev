@@ -1,0 +1,88 @@
+---
+import Layout from '../layouts/default.astro';
+import PageHeader from '../components/page-header.astro';
+import NewsletterSection from '../components/home/newsletter.astro';
+import Aside from '../components/aside.astro';
+import Heart from '../components/heart.astro';
+
+export const prerender = true;
+---
+
+<Layout
+	title="Become a CodeTV Supporter"
+	description="With your help, we can make learning web dev more fun, create a welcoming and supportive community, and build resilient careers in tech. Let's do this together."
+>
+	<main>
+		<PageHeader
+			image={{
+				public_id: 'codetv/support-header',
+				alt: 'Alexis Aguilar smiling at a game show podium on the set of Leet Heat S1. Andy Stewart is visible at the other podium.',
+			}}
+			line1="Become a"
+			line2="CodeTV Supporter"
+		/>
+
+    <section>
+      <p>
+        <strong>Starting at $5 each month, you can directly support the production of new CodeTV programming.</strong> Your contribution helps us create more episodes of the shows you love, and makes it possible to introduce new shows.
+      </p>
+
+      <p>
+        Supporters get exclusive perks, including:
+      </p>
+
+      <ul>
+        <li>Early access to new episodes</li>
+        <li>Exclusive content</li>
+        <li>Supporter-only discounts</li>
+        <li>Special thanks in the credits of CodeTV shows</li>
+        <li>and more!</li>
+      </ul>
+
+      <h2>How to become a CodeTV supporter</h2>
+
+      <ol>
+        <li><a href="/dashboard/sign-up">Create your CodeTV account</a> (or <a href="/dashboard/sign-in">sign in</a> if you already have one)</li>
+        <li>Choose a supporter tier from <a href="/dashboard">your dashboard</a></li>
+      </ol>
+
+      <Aside>
+        <p>
+          <strong>Please note:</strong> there is no minimum commitment, and every dollar counts. Thank you so much for helping us make dev more fun. <Heart />
+        </p>
+      </Aside>
+    </section>
+	</main>
+</Layout>
+
+<style>
+	section {
+		font-size: 1rem;
+		max-inline-size: min(90dvi, 54ch);
+		margin: 80px auto;
+		word-wrap: break-word;
+
+    h2 {
+      line-height: 1.1;
+    }
+
+		:is(p, ul, ol) {
+			&:not(:first-child) {
+				margin-block-start: 20px;
+			}
+
+			&.lede {
+				font-size: 1.25em;
+				margin-block-start: 16px;
+
+				& + p {
+					margin-block-start: 20px;
+				}
+			}
+		}
+
+		li {
+			margin-block-start: 8px;
+		}
+	}
+</style>

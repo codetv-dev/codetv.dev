@@ -6,14 +6,39 @@ const user = await Astro.locals.currentUser();
 
 {
 	user ? (
-		<a href="/dashboard">
-			{user.fullName}
+		<a href="/dashboard" class="account" title="Manage your account">
+			{user.firstName}
 			<img src={user.imageUrl} alt={user.fullName} width={60} />
 		</a>
 	) : (
-		<>
-			<a href="/dashboard/sign-in">Sign In</a>
-			<a href="/dashboard/sign-up">Create Account</a>
-		</>
+		<a href="/dashboard/sign-in" class="button">Become a Supporter</a>
 	)
 }
+
+<style>
+	.account {
+		align-items: center;
+		border: 1px solid color-mix(in oklch, var(--text-muted) 15%, transparent);
+		border-radius: 5px;
+		display: flex;
+		font-family: var(--font-family);
+		font-size: 0.75rem;
+		gap: 10px;
+		padding: 5px 5px 5px 10px;
+		transition: background-color 100ms linear;
+
+		&:is(:hover, :focus) {
+			background-color: color-mix(in oklch, var(--text-muted) 25%, transparent);
+		}
+
+		img {
+			aspect-ratio: 1;
+			block-size: auto;
+			border-radius: 3px;
+			display: block;
+			inline-size: 30px;
+			object-fit: cover;
+			outline: 1px solid var(--text-muted);
+		}
+	}
+</style>

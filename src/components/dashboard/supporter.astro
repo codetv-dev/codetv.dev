@@ -1,0 +1,217 @@
+---
+import {
+	getSubscriptionDetails,
+	STRIPE_SUBSCRIPTION_TYPES,
+} from '../../util/stripe';
+import Panel from './panel.astro';
+
+const user = await Astro.locals.currentUser();
+
+const stripeSub = await getSubscriptionDetails(user);
+
+const subscription = user?.publicMetadata.stripe;
+const isSubscriber = subscription?.status === 'active';
+---
+
+{
+	isSubscriber ? (
+		<Panel heading="Thank you for supporting CodeTV!">
+			<Fragment slot="blurb">
+				{stripeSub?.cancel_at_period_end && stripeSub.cancel_at ? (
+					<p class="cancellation-pending">
+						Your subscription has been canceled. Supporter benefits will
+						remain available until
+						{new Intl.DateTimeFormat('en-US', {
+							dateStyle: 'medium',
+						}).format(new Date(stripeSub.cancel_at * 1000))}
+						.
+					</p>
+				) : null}
+			
+				<p>You're directly contributing to the creation of new CodeTV programming!</p>
+			</Fragment>
+
+			<Fragment slot="panel-content">
+				<div class="panel-field">
+					<div class="field">
+						<p class="field-label">Current support level</p>
+						<p class="field-value level">{subscription.level}</p>
+
+						<p class="field-label">Supporter since</p>
+						<p class="field-value start-date">
+							{new Intl.DateTimeFormat('en-US', {
+								dateStyle: 'medium',
+							}).format(
+								new Date((stripeSub?.start_date ?? Date.now() / 1000) * 1000),
+							)}
+						</p>
+					</div>
+				</div>
+
+				<div class="panel-field">
+					<div class="field">
+						<form action="/api/stripe/portal" method="POST">
+							<input
+								type="hidden"
+								name="customerId"
+								value={subscription.customer}
+							/>
+
+							<div class="field-value">
+								<button class="button manage-subscription">
+									manage your subscription
+								</button>
+							</div>
+						</form>
+					</div>
+				</div>
+			</Fragment>
+		</Panel>
+	) : (
+		<Panel heading="Become a CodeTV Supporter">
+			<Fragment slot="blurb">
+				<p>
+					CodeTV's goal is to make tv for developers. To fund our programming,
+					we rely on a mix of partnerships with dev tooling companies and direct
+					support from viewers like you.
+				</p>
+				<p>
+					The more direct viewer support we have, the more freedom we have to
+					make more shows — whether or not we can make a strong case for their
+					business value to a corprorate backer.
+				</p>
+				<p>
+					What that means in practical terms is: every dollar you contribute to
+					CodeTV brings us one step closer to unbounded silliness and fun, free
+					from the shackles of OKRs and KPIs. And we don't know about you, but
+					we'd love to see what promise that future holds.
+				</p>
+			</Fragment>
+
+			<Fragment slot="panel-content">
+				<div class="plans">
+					<h2>Choose your level of support</h2>
+
+					<div class="plan-cards">
+						{STRIPE_SUBSCRIPTION_TYPES.map((plan) => (
+							<div class="plan">
+								<h3>{plan.name}</h3>
+								<p>{plan.description}</p>
+
+								{plan.prices.map((price) => {
+									const formattedPrice = new Intl.NumberFormat('en-US', {
+										style: 'currency',
+										currency: 'USD',
+										maximumFractionDigits: 0,
+									}).format(price.price / 100);
+
+									return (
+										<form action="/api/stripe/checkout" method="POST">
+											{user?.publicMetadata?.stripe?.customer ? (
+												<input
+													type="hidden"
+													name="customerId"
+													value={user.publicMetadata.stripe.customer}
+												/>
+											) : null}
+											<input
+												type="hidden"
+												name="priceId"
+												value={price.priceId}
+											/>
+											<button class="button">
+												Subscribe {price.period} for {formattedPrice}
+											</button>
+										</form>
+									);
+								})}
+							</div>
+						))}
+					</div>
+				</div>
+			</Fragment>
+		</Panel>
+	)
+}
+
+<style>
+	.cancellation-pending {
+		background: color-mix(in oklch, var(--orange) 15%, transparent);
+		border: 1px solid color-mix(in oklch, var(--orange) 50%, transparent);
+		border-radius: 3px;
+		color: var(--text-emphasized);
+		font-style: italic;
+		margin-block-start: 0.5rem;
+		padding: 0.25rem;
+	}
+
+	.field {
+		grid-template-columns: 160px minmax(max-content, 1fr);
+
+		> form {
+			grid-column-start: 2;
+		}
+	}
+
+	.field-label {
+		font-weight: 700;
+		text-align: start;
+	}
+
+	.field-value {
+		color: var(--text);
+	}
+
+	.button.manage-subscription {
+		background: none;
+		border: none;
+		color: var(--text-emphasized);
+		font-family: inherit;
+		font-size: 0.875rem;
+		grid-column-start: 2;
+		inline-size: max-content;
+		margin-block-start: 8px;
+		padding-inline: 0;
+		transition: color 100ms linear;
+
+		&::after {
+			content: '→';
+		}
+
+		&:is(:hover, :focus) {
+			color: var(--white);
+		}
+	}
+
+	.plans {
+		border-block-start: 1px solid rgb(255 255 255 / 0.07);
+		container: plans / inline-size;
+		padding-block: 16px;
+	}
+
+	.plan-cards {
+		display: grid;
+
+		@container plans (min-width: 500px) {
+			gap: 16px;
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+	}
+
+	.plan {
+		border: 1px solid rgba(255, 255, 255, 0.07);
+		border-radius: 3px;
+		padding: 12px;
+
+		p {
+			color: var(--text);
+			margin-block-start: 8px;
+		}
+
+		.button {
+			border: none;
+			inline-size: 100%;
+			text-align: center;
+		}
+	}
+</style>

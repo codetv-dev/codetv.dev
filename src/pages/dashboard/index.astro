@@ -1,227 +1,149 @@
 ---
-import { actions } from 'astro:actions';
-import { SignOutButton } from '@clerk/astro/components';
-import { getPersonById } from '../../util/sanity';
-import { getSubscriptionDetails, STRIPE_SUBSCRIPTION_TYPES } from '../../util/stripe';
+import { UserProfile } from '@clerk/astro/components';
 import Layout from '../../layouts/default.astro';
-
-export const prerender = false;
-
-const user = await Astro.locals.currentUser();
-
-if (!user) {
-	throw new Error('not logged in');
-}
-
-const stripeSub = await getSubscriptionDetails(user);
-const	userDetails = await getPersonById({ user_id: user.id }, { useCdn: false });
-
-if (!userDetails) {
-	// TODO report this somehow that doesn't crash the page
-	// throw new Error('no user details found')
-}
-
-const subscription = user?.publicMetadata.stripe;
-const isSubscriber = subscription?.status === 'active';
+import DashboardSupporter from '../../components/dashboard/supporter.astro';
+import LinksBio from '../../components/dashboard/links-bio.astro';
 ---
 
 <Layout title="Your Dashboard — CodeTV">
-	<main>
-		{user ? (
-			<section class="user-info">
-				<img src={user.imageUrl} alt={`${user.firstName} ${user.lastName}`} width="200" height="200" />
-				<h1 class="name">
-					{user.firstName} {user.lastName}
-					<span class="view-profile">
-						(<a href={`/profile/${user.username}`} class="view-profile">view profile</a>)
-					</span>
-				</h1>
+	<main id="user-profile">
+		<UserProfile>
+			<UserProfile.Page label="Support" url="support">
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					fill="none"
+					viewBox="0 0 16 16"
+					slot="label-icon"
+				>
+					<path
+						fill="currentColor"
+						fill-rule="evenodd"
+						d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14ZM5.5 5.5c1.064-.183 1.95.251 2.351.521a.312.312 0 0 0 .344 0c.402-.27 1.287-.704 2.351-.521 1.262.217 1.963 2.2.954 3.5-.732.943-2.098 1.951-3 2.5a.91.91 0 0 1-1 0c-.902-.549-2.268-1.557-3-2.5-1.01-1.3-.262-3.283 1-3.5Z"
+						clip-rule="evenodd"></path>
+				</svg>
+				<DashboardSupporter />
+			</UserProfile.Page>
 
-				<Fragment>
-					{isSubscriber ? (
-						<p class="level">{subscription.level}</p>
-						<p class="start-date">Supporter since {new Intl.DateTimeFormat('en-US', { dateStyle: 'medium'}).format(new Date((stripeSub?.start_date ?? Date.now() / 1000) * 1000))}</p>
+			<UserProfile.Page label="account" />
 
-						<>
-							{stripeSub?.cancel_at_period_end && stripeSub.cancel_at ? (
-								<p class="cancellation-pending">
-									Your subscription has been canceled. Supporter benefits 
-									will remain available until 
-									{new Intl.DateTimeFormat('en-US', { dateStyle: 'medium' }).format(new Date(stripeSub.cancel_at * 1000))}.
-								</p>
-							) : null}
-						</>
+			<UserProfile.Page label="Links & Bio" url="links-bio">
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					fill="none"
+					viewBox="0 0 16 16"
+					slot="label-icon"
+				>
+					<path
+						fill="currentColor"
+						fill-rule="evenodd"
+						d="M12.95 13.2a7 7 0 1 0-9.9-9.9 7 7 0 0 0 9.9 9.9ZM6.409 7.367a.5.5 0 0 0-.707 0l-.026.025c-.337.337-.842.842-1.08 1.45a1.865 1.865 0 0 0-.097 1.1c.088.397.313.777.672 1.136.36.36.74.585 1.137.673.4.09.773.032 1.1-.096.608-.238 1.113-.744 1.45-1.08l.026-.027a.5.5 0 0 0-.707-.707c-.37.371-.74.728-1.132.882a.866.866 0 0 1-.518.053c-.172-.039-.39-.146-.648-.405-.259-.258-.365-.476-.404-.647a.867.867 0 0 1 .052-.519c.154-.392.512-.76.883-1.131a.5.5 0 0 0-.001-.707Zm2.237-.47a.5.5 0 1 1 .707.707l-2 2a.5.5 0 0 1-.707-.707l2-2Zm1.046-2.149c-.4-.089-.773-.031-1.1.097-.608.238-1.113.743-1.45 1.08l-.026.027a.5.5 0 0 0 .707.708c.371-.372.74-.73 1.133-.883.18-.07.349-.09.518-.053.172.038.39.146.648.404.258.259.366.476.404.648a.868.868 0 0 1-.053.518c-.154.393-.51.762-.882 1.133a.5.5 0 1 0 .707.707l.027-.026c.337-.337.842-.842 1.08-1.45.128-.327.186-.7.097-1.1-.09-.397-.313-.777-.673-1.137-.36-.36-.74-.584-1.137-.673Z"
+						clip-rule="evenodd"></path>
+				</svg>
+				<LinksBio />
+			</UserProfile.Page>
 
-						<form action="/api/stripe/portal" method="POST">
-							<input type="hidden" name="customerId" value={subscription.customer} />
-							<button>manage your subscription</button>
-						</form>
-					) : null}
-
-					<a href="https://accounts.codetv.dev/user" class="update-profile">Update Avatar, Username, etc.</a>
-
-					<SignOutButton />
-				</Fragment>
-			</section>
-		) : null}
-
-		{!isSubscriber ? (
-			<section class="support">
-				<h2>Become a supporter</h2>
-				<p>
-					<strong>CodeTV is not a VC-backed company.</strong> We rely on sponsorships and support from people just like you to continue operating. Creating content for developers at the level of quality they deserve isn’t cheap, and your contribution makes new series and formats possible.
-				</p>
-
-				<h3>Choose your level of support:</h3>
-
-				<div class="sub-levels">
-					{STRIPE_SUBSCRIPTION_TYPES.map((level) => {
-						return (
-							<div class="sub-level">
-								<h3>{level.name}</h3>
-								<p>{level.description}</p>
-
-								{level.prices.map((price) => {
-									const formattedPrice = new Intl.NumberFormat(
-										'en-US',
-										{
-											style: 'currency',
-											currency: 'USD',
-											maximumFractionDigits: 0,
-										}
-									).format(price.price / 100);
-
-									return (
-										<form action="/api/stripe/checkout" method="POST">
-											{user?.publicMetadata?.stripe?.customer ? (
-												<input type="hidden" name="customerId" value={user.publicMetadata.stripe.customer} />
-											) : null}
-											<input type="hidden" name="priceId" value={price.priceId} />
-											<button>Subscribe {price.period} for {formattedPrice}</button>
-										</form>
-									)}
-								)}
-							</div>
-						)}
-					)}
-				</div>
-			</section>
-		) : null}
-
-		{userDetails ? (
-			<section class="details">
-				<form method="post" action={actions.user.updateProfile} class="update-profile-form">
-					<legend>Account Details</legend>
-
-					<label for="bio">Bio</label>
-					<textarea name="bio" id="bio">{userDetails.bio}</textarea>
-
-					<div class="profile-links">
-						<h3>Your Links</h3>
-
-						<div class="links">
-							{userDetails.links?.map((link, i: number) => (
-								<div class="link">
-									<label for={`link-label-${i}`}>Label
-										<input type="text" name="link_label[]" id={`link-label-${i}`} value={link.label} required />
-									</label>
-
-									<label for={`link-url-${i}`}>URL
-										<input type="url" name="link_url[]" id={`link-url-${i}`} value={link.url} required />
-									</label>
-
-									<button class="remove-link">
-										<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
-										<span class="sr-only">Delete Link</span>
-									</button>
-								</div>
-							))}
-						</div>
-
-						<button id="add-profile-link">+ add a link</button>
-					</div>
-
-					<input type="hidden" name="id" value={userDetails._id} />
-					<input type="hidden" name="username" value={user.username} />
-
-					<button type="submit" class="update-profile-btn">Update Profile</button>
-				</form>
-			</section>
-		) : (
-			<section class="details">
-				<p>Your account is being set up. Please check back in a few seconds.</p>
-			</section>
-		)}
+			<UserProfile.Page label="security" />
+		</UserProfile>
 	</main>
 </Layout>
 
-<template id="link-template">
-	<div class="link">
-		<label>Label
-			<input type="text" name="link_label[]" required />
-		</label>
-
-		<label>URL
-			<input type="url" name="link_url[]" required />
-		</label>
-
-		<button class="remove-link">
-			<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
-			<span class="sr-only">Delete Link</span>
-		</button>
-	</div>
-</template>
-
 <script>
-	// handle removing links
-	function addRemoveHandlers() {
-		const removeLinkBtns = document.querySelectorAll('.remove-link');
-		removeLinkBtns.forEach((btn) => {
-			function removeParent(event: Event) {
-				event.preventDefault();
-				event.stopImmediatePropagation();
-				btn.parentElement?.remove();
-			}
+	function linksBioSetup() {
+		// handle removing links
+		function addRemoveHandlers() {
+			const removeLinkBtns = document.querySelectorAll('.remove-link');
+			removeLinkBtns.forEach((btn) => {
+				function removeParent(event: Event) {
+					event.preventDefault();
+					event.stopImmediatePropagation();
+					btn.parentElement?.remove();
+				}
 
-			btn.removeEventListener('click', removeParent);
-			btn.addEventListener('click', removeParent);
+				btn.removeEventListener('click', removeParent);
+				btn.addEventListener('click', removeParent);
+			});
+		}
+
+		addRemoveHandlers();
+
+		// handle adding additional links
+		const linkTemplate = document.querySelector(
+			'#link-template',
+		) as HTMLTemplateElement;
+		const linksContainer = document.querySelector('.links') as HTMLDivElement;
+		const addLinkBtn = document.querySelector(
+			'#add-profile-link',
+		) as HTMLButtonElement;
+
+		function addLink() {
+			const link = linkTemplate.content.cloneNode(true);
+
+			linksContainer.appendChild(link);
+		}
+
+		addLinkBtn.addEventListener('click', (event) => {
+			event.preventDefault();
+
+			addLink();
+			addRemoveHandlers();
+		});
+
+		// disable form while waiting for update
+		const updateProfile = document.querySelector('.update-profile-form');
+
+		updateProfile?.addEventListener('submit', () => {
+			updateProfile.classList.add('submitting');
+			updateProfile.querySelector('button')?.setAttribute('disabled', 'true');
 		});
 	}
 
-	addRemoveHandlers();
+	function addObserver() {
+		const targetNode = document.getElementById('user-profile');
 
-	// handle adding additional links
-	const linkTemplate = document.querySelector('#link-template') as HTMLTemplateElement;
-	const linksContainer = document.querySelector('.links') as HTMLDivElement;
-	const addLinkBtn = document.querySelector('#add-profile-link') as HTMLButtonElement;
+		if (!targetNode) {
+			return;
+		}
 
-	function addLink() {
-		const link = linkTemplate.content.cloneNode(true);
+		// Create an observer instance linked to the callback function
+		const observer = new MutationObserver((mutationList) => {
+			for (const mutation of mutationList) {
+				mutation.addedNodes.forEach((node) => {
+					if (node.nodeType !== node.ELEMENT_NODE) {
+						return;
+					}
 
-		linksContainer.appendChild(link);
+					const el = node as HTMLElement;
+					const btn = el.querySelector('#add-profile-link');
+					if (!btn) {
+						return;
+					}
+
+					linksBioSetup();
+				});
+			}
+		});
+
+		// Start observing the target node for configured mutations
+		observer.observe(targetNode, {
+			attributes: true,
+			childList: true,
+			subtree: true,
+		});
 	}
 
-	addLinkBtn.addEventListener('click', (event) => {
-		event.preventDefault();
-
-		addLink();
-		addRemoveHandlers();
-	});
-
-	// disable form while waiting for update
-	const updateProfile = document.querySelector('.update-profile-form');
-
-	updateProfile?.addEventListener('submit', () => {
-		updateProfile.classList.add('submitting');
-		updateProfile.querySelector('button')?.setAttribute('disabled', 'true');
-	})
+	addObserver();
 </script>
 
 <style>
 	main {
 		font-size: 0.75rem;
-		inline-size: min(90dvi, 1080px);
-		margin: 3rem auto;
+		margin: 0 auto 3rem;
+		min-block-size: 90dvb;
+		padding-block-start: 40px;
+
+		@media (min-width: 1280px) {
+			padding-block-start: 80px;
+		}
 	}
 
 	.user-info {
@@ -229,17 +151,20 @@ const isSubscriber = subscription?.status === 'active';
 		inline-size: 250px;
 		margin-block-end: 4rem;
 		margin-inline: auto;
+
 		img {
 			block-size: auto;
-			border: 1px solid var(--gray-600);
-			border-radius: 50%;
+			border: 1px solid var(--text-muted);
+			border-radius: 3px;
 			display: block;
 			inline-size: 100%;
 		}
 
 		.view-profile {
+			display: block;
 			font-size: 0.625rem;
 			font-weight: 400;
+			margin-block-start: 0.5rem;
 		}
 
 		.name,
@@ -248,9 +173,10 @@ const isSubscriber = subscription?.status === 'active';
 			text-align: center;
 
 			&.name {
-				font-size: 0.875rem;
+				font-size: 1.25rem;
 				font-weight: 500;
-				margin-block-start: 0.25rem;
+				letter-spacing: 0.02em;
+				margin-block-start: 1rem;
 			}
 
 			&.level {
@@ -258,6 +184,7 @@ const isSubscriber = subscription?.status === 'active';
 				border: 0.5px solid var(--green-500);
 				border-radius: 0.125rem;
 				inline-size: max-content;
+				margin-block-start: 10px;
 				margin-inline: auto;
 				padding-inline: 0.25rem;
 			}
@@ -270,7 +197,7 @@ const isSubscriber = subscription?.status === 'active';
 			}
 
 			&.cancellation-pending {
-				background: color-mix(in oklch, var(--orange-500) 15%, transparent);
+				background: color-mix(in oklch, var(--orange-500) 25%, transparent);
 				border: 1px solid var(--orange-500);
 				border-radius: 0.125rem;
 				color: var(--gray-600);
@@ -280,14 +207,29 @@ const isSubscriber = subscription?.status === 'active';
 				padding: 0.25rem;
 			}
 		}
+
+		.button {
+			background: var(--bg);
+			border: 1px solid color-mix(in oklch, var(--text-muted) 25%, transparent);
+			color: var(--text-emphasized);
+			font-family: var(--font-family);
+			font-size: 0.75rem;
+			inline-size: 100%;
+			margin-block-start: 10px;
+			text-align: center;
+			transition: background 100ms linear;
+
+			&:is(:hover, :active, :focus) {
+				background: color-mix(in oklch, var(--text-muted) 15%, transparent);
+			}
+		}
 	}
 
-	.update-profile,
-	button {
+	.update-profile {
 		background: var(--white);
-		border: 1px solid var(--gray-400);
+		border: 1px solid var(--text-muted);
 		border-radius: 0.125rem;
-		color: var(--gray-400);
+		color: var(--text-muted);
 		cursor: pointer;
 		display: block;
 		font-size: 0.625rem;
@@ -320,6 +262,7 @@ const isSubscriber = subscription?.status === 'active';
 
 		p {
 			font-size: 0.875rem;
+			font-weight: 200;
 			margin-block-start: 0.5rem;
 			margin-inline: auto;
 			max-inline-size: 54ch;
@@ -338,18 +281,19 @@ const isSubscriber = subscription?.status === 'active';
 		}
 
 		.sub-level {
-			background: var(--gray-000);
-			border: 1px solid var(--gray-200);
-			border-radius: 0.25rem;
+			background: var(--black);
+			border: 1px solid color-mix(in oklch, var(--text-muted) 25%, transparent);
+			border-radius: 3%;
 			display: flex;
 			flex-direction: column;
-			gap: 0.75rem;
+			gap: 10px;
 			inline-size: 220px;
-			padding: 0.75rem;
-			text-align: left;
+			padding: 10px;
+			text-align: start;
+			transition: 150ms background linear;
 
 			&:has(button:hover, button:active, button:focus) {
-				background: var(--indigo-100);
+				background: color-mix(in oklch, var(--text-muted) 15%, transparent);
 			}
 
 			h3 {
@@ -369,14 +313,31 @@ const isSubscriber = subscription?.status === 'active';
 			}
 
 			button {
-				background: var(--indigo-100);
-				border-color: var(--indigo-500);
+				background: var(--orange); /* color-mix(in oklch, var(--orange)); */
+				/* border-color: color-mix(in oklch, var(--text-muted) 15%, transparent); */
+				color: var(--black);
+				font-size: 0.875rem;
 				margin-block-start: 0;
+				text-transform: uppercase;
+				text-box-trim: trim-both;
+				text-spacing-trim: space-all;
+				transition: 150ms all linear;
 
 				&:is(:hover, :active, :focus) {
-					background: var(--indigo-500);
-					color: var(--white);
+					background: var(--white);
 				}
+			}
+		}
+
+		@media (min-width: 1280px) {
+			inline-size: 100%;
+			margin-block-start: 0;
+			text-align: start;
+
+			p {
+				font-size: 1rem;
+				margin-inline-start: 0;
+				max-inline-size: 60ch;
 			}
 		}
 	}
@@ -392,14 +353,14 @@ const isSubscriber = subscription?.status === 'active';
 				padding: 0;
 			}
 
-			:is(label, input:not([type=checkbox]), textarea, button) {
+			:is(label, input:not([type='checkbox']), textarea, button) {
 				display: block;
 				inline-size: 100%;
 			}
 
-			:is(input:not([type=checkbox]), textarea, button) {
+			:is(input:not([type='checkbox']), textarea, button) {
 				background: var(--white);
-				border: 1px solid var(--gray-400);
+				border: 1px solid var(--text-muted);
 				border-radius: 0.125rem;
 				font-size: 16px;
 				font-weight: 400;
@@ -453,10 +414,18 @@ const isSubscriber = subscription?.status === 'active';
 				}
 			}
 
-			button[type="submit"] {
+			button[type='submit'] {
 				&:is(:hover, :focus, :active) {
 					background: var(--yellow-500);
 				}
+			}
+		}
+
+		@media (min-width: 1280px) {
+			grid-column-start: 2;
+
+			form {
+				inline-size: 100%;
 			}
 		}
 	}
@@ -469,7 +438,7 @@ const isSubscriber = subscription?.status === 'active';
 
 	.update-profile-form {
 		position: relative;
-		
+
 		&.submitting {
 			opacity: 0.5;
 
@@ -477,12 +446,43 @@ const isSubscriber = subscription?.status === 'active';
 				align-items: center;
 				background: color-mix(in oklch, var(--gray-000) 80%, transparent);
 				content: 'please wait';
-				display:flex;
-				flex-direction:row;
+				display: flex;
+				flex-direction: row;
 				inset: 0;
 				justify-content: center;
 				position: absolute;
 			}
 		}
+	}
+</style>
+
+<style is:global>
+	.panel-field {
+		border-block-start: 1px solid rgb(255 255 255 / 0.07);
+		margin-block-start: 24px;
+		padding-block-start: 24px;
+
+		@container (min-width: 500px) {
+			align-items: first baseline;
+			display: grid;
+			grid-template-columns: 120px minmax(0, 1fr);
+		}
+	}
+
+	.field {
+		align-items: first baseline;
+		display: grid;
+		gap: 8px 20px;
+		grid-template-columns: 80px minmax(0, 1fr);
+		justify-content: space-between;
+	}
+
+	.field-label {
+		display: block;
+		text-align: end;
+	}
+
+	.field-value {
+		color: var(--white);
 	}
 </style>

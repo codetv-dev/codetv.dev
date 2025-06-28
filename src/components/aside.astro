@@ -110,10 +110,10 @@ const { variant = 'default' } = Astro.props;
 
 		&::after,
 		&::before {
-			background: var(--gray-400);
+			background: color-mix(in oklch, var(--text-muted) 40%, transparent);
 			background-size: 200%;
 			content: '';
-			height: 2px;
+			height: 1px;
 			left: 0;
 			position: absolute;
 			width: 100%;
@@ -148,7 +148,7 @@ const { variant = 'default' } = Astro.props;
 			margin-top: 0;
 		}
 
-		& :global(> :last-child) {
+		& :global(> :last-child:not(svg)) {
 			padding-bottom: 16px;
 		}
 

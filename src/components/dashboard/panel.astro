@@ -1,0 +1,53 @@
+---
+export interface Props {
+	heading: string;
+}
+
+const { heading } = Astro.props;
+---
+
+<section class="clerk-panel">
+	<div class="overview">
+		<h1>{heading}</h1>
+		<div class="blurb">
+			<slot name="blurb" />
+		</div>
+	</div>
+
+	<div class="panel-content">
+		<slot name="panel-content" />
+	</div>
+</section>
+
+<style>
+	.clerk-panel {
+		container: clerk-panel / inline-size;
+
+		:is(h1, h2, h3) {
+			color: var(--white);
+			font-family: inherit;
+			font-size: 1.0625rem;
+			font-weight: 700;
+			line-height: 1.45;
+			margin-block-end: 16px;
+		}
+
+		h2 {
+			font-size: 1rem;
+		}
+
+		h3 {
+			font-size: 0.875rem;
+		}
+
+		.blurb {
+			border-block-start: 1px solid rgba(255, 255, 255, 0.07);
+			color: var(--text);
+			padding-block: 16px;
+
+			p:not(:first-child) {
+				margin: 20px 0 0;
+			}
+		}
+	}
+</style>

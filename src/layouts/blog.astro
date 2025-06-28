@@ -248,8 +248,9 @@ og.image = frontmatter.share?.image ?? generateDefaultImage({ text: og.title });
 			text-decoration: none;
 
 			&.active {
-				background: color-mix(in oklch, var(--purple-500) 15%, transparent);
-				border-color: var(--purple-600);
+				background: color-mix(in oklch, var(--orange) 15%, transparent);
+				border-color: var(--orange);
+				color: var(--white);
 			}
 		}
 	}
@@ -378,7 +379,7 @@ og.image = frontmatter.share?.image ?? generateDefaultImage({ text: og.title });
 
 	.post-content :not(pre) > code {
 		background: var(--gray-100);
-		border: 1px solid color-mix(in oklch, var(--gray-200) 10%, var(--gray-100));
+		border: 1px solid color-mix(in oklch, var(--text-muted) 10%, var(--gray-100));
 		border-radius: 2px;
 		font-size: 0.9em;
 		line-height: 1;
@@ -388,7 +389,7 @@ og.image = frontmatter.share?.image ?? generateDefaultImage({ text: og.title });
 	}
 
 	blockquote {
-		border-inline-start: 0.5rem var(--gray-200est) solid;
+		border-inline-start: 0.5rem var(--text-muted) solid;
 		color: var(--text-strong);
 		font-size: 1.125rem;
 		font-style: italic;

@@ -1,13 +1,11 @@
 import { defineConfig, envField } from 'astro/config';
 import clerk from '@clerk/astro';
+import { dark } from '@clerk/themes'
 import netlify from '@astrojs/netlify';
 import { imageService } from '@unpic/astro/service';
 import mdx from '@astrojs/mdx';
-
 import react from '@astrojs/react';
-
 import sitemap from '@astrojs/sitemap';
-
 import expressiveCode from 'astro-expressive-code';
 
 // https://astro.build/config
@@ -16,7 +14,16 @@ export default defineConfig({
 	output: 'server',
 	trailingSlash: 'never',
 	integrations: [
-		clerk({ afterSignInUrl: '/dashboard', afterSignUpUrl: '/dashboard' }),
+		clerk({
+			afterSignInUrl: '/dashboard',
+			afterSignUpUrl: '/dashboard',
+			appearance: {
+				baseTheme: dark,
+				variables: {
+					colorBackground: '#18151f'
+				}
+			}
+		}),
 		expressiveCode({ themes: ['night-owl'] }),
 		mdx(),
 		react(),

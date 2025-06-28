@@ -1,5 +1,6 @@
 ---
 import CodeTVLogo from '../assets/codetv-logo.svg';
+import UserButton from './user-button.astro';
 
 const nav = [
 	{ path: '/watch', label: 'Watch' },
@@ -35,14 +36,18 @@ const nav = [
 					d="M14.386 14.386l4.088 4.088-4.088-4.088A7.533 7.533 0 113.733 3.733a7.533 7.533 0 0110.653 10.653z"
 				></path>
 			</svg>
-			⌘+K
+			<span class="small">search</span>
+			<span class="large">⌘+K</span>
 		</a>
 
-		<a
-			href="https://calendly.com/codetv/new-project"
-			class="button"
-			data-open="modal">Book A Call</a
-		>
+		<UserButton server:defer>
+			<Fragment slot="fallback">
+				<a href="#" class="account">
+					loading...
+					<img src="https://res.cloudinary.com/jlengstorf/image/upload/q_auto/f_auto/c_fill,w_60,ar_1/v1738215366/codetv/codetv-avatar.png" alt="loading" />
+				</a>
+			</Fragment>
+		</UserButton>
 	</nav>
 </header>
 
@@ -68,14 +73,21 @@ const nav = [
 		align-items: center;
 		background: color-mix(in oklch, var(--black) 75%, transparent);
 		backdrop-filter: blur(20px);
+		block-size: 70px;
+		border: 1px solid color-mix(in oklch, var(--text-muted) 15%, transparent);
 		display: flex;
+		font-family: var(--font-family-heading);
+		font-size: 1.125rem;
+		inline-size: 100cqi;
+		inset-block-start: 0;
 		justify-content: space-between;
 		line-height: 1;
 		margin-inline: auto;
 		padding: 10px;
+		position: fixed;
 		z-index: 100;
 
-		@media (min-width: 1280px) {
+		@media (min-width: 1080px) {
 			border-radius: 8px;
 			box-shadow: 0 0 20px var(--black);
 			inset-block-start: 25px;
@@ -83,7 +95,6 @@ const nav = [
 			margin-inline: calc(
 				(100% - min(90dvi + 20px, var(--max-width) + 20px)) / 2
 			);
-			position: fixed;
 		}
 	}
 
@@ -93,16 +104,14 @@ const nav = [
 		display: flex;
 		flex-wrap: wrap;
 		font-weight: 500;
-		gap: 1rem 1.5rem;
-		inline-size: min(max-content, 90dvi);
+		gap: 1rem 10px;
 		justify-content: center;
-		letter-spacing: 0.1em;
 
 		@media (min-width: 1080px) {
 			gap: 10px;
 			inline-size: max-content;
 			justify-content: start;
-			padding: 0 25px;
+			padding: 0 0 0 25px;
 		}
 
 		a {
@@ -112,9 +121,16 @@ const nav = [
 			padding: 15px 10px;
 			pointer-events: all;
 			text-decoration: none;
+			transition: opacity 150ms linear;
 
 			&.button {
 				margin: 0;
+			}
+		}
+
+		&:has(:focus, :active, :hover) {
+			a:not(:is(:focus, :hover)) {
+				opacity: 0.75;
 			}
 		}
 
@@ -131,10 +147,31 @@ const nav = [
 				position: relative;
 				inset-block-start: 0.1rem;
 			}
+
+			.small {
+				display: block;
+				font-size: 0.75rem;
+			}
+
+			.large {
+				display: none;
+			}
+
+			@media (min-width: 1080px) {
+				.small {
+					display: none;
+				}
+
+				.large {
+					display: block;
+				}
+			}
 		}
 
 		.button {
 			color: var(--black);
+			font-size: clamp(0.875rem, 1.5cqi, 1rem);
+			letter-spacing: 0;
 		}
 	}
 
@@ -155,13 +192,40 @@ const nav = [
 			}
 		}
 
-		nav &:not(.button, .open-search) {
+		nav &:not(.button, .open-search, .account) {
 			color: inherit;
 			display: none;
 
-			@media (min-width: 1280px) {
+			@media (min-width: 1080px) {
 				display: block;
 			}
+		}
+	}
+
+	.account {
+		align-items: center;
+		border: 1px solid color-mix(in oklch, var(--text-muted) 15%, transparent);
+		border-radius: 5px;
+		display: flex;
+		font-family: var(--font-family);
+		font-size: 0.75rem;
+		gap: 10px;
+		inline-size: max-content;
+		padding: 5px 5px 5px 10px;
+		transition: background-color 100ms linear;
+
+		&:is(:hover, :focus) {
+			background-color: color-mix(in oklch, var(--text-muted) 25%, transparent);
+		}
+
+		img {
+			aspect-ratio: 1;
+			block-size: auto;
+			border-radius: 3px;
+			display: block;
+			inline-size: 30px;
+			object-fit: cover;
+			outline: 1px solid var(--text-muted);
 		}
 	}
 </style>

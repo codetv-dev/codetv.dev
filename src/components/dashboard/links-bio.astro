@@ -1,0 +1,209 @@
+---
+import { actions } from 'astro:actions';
+import { getPersonById } from '../../util/sanity';
+import Panel from './panel.astro';
+
+const user = await Astro.locals.currentUser();
+
+if (!user) {
+	return null;
+}
+
+const userDetails = (await getPersonById(
+	{ user_id: user.id },
+	{ useCdn: false },
+)) ?? { _id: undefined, bio: '', links: [] };
+---
+
+<Panel heading="Your Bio and Links">
+	<Fragment slot="blurb">
+		<p>Set your bio and links so people know where to find you online.</p>
+	</Fragment>
+
+	<Fragment slot="panel-content">
+		<div>
+			<form
+				method="post"
+				action={actions.user.updateProfile}
+				class="update-profile-form"
+			>
+				<div class="panel-field">
+					<h2>Your Bio</h2>
+
+					<div class="field">
+						<label for="bio" class="field-label">Bio</label>
+						<textarea name="bio" id="bio">{userDetails.bio}</textarea>
+					</div>
+				</div>
+
+				<div class="panel-field">
+					<h2>Your Links</h2>
+
+					<div class="links">
+						<dl class="existing-links field">
+							{
+								userDetails.links?.map((link, i: number) => (
+									<>
+										<dt class="link field-label">{link.label}</dt>
+
+										<dd class="url">
+											<span>{link.url}</span>
+
+											<button class="remove-link">
+												<svg
+													xmlns="http://www.w3.org/2000/svg"
+													width="16"
+													height="16"
+													viewBox="0 0 24 24"
+													fill="none"
+													stroke="currentColor"
+													stroke-width="1.5"
+													stroke-linecap="round"
+													stroke-linejoin="round"
+													class="lucide lucide-trash"
+												>
+													<path d="M3 6h18" />
+													<path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+													<path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+												</svg>
+												<span class="sr-only">Delete Link</span>
+											</button>
+
+											<input
+												type="hidden"
+												name="link_label[]"
+												id={`link-label-${i}`}
+												value={link.label}
+											/>
+											<input
+												type="hidden"
+												name="link_url[]"
+												id={`link-url-${i}`}
+												value={link.url}
+											/>
+										</dd>
+									</>
+								))
+							}
+						</dl>
+					</div>
+
+					<button id="add-profile-link">+ add a link</button>
+				</div>
+
+				<div class="panel-field">
+					<input type="hidden" name="id" value={userDetails._id} />
+					<input type="hidden" name="username" value={user.username} />
+
+					<button type="submit" class="button">Update Profile</button>
+				</div>
+			</form>
+		</div>
+	</Fragment>
+</Panel>
+
+<template id="link-template">
+	<div class="add-link">
+		<label>
+			Label
+			<input type="text" name="link_label[]" data-type="link-input" required />
+		</label>
+
+		<label>
+			URL
+			<input type="url" name="link_url[]" data-type="link-input" required />
+		</label>
+
+		<button class="remove-link">
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				width="16"
+				height="16"
+				viewBox="0 0 24 24"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="1.5"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+				class="lucide lucide-trash"
+				><path d="M3 6h18"></path><path
+					d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path
+					d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg
+			>
+			<span class="sr-only">Delete Link</span>
+		</button>
+	</div>
+</template>
+
+<style>
+	#bio,
+	:global([data-type="link-input"]) {
+		background: var(--black);
+		border: 1px solid rgb(255 255 255 / 0.15);
+		border-radius: 3px;
+		color: var(--white);
+		padding: 8px;
+	}
+
+	#bio {
+		field-sizing: content;
+	}
+
+	.url {
+		align-items: flex-start;
+		display: flex;
+		gap: 8px;
+
+		span {
+			display: block;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+		}
+	}
+
+	.remove-link {
+		background: none;
+		border: none;
+		color: var(--text-muted);
+	}
+
+	#add-profile-link {
+		background: none;
+		border: none;
+		color: var(--text);
+		font-size: 0.875rem;
+		grid-column-start: 2;
+		inline-size: max-content;
+		margin-block-start: 16px;
+		margin-inline-start: 92px;
+		transition: color 100ms linear;
+
+		&:is(:hover, :focus) {
+			color: var(--white);
+		}
+	}
+
+	.button {
+		border: none;
+		font-size: 1.25rem;
+		grid-column-start: 2;
+	}
+
+	.add-link {
+		align-items: last baseline;
+		display: grid;
+		gap: 20px;
+		grid-template-columns: minmax(0, 1fr) minmax(0, 2fr) 30px;
+		margin-block-start: 16px;
+
+		label {
+			color: var(--text-muted);
+
+			input {
+				display: block;
+				inline-size: 100%;
+			}
+		}
+	}
+</style>
