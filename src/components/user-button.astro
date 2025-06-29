@@ -24,8 +24,14 @@ const user = await Astro.locals.currentUser();
 		font-family: var(--font-family);
 		font-size: 0.75rem;
 		gap: 10px;
-		padding: 5px 5px 5px 10px;
+		inline-size: max-content;
+		margin-inline: auto;
+		padding: 15px 5px 15px 10px;
 		transition: background-color 100ms linear;
+
+		@media (min-width: 1080px) {
+			padding-block: 5px;
+		}
 
 		&:is(:hover, :focus) {
 			background-color: color-mix(in oklch, var(--text-muted) 25%, transparent);
