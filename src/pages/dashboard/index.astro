@@ -43,6 +43,17 @@ import LinksBio from '../../components/dashboard/links-bio.astro';
 			</UserProfile.Page>
 
 			<UserProfile.Page label="security" />
+
+			<UserProfile.Link label="Log Out" url="/api/sign-out">
+				<svg
+					slot="label-icon"
+					xmlns="http://www.w3.org/2000/svg"
+					viewBox="0 0 512 512"
+					fill="currentColor"
+				>
+					<path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512z"></path>
+				</svg>
+			</UserProfile.Link>
 		</UserProfile>
 	</main>
 </Layout>

@@ -1,9 +1,7 @@
 ---
-import Eyebrow from '../components/eyebrow.astro';
-import Logo from '../components/logo.astro';
+// import Eyebrow from '../components/eyebrow.astro';
 import Header from '../components/header.astro';
 import Footer from '../components/footer.astro';
-import UserButton from '../components/user-button.astro';
 import '../styles/global.css';
 
 export interface Props {
@@ -57,51 +55,7 @@ const {
 		></script>
 	</head>
 	<body>
-		<!-- <header>
-			<Eyebrow />
-
-			<div>
-				<a href="/" rel="home" class="logo">
-					<Logo />
-				</a>
-
-				<button class="nav-toggle" popovertarget="menu"> menu </button>
-
-				<div class="nav-group" id="menu" popover>
-					<div class="account">
-						<UserButton server:defer>
-							<a slot="fallback" href="#loading">
-								loading... <div class="placeholder-img"></div>
-							</a>
-						</UserButton>
-					</div>
-
-					<nav>
-						{nav.map(({ path, label }) => <a href={path}>{label}</a>)}
-
-						<a
-							href="#search"
-							class="open-search"
-							title="open site search"
-							data-name="nav-search"
-						>
-							<svg viewBox="0 0 20 20">
-								<path
-									fill="none"
-									fill-rule="evenodd"
-									stroke="currentColor"
-									stroke-width="2"
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									d="M14.386 14.386l4.088 4.088-4.088-4.088A7.533 7.533 0 113.733 3.733a7.533 7.533 0 0110.653 10.653z"
-								></path>
-							</svg>
-							⌘+K
-						</a>
-					</nav>
-				</div>
-			</div>
-		</header> -->
+		<!-- <Eyebrow /> -->
 		<Header />
 
 		<slot />
