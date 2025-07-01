@@ -5,12 +5,8 @@ import Panel from './panel.astro';
 
 const user = await Astro.locals.currentUser();
 
-if (!user) {
-	return null;
-}
-
 const userDetails = (await getPersonById(
-	{ user_id: user.id },
+	{ user_id: user?.id ?? '' },
 	{ useCdn: false },
 )) ?? { _id: undefined, bio: '', links: [] };
 ---
@@ -93,7 +89,7 @@ const userDetails = (await getPersonById(
 
 				<div class="panel-field">
 					<input type="hidden" name="id" value={userDetails._id} />
-					<input type="hidden" name="username" value={user.username} />
+					<input type="hidden" name="username" value={user?.username} />
 
 					<button type="submit" class="button">Update Profile</button>
 				</div>
