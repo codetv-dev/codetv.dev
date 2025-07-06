@@ -1,9 +1,11 @@
 import { purgeCache } from '@netlify/functions';
 import { NETLIFY_PERSONAL_ACCESS_TOKEN } from 'astro:env/server';
-import { Inngest, EventSchemas, NonRetriableError } from 'inngest';
+import { NonRetriableError } from 'inngest';
 import type { InvocationResult } from 'inngest/types';
 import type Stripe from 'stripe';
+import { inngest } from './inngest/client';
 
+import { discordUpdateUserRole } from './inngest/discord';
 import {
 	createPerson,
 	getPersonByClerkId,
@@ -15,95 +17,6 @@ import { cloudinary } from './cloudinary';
 import { stripe } from './stripe';
 import { clerk } from './clerk';
 import { sendDiscordMessage } from './discord';
-
-type ClerkWebhookUser = {
-	data: {
-		id: string;
-		username: string;
-		first_name: string;
-		last_name: string;
-		profile_image_url: string;
-	};
-};
-
-type Events = {
-	'clerk/user.updated': ClerkWebhookUser;
-	'clerk/user.created': ClerkWebhookUser;
-	'internal/stripe.subscription.retrieve': {
-		data: {
-			subscriptionId: string;
-		};
-	};
-	'internal/stripe.product.retrieve': {
-		data: {
-			productId: string;
-		};
-	};
-	'internal/clerk.user.update-subscription': {
-		data: {
-			clerkUserId: string;
-			stripeCustomerId: string;
-			subscriptionStatus: string;
-			productName: string;
-		};
-	};
-	'internal/sanity.person.update-subscription': {
-		data: {
-			sanityUserId: string;
-			stripeCustomerId: string;
-			subscriptionStatus: string;
-			productName: string;
-		};
-	};
-	'internal/netlify.cache-tag.invalidate': {
-		data: {
-			cacheTag: string;
-		};
-	};
-	'stripe/checkout.session.completed': {
-		data: {
-			object: {
-				customer: string;
-				metadata: {
-					userId: string;
-				};
-				subscription: string;
-				cancel_at_period_end: boolean;
-			};
-		};
-	};
-	'stripe/customer.subscription.updated': {
-		data: {
-			object: {
-				id: string;
-				cancel_at_period_end: boolean;
-			};
-		};
-	};
-	'stripe/customer.subscription.deleted': {
-		data: {
-			object: {
-				id: string;
-			};
-		};
-	};
-	'codetv/user.profile.update': {
-		data: {
-			id: string;
-			username: string;
-			bio: string;
-			links: Array<{ label: string; url: string }>;
-		};
-	};
-};
-
-export const schemas = new EventSchemas().fromRecord<Events>();
-
-export const inngest = new Inngest({
-	id: 'codetv',
-	schemas,
-	eventKey: import.meta.env.INNGEST_EVENT_KEY,
-});
 
 export const handleClerkUserCreatedOrUpdatedWebhook = inngest.createFunction(
 	{ id: 'clerk/user-created-or-updated' },
@@ -479,6 +392,7 @@ export const handleStripeSubscriptionUpdatedWebhook = inngest.createFunction(
 );
 
 export const functions = [
+	discordUpdateUserRole,
 	handleClerkUserCreatedOrUpdatedWebhook,
 	handleStripeSubscriptionCompletedWebhook,
 	handleStripeSubscriptionUpdatedWebhook,

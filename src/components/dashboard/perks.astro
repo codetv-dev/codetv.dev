@@ -1,0 +1,225 @@
+---
+import PerkCard from '../perk-card.astro';
+import Panel from './panel.astro';
+
+const user = await Astro.locals.currentUser();
+
+if (!user) {
+	return null;
+}
+
+const subscription = user?.publicMetadata.stripe;
+const isSubscriber = subscription && subscription.status === 'active';
+const level = subscription ? subscription.level : '';
+
+const discordAcct = user.externalAccounts.find(
+	(acct) => acct.provider === 'oauth_discord',
+);
+
+let perkClaims = [];
+if (discordAcct) {
+	perkClaims.push('discord');
+}
+
+if (
+	isSubscriber &&
+	[
+		'Silver Tier Supporter',
+		'Gold Tier Supporter',
+		'Platinum Tier Supporter',
+	].includes(level)
+) {
+	perkClaims.push('silver');
+}
+
+if (
+	isSubscriber &&
+	['Gold Tier Supporter', 'Platinum Tier Supporter'].includes(level)
+) {
+	perkClaims.push('gold');
+}
+
+if (
+	isSubscriber &&
+	['Gold Tier Supporter', 'Platinum Tier Supporter'].includes(level)
+) {
+	perkClaims.push('gold');
+}
+
+if (isSubscriber && ['Platinum Tier Supporter'].includes(level)) {
+	perkClaims.push('platinum');
+}
+---
+
+<Panel heading="Claim your CodeTV perks">
+	<Fragment slot="blurb">
+		<p>
+			CodeTV supporters get access to perks. Review this page and follow
+			instructions to fully unlock your perks.
+		</p>
+	</Fragment>
+
+	<Fragment slot="panel-content">
+		<h2>Available Perks</h2>
+
+		<div class="perks">
+			<div class="perk-cards">
+				<PerkCard
+					claimCondition={perkClaims.includes('discord')}
+					title="CodeTV Discord Access"
+				>
+					<svg
+						slot="perk-icon"
+						xmlns="http://www.w3.org/2000/svg"
+						fill="none"
+						viewBox="0 0 100 100"
+					>
+						<g clip-path="url(#a)">
+							<path
+								fill="#fff"
+								d="M58.04 28a34.54 34.54 0 0 0-1.575 3.185 45.877 45.877 0 0 0-13.592 0A31.808 31.808 0 0 0 41.3 28a49.478 49.478 0 0 0-12.254 3.777c-7.742 11.472-9.838 22.648-8.796 33.67a49.236 49.236 0 0 0 15.024 7.541 36.047 36.047 0 0 0 3.22-5.185 32.55 32.55 0 0 1-5.067-2.415c.426-.308.84-.628 1.243-.936a35.276 35.276 0 0 0 30.035 0c.403.332.817.651 1.244.936a32.229 32.229 0 0 1-5.08 2.426A36.04 36.04 0 0 0 64.089 73a49.214 49.214 0 0 0 15.025-7.53c1.23-12.786-2.108-23.867-8.82-33.681a48.711 48.711 0 0 0-12.242-3.765L58.039 28ZM39.818 58.663c-2.924 0-5.351-2.652-5.351-5.931 0-3.28 2.332-5.944 5.339-5.944 3.007 0 5.399 2.676 5.351 5.944-.047 3.267-2.356 5.931-5.34 5.931Zm19.724 0c-2.937 0-5.34-2.652-5.34-5.931 0-3.28 2.332-5.944 5.34-5.944 3.007 0 5.386 2.676 5.339 5.944-.047 3.267-2.356 5.931-5.34 5.931Z"
+								style="fill:#fff;fill-opacity:1"></path>
+						</g>
+						<defs>
+							<clipPath id="a">
+								<path
+									fill="#fff"
+									d="M0 0h59.364v45H0z"
+									style="fill:#fff;fill-opacity:1"
+									transform="translate(20 27)"></path>
+							</clipPath>
+						</defs>
+					</svg>
+
+					<p slot="claimed-description">
+						You’ve got access to the CodeTV Discord.
+						<a href="https://codetv.link/discord">Join the Discord &rarr;</a>
+					</p>
+
+					<p slot="unclaimed-description">
+						Join the exclusive Discord for direct access to the CodeTV
+						community.
+						<a href="#/account">Connect your Discord account to join &rarr;</a>
+					</p>
+				</PerkCard>
+
+				<PerkCard
+					claimCondition={perkClaims.includes('silver')}
+					title="Early Access to New Episodes"
+				>
+					<svg
+						slot="perk-icon"
+						xmlns="http://www.w3.org/2000/svg"
+						fill="none"
+						viewBox="0 0 100 100"
+					>
+						<path
+							fill="#fff"
+							d="M60.524 27C76.562 27 80 30.438 80 46.476v6.048C80 68.562 76.562 72 60.524 72H39.476C23.438 72 20 68.562 20 52.524v-6.048C20 30.438 23.438 27 39.476 27h21.048ZM45 39a1 1 0 0 0-1 1v20a1 1 0 0 0 1 1h.06a1 1 0 0 0 .508-.139l16.97-10a1 1 0 0 0 0-1.722l-16.97-10A1 1 0 0 0 45.06 39H45Z"
+							style="fill:#fff;fill-opacity:1"></path>
+						<path
+							fill="#fff"
+							d="M74.566 62c.13 0 .259.038.368.11l10.7 7.055a1 1 0 0 1 0 1.67l-10.7 7.055a.667.667 0 0 1-1.034-.557v-6.405l-9.742 6.959a.606.606 0 0 1-.958-.492v-14.79a.606.606 0 0 1 .958-.492l9.742 6.958v-6.404c0-.368.298-.667.666-.667Z"
+							style="fill:#fff;fill-opacity:1"></path>
+						<path
+							fill="#18151F"
+							d="M63.806 59c.756 0 1.489.238 2.096.672l4.998 3.57v-.575A3.667 3.667 0 0 1 74.565 59h.001c.63 0 1.247.163 1.79.467l.229.139 10.7 7.054.218.154c2.107 1.592 2.107 4.78 0 6.372l-.218.154-10.7 7.054a3.667 3.667 0 0 1-5.685-3.061v-.575l-4.998 3.57a3.608 3.608 0 0 1-2.096.672h-.001a3.606 3.606 0 0 1-3.605-3.603V62.603l.005-.185a3.606 3.606 0 0 1 3.6-3.418ZM63.2 77.394a.606.606 0 0 0 .958.493l9.742-6.96v6.406a.667.667 0 0 0 1.034.557l10.7-7.055a1 1 0 0 0 0-1.67l-10.7-7.055a.667.667 0 0 0-1.034.557v6.404l-9.742-6.958a.606.606 0 0 0-.958.492v14.79Z"
+							style="fill:#18151f;fill:color(display-p3 .0941 .0824 .1216);fill-opacity:1"
+						></path>
+					</svg>
+
+					<span slot="badge" class="badge orange">Silver Tier</span>
+
+					<p slot="unclaimed-description">
+						Silver tier supporters get access to new episodes of CodeTV series
+						ahead of their public release.
+						<a href="#">Become a supporter to unlock &rarr;</a>
+					</p>
+
+					<p slot="claimed-description">
+						You’ve got early access to new episodes.
+						<a href="#">See early access episodes now &rarr;</a>
+					</p>
+				</PerkCard>
+
+				<PerkCard
+					claimCondition={perkClaims.includes('gold')}
+					title="Supporter-Only Discounts"
+				>
+					<svg
+						slot="perk-icon"
+						xmlns="http://www.w3.org/2000/svg"
+						fill="none"
+						viewBox="0 0 100 100"
+					>
+						<path
+							fill="#fff"
+							d="M31.343 61.486h-3.22l5.651-10.685c-.685.309-1.575.514-2.843.514-2.088 0-3.39-.41-4.143-1.13-.685-.72-.788-1.199-.788-2.534v-6.952c0-1.336.069-1.747.72-2.432.753-.753 2.123-1.233 4.314-1.233 2.09 0 3.528.48 4.247 1.199.685.685.856 1.164.822 2.5l-.206 5.788 4.247-9.007h3.219l-5.582 10.719c.685-.343 1.61-.548 2.91-.548 2.09 0 3.391.41 4.145 1.13.684.72.787 1.199.787 2.534v6.952c0 1.336-.068 1.747-.753 2.432-.72.753-2.09 1.233-4.281 1.233-2.089 0-3.527-.48-4.246-1.199-.686-.685-.857-1.164-.822-2.5l.205-5.959-4.383 9.178Zm-1.2-14.726c0 .514.24.788.925.788.651 0 .89-.274.89-.788v-5.308c0-.514-.239-.788-.89-.788-.684 0-.924.274-.924.788v5.308Zm9.487 10.788c0 .514.274.788.959.788.65 0 .89-.274.89-.788V52.24c0-.514-.24-.788-.89-.788-.685 0-.959.274-.959.788v5.308Z"
+							style="fill:#fff;fill-opacity:1"></path>
+						<rect
+							width="60"
+							height="5"
+							x="20"
+							y="27"
+							fill="#fff"
+							rx="1"
+							style="fill:#fff;fill-opacity:1"></rect>
+						<path
+							fill="#fff"
+							d="M52.159 51.202 62.214 64a1 1 0 0 0 1.572 0l10.055-12.797A.743.743 0 0 0 73.257 50H52.743a.743.743 0 0 0-.584 1.202Z"
+							style="fill:#fff;fill-opacity:1"></path>
+						<rect
+							width="18"
+							height="6"
+							x="60"
+							y="52"
+							fill="#fff"
+							rx="1"
+							style="fill:#fff;fill-opacity:1"
+							transform="rotate(-90 60 52)"></rect>
+						<rect
+							width="60"
+							height="5"
+							x="20"
+							y="67"
+							fill="#fff"
+							rx="1"
+							style="fill:#fff;fill-opacity:1"></rect>
+					</svg>
+
+					<span slot="badge" class="badge orange">Gold Tier</span>
+
+					<p slot="unclaimed-description">
+						Get discounts on courses, workshops, and merchandise from CodeTV.
+						<a href="#">
+							{
+								perkClaims.includes('silver')
+									? 'Upgrade to unlock'
+									: 'Become a supporter to unlock'
+							} &rarr;
+						</a>
+					</p>
+
+					<p slot="claimed-description">Claimed description.</p>
+				</PerkCard>
+			</div>
+		</div>
+	</Fragment>
+
+	<style>
+		h2 {
+			padding-block-end: 8px;
+		}
+
+		.perks {
+			border-block-start: 1px solid rgb(255 255 255 / 0.07);
+			container: perks / inline-size;
+			padding-block: 16px;
+		}
+
+		.perk-cards {
+			display: grid;
+			gap: 16px;
+		}
+	</style>
+</Panel>

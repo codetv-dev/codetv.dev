@@ -32,6 +32,7 @@ const isSubscriber = subscription?.status === 'active';
 			</Fragment>
 
 			<Fragment slot="panel-content">
+				<h2>Your Subscription</h2>
 				<div class="panel-field">
 					<div class="field">
 						<p class="field-label">Current support level</p>
@@ -50,6 +51,26 @@ const isSubscriber = subscription?.status === 'active';
 
 				<div class="panel-field">
 					<div class="field">
+						<form action="/api/stripe/portal" method="POST">
+							<input
+								type="hidden"
+								name="customerId"
+								value={subscription.customer}
+							/>
+
+							<div class="field-value">
+								<button class="button manage-subscription">
+									manage your subscription
+								</button>
+							</div>
+						</form>
+					</div>
+				</div>
+
+				<h2>Newsletter</h2>
+				<div class="panel-field">
+					<div class="field">
+						<p class="field-label">Newsletter</p>
 						<form action="/api/stripe/portal" method="POST">
 							<input
 								type="hidden"

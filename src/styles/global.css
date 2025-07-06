@@ -161,6 +161,25 @@ button {
 	cursor: pointer;
 }
 
+.badge {
+	background: var(--blue);
+	border-radius: 3px;
+	color: var(--black);
+	display: inline-block;
+	font-size: 0.625rem;
+	font-weight: 900;
+	letter-spacing: 0.1em;
+	line-height: 1;
+	padding: 1px 4px 1px 5px;
+	text-box-trim: trim-both;
+	text-spacing-trim: space-all;
+	text-transform: uppercase;
+
+	&.orange {
+		background: var(--orange);
+	}
+}
+
 .sr-only {
 	position: absolute;
 	width: 1px;

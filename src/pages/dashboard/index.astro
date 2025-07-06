@@ -3,6 +3,7 @@ import { UserProfile } from '@clerk/astro/components';
 import Layout from '../../layouts/default.astro';
 import DashboardSupporter from '../../components/dashboard/supporter.astro';
 import LinksBio from '../../components/dashboard/links-bio.astro';
+import Perks from '../../components/dashboard/perks.astro';
 ---
 
 <Layout title="Your Dashboard — CodeTV">
@@ -24,20 +25,50 @@ import LinksBio from '../../components/dashboard/links-bio.astro';
 				<DashboardSupporter />
 			</UserProfile.Page>
 
+			<UserProfile.Page label="Perks" url="perks">
+				<svg
+					slot="label-icon"
+					xmlns="http://www.w3.org/2000/svg"
+					fill="none"
+					viewBox="0 0 70 70"
+				>
+					<g clip-path="url(#a)">
+						<path
+							fill="currentColor"
+							d="M35 0c19.33 0 35 15.67 35 35S54.33 70 35 70 0 54.33 0 35 15.67 0 35 0Zm19.646 16.076a3.89 3.89 0 0 0-5.313 1.424L32.028 47.47l-10.052-8.617-.316-.243a3.89 3.89 0 0 0-5.035 5.875l.288.273 13.611 11.667a3.89 3.89 0 0 0 5.9-1.008L56.07 21.389a3.89 3.89 0 0 0-1.424-5.313Z"
+							style="fill:currentColor;fill-opacity:1"></path>
+					</g>
+					<defs>
+						<clipPath id="a">
+							<path
+								fill="currentColor"
+								d="M0 0h70v70H0z"
+								style="fill:currentColor;fill-opacity:1"></path>
+						</clipPath>
+					</defs>
+				</svg>
+
+				<Perks />
+			</UserProfile.Page>
+
 			<UserProfile.Page label="account" />
 
 			<UserProfile.Page label="Links & Bio" url="links-bio">
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					fill="none"
-					viewBox="0 0 16 16"
-					slot="label-icon"
-				>
-					<path
-						fill="currentColor"
-						fill-rule="evenodd"
-						d="M12.95 13.2a7 7 0 1 0-9.9-9.9 7 7 0 0 0 9.9 9.9ZM6.409 7.367a.5.5 0 0 0-.707 0l-.026.025c-.337.337-.842.842-1.08 1.45a1.865 1.865 0 0 0-.097 1.1c.088.397.313.777.672 1.136.36.36.74.585 1.137.673.4.09.773.032 1.1-.096.608-.238 1.113-.744 1.45-1.08l.026-.027a.5.5 0 0 0-.707-.707c-.37.371-.74.728-1.132.882a.866.866 0 0 1-.518.053c-.172-.039-.39-.146-.648-.405-.259-.258-.365-.476-.404-.647a.867.867 0 0 1 .052-.519c.154-.392.512-.76.883-1.131a.5.5 0 0 0-.001-.707Zm2.237-.47a.5.5 0 1 1 .707.707l-2 2a.5.5 0 0 1-.707-.707l2-2Zm1.046-2.149c-.4-.089-.773-.031-1.1.097-.608.238-1.113.743-1.45 1.08l-.026.027a.5.5 0 0 0 .707.708c.371-.372.74-.73 1.133-.883.18-.07.349-.09.518-.053.172.038.39.146.648.404.258.259.366.476.404.648a.868.868 0 0 1-.053.518c-.154.393-.51.762-.882 1.133a.5.5 0 1 0 .707.707l.027-.026c.337-.337.842-.842 1.08-1.45.128-.327.186-.7.097-1.1-.09-.397-.313-.777-.673-1.137-.36-.36-.74-.584-1.137-.673Z"
-						clip-rule="evenodd"></path>
+				<svg slot="label-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 70 70">
+					<g clip-path="url(#a)">
+						<path
+							fill="currentColor"
+							d="M35 0c19.33 0 35 15.67 35 35S54.33 70 35 70 0 54.33 0 35 15.67 0 35 0Zm-6.563 32.366a6 6 0 0 0-8.196 2.197l-7 12.123a6 6 0 0 0 2.197 8.197l12.124 7a6 6 0 0 0 8.197-2.197l7-12.123a6 6 0 0 0-2.197-8.197l-.289-.167-.134-.073a3 3 0 0 0-2.996 5.19l.13.08.29.166-7 12.125-12.125-7 7-12.124.289.165a3 3 0 1 0 3-5.196l-.29-.166ZM41.5 23.741a3 3 0 0 0-4.098 1.099l-10 17.32a3 3 0 0 0 5.196 3l10-17.32A3 3 0 0 0 41.5 23.74Zm.938-15.624a6 6 0 0 0-8.197 2.196l-7 12.124a6 6 0 0 0 2.197 8.197l.289.167.134.073a3 3 0 0 0 2.996-5.19l-.13-.08-.29-.166 7-12.124 12.126 7-7 12.123-.29-.165a3 3 0 1 0-3 5.196l.29.166a6 6 0 0 0 8.196-2.197l7-12.123a6 6 0 0 0-2.197-8.197l-12.124-7Z"
+							style="fill:currentColor;fill-opacity:1"></path>
+					</g>
+					<defs>
+						<clipPath id="a">
+							<path
+								fill="currentColor"
+								d="M0 0h70v70H0z"
+								style="fill:currentColor;fill-opacity:1"></path>
+						</clipPath>
+					</defs>
 				</svg>
 				<LinksBio />
 			</UserProfile.Page>
@@ -48,10 +79,23 @@ import LinksBio from '../../components/dashboard/links-bio.astro';
 				<svg
 					slot="label-icon"
 					xmlns="http://www.w3.org/2000/svg"
-					viewBox="0 0 512 512"
-					fill="currentColor"
+					fill="none"
+					viewBox="0 0 70 70"
 				>
-					<path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512z"></path>
+					<g clip-path="url(#a)">
+						<path
+							fill="currentColor"
+							d="M35 0c19.33 0 35 15.67 35 35S54.33 70 35 70 0 54.33 0 35 15.67 0 35 0Zm-1 12.5-.335.009a6.5 6.5 0 0 0-6.156 6.156L27.5 19v4a3.5 3.5 0 1 0 7 0v-3.5h15v31h-15V47a3.5 3.5 0 1 0-7 0v4a6.5 6.5 0 0 0 6.5 6.5h16a6.5 6.5 0 0 0 6.5-6.5V19a6.5 6.5 0 0 0-6.5-6.5H34ZM22.092 23.143a3.5 3.5 0 0 0-4.95.058l-8.646 8.854a3.5 3.5 0 0 0 0 4.89l8.647 8.854.128.126a3.5 3.5 0 0 0 5.002-4.885l-.123-.132L19.31 38H40a3.5 3.5 0 1 0 0-7H19.31l2.84-2.908a3.5 3.5 0 0 0-.058-4.95Z"
+							style="fill:currentColor;fill-opacity:1"></path>
+					</g>
+					<defs>
+						<clipPath id="a">
+							<path
+								fill="currentColor"
+								d="M0 0h70v70H0z"
+								style="fill:currentColor;fill-opacity:1"></path>
+						</clipPath>
+					</defs>
 				</svg>
 			</UserProfile.Link>
 		</UserProfile>
@@ -473,6 +517,10 @@ import LinksBio from '../../components/dashboard/links-bio.astro';
 		margin-block-start: 24px;
 		padding-block-start: 24px;
 
+		h2 {
+			margin: 0;
+		}
+
 		@container (min-width: 500px) {
 			align-items: first baseline;
 			display: grid;
@@ -484,6 +532,7 @@ import LinksBio from '../../components/dashboard/links-bio.astro';
 		align-items: first baseline;
 		display: grid;
 		gap: 8px 20px;
+		grid-column-start: 2;
 		grid-template-columns: 80px minmax(0, 1fr);
 		justify-content: space-between;
 	}

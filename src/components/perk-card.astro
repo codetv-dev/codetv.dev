@@ -1,0 +1,94 @@
+---
+export interface Props {
+	title: string;
+	claimCondition: boolean;
+}
+
+const { title, claimCondition } = Astro.props;
+---
+
+<div class:list={{ perk: true, claimed: claimCondition }}>
+	<div class="perk-image">
+		<slot name="perk-icon">
+			<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 100 100">
+				<path
+					fill="#fff"
+					d="M57.842 47.13h5.084c4.278 0 5.828-1.116 5.828-5.27v-2.294c0-2.976-1.116-3.906-3.844-3.906-2.852 0-3.968.93-3.968 3.906v3.596H51.27v-4.588c0-4.65.372-6.51 2.418-8.556 2.17-2.17 5.58-3.348 11.346-3.348s9.114 1.178 11.16 3.224c2.356 2.356 2.604 4.03 2.604 8.68v3.72c0 5.27-.496 7.75-2.852 10.106s-6.014 3.534-12.028 3.534H59.02l-1.178-8.804Zm.434 11.842H68.32V71H58.276V58.972ZM27.75 47.13h5.084c4.278 0 5.828-1.116 5.828-5.27v-2.294c0-2.976-1.116-3.906-3.844-3.906-2.852 0-3.968.93-3.968 3.906v3.596h-9.672v-4.588c0-4.65.372-6.51 2.418-8.556 2.17-2.17 5.58-3.348 11.346-3.348s9.114 1.178 11.16 3.224c2.356 2.356 2.604 4.03 2.604 8.68v3.72c0 5.27-.496 7.75-2.852 10.106s-6.014 3.534-12.028 3.534h-4.898L27.75 47.13Zm.434 11.842h10.044V71H28.184V58.972Z"
+					style="fill:#fff;fill-opacity:1"></path>
+			</svg>
+		</slot>
+
+		{
+			claimCondition ? (
+				<svg
+          class="perk-claimed"
+					xmlns="http://www.w3.org/2000/svg"
+					fill="none"
+					viewBox="0 0 100 100"
+				>
+					<path
+						fill="#647CF6"
+						d="M23 5c9.941 0 18 8.059 18 18s-8.059 18-18 18S5 32.941 5 23 13.059 5 23 5Zm10.103 8.268a2 2 0 0 0-2.732.732l-8.9 15.413-5.17-4.432-.161-.125a2 2 0 0 0-2.59 3.022l.148.14 7 6a2 2 0 0 0 3.034-.518L33.836 16a2 2 0 0 0-.733-2.732Z"
+						style="fill:#647cf6;fill:color(display-p3 .3922 .4863 .9647);fill-opacity:1"
+					/>
+					<path
+						fill="#18151F"
+						d="M41 23c0-9.941-8.059-18-18-18S5 13.059 5 23s8.059 18 18 18 18-8.059 18-18Zm-10.629-9a2 2 0 0 1 3.465 2L23.732 33.5a2 2 0 0 1-3.034.519l-7-6-.148-.141a2 2 0 0 1 2.59-3.022l.162.125 5.17 4.432L30.372 14Zm2.232.134a1 1 0 0 0-1.31.28l-.056.086-9.502 16.456-6.057-5.193-.116-.09a1 1 0 0 0-1.298 1.505l.106.1 6.979 5.982c.225.193.526.276.819.226l.108-.025a1 1 0 0 0 .59-.461L32.97 15.5a1 1 0 0 0-.28-1.31l-.087-.056ZM42 23c0 10.493-8.507 19-19 19S4 33.493 4 23 12.507 4 23 4s19 8.507 19 19Z"
+						style="fill:#18151f;fill:color(display-p3 .0941 .0824 .1216);fill-opacity:1"
+					/>
+				</svg>
+			) : null
+		}
+	</div>
+
+	<div class="perk-details">
+		<h3>
+			{title}
+			{claimCondition ? <span class="badge blue">claimed</span> : <slot name="badge" />}
+		</h3>
+
+		{
+			claimCondition ? (
+				<slot name="claimed-description" />
+			) : (
+				<slot name="unclaimed-description" />
+			)
+		}
+	</div>
+</div>
+
+<style>
+	.perk {
+		align-items: center;
+		border: 1px solid rgba(255, 255, 255, 0.07);
+		border-radius: 3px;
+		display: grid;
+		gap: 16px;
+		grid-template-columns: 50px minmax(0, 1fr);
+		padding: 12px;
+
+		h3 {
+			margin: 0;
+		}
+
+		p {
+			color: var(--text);
+			margin-block-start: 4px;
+		}
+
+		.button {
+			border: none;
+			inline-size: 100%;
+			text-align: center;
+		}
+	}
+
+	.perk-image {
+		position: relative;
+	}
+
+	.perk-claimed {
+		inset: 0;
+		position: absolute;
+	}
+</style>

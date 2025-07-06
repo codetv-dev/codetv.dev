@@ -78,10 +78,6 @@ export default defineConfig({
 				access: 'secret',
 				context: 'server',
 			}),
-			// MUX_JWT_PRIVATE_KEY: envField.string({
-			// 	access: 'secret',
-			// 	context: 'server',
-			// }),
 			MUX_TOKEN_ID: envField.string({ access: 'secret', context: 'server' }),
 			MUX_TOKEN_SECRET: envField.string({
 				access: 'secret',
