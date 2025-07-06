@@ -1,0 +1,51 @@
+---
+import Layout from '../layouts/default.astro';
+
+export const prerender = true;
+
+const issueURL = new URL('https://github.com');
+issueURL.pathname = '/codetv-dev/codetv.dev/issues/new';
+issueURL.searchParams.append('title', '404 Error');
+issueURL.searchParams.append('body', `Missing URL: ${Astro.url}`);
+---
+
+<Layout
+	title="404 — Page Note Found"
+	description="The page you requested does not exist."
+>
+	<main>
+		<h1>Page Not Found</h1>
+
+		<p>
+			The page you requested was not found. If you got here from a link or
+			otherwise think this is in error, please
+			<a href={issueURL.toString()}>open an issue</a>.
+		</p>
+	</main>
+</Layout>
+
+<style>
+	main {
+		padding: 180px max((100% - 900px) / 2, 5%);
+	}
+
+	h1 {
+		--font-size: 1;
+
+		color: var(--white);
+		font-family: var(--font-heading);
+		font-size: calc(var(--font-size) * clamp(1rem, 2.5cqi, 4rem));
+		line-height: 1.1;
+		margin: 0;
+		padding: 0;
+		text-align: center;
+	}
+
+	p {
+		color: var(--white);
+		margin: 16px auto 0;
+		max-inline-size: 54ch;
+		text-align: center;
+		text-wrap: balance;
+	}
+</style>
