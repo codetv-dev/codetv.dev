@@ -29,6 +29,13 @@ const {
 		<meta name="generator" content={Astro.generator} />
 		<title>{title}</title>
 
+		<link
+			rel="alternate"
+			type="application/rss+xml"
+			title="CodeTV Blog RSS"
+			href={new URL('blog/rss.xml', Astro.site)}
+		/>
+
 		<slot name="head">
 			<meta name="description" content={description} />
 			<meta name="image" content={image} />

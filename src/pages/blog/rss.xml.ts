@@ -51,7 +51,7 @@ export async function GET(context: AstroConfig) {
 					title: post.data.title,
 					pubDate: post.data.pubDate,
 					description: post.data.description,
-					link: `/blog/${post.slug}`,
+					link: `/blog/${post.id}`,
 					content: sanitizeHtml(html, {
 						// images are stripped by default
 						allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img']),
