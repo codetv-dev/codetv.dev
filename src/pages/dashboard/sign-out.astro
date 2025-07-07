@@ -1,3 +1,14 @@
 ---
-return Astro.redirect('/', 307);
+const url = Astro.url;
+
+url.pathname = '/';
 ---
+
+<html lang="en">
+	<head>
+    <meta http-equiv="refresh" content={`0; url=${url}`} />
+  </head>
+  <body>
+    <p>Redirecting...</p>
+  </body>
+</html>

@@ -1,7 +1,6 @@
 ---
 import { SignIn as ClerkSignIn } from '@clerk/astro/components';
 import Layout from '../../layouts/default.astro';
-import Aside from '../../components/aside.astro';
 import PageHeader from '../../components/page-header.astro';
 import Heart from '../../components/heart.astro';
 ---
@@ -10,11 +9,12 @@ import Heart from '../../components/heart.astro';
 	<main>
 		<PageHeader
 			image={{
-				public_id: 'codetv/support-header',
-				alt: 'Alexis Aguilar smiling at a game show podium on the set of Leet Heat S1. Andy Stewart is visible at the other podium.',
+				public_id: 'supporter-header',
+				alt: 'A group of people posing together on the set of Web Dev Challenge.',
 			}}
-			line1="Become a"
-			line2="CodeTV Supporter"
+			line1=""
+			line2="Sign In"
+			aspectRatio={1728 / 480}
 		/>
 
 		<section class="support">
