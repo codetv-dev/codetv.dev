@@ -67,7 +67,7 @@ const isSubscriber = subscription?.status === 'active';
 					</div>
 				</div>
 
-				<h2>Newsletter</h2>
+				{/* <h2>Newsletter</h2>
 				<div class="panel-field">
 					<div class="field">
 						<p class="field-label">Newsletter</p>
@@ -85,11 +85,11 @@ const isSubscriber = subscription?.status === 'active';
 							</div>
 						</form>
 					</div>
-				</div>
+				</div> */}
 			</Fragment>
 		</Panel>
 	) : (
-		<Panel heading="Become a CodeTV Supporter">
+		<Panel heading="Upgrade your CodeTV Supporter account">
 			<Fragment slot="blurb">
 				<p>
 					CodeTV's goal is to make tv for developers. To fund our programming,
@@ -116,7 +116,7 @@ const isSubscriber = subscription?.status === 'active';
 					<div class="plan-cards">
 						{STRIPE_SUBSCRIPTION_TYPES.map((plan) => (
 							<div class="plan">
-								<h3>{plan.name}</h3>
+								<h3>{plan.name} Tier</h3>
 								<p>{plan.description}</p>
 
 								{plan.prices.map((price) => {
@@ -141,7 +141,7 @@ const isSubscriber = subscription?.status === 'active';
 												value={price.priceId}
 											/>
 											<button class="button">
-												Subscribe {price.period} for {formattedPrice}
+												Join {price.period} for {formattedPrice}
 											</button>
 										</form>
 									);
@@ -167,10 +167,12 @@ const isSubscriber = subscription?.status === 'active';
 	}
 
 	.field {
-		grid-template-columns: 160px minmax(max-content, 1fr);
+		@media (min-width: 480px) {
+			grid-template-columns: 160px minmax(max-content, 1fr);
 
-		> form {
-			grid-column-start: 2;
+			> form {
+				grid-column-start: 2;
+			}
 		}
 	}
 

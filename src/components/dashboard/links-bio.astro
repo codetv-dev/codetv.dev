@@ -133,7 +133,7 @@ const userDetails = (await getPersonById(
 
 <style>
 	#bio,
-	:global([data-type="link-input"]) {
+	:global([data-type='link-input']) {
 		background: var(--black);
 		border: 1px solid rgb(255 255 255 / 0.15);
 		border-radius: 3px;
@@ -172,8 +172,11 @@ const userDetails = (await getPersonById(
 		grid-column-start: 2;
 		inline-size: max-content;
 		margin-block-start: 16px;
-		margin-inline-start: 92px;
 		transition: color 100ms linear;
+
+		@media (min-width: 480px) {
+			margin-inline-start: 92px;
+		}
 
 		&:is(:hover, :focus) {
 			color: var(--white);
@@ -183,15 +186,20 @@ const userDetails = (await getPersonById(
 	.button {
 		border: none;
 		font-size: 1.25rem;
-		grid-column-start: 2;
+		@media (min-width: 480px) {
+			grid-column-start: 2;
+		}
 	}
 
 	.add-link {
 		align-items: last baseline;
 		display: grid;
 		gap: 20px;
-		grid-template-columns: minmax(0, 1fr) minmax(0, 2fr) 30px;
 		margin-block-start: 16px;
+
+		@media (min-width: 480px) {
+			grid-template-columns: minmax(0, 1fr) minmax(0, 2fr) 30px;
+		}
 
 		label {
 			color: var(--text-muted);

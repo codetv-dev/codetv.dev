@@ -59,7 +59,7 @@ if (image.src) {
 		<figure
 			style={`--bg-img: url(${cardImage.replace(/\/w_\d+\//, '/w_30/')})`}
 		>
-			<a href={link}>
+			<a href={link} tabindex="-1">
 				<Image
 					src={cardImage}
 					alt={image.alt}
@@ -79,7 +79,7 @@ if (image.src) {
 			</div>
 			{description ? <p class="description">{description}</p> : null}
 			<p>
-				<a href={link} class="button">{linkText}</a>
+				<a href={link} class="button" tabindex="-1">{linkText}</a>
 			</p>
 		</div>
 	</section>

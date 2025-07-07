@@ -423,6 +423,10 @@ if (episode.video && !episode.video.youtube_id && episode.video.mux) {
 		position: relative;
 		z-index: 1;
 
+		@media (min-width: 1080px) {
+			margin-block-start: 120px;
+		}
+
 		&::after {
 			background: var(--bg-img);
 			background-size: cover;

@@ -1,8 +1,88 @@
 ---
 import { SignIn as ClerkSignIn } from '@clerk/astro/components';
 import Layout from '../../layouts/default.astro';
+import Aside from '../../components/aside.astro';
+import PageHeader from '../../components/page-header.astro';
+import Heart from '../../components/heart.astro';
 ---
 
 <Layout title="Sign In to CodeTV">
-	<ClerkSignIn />
+	<main>
+		<PageHeader
+			image={{
+				public_id: 'codetv/support-header',
+				alt: 'Alexis Aguilar smiling at a game show podium on the set of Leet Heat S1. Andy Stewart is visible at the other podium.',
+			}}
+			line1="Become a"
+			line2="CodeTV Supporter"
+		/>
+
+		<section class="support">
+			<div class="benefits">
+				<h2>With your help, we can keep web dev fun</h2>
+				<p>
+					Join CodeTV and help us prove that the tech industry works best when
+					it’s full of people who are having fun and excited about learning.
+				</p>
+				<p>
+					Accounts start free, and you can choose to upgrade for as little as
+					$5/month. Paid accounts directly fund the creation of new CodeTV programming and
+					unlock exclusive, supporter-only perks, including:
+				</p>
+
+				<ul>
+					<li>Early access to new episodes</li>
+					<li>Access to the members-only Discord community</li>
+					<li>Supporter-only discounts</li>
+					<li>Special thanks in CodeTV shows</li>
+					<li>and more!</li>
+				</ul>
+
+				<p>
+					Welcome to CodeTV. You belong here. <Heart />
+				</p>
+			</div>
+
+			<div class="auth">
+				<ClerkSignIn />
+			</div>
+		</section>
+	</main>
 </Layout>
+
+<style>
+	.support {
+		display: grid;
+		gap: 40px;
+		grid-template-column: 100%;
+		padding: 40px 5cqw 80px;
+
+		@media (min-width: 960px) {
+			grid-template-columns: minmax(0, 1fr) 440px;
+			margin-inline: auto;
+			max-inline-size: 1080px;
+		}
+
+		.benefits {
+			h2 {
+				font-family: var(--font-family-heading);
+				line-height: 1.1;
+			}
+
+			:is(p, ul) {
+				margin: 24px 0 0;
+			}
+
+			li {
+				margin: 8px 0 0;
+			}
+		}
+
+		.auth {
+			.cl-rootBox {
+				margin-block: 0;
+				max-inline-size: 50cqi;
+			}
+		}
+	}
+</style>

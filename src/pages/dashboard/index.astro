@@ -532,14 +532,22 @@ import Perks from '../../components/dashboard/perks.astro';
 		align-items: first baseline;
 		display: grid;
 		gap: 8px 20px;
-		grid-column-start: 2;
-		grid-template-columns: 80px minmax(0, 1fr);
 		justify-content: space-between;
+
+		@media (min-width: 480px) {
+			grid-column-start: 2;
+			grid-template-columns: 80px minmax(0, 1fr);
+		}
 	}
 
 	.field-label {
 		display: block;
-		text-align: end;
+		margin-block-start: 16px;
+
+		@media (min-width: 480px) {
+			margin-block-start: 0;
+			text-align: end;
+		}
 	}
 
 	.field-value {
