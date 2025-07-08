@@ -1,5 +1,9 @@
 import {defineField, defineType} from 'sanity'
+import {PlayIcon, UserIcon, TagIcon, ImageIcon, FolderIcon, StarIcon} from '@sanity/icons'
 import {person} from './documents/person'
+import {episode} from './documents/episode'
+import {episodeTag} from './documents/tags'
+import {episodeImage} from './objects/episode-image'
 
 function slugify(str: string) {
   return String(str)
@@ -32,102 +36,153 @@ export const slugField = defineField({
     // TODO collection and episode slugs can duplicate as long as they have different parents
     isUnique: () => true,
   },
-  validation: (Rule) => Rule.required(),
+  validation: (Rule) => Rule.required().error('Slug is required for URL generation'),
 })
 
 const series = defineType({
   type: 'document',
   name: 'series',
   title: 'Series',
+  icon: FolderIcon,
+  groups: [
+    {name: 'content', title: 'Content', default: true},
+    {name: 'publishing', title: 'Publishing'},
+  ],
   fields: [
     defineField({
       title: 'Series Title',
       name: 'title',
       type: 'string',
-      validation: (Rule) => Rule.required(),
+      validation: (Rule) => Rule.required().error('Series title is required'),
+      group: 'content',
     }),
     slugField,
+    defineField({
+      title: 'Series Description',
+      name: 'description',
+      type: 'text',
+      description: 'Brief description of the series',
+      validation: (Rule) => Rule.required().error('Series description is required'),
+      group: 'content',
+    }),
+    defineField({
+      title: 'Series Image',
+      name: 'image',
+      type: 'cloudinary.asset',
+      options: {hotspot: true},
+      group: 'content',
+    }),
     defineField({
       title: 'Collections',
       name: 'collections',
       type: 'array',
+      description: 'Collections that belong to this series',
       of: [
         {
           type: 'reference',
           to: [{type: 'collection'}],
         },
       ],
-    }),
-    defineField({
-      title: 'Series Image',
-      name: 'image',
-      type: 'cloudinary.asset',
-    }),
-    defineField({
-      title: 'Series Description',
-      name: 'description',
-      type: 'text',
-      validation: (Rule) => Rule.required(),
+      group: 'content',
     }),
     defineField({
       title: 'Sponsors',
       name: 'sponsors',
       type: 'array',
+      description: 'Sponsors for this series',
       of: [
         {
           type: 'reference',
           to: [{type: 'sponsor'}],
         },
       ],
+      group: 'content',
     }),
     defineField({
-      title: 'Feature on the home page?',
+      title: 'Featured Status',
       name: 'featured',
-      type: 'boolean',
+      type: 'string',
+      description: 'Control whether this series appears on the home page',
+      options: {
+        list: [
+          {title: 'Normal', value: 'normal'},
+          {title: 'Featured', value: 'featured'},
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'normal',
+      group: 'publishing',
     }),
   ],
-  initialValue: () => {
-    return {
-      featured: false,
-    }
+  preview: {
+    select: {
+      title: 'title',
+      description: 'description',
+      collections: 'collections',
+      featured: 'featured',
+    },
+    prepare({title, description, collections, featured}) {
+      const collectionCount = collections?.length || 0
+      const status = featured === 'featured' ? ' (Featured)' : ''
+
+      return {
+        title: title || 'Untitled Series',
+        subtitle: `${collectionCount} collections${status}`,
+        media: FolderIcon,
+      }
+    },
   },
+  initialValue: () => ({
+    featured: 'normal',
+  }),
 })
 
 const collection = defineType({
   type: 'document',
   name: 'collection',
   title: 'Collection',
+  icon: FolderIcon,
+  groups: [
+    {name: 'content', title: 'Content', default: true},
+    {name: 'organization', title: 'Organization'},
+  ],
   fields: [
     defineField({
       title: 'Collection Title',
       name: 'title',
       type: 'string',
-      validation: (Rule) => Rule.required(),
+      validation: (Rule) => Rule.required().error('Collection title is required'),
+      group: 'content',
     }),
     slugField,
     defineField({
       type: 'date',
       name: 'release_year',
       title: 'Release Year',
-      validation: (Rule) => Rule.required(),
+      description: 'When this collection was released',
+      validation: (Rule) => Rule.required().error('Release year is required'),
+      group: 'content',
     }),
     defineField({
       title: 'Series',
       name: 'series',
       type: 'reference',
       to: {type: 'series'},
-      validation: (Rule) => Rule.required(),
+      validation: (Rule) => Rule.required().error('Series is required'),
+      group: 'organization',
     }),
     defineField({
       title: 'Episodes',
       name: 'episodes',
       type: 'array',
+      description: 'Episodes that belong to this collection',
       of: [
         {
           type: 'reference',
           to: [{type: 'episode'}],
         },
       ],
+      group: 'organization',
     }),
   ],
   preview: {
@@ -143,136 +198,9 @@ const collection = defineType({
       return {
         title: `${series_title}: ${title}`,
         subtitle: `Released ${new Date(year).getFullYear()} · ${episodeCount} episodes`,
+        media: FolderIcon,
       }
     },
-  },
-})
-
-const episode = defineType({
-  type: 'document',
-  name: 'episode',
-  title: 'Episode',
-  groups: [
-    {name: 'video', title: 'Video Details'},
-    {name: 'seo', title: 'SEO'},
-  ],
-  fields: [
-    defineField({
-      title: 'Hide on the website?',
-      name: 'hidden',
-      type: 'boolean',
-    }),
-    defineField({
-      title: 'Title',
-      name: 'title',
-      type: 'string',
-      validation: (Rule) => Rule.required(),
-    }),
-    slugField,
-    defineField({
-      name: 'publish_date',
-      type: 'datetime',
-      title: 'Publish Date',
-      options: {
-        timeStep: 30,
-      },
-      validation: (Rule) => Rule.required(),
-    }),
-    defineField({
-      title: 'People In This Episode',
-      name: 'people',
-      type: 'array',
-      of: [{type: 'reference', to: [{type: 'person'}]}],
-    }),
-    defineField({
-      title: 'Short Description',
-      name: 'short_description',
-      type: 'text',
-      validation: (Rule) => Rule.required(),
-    }),
-    defineField({
-      title: 'Description',
-      name: 'description',
-      type: 'markdown',
-      validation: (Rule) => Rule.required(),
-    }),
-    defineField({
-      title: 'Linked Resources',
-      name: 'resources',
-      type: 'array',
-      of: [
-        {
-          title: 'Resource',
-          name: 'resource',
-          type: 'object',
-          fields: [
-            {title: 'Label', name: 'label', type: 'string'},
-            {title: 'URL', name: 'url', type: 'url'},
-          ],
-        },
-      ],
-    }),
-    defineField({
-      title: 'Sponsors',
-      name: 'sponsors',
-      type: 'array',
-      of: [
-        {
-          type: 'reference',
-          to: [{type: 'sponsor'}],
-        },
-      ],
-    }),
-    defineField({
-      title: 'Video',
-      name: 'video',
-      type: 'object',
-      group: 'video',
-      fields: [
-        {
-          title: 'Members-only',
-          name: 'members_only',
-          type: 'boolean',
-        },
-        {name: 'mux_video', title: 'Video File', type: 'mux.video'},
-        {name: 'captions', title: 'Captions (SRT)', type: 'file', options: {accept: '.srt'}},
-        {
-          name: 'youtube_id',
-          title: 'YouTube ID',
-          description:
-            'If this is supplied, the YouTube video will be displayed instead of the Mux video.',
-          type: 'string',
-        },
-        {name: 'thumbnail', title: 'Thumbnail', type: 'cloudinary.asset'},
-        {name: 'thumbnail_alt', title: 'Thumbnail Alt', type: 'string'},
-        {
-          name: 'transcript',
-          title: 'Transcript',
-          description: 'If the video was live transcribed, add it here.',
-          type: 'markdown',
-        },
-      ],
-    }),
-  ],
-  preview: {
-    select: {
-      title: 'title',
-      publish_date: 'publish_date',
-    },
-    prepare({title, publish_date}) {
-      return {
-        title,
-        subtitle: date.format(new Date(publish_date)),
-      }
-    },
-  },
-  initialValue: () => {
-    return {
-      hidden: false,
-      video: {
-        members_only: false,
-      },
-    }
   },
 })
 
@@ -280,27 +208,42 @@ const sponsor = defineType({
   type: 'document',
   name: 'sponsor',
   title: 'Sponsor',
+  icon: StarIcon,
   fields: [
     defineField({
       title: 'Sponsor Name',
       name: 'title',
       type: 'string',
-      validation: (Rule) => Rule.required(),
+      validation: (Rule) => Rule.required().error('Sponsor name is required'),
     }),
     slugField,
     defineField({
       title: 'Logo',
       name: 'logo',
       type: 'cloudinary.asset',
-      validation: (Rule) => Rule.required(),
+      options: {hotspot: true},
+      validation: (Rule) => Rule.required().error('Sponsor logo is required'),
     }),
     defineField({
       title: 'Link',
       name: 'link',
       type: 'string',
-      validation: (Rule) => Rule.required(),
+      description: "URL to the sponsor's website",
+      validation: (Rule) => Rule.required().error('Sponsor link is required'),
     }),
   ],
+  preview: {
+    select: {
+      title: 'title',
+      logo: 'logo',
+    },
+    prepare({title, logo}) {
+      return {
+        title: title || 'Untitled Sponsor',
+        media: logo || StarIcon,
+      }
+    },
+  },
 })
 
-export const schemaTypes = [series, collection, episode, person, sponsor]
+export const schemaTypes = [series, collection, episode, person, sponsor, episodeTag, episodeImage]

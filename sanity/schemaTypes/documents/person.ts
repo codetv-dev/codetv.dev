@@ -1,4 +1,5 @@
 import {defineField, defineType} from 'sanity'
+import {UserIcon} from '@sanity/icons'
 
 function slugify(str: string) {
   return String(str)
@@ -19,33 +20,43 @@ const slugField = defineField({
     source: 'name',
     slugify,
   },
-  validation: (Rule) => Rule.required(),
+  validation: (Rule) => Rule.required().error('Slug is required for URL generation'),
 })
 
 export const person = defineType({
   name: 'person',
   type: 'document',
   title: 'Person',
+  icon: UserIcon,
+  groups: [
+    {name: 'profile', title: 'Profile', default: true},
+    {name: 'social', title: 'Social & Links'},
+    {name: 'subscription', title: 'Subscription Data'},
+  ],
   fields: [
     defineField({
       title: 'Display Name',
       name: 'name',
       type: 'string',
+      validation: (Rule) => Rule.required().error('Name is required'),
+      group: 'profile',
     }),
     slugField,
     defineField({
       title: 'Profile Photo',
       name: 'photo',
       type: 'cloudinary.asset',
+      options: {hotspot: true},
+      group: 'profile',
     }),
     defineField({
       title: 'Bio',
       name: 'bio',
       type: 'markdown',
-      validation: (rule) => rule.max(750),
+      validation: (Rule) => Rule.max(750).warning('Keep bio under 750 characters'),
+      group: 'profile',
     }),
     defineField({
-      title: 'Links',
       name: 'links',
       type: 'array',
       of: [
@@ -53,30 +64,51 @@ export const person = defineType({
           type: 'object',
           name: 'link',
           fields: [
-            {type: 'string', name: 'label', title: 'Label'},
-            {type: 'url', name: 'url', title: 'URL'},
+            defineField({type: 'string', name: 'label', title: 'Label'}),
+            defineField({type: 'url', name: 'url', title: 'URL'}),
           ],
         },
       ],
+      group: 'social',
     }),
     defineField({
-      title: 'Subscription',
       name: 'subscription',
       type: 'object',
+      description: 'Read-only data from Stripe',
       fields: [
-        {title: 'Stripe Customer ID', name: 'customer', type: 'string'},
-        {title: 'Level', name: 'level', type: 'string'},
-        {title: 'Status', name: 'status', type: 'string'},
-        {title: 'Join Date', name: 'date', type: 'datetime'},
+        defineField({title: 'Stripe Customer ID', name: 'customer', type: 'string'}),
+        defineField({
+          name: 'level',
+          type: 'string',
+          options: {
+            list: [
+              {title: 'Free', value: 'free'},
+              {title: 'Supporter', value: 'supporter'},
+              {title: 'Patron', value: 'patron'},
+            ],
+          },
+        }),
+        defineField({
+          name: 'status',
+          type: 'string',
+          options: {
+            list: [
+              {title: 'Active', value: 'active'},
+              {title: 'Inactive', value: 'inactive'},
+              {title: 'Cancelled', value: 'cancelled'},
+            ],
+          },
+        }),
+        defineField({title: 'Join Date', name: 'date', type: 'datetime'}),
       ],
-      // readOnly: true,
+      group: 'subscription',
     }),
     defineField({
       title: 'Clerk User ID',
       name: 'user_id',
       type: 'string',
-      // validation: (rule) => rule.required(),
-      // readOnly: true,
+      description: 'Read-only data from Clerk',
+      group: 'subscription',
     }),
   ],
   preview: {
@@ -110,6 +142,7 @@ export const person = defineType({
         title: name ?? 'Draft Person',
         subtitle,
         imageUrl: url.toString(),
+        media: UserIcon,
       }
     },
   },

@@ -39,12 +39,26 @@ export type SanityImageDimensions = {
   aspectRatio?: number;
 };
 
-export type SanityImageHotspot = {
-  _type: "sanity.imageHotspot";
-  x?: number;
-  y?: number;
-  height?: number;
-  width?: number;
+export type Geopoint = {
+  _type: "geopoint";
+  lat?: number;
+  lng?: number;
+  alt?: number;
+};
+
+export type EpisodeImage = {
+  _type: "episodeImage";
+  asset?: {
+    _ref: string;
+    _type: "reference";
+    _weak?: boolean;
+    [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+  };
+  media?: unknown;
+  hotspot?: SanityImageHotspot;
+  crop?: SanityImageCrop;
+  alt?: string;
+  caption?: string;
 };
 
 export type SanityImageCrop = {
@@ -53,6 +67,14 @@ export type SanityImageCrop = {
   bottom?: number;
   left?: number;
   right?: number;
+};
+
+export type SanityImageHotspot = {
+  _type: "sanity.imageHotspot";
+  x?: number;
+  y?: number;
+  height?: number;
+  width?: number;
 };
 
 export type SanityImageAsset = {
@@ -89,11 +111,15 @@ export type SanityImageMetadata = {
   isOpaque?: boolean;
 };
 
-export type Geopoint = {
-  _type: "geopoint";
-  lat?: number;
-  lng?: number;
-  alt?: number;
+export type EpisodeTag = {
+  _id: string;
+  _type: "episodeTag";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  label?: string;
+  slug?: Slug;
+  description?: string;
 };
 
 export type Sponsor = {
@@ -126,8 +152,8 @@ export type Person = {
   }>;
   subscription?: {
     customer?: string;
-    level?: string;
-    status?: string;
+    level?: "free" | "supporter" | "patron";
+    status?: "active" | "inactive" | "cancelled";
     date?: string;
   };
   user_id?: string;
@@ -139,9 +165,10 @@ export type Episode = {
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
-  hidden?: boolean;
   title?: string;
   slug?: Slug;
+  short_description?: string;
+  description?: string;
   publish_date?: string;
   people?: Array<{
     _ref: string;
@@ -150,24 +177,23 @@ export type Episode = {
     _key: string;
     [internalGroqTypeReferenceTo]?: "person";
   }>;
-  short_description?: string;
-  description?: string;
+  episodeTags?: Array<{
+    _ref: string;
+    _type: "reference";
+    _weak?: boolean;
+    _key: string;
+    [internalGroqTypeReferenceTo]?: "episodeTag";
+  }>;
   resources?: Array<{
     label?: string;
     url?: string;
     _type: "resource";
     _key: string;
   }>;
-  sponsors?: Array<{
-    _ref: string;
-    _type: "reference";
-    _weak?: boolean;
-    _key: string;
-    [internalGroqTypeReferenceTo]?: "sponsor";
-  }>;
   video?: {
-    members_only?: boolean;
+    members_only?: "public" | "members";
     mux_video?: MuxVideo;
+    youtube_id?: string;
     captions?: {
       asset?: {
         _ref: string;
@@ -178,11 +204,19 @@ export type Episode = {
       media?: unknown;
       _type: "file";
     };
-    youtube_id?: string;
     thumbnail?: CloudinaryAsset;
     thumbnail_alt?: string;
     transcript?: string;
   };
+  hidden?: "visible" | "hidden";
+  featured?: "normal" | "featured";
+  sponsors?: Array<{
+    _ref: string;
+    _type: "reference";
+    _weak?: boolean;
+    _key: string;
+    [internalGroqTypeReferenceTo]?: "sponsor";
+  }>;
 };
 
 export type SanityFileAsset = {
@@ -246,6 +280,8 @@ export type Series = {
   _rev: string;
   title?: string;
   slug?: Slug;
+  description?: string;
+  image?: CloudinaryAsset;
   collections?: Array<{
     _ref: string;
     _type: "reference";
@@ -253,8 +289,6 @@ export type Series = {
     _key: string;
     [internalGroqTypeReferenceTo]?: "collection";
   }>;
-  image?: CloudinaryAsset;
-  description?: string;
   sponsors?: Array<{
     _ref: string;
     _type: "reference";
@@ -262,7 +296,7 @@ export type Series = {
     _key: string;
     [internalGroqTypeReferenceTo]?: "sponsor";
   }>;
-  featured?: boolean;
+  featured?: "normal" | "featured";
 };
 
 export type Slug = {
@@ -396,7 +430,7 @@ export type CloudinaryAssetContext = {
 
 export type Markdown = string;
 
-export type AllSanitySchemaTypes = SanityImagePaletteSwatch | SanityImagePalette | SanityImageDimensions | SanityImageHotspot | SanityImageCrop | SanityImageAsset | SanityImageMetadata | Geopoint | Sponsor | Person | Episode | SanityFileAsset | SanityAssetSourceData | Collection | Series | Slug | MuxVideo | MuxVideoAsset | MuxAssetData | MuxStaticRenditions | MuxStaticRenditionFile | MuxPlaybackId | MuxTrack | CloudinaryAssetContextCustom | CloudinaryAssetDerived | CloudinaryAsset | CloudinaryAssetContext | Markdown;
+export type AllSanitySchemaTypes = SanityImagePaletteSwatch | SanityImagePalette | SanityImageDimensions | Geopoint | EpisodeImage | SanityImageCrop | SanityImageHotspot | SanityImageAsset | SanityImageMetadata | EpisodeTag | Sponsor | Person | Episode | SanityFileAsset | SanityAssetSourceData | Collection | Series | Slug | MuxVideo | MuxVideoAsset | MuxAssetData | MuxStaticRenditions | MuxStaticRenditionFile | MuxPlaybackId | MuxTrack | CloudinaryAssetContextCustom | CloudinaryAssetDerived | CloudinaryAsset | CloudinaryAssetContext | Markdown;
 export declare const internalGroqTypeReferenceTo: unique symbol;
 // Source: ../src/pages/api/sanity/generate-redirects.ts
 // Variable: getEpisodeSlugQuery
@@ -417,9 +451,10 @@ export type OldEpisodesQueryResult = Array<{
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
-  hidden?: boolean;
   title?: string;
   slug?: Slug;
+  short_description?: string;
+  description?: string;
   publish_date?: string;
   people?: Array<{
     _ref: string;
@@ -428,24 +463,23 @@ export type OldEpisodesQueryResult = Array<{
     _key: string;
     [internalGroqTypeReferenceTo]?: "person";
   }>;
-  short_description?: string;
-  description?: string;
+  episodeTags: Array<{
+    _ref: string;
+    _type: "reference";
+    _weak?: boolean;
+    _key: string;
+    [internalGroqTypeReferenceTo]?: "episodeTag";
+  }> | null;
   resources?: Array<{
     label?: string;
     url?: string;
     _type: "resource";
     _key: string;
   }>;
-  sponsors?: Array<{
-    _ref: string;
-    _type: "reference";
-    _weak?: boolean;
-    _key: string;
-    [internalGroqTypeReferenceTo]?: "sponsor";
-  }>;
   video?: {
-    members_only?: boolean;
+    members_only?: "members" | "public";
     mux_video?: MuxVideo;
+    youtube_id?: string;
     captions?: {
       asset?: {
         _ref: string;
@@ -456,14 +490,21 @@ export type OldEpisodesQueryResult = Array<{
       media?: unknown;
       _type: "file";
     };
-    youtube_id?: string;
     thumbnail?: CloudinaryAsset;
     thumbnail_alt?: string;
     transcript?: string;
   };
+  hidden?: "hidden" | "visible";
+  featured?: "featured" | "normal";
+  sponsors?: Array<{
+    _ref: string;
+    _type: "reference";
+    _weak?: boolean;
+    _key: string;
+    [internalGroqTypeReferenceTo]?: "sponsor";
+  }>;
   host: null;
   guest: null;
-  episodeTags: null;
 }>;
 
 // Source: ../src/util/sanity.ts
@@ -486,23 +527,11 @@ export type AllSeriesQueryResult = Array<{
   }> | null;
   total_episode_count: number | null;
   latestEpisodeDate: string | null;
-  featured: boolean | null;
+  featured: "featured" | "normal" | null;
 }>;
 // Variable: featuredSeriesQuery
 // Query: *[_type=="series" && featured == true] {    'slug': slug.current,    title,    description,    image {      public_id,      height,      width,    },    'path': '/series/' + slug.current + '/' + collections[-1]->slug.current,    'total_episode_count': count(collections[]->episodes[@->hidden != true && (defined(@->video.youtube_id) || defined(@->video.mux_video))]),    'total_season_count': count(collections[])  }
-export type FeaturedSeriesQueryResult = Array<{
-  slug: string | null;
-  title: string | null;
-  description: string | null;
-  image: {
-    public_id: string | null;
-    height: number | null;
-    width: number | null;
-  } | null;
-  path: string | null;
-  total_episode_count: number | null;
-  total_season_count: number | null;
-}>;
+export type FeaturedSeriesQueryResult = Array<never>;
 // Variable: seriesBySlugQuery
 // Query: *[_type=="series" && slug.current==$series][0] {    title,    'slug': slug.current,    description,    image {      public_id,      height,      width,    },    'sponsors': sponsors[]->{      'title': title,      logo {        public_id,        width,        height      },      link,    },    'collection': collections[@->slug.current==$collection && @->series._ref==^._id][0]->{      title,      'slug': slug.current,      release_year,      episodes[@->hidden != true]->{        title,        'slug': slug.current,        short_description,        publish_date,        'thumbnail': {          'public_id': video.thumbnail.public_id,          'alt': video.thumbnail_alt,          'width': video.thumbnail.width,          'height': video.thumbnail.height,        },        video {          youtube_id,          mux_video,          members_only        }      }    },    collections[]->{      title,      'slug': slug.current,      release_year,      'episode_count': count(episodes[@->hidden != true])    }  }
 export type SeriesBySlugQueryResult = {
@@ -541,7 +570,7 @@ export type SeriesBySlugQueryResult = {
       video: {
         youtube_id: string | null;
         mux_video: MuxVideo | null;
-        members_only: boolean | null;
+        members_only: "members" | "public" | null;
       } | null;
     }> | null;
   } | null;
@@ -778,8 +807,8 @@ export type AllUsersQueryResult = Array<{
   } | null;
   subscription: {
     cus_id: string | null;
-    level: string | null;
-    status: string | null;
+    level: "free" | "patron" | "supporter" | null;
+    status: "active" | "cancelled" | "inactive" | null;
     date: string | null;
   } | null;
   user_id: string | null;
@@ -865,7 +894,7 @@ export type PersonByClerkIdQueryResult = {
   user_id: string | null;
 } | null;
 // Variable: supportersQuery
-// Query: *[_type == "person" && subscription.status == "active"] {    _id,    name,    photo {      public_id,      height,      width,    },    'username': slug.current,    subscription {      level,      status    }  } | score(    boost(subscription.level match "Platinum", 3),    boost(subscription.level match "Gold", 2),    boost(subscription.level match "Silver", 1),  ) | order(_score desc)
+// Query: *[_type == "person" && subscription.status == "active"] | order(subscription.date asc) {    _id,    name,    photo {      public_id,      height,      width,    },    'username': slug.current,    subscription {      level,      status    }  }
 export type SupportersQueryResult = Array<{
   _id: string;
   name: string | null;
@@ -876,8 +905,8 @@ export type SupportersQueryResult = Array<{
   } | null;
   username: string | null;
   subscription: {
-    level: string | null;
-    status: string | null;
+    level: "free" | "patron" | "supporter" | null;
+    status: "active" | "cancelled" | "inactive" | null;
   } | null;
 }>;
 
@@ -900,6 +929,6 @@ declare module "@sanity/client" {
     "\n  *[_type==\"person\"] | order(name asc) | order(subscription.level asc) {\n    _id,\n    name,\n    \"slug\": slug.current,\n    bio,\n    photo {\n      public_id,\n      height,\n      width,\n    },\n    subscription {\n      \"cus_id\": customer,\n      level,\n      status,\n      date\n    },\n    user_id,\n    links[] {\n      label,\n      url\n    },\n    \"episodes\": *[_type == \"episode\" && references(^._id) && hidden != true && (defined(video.youtube_id) || defined(video.mux_video))] {\n      title,\n      'slug': slug.current,\n      short_description,\n      publish_date,\n      'thumbnail': {\n        'public_id': video.thumbnail.public_id,\n        'alt': video.thumbnail_alt,\n        'width': video.thumbnail.width,\n        'height': video.thumbnail.height,\n      },\n      video {\n        youtube_id,\n      },\n      'collection': *[_type==\"collection\" && references(^._id)][0] {\n        'slug': slug.current,\n        title,\n        'episodeSlugs': episodes[]->slug.current,\n      },\n      'series': *[_type==\"collection\" && references(^._id)][0].series->{\n        'slug': slug.current,\n        title,\n      },\n    } | order(publish_date desc)[0...6]\n  }\n": AllUsersQueryResult;
     "\n  *[_type == \"person\" && slug.current == $slug][0] {\n    _id,\n    name,\n    \"slug\": slug.current,\n    photo {\n      public_id,\n      height,\n      width,\n    },\n    bio,\n    links[],\n    user_id,\n    \"episodes\": *[_type == \"episode\" && references(^._id) && hidden != true && (defined(video.youtube_id) || defined(video.mux_video))] {\n      title,\n      'slug': slug.current,\n      short_description,\n      publish_date,\n      'thumbnail': {\n        'public_id': video.thumbnail.public_id,\n        'alt': video.thumbnail_alt,\n        'width': video.thumbnail.width,\n        'height': video.thumbnail.height,\n      },\n      video {\n        youtube_id,\n      },\n      'collection': *[_type==\"collection\" && references(^._id)][0] {\n        'slug': slug.current,\n        title,\n        'episodeSlugs': episodes[]->slug.current,\n      },\n      'series': *[_type==\"collection\" && references(^._id)][0].series->{\n        'slug': slug.current,\n        title,\n      },\n    } | order(publish_date desc)[0...6]\n  }\n": PersonBySlugQueryResult;
     "\n  *[_type == \"person\" && user_id == $user_id][0] {\n    _id,\n    name,\n    slug,\n    user_id,\n  }\n": PersonByClerkIdQueryResult;
-    "\n  *[_type == \"person\" && subscription.status == \"active\"] {\n    _id,\n    name,\n    photo {\n      public_id,\n      height,\n      width,\n    },\n    'username': slug.current,\n    subscription {\n      level,\n      status\n    }\n  } | score(\n    boost(subscription.level match \"Platinum\", 3),\n    boost(subscription.level match \"Gold\", 2),\n    boost(subscription.level match \"Silver\", 1),\n  ) | order(_score desc)\n": SupportersQueryResult;
+    "\n  *[_type == \"person\" && subscription.status == \"active\"] | order(subscription.date asc) {\n    _id,\n    name,\n    photo {\n      public_id,\n      height,\n      width,\n    },\n    'username': slug.current,\n    subscription {\n      level,\n      status\n    }\n  }\n": SupportersQueryResult;
   }
 }

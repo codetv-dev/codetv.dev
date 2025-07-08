@@ -1,4 +1,3 @@
-// @ts-nocheck
 import {defineConfig} from 'sanity'
 import {structureTool} from 'sanity/structure'
 import {visionTool} from '@sanity/vision'
@@ -19,11 +18,11 @@ export default defineConfig({
       structure: (S) => {
         return S.list()
           .title('Content')
-          .items([
-            ...S.documentTypeListItems().filter(
+          .items(
+            S.documentTypeListItems().filter(
               (li) => !['Episode', 'Collection'].includes(li.getTitle() ?? ''),
             ),
-          ])
+          )
       },
     }),
     visionTool(),
