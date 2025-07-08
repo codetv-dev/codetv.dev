@@ -137,7 +137,7 @@ a {
 	border-radius: 3px;
 	color: var(--black);
 	display: inline-block;
-	font-family: supermassive, impact;
+	font-family: var(--font-family-heading);
 	font-size: clamp(0.875em, 6cqi, 1.25em);
 	font-weight: normal;
 	line-height: 0.9;
