@@ -123,10 +123,6 @@ export default defineConfig({
 				access: 'secret',
 				context: 'server',
 			}),
-			GOOGLE_SHEETS_PRIVATE_KEY: envField.string({
-				access: 'secret',
-				context: 'server',
-			}),
 		},
 	},
 });

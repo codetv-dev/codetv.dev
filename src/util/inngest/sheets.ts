@@ -1,8 +1,14 @@
+import { join } from 'node:path';
 import {
 	GOOGLE_SHEETS_SERVICE_ACCOUNT,
-	GOOGLE_SHEETS_PRIVATE_KEY,
 } from 'astro:env/server';
+import { decrypt } from '@tka85/dotenvenc';
 import jwt from 'jsonwebtoken';
+
+const env = await decrypt({
+	passwd: process.env.DOTENVENC_PASS,
+	encryptedFile: join(process.cwd(), '.env.enc'),
+});
 
 const SHEET_ID = '1ihOfKXacyKDmarkq1yrwSpodRvfncS-xpXSVJP5Zrnw';
 const SHEET_RANGE = 'Sheet1!A2';
@@ -18,7 +24,7 @@ async function getGoogleSheetsAccessToken() {
 			exp,
 			iat,
 		},
-		GOOGLE_SHEETS_PRIVATE_KEY,
+		env.GOOGLE_SHEETS_PRIVATE_KEY,
 		{ algorithm: 'RS256' },
 	);
 
