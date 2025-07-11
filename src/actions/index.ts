@@ -70,6 +70,8 @@ export const server = {
 				'link_url[]': z.array(z.string()),
 			}),
 			handler: async (input) => {
+				console.log('actions.user.wdcIntake');
+				console.log(input);
 				const {
 					id,
 					username,
