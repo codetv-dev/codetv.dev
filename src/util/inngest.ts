@@ -17,6 +17,7 @@ import { cloudinary } from './cloudinary';
 import { stripe } from './stripe';
 import { clerk } from './clerk';
 import { sendDiscordMessage } from './discord';
+import { appendValue } from './inngest/sheets';
 
 export const handleClerkUserCreatedOrUpdatedWebhook = inngest.createFunction(
 	{ id: 'clerk/user-created-or-updated' },
@@ -170,6 +171,54 @@ const handleUpdateUserProfile = inngest.createFunction(
 		});
 
 		await Promise.all([updateSanityUser, purgeCache]);
+	},
+);
+
+const handleWDCIntakeSubmit = inngest.createFunction(
+	{ id: 'codetv/forms.wdc.submit' },
+	{ event: 'codetv/forms.wdc.submit' },
+	async function ({ event, step }) {
+		const {
+			id,
+			bio,
+			email,
+			phone,
+			groupchat,
+			coffee,
+			role,
+			reimbursement,
+			dietaryRequirements,
+			foodAdventurousness,
+			terms,
+			links,
+		} = event.data;
+
+		const updateSanityUser = step.run('sanity/update-user', async () => {
+			return updatePerson(id, { bio, links });
+		});
+
+		// these details are only relevant to the production, so don’t store in Sanity/Clerk
+		const appendEntry = step.run('sheets/append', async () => {
+			return await appendValue({
+				terms,
+				role,
+				reimbursement,
+				email,
+				phone,
+				groupchat,
+				dietaryRequirements,
+				foodAdventurousness,
+				coffee,
+			});
+		});
+
+		const [,sheetUrl] = await Promise.all([updateSanityUser, appendEntry]);
+
+		await step.run('discord/notification.send', async () => {
+			await sendDiscordMessage({
+				content: `${terms} filled out the WDC onboarding form ([view submission](${sheetUrl}))`
+			});
+		});
 	},
 );
 
@@ -402,4 +451,5 @@ export const functions = [
 	updateSanityPersonSubscription,
 	invalidateNetlifyProfileCacheTag,
 	handleUpdateUserProfile,
+	handleWDCIntakeSubmit,
 ];

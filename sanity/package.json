@@ -12,7 +12,8 @@
     "prebuild": "npm run typegen",
     "typegen": "sanity schema extract && sanity typegen generate",
     "deploy": "sanity deploy",
-    "deploy-graphql": "sanity graphql deploy"
+    "deploy-graphql": "sanity graphql deploy",
+    "login": "sanity login"
   },
   "keywords": [
     "sanity"

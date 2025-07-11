@@ -1,0 +1,41 @@
+---
+import { SignedIn, SignedOut, SignIn } from '@clerk/astro/components';
+import Layout from '../../layouts/default.astro';
+
+const url = Astro.url;
+url.pathname = '/forms/web-dev-challenge';
+---
+
+<Layout title="Web Dev Challenge Filming Questionnaire">
+	<main>
+		<SignedIn>
+			<section class="wrapper">
+				<h2>Thank you!</h2>
+				<p>
+					Your response has been saved. You can update your bio, profile photo,
+					and links at any time on <a href="/dashboard">your dashboard</a>.
+				</p>
+			</section>
+		</SignedIn>
+
+		<SignedOut>
+      <SignIn forceRedirectUrl={url.toString()} />
+		</SignedOut>
+	</main>
+</Layout>
+
+<style>
+	main {
+		background: var(--black);
+		padding: 40px 5cqw 60px;
+	}
+
+	.wrapper {
+		margin-inline: auto;
+		max-inline-size: 54ch;
+
+		@media (min-width: 750px) {
+			padding-block-start: 120px;
+		}
+	}
+</style>

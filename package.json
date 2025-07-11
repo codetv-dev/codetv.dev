@@ -41,6 +41,7 @@
 		"date-fns": "^4.1.0",
 		"groq": "^3.93.0",
 		"inngest": "^3.39.2",
+		"jsonwebtoken": "^9.0.2",
 		"lite-youtube-embed": "^0.3.3",
 		"marked": "^15.0.12",
 		"mdx-bundler": "^10.1.1",
@@ -52,6 +53,7 @@
 		"zod": "^3.25.67"
 	},
 	"devDependencies": {
+		"@types/jsonwebtoken": "^9.0.10",
 		"@types/sanitize-html": "^2.16.0",
 		"netlify-plugin-inngest": "^1.0.1",
 		"prettier": "^3.5.3",
