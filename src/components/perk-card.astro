@@ -21,7 +21,7 @@ const { title, claimCondition } = Astro.props;
 		{
 			claimCondition ? (
 				<svg
-          class="perk-claimed"
+					class="perk-claimed"
 					xmlns="http://www.w3.org/2000/svg"
 					fill="none"
 					viewBox="0 0 100 100"
@@ -44,7 +44,13 @@ const { title, claimCondition } = Astro.props;
 	<div class="perk-details">
 		<h3>
 			{title}
-			{claimCondition ? <span class="badge blue">claimed</span> : <slot name="badge" />}
+			{
+				claimCondition ? (
+					<span class="badge blue">claimed</span>
+				) : (
+					<slot name="badge" />
+				)
+			}
 		</h3>
 
 		{

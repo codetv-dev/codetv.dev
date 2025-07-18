@@ -45,7 +45,9 @@ const links = result && result.data ? result.data.links : userDetails.links;
 							{
 								links?.map((link, i: number) => (
 									<>
-										<dt class="link field-label" title={link.label}>{link.label}</dt>
+										<dt class="link field-label" title={link.label}>
+											{link.label}
+										</dt>
 
 										<dd class="url">
 											<span title={link.url}>{link.url}</span>

@@ -119,20 +119,20 @@ if (!Astro.cookies.has('has_codetv_account')) {
 	await clerk.load();
 
 	const addAccount = () => {
-			clerk.user
-				?.createExternalAccount({
-					strategy: 'oauth_discord',
-					redirectUrl: '/dashboard#/perks',
-				})
-				.then((externalAccount) => {
-					window.location.href =
-						externalAccount.verification?.externalVerificationRedirectURL?.toString() ??
-						'';
-				})
-				.catch((error) => {
-					console.log('An error occurred:', error.errors);
-				});
-		};
+		clerk.user
+			?.createExternalAccount({
+				strategy: 'oauth_discord',
+				redirectUrl: '/dashboard#/perks',
+			})
+			.then((externalAccount) => {
+				window.location.href =
+					externalAccount.verification?.externalVerificationRedirectURL?.toString() ??
+					'';
+			})
+			.catch((error) => {
+				console.log('An error occurred:', error.errors);
+			});
+	};
 
 	function linksBioSetup() {
 		// handle removing links

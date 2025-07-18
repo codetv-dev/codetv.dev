@@ -14,7 +14,7 @@ const userDetails = (await getPersonById(
 const result = Astro.getActionResult(actions.forms.wdc);
 
 if (result && !result.error) {
-  return Astro.redirect(`/forms/submitted`);
+	return Astro.redirect(`/forms/submitted`);
 }
 ---
 
@@ -218,10 +218,9 @@ if (result && !result.error) {
 									>).
 								</p>
 
-								<textarea
-									name="bio"
-									id="bio"
-									class="input textarea">{userDetails.bio}</textarea>
+								<textarea name="bio" id="bio" class="input textarea"
+									>{userDetails.bio}</textarea
+								>
 							</div>
 
 							<div class="field">
@@ -367,7 +366,6 @@ if (result && !result.error) {
 							<input type="hidden" name="username" value={user?.username} />
 						</section>
 					</form>
-
 				</div>
 			</section>
 		</SignedIn>

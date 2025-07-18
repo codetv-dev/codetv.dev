@@ -379,7 +379,8 @@ og.image = frontmatter.share?.image ?? generateDefaultImage({ text: og.title });
 
 	.post-content :not(pre) > code {
 		background: var(--gray-100);
-		border: 1px solid color-mix(in oklch, var(--text-muted) 10%, var(--gray-100));
+		border: 1px solid
+			color-mix(in oklch, var(--text-muted) 10%, var(--gray-100));
 		border-radius: 2px;
 		font-size: 0.9em;
 		line-height: 1;

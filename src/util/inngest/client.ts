@@ -95,8 +95,8 @@ type Events = {
 			role: 'developer' | 'advisor';
 			reimbursement: boolean;
 			links: Array<{ label: string; url: string }>;
-		}
-	}
+		};
+	};
 };
 
 export const schemas = new EventSchemas().fromRecord<Events>();

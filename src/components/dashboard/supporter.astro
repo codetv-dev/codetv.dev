@@ -19,16 +19,19 @@ const isSubscriber = subscription?.status === 'active';
 			<Fragment slot="blurb">
 				{stripeSub?.cancel_at_period_end && stripeSub.cancel_at ? (
 					<p class="cancellation-pending">
-						Your subscription has been canceled. Supporter benefits will
-						remain available until
+						Your subscription has been canceled. Supporter benefits will remain
+						available until
 						{new Intl.DateTimeFormat('en-US', {
 							dateStyle: 'medium',
 						}).format(new Date(stripeSub.cancel_at * 1000))}
 						.
 					</p>
 				) : null}
-			
-				<p>You're directly contributing to the creation of new CodeTV programming!</p>
+
+				<p>
+					You're directly contributing to the creation of new CodeTV
+					programming!
+				</p>
 			</Fragment>
 
 			<Fragment slot="panel-content">

@@ -1,6 +1,11 @@
 import { clerk } from '../../util/clerk';
 import type { APIRoute } from 'astro';
-import { getRoleId, sendDiscordMessage, updateRole, type SubscriptionLevel } from '../../util/discord';
+import {
+	getRoleId,
+	sendDiscordMessage,
+	updateRole,
+	type SubscriptionLevel,
+} from '../../util/discord';
 
 export const GET: APIRoute = async ({ locals }) => {
 	const { userId } = locals.auth();

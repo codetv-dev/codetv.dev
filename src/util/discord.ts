@@ -56,10 +56,10 @@ export async function getMember(memberId: string) {
 	const data = await res.json();
 
 	const schema = z.object({
-		"roles": z.array(z.string()),
-		"user": z.object({
-			"id": z.string(),
-			"username": z.string(),
+		roles: z.array(z.string()),
+		user: z.object({
+			id: z.string(),
+			username: z.string(),
 		}),
 	});
 

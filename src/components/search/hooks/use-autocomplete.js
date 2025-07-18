@@ -22,7 +22,7 @@ export function useAutocomplete(props) {
 					setState(params.state);
 				},
 			}),
-		[]
+		[],
 	);
 
 	return { autocomplete, state };

@@ -40,24 +40,24 @@ const { heading = 'tv for developers in your inbox', disclaimer } = Astro.props;
 
 <script>
 	import { actions } from 'astro:actions';
-  import { navigate } from 'astro:transitions/client';
+	import { navigate } from 'astro:transitions/client';
 
-  const form = document.querySelector('form');
-  form?.addEventListener('submit', async (event) => {
-    event.preventDefault();
+	const form = document.querySelector('form');
+	form?.addEventListener('submit', async (event) => {
+		event.preventDefault();
 
-    const formData = new FormData(form);
+		const formData = new FormData(form);
 		const input = {
 			firstName: formData.get('firstName')?.toString() ?? '',
 			email: formData.get('email')?.toString() ?? '',
 		};
 
-    const { error } = await actions.newsletter.subscribe(input);
+		const { error } = await actions.newsletter.subscribe(input);
 
-    if (!error) {
+		if (!error) {
 			navigate('/confirm');
 		}
-  })
+	});
 </script>
 
 <style>

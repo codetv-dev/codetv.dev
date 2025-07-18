@@ -101,8 +101,8 @@ export const person = defineType({
               {title: 'Canceled', value: 'canceled'},
               {title: 'Unpaid', value: 'unpaid'},
               {title: 'Paused', value: 'paused'},
-            ]
-          }
+            ],
+          },
         }),
         defineField({title: 'Join Date', name: 'date', type: 'datetime'}),
       ],

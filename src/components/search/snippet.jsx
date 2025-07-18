@@ -6,7 +6,7 @@ export function Snippet({ hit, attribute }) {
 		<>
 			{parseAlgoliaHitSnippet({ hit, attribute }).map(
 				({ value, isHighlighted }, index) =>
-					isHighlighted ? <mark key={index}>{value}</mark> : value
+					isHighlighted ? <mark key={index}>{value}</mark> : value,
 			)}
 		</>
 	);

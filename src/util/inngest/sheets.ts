@@ -1,7 +1,5 @@
 import { join } from 'node:path';
-import {
-	GOOGLE_SHEETS_SERVICE_ACCOUNT,
-} from 'astro:env/server';
+import { GOOGLE_SHEETS_SERVICE_ACCOUNT } from 'astro:env/server';
 import { decrypt } from '@tka85/dotenvenc';
 import jwt from 'jsonwebtoken';
 
@@ -46,53 +44,53 @@ async function getGoogleSheetsAccessToken() {
 }
 
 export async function appendValue({
-  signature,
-  role,
-  reimbursement,
-  email,
-  phone,
-  groupchat,
-  dietaryRequirements,
-  foodAdventurousness,
-  coffee,
+	signature,
+	role,
+	reimbursement,
+	email,
+	phone,
+	groupchat,
+	dietaryRequirements,
+	foodAdventurousness,
+	coffee,
 }: {
-  signature: string;
-  role: string;
-  reimbursement: boolean;
-  email: string;
-  phone: string;
-  groupchat: boolean;
-  dietaryRequirements?: string;
-  foodAdventurousness: number;
-  coffee?: string;
+	signature: string;
+	role: string;
+	reimbursement: boolean;
+	email: string;
+	phone: string;
+	groupchat: boolean;
+	dietaryRequirements?: string;
+	foodAdventurousness: number;
+	coffee?: string;
 }) {
 	const accessToken = await getGoogleSheetsAccessToken();
 
 	// const fieldOrder = [
-  //  'Date Submitted',
+	//  'Date Submitted',
 	// 	'Video Release Signature',
-  //   'Role',
+	//   'Role',
 	// 	'Booking Reimbursement Confirmed',
 	// 	'Email',
 	// 	'Phone',
-  //   'Groupchat Approval',
+	//   'Groupchat Approval',
 	// 	'Dietary requirements',
 	// 	'Food Adventurousness',
 	// 	'Coffee Order',
 	// ];
 
-  const entry = [
-    new Date().toLocaleString(),
-    signature,
-    role,
-    reimbursement,
-    email,
-    phone,
-    groupchat,
-    dietaryRequirements,
-    foodAdventurousness,
-    coffee,
-  ]
+	const entry = [
+		new Date().toLocaleString(),
+		signature,
+		role,
+		reimbursement,
+		email,
+		phone,
+		groupchat,
+		dietaryRequirements,
+		foodAdventurousness,
+		coffee,
+	];
 
 	const res = await fetch(
 		`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${SHEET_RANGE}:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS`,
@@ -103,7 +101,7 @@ export async function appendValue({
 				Authorization: `Bearer ${accessToken}`,
 			},
 			body: JSON.stringify({
-				values: [ entry ],
+				values: [entry],
 			}),
 		},
 	);

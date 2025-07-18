@@ -1,6 +1,6 @@
 import { defineConfig, envField } from 'astro/config';
 import clerk from '@clerk/astro';
-import { dark } from '@clerk/themes'
+import { dark } from '@clerk/themes';
 import netlify from '@astrojs/netlify';
 import { imageService } from '@unpic/astro/service';
 import mdx from '@astrojs/mdx';
@@ -20,9 +20,9 @@ export default defineConfig({
 			appearance: {
 				baseTheme: dark,
 				variables: {
-					colorBackground: '#18151f'
-				}
-			}
+					colorBackground: '#18151f',
+				},
+			},
 		}),
 		expressiveCode({ themes: ['night-owl'] }),
 		mdx(),

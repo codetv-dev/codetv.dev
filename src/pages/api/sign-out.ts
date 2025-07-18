@@ -1,12 +1,12 @@
-import type { APIRoute } from "astro";
+import type { APIRoute } from 'astro';
 import { clerk } from '../../util/clerk';
 
 export const GET: APIRoute = async ({ locals, redirect }) => {
-  const sessionId = locals.auth().sessionId;
+	const sessionId = locals.auth().sessionId;
 
-  if (sessionId) {
-    await clerk.sessions.revokeSession(sessionId);
-  }
+	if (sessionId) {
+		await clerk.sessions.revokeSession(sessionId);
+	}
 
-  return redirect('/dashboard/sign-out', 307);
-}
+	return redirect('/dashboard/sign-out', 307);
+};

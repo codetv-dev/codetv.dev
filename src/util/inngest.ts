@@ -213,11 +213,11 @@ const handleWDCIntakeSubmit = inngest.createFunction(
 			});
 		});
 
-		const [,sheetUrl] = await Promise.all([updateSanityUser, appendEntry]);
+		const [, sheetUrl] = await Promise.all([updateSanityUser, appendEntry]);
 
 		await step.run('discord/notification.send', async () => {
 			await sendDiscordMessage({
-				content: `${signature} filled out the WDC onboarding form ([view submission](${sheetUrl}))`
+				content: `${signature} filled out the WDC onboarding form ([view submission](${sheetUrl}))`,
 			});
 		});
 	},
@@ -352,12 +352,9 @@ export const handleStripeSubscriptionUpdatedWebhook = inngest.createFunction(
 				},
 			});
 
-			const retrieveCustomer = step.run(
-				'stripe/customer.get',
-				async () => {
-					return stripe.customers.retrieve(subscription.customer as string);
-				},
-			) as InvocationResult<Stripe.Customer>;
+			const retrieveCustomer = step.run('stripe/customer.get', async () => {
+				return stripe.customers.retrieve(subscription.customer as string);
+			}) as InvocationResult<Stripe.Customer>;
 
 			const retrieveProduct = step.invoke('stripe/product.get', {
 				function: retrieveStripeProduct,
@@ -375,12 +372,9 @@ export const handleStripeSubscriptionUpdatedWebhook = inngest.createFunction(
 				throw new NonRetriableError('No customer found');
 			}
 
-			const getSanityUser = step.run(
-				'sanity/user.get',
-				async () => {
-					return getPersonByClerkId({ user_id: customer.metadata.userId });
-				},
-			);
+			const getSanityUser = step.run('sanity/user.get', async () => {
+				return getPersonByClerkId({ user_id: customer.metadata.userId });
+			});
 
 			const updateClerkUser = step.invoke('clerk/user.subscription.update', {
 				function: updateClerkUserSubscription,
@@ -392,7 +386,10 @@ export const handleStripeSubscriptionUpdatedWebhook = inngest.createFunction(
 				},
 			});
 
-			const [user, clerkUser] = await Promise.all([getSanityUser, updateClerkUser]);
+			const [user, clerkUser] = await Promise.all([
+				getSanityUser,
+				updateClerkUser,
+			]);
 
 			if (!user) {
 				throw new NonRetriableError('unable to find user');
@@ -417,7 +414,9 @@ export const handleStripeSubscriptionUpdatedWebhook = inngest.createFunction(
 
 				const isNew = startDate === cycleStart;
 
-				const discordUser = clerkUser.externalAccounts.find((acct) => acct.provider === 'oauth_discord');
+				const discordUser = clerkUser.externalAccounts.find(
+					(acct) => acct.provider === 'oauth_discord',
+				);
 
 				const n = discordUser ? `<@${discordUser.externalId}>` : user.name;
 				const p = product.name;
@@ -439,11 +438,10 @@ export const handleStripeSubscriptionUpdatedWebhook = inngest.createFunction(
 
 					const d = (duration.years ?? 0) * 12 + (duration.months ?? 0);
 
-					msg = `${n} renewed their subscription. They’ve been a ${p} for ${d} months! ${emoji}`
+					msg = `${n} renewed their subscription. They’ve been a ${p} for ${d} months! ${emoji}`;
 				}
 
 				// TODO: if canceled, show a different message
-
 
 				return sendDiscordMessage({
 					content: msg,
