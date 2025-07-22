@@ -1,7 +1,7 @@
 ---
 import { SignedIn, SignedOut, SignIn } from '@clerk/astro/components';
 import Layout from '../../layouts/default.astro';
-import { getPersonById } from '../../util/sanity';
+import { getPersonById } from '@codetv/sanity';
 import { actions } from 'astro:actions';
 
 const user = await Astro.locals.currentUser();

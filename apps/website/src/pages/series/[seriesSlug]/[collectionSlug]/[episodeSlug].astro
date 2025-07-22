@@ -5,12 +5,12 @@ import { Image } from '@unpic/astro';
 import {
 	getAllEpisodes,
 	getEpisodeTranscriptBySlug,
-} from '../../../../util/sanity';
+} from '@codetv/sanity';
 import {
 	createImageUrl,
 	generateDefaultImage,
 	getYouTubeThumbnail,
-} from '../../../../util/cloudinary';
+} from '@codetv/cloudinary';
 import Layout from '../../../../layouts/default.astro';
 import VideoPlayer from '../../../../components/video-player.astro';
 import ShareInput from '../../../../components/share-input.astro';

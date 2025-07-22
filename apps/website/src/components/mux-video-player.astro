@@ -8,10 +8,15 @@ import {
 	MUX_JWT_SIGNING_KEY,
 } from 'astro:env/server';
 import { decrypt } from '@tka85/dotenvenc';
-import { createImageUrl } from '../util/cloudinary';
+import { createImageUrl } from '@codetv/cloudinary';
 import Heart from './heart.astro';
 
 export const prerender = false;
+
+console.log({
+	path: join(process.cwd(), '.env.enc'),
+	filename: import.meta.filename,
+});
 
 const env = await decrypt({
 	encryptedFile: join(process.cwd(), '.env.enc'),

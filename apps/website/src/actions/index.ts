@@ -1,7 +1,7 @@
 import { defineAction } from 'astro:actions';
 import { z } from 'astro:content';
+import { inngest } from '@codetv/inngest';
 import { addSubscriber } from '../util/convertkit';
-import { inngest } from '../util/inngest/client';
 
 export const server = {
 	user: {

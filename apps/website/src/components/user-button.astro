@@ -1,4 +1,6 @@
 ---
+import { SignedIn, SignedOut } from "@clerk/astro/components";
+
 export const prerender = false;
 
 const user = await Astro.locals.currentUser();
@@ -9,18 +11,20 @@ const loggedOutText =
 		: 'Become a Supporter';
 ---
 
-{
-	user ? (
+<SignedIn>
+	{user ? (
 		<a href="/dashboard" class="account" title="Manage your account">
 			{user.firstName}
 			<img src={user.imageUrl} alt={user.fullName} width={60} />
 		</a>
-	) : (
-		<a href="/dashboard/sign-in" class="button">
-			{loggedOutText}
-		</a>
-	)
-}
+	) : null}
+</SignedIn>
+
+<SignedOut>
+	<a href="/dashboard/sign-in" class="button">
+		{loggedOutText}
+	</a>
+</SignedOut>
 
 <style>
 	.account {

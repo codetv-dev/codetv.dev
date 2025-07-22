@@ -2,7 +2,7 @@ import type { APIRoute } from 'astro';
 import { SANITY_SECRET_TOKEN } from 'astro:env/server';
 import { createClient, Transaction } from '@sanity/client';
 import groq from 'groq';
-import { cloudinary } from '../../../util/cloudinary';
+import { cloudinary } from '@codetv/cloudinary';
 import type { Episode, OldEpisodesQueryResult, Person } from '@codetv/types';
 import { createUser } from '../../../util/clerk';
 import { slugify } from 'inngest';

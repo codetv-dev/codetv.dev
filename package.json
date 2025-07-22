@@ -3,7 +3,7 @@
 	"version": "0.0.0",
 	"license": "MIT",
 	"scripts": {
-		"dev": "NX_DAEMON=false nx run-many -t dev,dev:inngest"
+		"dev": "nx run-many -t dev,dev:inngest"
 	},
 	"private": true,
 	"devDependencies": {
@@ -26,6 +26,7 @@
 		"cloudinary": "^2.7.0",
 		"date-fns": "^4.1.0",
 		"groq": "^3.99.0",
+		"inngest": "^3.40.1",
 		"jsonwebtoken": "^9.0.2",
 		"netlify-plugin-inngest": "^1.0.1",
 		"stripe": "^18.3.0",

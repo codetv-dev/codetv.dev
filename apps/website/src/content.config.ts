@@ -1,6 +1,6 @@
 import { glob } from 'astro/loaders';
 import { defineCollection, z } from 'astro:content';
-import { getAllUsers } from './util/sanity';
+import { getAllUsers } from '@codetv/sanity';
 
 const blog = defineCollection({
 	loader: glob({ pattern: '**/*.mdx', base: './src/content/blog' }),

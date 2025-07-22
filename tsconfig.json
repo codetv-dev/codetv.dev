@@ -22,6 +22,9 @@
     },
     {
       "path": "./libs/sanity"
+    },
+    {
+      "path": "./libs/inngest"
     }
   ]
 }
