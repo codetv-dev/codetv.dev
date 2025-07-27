@@ -13,8 +13,8 @@
 		},
 		"./package.json": "./package.json"
 	},
-	"nx": {
-		"name": "inngest"
+	"scripts": {
+		"build": "envsubst < ./src/integrations/google/config.ts > ./src/integrations/google/config.updated.ts && mv ./src/integrations/google/config.updated.ts ./src/integrations/google/config.ts"
 	},
 	"dependencies": {
 		"@clerk/backend": "^2.5.0",
