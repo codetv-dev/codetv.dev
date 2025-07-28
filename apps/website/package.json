@@ -9,7 +9,8 @@
 		"preview": "astro preview",
 		"astro": "astro",
 		"upgrade": "npx @astrojs/upgrade beta",
-		"env:encrypt": "npx dotenvenc -e -i .env.raw"
+		"env:encrypt": "npx dotenvenc -e -i .env.raw",
+		"prebuild": "envsubst < ./src/components/mux-video-player.astro > ./src/components/mux-video-player.updated.astro && mv ./src/components/mux-video-player.updated.astro ./src/components/mux-video-player.astro"
 	},
 	"dependencies": {
 		"@algolia/autocomplete-core": "^1.19.2",

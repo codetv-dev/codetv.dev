@@ -41,7 +41,7 @@ const mux = new Mux({
 
 	// for signed asset access
 	jwtSigningKey: MUX_JWT_SIGNING_KEY,
-	jwtPrivateKey: env.MUX_JWT_PRIVATE_KEY!,
+	jwtPrivateKey: '${MUX_JWT_PRIVATE_KEY}',
 });
 
 let user;
