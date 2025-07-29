@@ -1,11 +1,5 @@
 import { z } from 'zod';
-import { ClerkWebhookUser } from '../clerk/index.js';
-
-export type SubscriptionLevel =
-	| 'Free Tier Supporter'
-	| 'Silver Tier Supporter'
-	| 'Gold Tier Supporter'
-	| 'Platinum Tier Supporter';
+import { ClerkWebhookUser } from '@codetv/clerk';
 
 export const schema = {
 	'discord/user.role.update': {

@@ -1,9 +1,5 @@
-import { z } from 'astro/zod';
-import { DISCORD_BOT_TOKEN } from 'astro:env/server';
-
-// TODO probably put these in the env?
-export const DISCORD_SERVER_ID = '936836444503310426';
-export const DISCORD_CHANNEL_ID = '1063702581567828008'; // #bot-testing
+import { z } from 'zod';
+import { config } from './config.ts';
 
 export type SubscriptionLevel =
 	| 'Free Tier Supporter'
@@ -11,41 +7,28 @@ export type SubscriptionLevel =
 	| 'Gold Tier Supporter'
 	| 'Platinum Tier Supporter';
 
-export const botRequestHeaders = {
-	Authorization: `Bot ${DISCORD_BOT_TOKEN}`,
-	'Content-Type': 'application/json',
-	'User-Agent': 'CodeTV Bot (http://www.codetv.dev, v0.1)',
-};
-
-export const roles = {
-	FREE_TIER_ROLE_ID: '1391513313258504213',
-	SILVER_TIER_ROLE_ID: '1388646332721270864',
-	GOLD_TIER_ROLE_ID: '1388646061572096170',
-	PLATINUM_TIER_ROLE_ID: '1364315006287740948',
-};
-
 export function getRoleId(plan: SubscriptionLevel) {
 	switch (plan) {
 		case 'Silver Tier Supporter':
-			return roles.SILVER_TIER_ROLE_ID;
+			return config.roles.silver;
 
 		case 'Gold Tier Supporter':
-			return roles.GOLD_TIER_ROLE_ID;
+			return config.roles.gold;
 
 		case 'Platinum Tier Supporter':
-			return roles.PLATINUM_TIER_ROLE_ID;
+			return config.roles.platinum;
 
 		default:
-			return roles.FREE_TIER_ROLE_ID;
+			return config.roles.free;
 	}
 }
 
 export async function getMember(memberId: string) {
 	const res = await fetch(
-		`https://discord.com/api/v10/guilds/${DISCORD_SERVER_ID}/members/${memberId}`,
+		`https://discord.com/api/v10/guilds/${config.serverID}/members/${memberId}`,
 		{
 			method: 'GET',
-			headers: botRequestHeaders,
+			headers: config.headers,
 		},
 	);
 
@@ -68,10 +51,10 @@ export async function getMember(memberId: string) {
 
 export async function sendDiscordMessage({ content }: { content: string }) {
 	const res = await fetch(
-		`https://discord.com/api/v10/channels/${DISCORD_CHANNEL_ID}/messages`,
+		`https://discord.com/api/v10/channels/${config.channelID}/messages`,
 		{
 			method: 'POST',
-			headers: botRequestHeaders,
+			headers: config.headers,
 			body: JSON.stringify({
 				content,
 			}),
@@ -95,10 +78,10 @@ export async function updateRole({
 	roleId: string;
 }) {
 	const res = await fetch(
-		`https://discord.com/api/v10/guilds/${DISCORD_SERVER_ID}/members/${memberId}/roles/${roleId}`,
+		`https://discord.com/api/v10/guilds/${config.serverID}/members/${memberId}/roles/${roleId}`,
 		{
 			method: 'PUT',
-			headers: botRequestHeaders,
+			headers: config.headers,
 		},
 	);
 
@@ -118,10 +101,10 @@ export async function removeRole({
 	roleId: string;
 }) {
 	const res = await fetch(
-		`https://discord.com/api/v10/guilds/${DISCORD_SERVER_ID}/members/${memberId}/roles/${roleId}`,
+		`https://discord.com/api/v10/guilds/${config.serverID}/members/${memberId}/roles/${roleId}`,
 		{
 			method: 'DELETE',
-			headers: botRequestHeaders,
+			headers: config.headers,
 		},
 	);
 

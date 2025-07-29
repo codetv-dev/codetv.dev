@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { clerk } from '../../util/clerk';
+import { clerk } from '@codetv/clerk';
 
 export const GET: APIRoute = async ({ locals, redirect }) => {
 	const sessionId = locals.auth().sessionId;

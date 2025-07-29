@@ -1,20 +1,15 @@
-import Stripe from 'stripe';
-import { inngest } from '../../client.js';
+import type Stripe from 'stripe';
 import { NonRetriableError } from 'inngest';
+import type { InvocationResult } from 'inngest/types';
+import { intervalToDuration } from 'date-fns';
+import { stripe } from '@codetv/stripe';
+import { inngest } from '../../client.js';
 import {
 	personGetByClerkId,
 	personUpdateSubscription,
 } from '../sanity/steps.ts';
 import { userSubscriptionUpdate } from '../clerk/steps.ts';
 import { messageSend } from '../discord/steps.ts';
-import type { InvocationResult } from 'inngest/types';
-import { intervalToDuration } from 'date-fns';
-
-if (!process.env.STRIPE_SECRET_KEY) {
-	throw new Error('STRIPE_SECRET_KEY must be set in the env');
-}
-
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 // TODO verify Stripe webhook signature: https://www.inngest.com/docs/platform/webhooks#verifying-request-signatures
 // export const handleStripeSubscriptionChangeWebhook = inngest.createFunction(

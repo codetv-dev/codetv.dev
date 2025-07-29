@@ -1,5 +1,7 @@
+// TODO figure out how to get these types into @codetv/types in a way that actually works.
+
 type Subscription = {
-	status: Stripe.Status;
+	status: Stripe.Subscription.Status;
 	level: string;
 	customer: Stripe.Customer | Stripe.DeletedCustomer | string;
 };
@@ -8,7 +10,6 @@ declare interface UserPublicMetadata {
 	stripe?: Subscription;
 }
 
-// copy-pasted out of @clerk/backend for use in a util function
 type UserMetadataParams = {
 	publicMetadata?: UserPublicMetadata;
 	privateMetadata?: UserPrivateMetadata;
@@ -27,7 +28,9 @@ type PasswordHasher =
 	| 'phpass'
 	| 'scrypt_firebase'
 	| 'scrypt_werkzeug'
-	| 'sha256';
+	| 'sha256'
+	| 'md5_phpass'
+	| 'ldap_ssha';
 type UserPasswordHashingParams = {
 	passwordDigest: string;
 	passwordHasher: PasswordHasher;
@@ -42,6 +45,8 @@ type CreateUserParams = {
 	lastName?: string;
 	skipPasswordChecks?: boolean;
 	skipPasswordRequirement?: boolean;
+	skipLegalChecks?: boolean;
+	legalAcceptedAt?: Date;
 	totpSecret?: string;
 	backupCodes?: string[];
 	createdAt?: Date;

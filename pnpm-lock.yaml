@@ -11,9 +11,15 @@ importers:
       '@astrojs/netlify':
         specifier: ^6.5.1
         version: 6.5.1(@types/node@24.0.15)(astro@5.12.0(@netlify/blobs@10.0.6)(@types/node@24.0.15)(jiti@2.4.2)(rollup@4.45.1)(typescript@5.7.3)(yaml@2.8.0))(jiti@2.4.2)(rollup@4.45.1)(yaml@2.8.0)
+      '@clerk/astro':
+        specifier: ^2.10.8
+        version: 2.10.8(astro@5.12.0(@netlify/blobs@10.0.6)(@types/node@24.0.15)(jiti@2.4.2)(rollup@4.45.1)(typescript@5.7.3)(yaml@2.8.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       '@clerk/backend':
         specifier: ^2.5.0
         version: 2.5.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      '@clerk/types':
+        specifier: ^4.71.0
+        version: 4.71.0
       '@sanity/client':
         specifier: ^7.8.0
         version: 7.8.0(debug@4.4.1)
@@ -163,15 +169,27 @@ importers:
       '@clerk/themes':
         specifier: ^2.2.55
         version: 2.3.3
+      '@codetv/clerk':
+        specifier: workspace:*
+        version: link:../../libs/clerk
       '@codetv/cloudinary':
         specifier: workspace:*
         version: link:../../libs/cloudinary
+      '@codetv/discord':
+        specifier: workspace:*
+        version: link:../../libs/discord
       '@codetv/inngest':
         specifier: workspace:*
         version: link:../../libs/inngest
+      '@codetv/kit':
+        specifier: workspace:*
+        version: link:../../libs/kit
       '@codetv/sanity':
         specifier: workspace:*
         version: link:../../libs/sanity
+      '@codetv/stripe':
+        specifier: workspace:*
+        version: link:../../libs/stripe
       '@codetv/types':
         specifier: workspace:*
         version: link:../../libs/types
@@ -291,23 +309,46 @@ importers:
         specifier: ^1.0.1
         version: 1.0.1
 
+  libs/clerk:
+    dependencies:
+      '@clerk/backend':
+        specifier: ^2.6.1
+        version: 2.6.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      '@codetv/types':
+        specifier: workspace:*
+        version: link:../types
+      zod:
+        specifier: ^3.25.76
+        version: 3.25.76
+
   libs/cloudinary:
     dependencies:
       cloudinary:
         specifier: ^2.7.0
         version: 2.7.0
 
+  libs/discord: {}
+
   libs/inngest:
     dependencies:
       '@clerk/backend':
         specifier: ^2.5.0
         version: 2.5.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      '@codetv/clerk':
+        specifier: workspace:*
+        version: link:../clerk
       '@codetv/cloudinary':
         specifier: workspace:*
         version: link:../cloudinary
+      '@codetv/discord':
+        specifier: workspace:*
+        version: link:../discord
       '@codetv/sanity':
         specifier: workspace:*
         version: link:../sanity
+      '@codetv/stripe':
+        specifier: workspace:*
+        version: link:../stripe
       '@tka85/dotenvenc':
         specifier: ^5.4.2
         version: 5.4.2(@swc/core@1.5.29(@swc/helpers@0.5.17))(@types/node@24.0.15)(typescript@5.8.3)
@@ -331,6 +372,8 @@ importers:
         specifier: ^9.0.10
         version: 9.0.10
 
+  libs/kit: {}
+
   libs/sanity:
     dependencies:
       '@codetv/types':
@@ -343,11 +386,26 @@ importers:
         specifier: ^3.99.0
         version: 3.99.0
 
+  libs/stripe:
+    dependencies:
+      '@clerk/astro':
+        specifier: ^2.10.8
+        version: 2.10.8(astro@5.12.0(@netlify/blobs@10.0.6)(@types/node@24.0.15)(jiti@2.4.2)(rollup@4.45.1)(typescript@5.8.3)(yaml@2.8.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+
   libs/types:
     dependencies:
+      '@clerk/backend':
+        specifier: ^2.6.1
+        version: 2.6.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      '@clerk/types':
+        specifier: ^4.71.0
+        version: 4.71.0
       '@sanity/client':
         specifier: ^7.8.0
         version: 7.8.0(debug@4.4.1)
+      stripe:
+        specifier: ^18.3.0
+        version: 18.3.0(@types/node@24.0.15)
 
 packages:
 
@@ -1153,6 +1211,10 @@ packages:
     resolution: {integrity: sha512-QLCpd3GVOKrTsDWVcn/F5TUKHXFG1Bgb9gjAYuQPjtzoyqcGwITYcYLZFb273KDGvaqaUgrEKhJprSEpbKwY1Q==}
     engines: {node: '>=18.17.0'}
 
+  '@clerk/backend@2.6.1':
+    resolution: {integrity: sha512-8Loy5jUJ3VMoKhO9lA7KObQarozAYdYMHNkQcJ2fFUrkPNwTRDdz+GzY7qHmkM5iGBPycrw5VqDy2ObPzT+Nnw==}
+    engines: {node: '>=18.17.0'}
+
   '@clerk/clerk-js@5.74.1':
     resolution: {integrity: sha512-1JkTz54Fp5frYM1I9fkC81cIG4FpSpgVWrPBkn9K7pwExdx8YabsiR0ljdT6e6fi9LTzdn+yGWBdzLHcL7E3Fw==}
     engines: {node: '>=18.17.0'}
@@ -1176,12 +1238,24 @@ packages:
       react-dom:
         optional: true
 
+  '@clerk/shared@3.16.0':
+    resolution: {integrity: sha512-jzaa7mnFszxWn0xPBu9tBmHQl3iTLMuHbTjOPWkEdz6/1rdPYWaUfCudMhv2p7Zv9YPesn3Nyui6BZ1nygxMig==}
+    engines: {node: '>=18.17.0'}
+    peerDependencies:
+      react: ^18.0.0 || ^19.0.0 || ^19.0.0-0
+      react-dom: ^18.0.0 || ^19.0.0 || ^19.0.0-0
+    peerDependenciesMeta:
+      react:
+        optional: true
+      react-dom:
+        optional: true
+
   '@clerk/themes@2.3.3':
     resolution: {integrity: sha512-nXVG9tyE7xhymS45Ee1XakLvT6V4WMOrYisWGwi/wAJqUuHqZufFHWV/jZ6FuJ0AAKImmIBbi8S6Y5UFkM63Ug==}
     engines: {node: '>=18.17.0'}
 
-  '@clerk/types@4.68.0':
-    resolution: {integrity: sha512-3+PoGGQgyzLZibzYleByPmx6dfPVoFUjLBy+kASHzF9g3o12WchDn1aI01vN7WNm1ik1Z5sbLhzJs8d9bz38EQ==}
+  '@clerk/types@4.71.0':
+    resolution: {integrity: sha512-QsZEIzx9AFTXAjcGc+aQ+k0TjzXTqi2EpScl36w187xhO3+CWXuk/tZai8IdVclp091+KmQKd8ayxuKnhg3QYQ==}
     engines: {node: '>=18.17.0'}
 
   '@codemirror/autocomplete@6.18.6':
@@ -8637,6 +8711,10 @@ packages:
     resolution: {integrity: sha512-VWfQzbinvXqcyoaTubrZZvZaB8P3mIowxqWGs4sCq7QZ+Y5BYyO1wY1neRJd72jpOBRgqubBTqN+mWIXImaVXg==}
     engines: {node: '>=22'}
 
+  snakecase-keys@9.0.2:
+    resolution: {integrity: sha512-Tr4gONsDj1Pa6HJH9D3b411r6tuRyCGgb1l7YpzDFp/thjVSWs7rcbNjyTyRqJi5SUV23sFpzf9epIJRbLR6Yw==}
+    engines: {node: '>=22'}
+
   source-map-js@1.2.1:
     resolution: {integrity: sha512-UXWMKhLOwVKb728IUtQPXxfYU+usdybtUrK/8uGE8CQMvrhOpwvzDBwj0QhSL7MQc7vIsISBG8VQ8+IDQxpfQA==}
     engines: {node: '>=0.10.0'}
@@ -11137,11 +11215,23 @@ snapshots:
     transitivePeerDependencies:
       - encoding
 
+  '@clerk/astro@2.10.8(astro@5.12.0(@netlify/blobs@10.0.6)(@types/node@24.0.15)(jiti@2.4.2)(rollup@4.45.1)(typescript@5.7.3)(yaml@2.8.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
+    dependencies:
+      '@clerk/backend': 2.6.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      '@clerk/shared': 3.16.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      '@clerk/types': 4.71.0
+      astro: 5.12.0(@netlify/blobs@10.0.6)(@types/node@24.0.15)(jiti@2.4.2)(rollup@4.45.1)(typescript@5.7.3)(yaml@2.8.0)
+      nanoid: 5.0.9
+      nanostores: 0.11.3
+    transitivePeerDependencies:
+      - react
+      - react-dom
+
   '@clerk/astro@2.10.8(astro@5.12.0(@netlify/blobs@10.0.6)(@types/node@24.0.15)(jiti@2.4.2)(rollup@4.45.1)(typescript@5.8.3)(yaml@2.8.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
     dependencies:
-      '@clerk/backend': 2.5.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
-      '@clerk/shared': 3.13.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
-      '@clerk/types': 4.68.0
+      '@clerk/backend': 2.6.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      '@clerk/shared': 3.16.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      '@clerk/types': 4.71.0
       astro: 5.12.0(@netlify/blobs@10.0.6)(@types/node@24.0.15)(jiti@2.4.2)(rollup@4.45.1)(typescript@5.8.3)(yaml@2.8.0)
       nanoid: 5.0.9
       nanostores: 0.11.3
@@ -11152,9 +11242,21 @@ snapshots:
   '@clerk/backend@2.5.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
     dependencies:
       '@clerk/shared': 3.13.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
-      '@clerk/types': 4.68.0
+      '@clerk/types': 4.71.0
       cookie: 1.0.2
       snakecase-keys: 9.0.1
+      standardwebhooks: 1.0.0
+      tslib: 2.8.1
+    transitivePeerDependencies:
+      - react
+      - react-dom
+
+  '@clerk/backend@2.6.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
+    dependencies:
+      '@clerk/shared': 3.16.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      '@clerk/types': 4.71.0
+      cookie: 1.0.2
+      snakecase-keys: 9.0.2
       standardwebhooks: 1.0.0
       tslib: 2.8.1
     transitivePeerDependencies:
@@ -11165,7 +11267,7 @@ snapshots:
     dependencies:
       '@clerk/localizations': 3.20.1
       '@clerk/shared': 3.13.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
-      '@clerk/types': 4.68.0
+      '@clerk/types': 4.71.0
       '@coinbase/wallet-sdk': 4.3.0
       '@emotion/cache': 11.11.0
       '@emotion/react': 11.11.1(@types/react@19.1.8)(react@19.1.0)
@@ -11192,11 +11294,23 @@ snapshots:
 
   '@clerk/localizations@3.20.1':
     dependencies:
-      '@clerk/types': 4.68.0
+      '@clerk/types': 4.71.0
 
   '@clerk/shared@3.13.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
     dependencies:
-      '@clerk/types': 4.68.0
+      '@clerk/types': 4.71.0
+      dequal: 2.0.3
+      glob-to-regexp: 0.4.1
+      js-cookie: 3.0.5
+      std-env: 3.9.0
+      swr: 2.3.4(react@19.1.0)
+    optionalDependencies:
+      react: 19.1.0
+      react-dom: 19.1.0(react@19.1.0)
+
+  '@clerk/shared@3.16.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
+    dependencies:
+      '@clerk/types': 4.71.0
       dequal: 2.0.3
       glob-to-regexp: 0.4.1
       js-cookie: 3.0.5
@@ -11208,10 +11322,10 @@ snapshots:
 
   '@clerk/themes@2.3.3':
     dependencies:
-      '@clerk/types': 4.68.0
+      '@clerk/types': 4.71.0
       tslib: 2.8.1
 
-  '@clerk/types@4.68.0':
+  '@clerk/types@4.71.0':
     dependencies:
       csstype: 3.1.3
 
@@ -20663,6 +20777,12 @@ snapshots:
   smol-toml@1.4.1: {}
 
   snakecase-keys@9.0.1:
+    dependencies:
+      change-case: 5.4.4
+      map-obj: 5.0.2
+      type-fest: 4.41.0
+
+  snakecase-keys@9.0.2:
     dependencies:
       change-case: 5.4.4
       map-obj: 5.0.2

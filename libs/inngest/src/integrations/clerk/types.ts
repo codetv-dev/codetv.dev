@@ -1,12 +1,5 @@
 import { z } from 'zod';
-
-export const ClerkWebhookUser = z.object({
-	id: z.string(),
-	username: z.string(),
-	first_name: z.string(),
-	last_name: z.string(),
-	image_url: z.string(),
-});
+import { ClerkWebhookUser } from '@codetv/clerk';
 
 export const schema = {
 	'clerk/user.updated': {
@@ -42,6 +35,11 @@ export const schema = {
 				z.literal('oauth_github'),
 				z.literal('oauth_discord'),
 			]),
+		}),
+	},
+	'clerk/user.get-by-id': {
+		data: z.object({
+			userId: z.string(),
 		}),
 	},
 };

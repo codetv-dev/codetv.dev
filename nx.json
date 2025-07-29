@@ -33,7 +33,11 @@
       "exclude": [
         "libs/inngest/*",
         "libs/cloudinary/*",
-        "libs/sanity/*"
+        "libs/sanity/*",
+        "libs/clerk/*",
+        "libs/stripe/*",
+        "libs/discord/*",
+        "libs/kit/*"
       ]
     },
     {
@@ -41,7 +45,11 @@
       "include": [
         "libs/inngest/*",
         "libs/cloudinary/*",
-        "libs/sanity/*"
+        "libs/sanity/*",
+        "libs/clerk/*",
+        "libs/stripe/*",
+        "libs/discord/*",
+        "libs/kit/*"
       ],
       "options": {
         "typecheck": {

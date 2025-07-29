@@ -18,8 +18,11 @@
 	},
 	"dependencies": {
 		"@clerk/backend": "^2.5.0",
+		"@codetv/clerk": "workspace:*",
 		"@codetv/cloudinary": "workspace:*",
+		"@codetv/discord": "workspace:*",
 		"@codetv/sanity": "workspace:*",
+		"@codetv/stripe": "workspace:*",
 		"@tka85/dotenvenc": "^5.4.2",
 		"date-fns": "^4.1.0",
 		"inngest": "^3.40.1",

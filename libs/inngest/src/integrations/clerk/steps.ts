@@ -1,7 +1,8 @@
+import { clerk, type User } from '@codetv/clerk';
 import { inngest } from '../../client.js';
 import { imageUpload } from '../cloudinary/steps.ts';
 import { personGetByClerkId, personUpsert } from '../sanity/steps.ts';
-import { clerk, type User } from './api.ts';
+import { NonRetriableError } from 'inngest';
 
 export const handleWebhookUserCreatedOrUpdated = inngest.createFunction(
 	{ id: 'clerk/user-created-or-updated' },
@@ -78,5 +79,17 @@ export const userGetExternalAccountId = inngest.createFunction(
 
 			return account.externalId;
 		});
+	},
+);
+
+export const userGetById = inngest.createFunction(
+	{ id: 'clerk/user.get-by-id' },
+	{ event: 'clerk/user.get-by-id' },
+	async ({ event, step }) => {
+		return step.run('clerk/user.get', async () => {
+			return clerk.users.getUser(event.data.userId).catch((err) => {
+				throw new NonRetriableError(err);
+			});
+		}) as Promise<User>;
 	},
 );

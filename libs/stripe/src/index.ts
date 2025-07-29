@@ -1,14 +1,11 @@
 import Stripe from 'stripe';
 import type { User } from '@clerk/astro/server';
-import {
-	STRIPE_SECRET_KEY,
-	TIER_SILVER_PRICE_ID,
-	TIER_GOLD_PRICE_ID,
-	TIER_PLATINUM_PRICE_ID,
-	STRIPE_WEBHOOK_SECRET,
-} from 'astro:env/server';
 
-export const stripe = new Stripe(STRIPE_SECRET_KEY);
+if (!process.env.STRIPE_SECRET_KEY) {
+	throw new Error('must set STRIPE_SECRET_KEY in env');
+}
+
+export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 export const STRIPE_SUBSCRIPTION_TYPES = [
 	{
@@ -19,7 +16,7 @@ export const STRIPE_SUBSCRIPTION_TYPES = [
 			{
 				period: 'monthly',
 				price: 5_00,
-				priceId: TIER_SILVER_PRICE_ID,
+				priceId: process.env.TIER_SILVER_PRICE_ID,
 			},
 			{
 				period: 'yearly',
@@ -36,7 +33,7 @@ export const STRIPE_SUBSCRIPTION_TYPES = [
 			{
 				period: 'monthly',
 				price: 20_00,
-				priceId: TIER_GOLD_PRICE_ID,
+				priceId: process.env.TIER_GOLD_PRICE_ID,
 			},
 			{
 				period: 'yearly',
@@ -59,7 +56,12 @@ export const STRIPE_SUBSCRIPTION_TYPES = [
 	// },
 ];
 
-export async function validateWebhookSignature(request: Request) {
+export async function validateWebhookSignature(
+	request: Request,
+): Promise<Stripe.Event | Response> {
+	if (!process.env.STRIPE_WEBHOOK_SECRET) {
+		throw new Error('must set STRIPE_WEBHOOK_SECRET in env');
+	}
 	const signature = request.headers.get('stripe-signature');
 
 	if (!signature) {
@@ -73,7 +75,7 @@ export async function validateWebhookSignature(request: Request) {
 		event = stripe.webhooks.constructEvent(
 			await request.text(),
 			signature,
-			STRIPE_WEBHOOK_SECRET,
+			process.env.STRIPE_WEBHOOK_SECRET,
 		);
 	} catch (error) {
 		if (error instanceof Error) {

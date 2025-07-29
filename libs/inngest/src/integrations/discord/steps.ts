@@ -1,15 +1,15 @@
 import { NonRetriableError } from 'inngest';
 import { inngest } from '../../client.js';
-import { clerk } from '../clerk/api.ts';
 import {
 	getMember,
 	getRoleId,
 	removeRole,
 	sendDiscordMessage,
 	updateRole,
-} from './api.ts';
-import type { SubscriptionLevel } from './types.ts';
+	type SubscriptionLevel,
+} from '@codetv/discord';
 import { config } from './config.ts';
+import { userGetById } from '../clerk/steps.ts';
 
 export const messageSend = inngest.createFunction(
 	{ id: 'discord/message.send' },
@@ -29,13 +29,16 @@ export const discordUpdateUserRole = inngest.createFunction(
 	async function ({ event, step }) {
 		const userId = event.data.id;
 
-		const user = await step.run('clerk/user.get', async () => {
-			return clerk.users.getUser(userId).catch((err) => {
-				throw new NonRetriableError(err);
-			});
+		const user = await step.invoke('discord-get-user', {
+			function: userGetById,
+			data: {
+				userId,
+			},
 		});
 
 		const roleId = await step.run('discord/user.role.get-id', async () => {
+			// TODO centralize types to avoid this problem
+			// @ts-expect-error not dealing with this
 			let level = (user.publicMetadata.stripe?.level ??
 				'Free Tier Supporter') as SubscriptionLevel;
 

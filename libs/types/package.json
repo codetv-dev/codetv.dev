@@ -1,9 +1,20 @@
 {
 	"type": "module",
 	"name": "@codetv/types",
-	"main": "src/index.ts",
+	"main": "src/index.d.ts",
 	"private": true,
+	"exports": {
+		".": {
+			"types": "./src/index.d.ts",
+			"import": "./src/index.d.ts",
+			"default": "./src/index.d.ts"
+		},
+		"./package.json": "./package.json"
+	},
 	"dependencies": {
-		"@sanity/client": "^7.8.0"
+		"@clerk/backend": "^2.6.1",
+		"@clerk/types": "^4.71.0",
+		"@sanity/client": "^7.8.0",
+		"stripe": "^18.3.0"
 	}
 }

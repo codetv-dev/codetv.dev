@@ -1,8 +1,18 @@
 import { createClerkClient } from '@clerk/backend';
-import { CLERK_SECRET_KEY } from 'astro:env/server';
+import { z } from 'zod';
+
+export { type User } from '@clerk/backend';
+
+export const ClerkWebhookUser = z.object({
+	id: z.string(),
+	username: z.string(),
+	first_name: z.string(),
+	last_name: z.string(),
+	image_url: z.string(),
+});
 
 export const clerk = createClerkClient({
-	secretKey: CLERK_SECRET_KEY,
+	secretKey: process.env.CLERK_SECRET_KEY,
 });
 
 export async function loadUsersByIDs(ids: Array<string>) {
@@ -36,5 +46,7 @@ export async function createUser(user: CreateUserParams) {
 
 			return result.data.at(0);
 		}
+
+		throw new Error(error);
 	}
 }
