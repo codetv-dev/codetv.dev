@@ -23,7 +23,6 @@
 		"@clerk/backend": "^2.5.0",
 		"@clerk/types": "^4.71.0",
 		"@sanity/client": "^7.8.0",
-		"@tka85/dotenvenc": "^5.4.2",
 		"astro": "^5.12.0",
 		"cloudinary": "^2.7.0",
 		"date-fns": "^4.1.0",

@@ -18,6 +18,14 @@ export const schemas = new EventSchemas()
 	.fromZod(stripeSchema)
 	.fromZod(websiteSchema);
 
+if (!process.env.INNGEST_EVENT_KEY) {
+	console.error('missing INNGEST_EVENT_KEY. Workflows will not run.');
+}
+
+if (!process.env.INNGEST_SIGNING_KEY) {
+	console.error('missing INNGEST_SIGNING_KEY. Workflows will not run.');
+}
+
 export const inngest = new Inngest({
 	id: 'codetv',
 	schemas,

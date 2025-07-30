@@ -9,7 +9,6 @@
 		"preview": "astro preview",
 		"astro": "astro",
 		"upgrade": "npx @astrojs/upgrade beta",
-		"env:encrypt": "npx dotenvenc -e -i .env.raw",
 		"prebuild": "envsubst < ./src/components/mux-video-player.astro > ./src/components/mux-video-player.updated.astro && mv ./src/components/mux-video-player.updated.astro ./src/components/mux-video-player.astro"
 	},
 	"dependencies": {
@@ -39,7 +38,6 @@
 		"@mux/videojs-kit": "^0.12.0",
 		"@netlify/functions": "^4.1.10",
 		"@sanity/client": "^7.6.0",
-		"@tka85/dotenvenc": "^5.4.2",
 		"@types/react": "^19.1.8",
 		"@types/react-dom": "^19.1.6",
 		"@unpic/astro": "^1.0.0",

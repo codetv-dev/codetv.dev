@@ -4,17 +4,13 @@ import netlify from '@astrojs/netlify';
 
 // https://astro.build/config
 export default defineConfig({
-  output: 'server',
-  server: {
-    port: 8765
-  },
+	output: 'server',
+	server: {
+		port: 8765,
+	},
 	adapter: netlify(),
 	env: {
 		schema: {
-			DOTENVENC_PASS: envField.string({
-				access: 'secret',
-				context: 'server',
-			}),
 			CLERK_SECRET_KEY: envField.string({
 				access: 'secret',
 				context: 'server',

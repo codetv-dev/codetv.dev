@@ -1,11 +1,15 @@
 import Stripe from 'stripe';
 import type { User } from '@clerk/astro/server';
 
-if (!process.env.STRIPE_SECRET_KEY) {
-	throw new Error('must set STRIPE_SECRET_KEY in env');
+const secret = process.env.STRIPE_SECRET_KEY;
+
+if (!secret) {
+	console.error(
+		'STRIPE_SECRET_KEY is not set in env. Payment features will not work.',
+	);
 }
 
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+export const stripe = new Stripe(secret ?? 'sk_test_123');
 
 export const STRIPE_SUBSCRIPTION_TYPES = [
 	{

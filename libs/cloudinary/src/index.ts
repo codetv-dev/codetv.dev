@@ -5,15 +5,15 @@ const api_key = process.env.CLOUDINARY_API_KEY;
 const api_secret = process.env.CLOUDINARY_API_SECRET;
 
 if (!cloud_name || !api_key || !api_secret) {
-	throw new Error(
+	console.error(
 		'Must provide Cloudinary env vars. See .env.TEMPLATE for details.',
 	);
 }
 
 v2.config({
-	cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-	api_key: process.env.CLOUDINARY_API_KEY,
-	api_secret: process.env.CLOUDINARY_API_SECRET,
+	cloud_name: cloud_name ?? 'jlengstorf', // fallback
+	api_key,
+	api_secret,
 });
 
 export const cloudinary = v2;

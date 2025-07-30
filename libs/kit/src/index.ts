@@ -1,10 +1,13 @@
-if (!process.env.CONVERTKIT_SECRET_KEY) {
-	throw new Error('must set CONVERTKIT_SECRET_KEY in env');
-}
-
 const ck_api = new URL('https://api.convertkit.com');
+const api_key = process.env.KIT_SECRET_KEY;
 
-ck_api.searchParams.set('api_secret', process.env.CONVERTKIT_SECRET_KEY);
+if (api_key) {
+	ck_api.searchParams.set('api_secret', api_key);
+} else {
+	console.error(
+		'KIT_SECRET_KEY is not set in env. Newsletter activities will not work.',
+	);
+}
 
 export async function addSubscriber(first_name: string, email: string) {
 	/** @see https://app.convertkit.com/forms/designers/1269192/edit */
@@ -16,7 +19,7 @@ export async function addSubscriber(first_name: string, email: string) {
 			'Content-Type': 'application/json; charset=utf-8',
 		},
 		body: JSON.stringify({
-			api_key: process.env.CONVERTKIT_SECRET_KEY,
+			api_key,
 			first_name,
 			email,
 		}),
