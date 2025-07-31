@@ -56,10 +56,12 @@ export default defineConfig({
 			ALGOLIA_API_KEY: envField.string({
 				access: 'public',
 				context: 'client',
+				default: '',
 			}),
 			ALGOLIA_APP_ID: envField.string({
 				access: 'public',
 				context: 'client',
+				default: '',
 			}),
 		},
 	},

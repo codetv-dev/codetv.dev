@@ -1,6 +1,8 @@
 import { z } from 'zod';
 import { ClerkWebhookUser } from '@codetv/clerk';
 
+export { ClerkWebhookUser } from '@codetv/clerk';
+
 export const schema = {
 	'clerk/user.updated': {
 		data: ClerkWebhookUser,

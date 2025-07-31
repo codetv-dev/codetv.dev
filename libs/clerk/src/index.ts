@@ -11,9 +11,9 @@ export const ClerkWebhookUser = z.object({
 	image_url: z.string(),
 });
 
-export const clerk = createClerkClient({
-	secretKey: process.env.CLERK_SECRET_KEY,
-});
+const secretKey = process.env.CLERK_SECRET_KEY;
+
+export const clerk = createClerkClient({ secretKey });
 
 export async function loadUsersByIDs(ids: Array<string>) {
 	const result = await clerk.users.getUserList({
