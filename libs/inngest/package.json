@@ -23,6 +23,7 @@
 		"@codetv/discord": "workspace:*",
 		"@codetv/sanity": "workspace:*",
 		"@codetv/stripe": "workspace:*",
+		"@codetv/types": "workspace:*",
 		"date-fns": "^4.1.0",
 		"inngest": "^3.40.1",
 		"jsonwebtoken": "^9.0.2",

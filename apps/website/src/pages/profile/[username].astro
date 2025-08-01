@@ -1,9 +1,9 @@
 ---
-import { getCollection } from 'astro:content';
+import { createImageUrl } from '@codetv/cloudinary';
 import { Image } from '@unpic/astro';
+import { getCollection } from 'astro:content';
 import { marked } from 'marked';
 import Layout from '../../layouts/default.astro';
-import { createImageUrl } from '@codetv/cloudinary';
 import Card from '../../components/cards/card.astro';
 import { getEntry } from 'astro:content';
 

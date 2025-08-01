@@ -10,9 +10,10 @@
 		"astro": "astro"
 	},
 	"dependencies": {
-		"@astrojs/netlify": "^6.5.1",
+		"@astrojs/netlify": "^6.5.4",
 		"@codetv/inngest": "workspace:*",
-		"astro": "^5.12.0",
+		"astro": "^5.12.7",
+		"inngest": "^3.40.1",
 		"netlify-plugin-inngest": "^1.0.1"
 	}
 }

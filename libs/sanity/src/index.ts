@@ -16,9 +16,7 @@ import type {
 	FeaturedSeriesQueryResult,
 	AllUsersQueryResult,
 } from '@codetv/types';
-import type { UploadApiResponse } from 'cloudinary';
-
-export * from './types.js';
+import type { UploadApiResponse } from '@codetv/cloudinary';
 
 const token = process.env.SANITY_SECRET_TOKEN;
 
@@ -60,7 +58,7 @@ const allSeriesQuery = groq`
 `;
 
 const featuredSeriesQuery = groq`
-  *[_type=="series" && featured == true] {
+  *[_type=="series" && featured == 'featured'] {
     'slug': slug.current,
     title,
     description,

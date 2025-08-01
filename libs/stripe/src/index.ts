@@ -1,5 +1,7 @@
 import Stripe from 'stripe';
-import type { User } from '@clerk/astro/server';
+import type { User } from '@codetv/clerk';
+
+export type { Stripe } from 'stripe';
 
 const secret = process.env.STRIPE_SECRET_KEY;
 

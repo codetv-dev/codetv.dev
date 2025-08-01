@@ -1,5 +1,7 @@
 import { v2, type TransformationOptions } from 'cloudinary';
 
+export type { UploadApiResponse } from 'cloudinary';
+
 const cloud_name = process.env.CLOUDINARY_CLOUD_NAME ?? 'jlengstorf';
 const api_key = process.env.CLOUDINARY_API_KEY;
 const api_secret = process.env.CLOUDINARY_API_SECRET;

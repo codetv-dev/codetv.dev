@@ -59,6 +59,10 @@ const loadAstroAsJsx = {
 export async function getHtmlFromContentCollectionEntry(
 	post: CollectionEntry<'blog'>,
 ) {
+	if (!post.body) {
+		return '';
+	}
+
 	const result = await bundleMDX({
 		source: post.body,
 		esbuildOptions(options) {

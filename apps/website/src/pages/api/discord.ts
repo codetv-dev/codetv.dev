@@ -1,11 +1,7 @@
 import { clerk } from '@codetv/clerk';
 import type { APIRoute } from 'astro';
-import {
-	getRoleId,
-	sendDiscordMessage,
-	updateRole,
-	type SubscriptionLevel,
-} from '@codetv/discord';
+import { getRoleId, sendDiscordMessage, updateRole } from '@codetv/discord';
+import { type SubscriptionLevel } from '@codetv/types';
 
 export const GET: APIRoute = async ({ locals }) => {
 	const { userId } = locals.auth();

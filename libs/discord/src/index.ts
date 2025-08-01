@@ -1,11 +1,6 @@
 import { z } from 'zod';
+import { type SubscriptionLevel } from '@codetv/types';
 import { config } from './config.ts';
-
-export type SubscriptionLevel =
-	| 'Free Tier Supporter'
-	| 'Silver Tier Supporter'
-	| 'Gold Tier Supporter'
-	| 'Platinum Tier Supporter';
 
 export function getRoleId(plan: SubscriptionLevel) {
 	switch (plan) {

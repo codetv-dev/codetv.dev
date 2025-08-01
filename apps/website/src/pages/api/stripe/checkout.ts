@@ -1,6 +1,5 @@
 import { type APIRoute } from 'astro';
-import { stripe } from '@codetv/stripe';
-import { type Stripe } from 'stripe';
+import { stripe, type Stripe } from '@codetv/stripe';
 
 export const POST: APIRoute = async ({ request, locals }) => {
 	const userId = locals.auth().userId;

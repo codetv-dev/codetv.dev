@@ -1,9 +1,9 @@
 ---
+import { createImageUrl } from '@codetv/cloudinary';
+import { getAllSeries, getSeriesBySlug } from '@codetv/sanity';
 import { format } from 'date-fns';
 import Layout from '../../../layouts/default.astro';
 import Card from '../../../components/cards/card.astro';
-import { getAllSeries, getSeriesBySlug } from '@codetv/sanity';
-import { createImageUrl } from '@codetv/cloudinary';
 
 export const prerender = true;
 

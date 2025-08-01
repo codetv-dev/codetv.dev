@@ -1,9 +1,4 @@
 import { z } from 'zod';
-import { inngest } from '../../client.js';
-import { getGoogleAccessToken } from './api/auth.ts';
-import { getCalendarEvents, getHostFreeBusy } from './api/calendar.ts';
-import { appendValue } from './api/sheets.ts';
-import { CalendarEvent } from './types.ts';
 import {
 	add,
 	eachDayOfInterval,
@@ -11,6 +6,11 @@ import {
 	isThursday,
 	nextThursday,
 } from 'date-fns';
+import { inngest } from '../../client.js';
+import { getGoogleAccessToken } from './api/auth.ts';
+import { getCalendarEvents, getHostFreeBusy } from './api/calendar.ts';
+import { appendValue } from './api/sheets.ts';
+import { CalendarEvent } from './types.ts';
 
 type CalendarEvent = z.infer<typeof CalendarEvent>;
 

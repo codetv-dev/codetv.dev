@@ -7,30 +7,8 @@
 	},
 	"private": true,
 	"devDependencies": {
-		"@nx/js": "20.8.2",
-		"@swc-node/register": "~1.9.1",
-		"@swc/core": "~1.5.7",
-		"@swc/helpers": "~0.5.11",
-		"@types/jsonwebtoken": "^9.0.10",
-		"@types/node": "^24.0.15",
-		"nx": "20.8.2",
-		"tslib": "^2.3.0",
-		"typescript": "~5.7.2"
-	},
-	"dependencies": {
-		"@astrojs/netlify": "^6.5.1",
-		"@clerk/astro": "^2.10.8",
-		"@clerk/backend": "^2.5.0",
-		"@clerk/types": "^4.71.0",
-		"@sanity/client": "^7.8.0",
-		"astro": "^5.12.0",
-		"cloudinary": "^2.7.0",
-		"date-fns": "^4.1.0",
-		"groq": "^3.99.0",
-		"inngest": "^3.40.1",
-		"jsonwebtoken": "^9.0.2",
-		"netlify-plugin-inngest": "^1.0.1",
-		"stripe": "^18.3.0",
-		"zod": "^3.22.5"
+		"@nx/js": "21.3.10",
+		"@types/node": "^24.1.0",
+		"nx": "21.3.10"
 	}
 }

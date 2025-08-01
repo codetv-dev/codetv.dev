@@ -1,6 +1,6 @@
-import type Stripe from 'stripe';
-import { NonRetriableError } from 'inngest';
+import type { Stripe } from '@codetv/stripe';
 import type { InvocationResult } from 'inngest/types';
+import { NonRetriableError } from 'inngest';
 import { intervalToDuration } from 'date-fns';
 import { stripe } from '@codetv/stripe';
 import { inngest } from '../../client.js';

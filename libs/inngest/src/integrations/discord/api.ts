@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { config } from './config.ts';
-import type { SubscriptionLevel } from './types.ts';
+import type { SubscriptionLevel } from '@codetv/types';
 
 export function getRoleId(plan: SubscriptionLevel) {
 	switch (plan) {
