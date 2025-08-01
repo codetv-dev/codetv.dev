@@ -22,6 +22,21 @@
     },
     {
       "path": "./libs/sanity"
+    },
+    {
+      "path": "./libs/inngest"
+    },
+    {
+      "path": "./libs/clerk"
+    },
+    {
+      "path": "./libs/stripe"
+    },
+    {
+      "path": "./libs/discord"
+    },
+    {
+      "path": "./libs/kit"
     }
   ]
 }

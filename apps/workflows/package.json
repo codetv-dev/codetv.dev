@@ -7,23 +7,12 @@
 		"dev": "astro dev",
 		"build": "astro build",
 		"preview": "astro preview",
-		"astro": "astro",
-		"env:encrypt": "npx dotenvenc -e -i .env.raw"
+		"astro": "astro"
 	},
 	"dependencies": {
 		"@astrojs/netlify": "^6.5.1",
-		"@clerk/backend": "^2.5.0",
-		"@codetv/cloudinary": "workspace:*",
-		"@codetv/sanity": "workspace:*",
-		"@tka85/dotenvenc": "^5.4.2",
+		"@codetv/inngest": "workspace:*",
 		"astro": "^5.12.0",
-		"date-fns": "^4.1.0",
-		"inngest": "^3.40.1",
-		"jsonwebtoken": "^9.0.2",
-		"netlify-plugin-inngest": "^1.0.1",
-		"stripe": "^18.3.0"
-	},
-	"devDependencies": {
-		"@types/jsonwebtoken": "^9.0.10"
+		"netlify-plugin-inngest": "^1.0.1"
 	}
 }

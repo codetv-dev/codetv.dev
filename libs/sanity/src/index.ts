@@ -23,14 +23,16 @@ export * from './types.js';
 const token = process.env.SANITY_SECRET_TOKEN;
 
 if (!token) {
-	throw new Error('Must set SANITY_SECRET_TOKEN in the env');
+	console.error(
+		'SANITY_SECRET_TOKEN is not set in the env. Write operations will not work.',
+	);
 }
 
 const client = createClient({
 	projectId: 'vnkupgyb',
 	dataset: 'develop',
 	apiVersion: '2024-08-10',
-	token: process.env.SANITY_SECRET_TOKEN,
+	token,
 	perspective: 'published',
 	useCdn: true,
 });

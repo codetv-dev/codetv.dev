@@ -5,12 +5,12 @@ import { Image } from '@unpic/astro';
 import {
 	getAllEpisodes,
 	getEpisodeTranscriptBySlug,
-} from '../../../../util/sanity';
+} from '@codetv/sanity';
 import {
 	createImageUrl,
 	generateDefaultImage,
 	getYouTubeThumbnail,
-} from '../../../../util/cloudinary';
+} from '@codetv/cloudinary';
 import Layout from '../../../../layouts/default.astro';
 import VideoPlayer from '../../../../components/video-player.astro';
 import ShareInput from '../../../../components/share-input.astro';
@@ -469,9 +469,10 @@ if (episode.video && !episode.video.youtube_id && episode.video.mux) {
 	.video-player-placeholder {
 		animation: 1s pulse infinite alternate linear;
 		aspect-ratio: 16 / 9;
-		background: var(--gray-900);
-		block-size: auto;
+		background: var(--gray-100);
+		block-size: 100%;
 		inline-size: 100dvi;
+		opacity: 0.25;
 	}
 
 	.thumbnail {

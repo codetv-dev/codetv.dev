@@ -1,6 +1,5 @@
 import { serve } from 'inngest/astro';
-import { inngest } from '../../inngest/client.ts';
-import { functions } from '../../inngest/index.ts';
+import { inngest, functions } from '@codetv/inngest';
 
 export const { GET, POST, PUT } = serve({
 	client: inngest,

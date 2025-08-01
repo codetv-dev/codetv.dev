@@ -1,0 +1,12 @@
+{
+	"name": "@codetv/website",
+	"targets": {
+		"build": {
+			"outputs": [
+				"{projectRoot}/dist",
+				"{projectRoot}/.netlify",
+				"{projectRoot}/.astro"
+			]
+		}
+	}
+}

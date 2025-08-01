@@ -34,94 +34,34 @@ export default defineConfig({
 	security: { checkOrigin: false },
 	env: {
 		schema: {
-			NETLIFY_PERSONAL_ACCESS_TOKEN: envField.string({
-				access: 'secret',
-				context: 'server',
-			}),
 			PUBLIC_CLERK_PUBLISHABLE_KEY: envField.string({
 				access: 'public',
 				context: 'client',
 			}),
-			PUBLIC_CLERK_SIGN_IN_URL: envField.string({
-				access: 'public',
-				context: 'client',
-			}),
-			PUBLIC_CLERK_SIGN_UP_URL: envField.string({
-				access: 'public',
-				context: 'client',
-			}),
-			CLERK_SECRET_KEY: envField.string({
-				access: 'secret',
-				context: 'server',
-			}),
-			STRIPE_SECRET_KEY: envField.string({
-				access: 'secret',
-				context: 'server',
-			}),
-			STRIPE_WEBHOOK_SECRET: envField.string({
-				access: 'secret',
-				context: 'server',
-			}),
-			TIER_SILVER_PRICE_ID: envField.string({
-				access: 'secret',
-				context: 'server',
-			}),
-			TIER_GOLD_PRICE_ID: envField.string({
-				access: 'secret',
-				context: 'server',
-			}),
-			TIER_PLATINUM_PRICE_ID: envField.string({
-				access: 'secret',
-				context: 'server',
-			}),
 			MUX_JWT_SIGNING_KEY: envField.string({
 				access: 'secret',
 				context: 'server',
+				default: '',
 			}),
-			MUX_TOKEN_ID: envField.string({ access: 'secret', context: 'server' }),
+			MUX_TOKEN_ID: envField.string({
+				access: 'secret',
+				context: 'server',
+				default: '',
+			}),
 			MUX_TOKEN_SECRET: envField.string({
 				access: 'secret',
 				context: 'server',
+				default: '',
 			}),
-			CLOUDINARY_CLOUD_NAME: envField.string({
-				access: 'secret',
-				context: 'server',
-			}),
-			CLOUDINARY_API_KEY: envField.string({
-				access: 'secret',
-				context: 'server',
-			}),
-			CLOUDINARY_API_SECRET: envField.string({
-				access: 'secret',
-				context: 'server',
-			}),
-			CONVERTKIT_API_KEY: envField.string({
-				access: 'secret',
-				context: 'server',
-			}),
-			CONVERTKIT_SECRET_KEY: envField.string({
-				access: 'secret',
-				context: 'server',
-			}),
-			SANITY_SECRET_TOKEN: envField.string({
-				access: 'secret',
-				context: 'server',
-			}),
-			DISCORD_BOT_TOKEN: envField.string({
-				access: 'secret',
-				context: 'server',
-			}),
-			PUBLIC_ALGOLIA_API_KEY: envField.string({
+			ALGOLIA_API_KEY: envField.string({
 				access: 'public',
 				context: 'client',
+				default: '',
 			}),
-			PUBLIC_ALGOLIA_APP_ID: envField.string({
+			ALGOLIA_APP_ID: envField.string({
 				access: 'public',
 				context: 'client',
-			}),
-			GOOGLE_API_SERVICE_ACCOUNT: envField.string({
-				access: 'secret',
-				context: 'server',
+				default: '',
 			}),
 		},
 	},
