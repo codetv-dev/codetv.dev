@@ -198,7 +198,6 @@ const sponsor = defineType({
   type: 'document',
   name: 'sponsor',
   title: 'Sponsor',
-  icon: StarIcon,
   fields: [
     defineField({
       title: 'Sponsor Name',
@@ -228,9 +227,27 @@ const sponsor = defineType({
       logo: 'logo',
     },
     prepare({title, logo}) {
+      let url
+      if (logo && logo.public_id) {
+        console.log(logo.public_id)
+        url = new URL('https://res.cloudinary.com')
+        url.pathname = [
+          'jlengstorf',
+          'image',
+          logo.type,
+          'b_black,ar_1,g_auto,c_auto_pad,w_100',
+          'v' + logo.version,
+          logo.public_id,
+        ].join('/')
+      } else {
+        url = new URL(
+          'https://res.cloudinary.com/jlengstorf/image/upload/t_thumb400/w_99/v1743473132/placeholder.jpg',
+        )
+      }
+
       return {
         title: title || 'Untitled Sponsor',
-        media: logo || StarIcon,
+        imageUrl: url.toString(),
       }
     },
   },

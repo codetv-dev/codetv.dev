@@ -1,5 +1,5 @@
 import {defineArrayMember, defineField, defineType} from 'sanity'
-import {PlayIcon} from '@sanity/icons'
+import {PlayIcon, LinkIcon} from '@sanity/icons'
 
 export const episode = defineType({
   name: 'episode',
@@ -7,7 +7,7 @@ export const episode = defineType({
   title: 'Episode',
   icon: PlayIcon,
   groups: [
-    {name: 'content', title: 'Content', default: true},
+    {name: 'details', title: 'Details', default: true},
     {name: 'video', title: 'Video Details'},
     {name: 'seo', title: 'SEO & Publishing'},
   ],
@@ -16,7 +16,7 @@ export const episode = defineType({
       name: 'title',
       type: 'string',
       validation: (Rule) => Rule.required().error('Episode title is required'),
-      group: 'content',
+      group: 'details',
     }),
     defineField({
       name: 'slug',
@@ -27,21 +27,7 @@ export const episode = defineType({
         maxLength: 96,
       },
       validation: (Rule) => Rule.required().error('Slug is required for URL generation'),
-      group: 'content',
-    }),
-    defineField({
-      name: 'short_description',
-      type: 'text',
-      description: 'Brief overview for previews and SEO',
-      validation: (Rule) => Rule.required().error('Short description is required for SEO'),
-      group: 'content',
-    }),
-    defineField({
-      name: 'description',
-      type: 'markdown',
-      description: 'Detailed description of the episode content',
-      validation: (Rule) => Rule.required().error('Full description is required'),
-      group: 'content',
+      group: 'details',
     }),
     defineField({
       name: 'publish_date',
@@ -51,21 +37,34 @@ export const episode = defineType({
         timeStep: 30,
       },
       validation: (Rule) => Rule.required().error('Publish date is required'),
-      group: 'content',
+      group: 'details',
+    }),
+    defineField({
+      name: 'short_description',
+      type: 'text',
+      description: 'Brief overview for previews and SEO',
+      validation: (Rule) => Rule.required().error('Short description is required for SEO'),
+      group: 'details',
+    }),
+    defineField({
+      name: 'description',
+      type: 'markdown',
+      description: 'Detailed description of the episode content',
+      validation: (Rule) => Rule.required().error('Full description is required'),
+      group: 'details',
     }),
     defineField({
       name: 'people',
       type: 'array',
       title: 'People in This Episode',
       of: [defineArrayMember({type: 'reference', to: [{type: 'person'}]})],
-      group: 'content',
+      group: 'details',
     }),
     defineField({
-      name: 'episodeTags',
+      name: 'sponsors',
       type: 'array',
-      title: 'Tags',
-      of: [defineArrayMember({type: 'reference', to: [{type: 'episodeTag'}]})],
-      group: 'content',
+      of: [defineArrayMember({type: 'reference', to: [{type: 'sponsor'}]})],
+      group: 'details',
     }),
     defineField({
       name: 'resources',
@@ -76,13 +75,14 @@ export const episode = defineType({
         {
           type: 'object',
           name: 'resource',
+          icon: LinkIcon,
           fields: [
             defineField({name: 'label', type: 'string', title: 'Label'}),
             defineField({name: 'url', type: 'url', title: 'URL'}),
           ],
         },
       ],
-      group: 'content',
+      group: 'details',
     }),
     defineField({
       name: 'video',
@@ -161,12 +161,6 @@ export const episode = defineType({
         layout: 'radio',
       },
       initialValue: 'normal',
-      group: 'seo',
-    }),
-    defineField({
-      name: 'sponsors',
-      type: 'array',
-      of: [defineArrayMember({type: 'reference', to: [{type: 'sponsor'}]})],
       group: 'seo',
     }),
   ],

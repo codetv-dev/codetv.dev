@@ -1,5 +1,5 @@
 import {defineField, defineType} from 'sanity'
-import {UserIcon} from '@sanity/icons'
+import {LinkIcon, UserIcon} from '@sanity/icons'
 
 function slugify(str: string) {
   return String(str)
@@ -27,7 +27,6 @@ export const person = defineType({
   name: 'person',
   type: 'document',
   title: 'Person',
-  icon: UserIcon,
   groups: [
     {name: 'profile', title: 'Profile', default: true},
     {name: 'social', title: 'Social & Links'},
@@ -63,6 +62,7 @@ export const person = defineType({
         {
           type: 'object',
           name: 'link',
+          icon: LinkIcon,
           fields: [
             defineField({type: 'string', name: 'label', title: 'Label'}),
             defineField({type: 'url', name: 'url', title: 'URL'}),
@@ -116,6 +116,7 @@ export const person = defineType({
       group: 'subscription',
     }),
   ],
+  __experimental_formPreviewTitle: false,
   preview: {
     select: {
       name: 'name',
@@ -125,6 +126,7 @@ export const person = defineType({
     prepare({name, photo, subscription}) {
       let url
       if (photo && photo.public_id) {
+        console.log(photo.public_id)
         url = new URL('https://res.cloudinary.com')
         url.pathname = [
           'jlengstorf',
@@ -147,7 +149,6 @@ export const person = defineType({
         title: name ?? 'Draft Person',
         subtitle,
         imageUrl: url.toString(),
-        media: UserIcon,
       }
     },
   },
