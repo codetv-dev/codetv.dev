@@ -1,3 +1,6 @@
+# Workflows
+/api/inngest                https://codetv-automations.netlify.app/api/inngest 200
+
 # series shortlinks
 /wdc                        /series/web-dev-challenge
 /series/web-dev-challenge   /series/web-dev-challenge/s1  301!
