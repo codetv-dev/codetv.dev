@@ -1,0 +1,197 @@
+# make sure everyone ends up on the same domain
+https://codetv-links.netlify.app/*		https://codetv.dev/:splat					301!
+
+/														https://codetv.dev/													301!
+
+/blog/*											https://codetv.dev/blog/:splat							301!
+/newsletter									https://codetv.dev/newsletter								301!
+/code-of-conduct						https://codetv.dev/code-of-conduct					301!
+/about											https://codetv.dev/about										301!
+/confirm										https://codetv.dev/confirm									301!
+/confirmed									https://codetv.dev/confirmed								301!
+/partners										https://partners.codetv.dev									301!
+/schedule										https://codetv.dev/series/learn-with-jason	301!
+/topic/:topic								https://codetv.dev/search?q=:topic					301!
+/episodes										https://codetv.dev/series/learn-with-jason	301!
+
+
+# quick links
+/discord										https://discord.gg/lwj
+/youtube										https://youtube.com/@codetv-dev
+/store											https://store.codetv.dev/
+/4d1a												https://codetv.dev/series/web-dev-challenge/s0
+/4d1a/info									https://codetv.dev/series/web-dev-challenge/s0
+/join												https://codetv.dev/support
+/partners										https://partners.codetv.dev/
+/uses												https://learnwithjason.notion.site/Recommended-Gear-Software-Books-etc-by-Jason-Lengstorf-fc2854ecfad74c77a87de7e9238763eb
+
+# Web Dev Challenge
+/wdc/sponsor								https://codetv.notion.site/Web-Dev-Challenge-Sponsorship-Season-2-19822b3cab0280a5b3d2d7f5a5c064bb
+/wdc												https://codetv.dev/series/web-dev-challenge/s2
+/wdc/casting-call						https://codetv.notion.site/Casting-Call-Web-Dev-Challenge-19b22b3cab028077b703d4916b20dfc1?pvs=4
+/wdc/s1e1										https://codetv.dev/series/web-dev-challenge/s1/dont-build-another-effin-chatbot
+/wdc/s1e2										https://codetv.dev/series/web-dev-challenge/s1/build-a-retro-gaming-app
+/wdc/s1e3										https://codetv.dev/series/web-dev-challenge/s1/build-an-e-commerce-site-with-a-twist
+/wdc/s1e4										https://codetv.dev/series/web-dev-challenge/s1/build-an-app-for-monsters
+/wdc/s1e5										https://codetv.dev/series/web-dev-challenge/s1/build-an-app-to-help-the-local-food-scene
+/wdc/s1e6										https://codetv.dev/series/web-dev-challenge/s1/build-an-app-to-capture-memories
+/wdc/s1e7										https://codetv.dev/series/web-dev-challenge/s1/build-a-spooky-app
+/wdc/s1e8										https://codetv.dev/series/web-dev-challenge/s1/build-an-app-to-show-gratitude
+/wdc/s1e9										https://codetv.dev/series/web-dev-challenge/s1/build-a-connected-e-commerce-app
+/wdc/s1e10									https://codetv.dev/series/web-dev-challenge/s1/build-an-app-to-save-santas-workshop
+/wdc/s2e1										https://codetv.dev/series/web-dev-challenge/s2/e1-build-a-custom-api-postman
+/wdc/s2e2										https://codetv.dev/series/web-dev-challenge/s2/e2-build-a-game-played-on-2-devices
+/wdc/s2e3										https://codetv.dev/series/web-dev-challenge/s2/e3-worst-video-player
+/wdc/s2e4										https://codetv.dev/series/web-dev-challenge/s2/e4-no-business-value
+/wdc/s2e5										https://codetv.dev/series/web-dev-challenge/s2/e5-worst-developer-urges
+/wdc/s2e6										https://codetv.dev/series/web-dev-challenge/s2/e6-future-of-ai-native-ux
+/wdc/s2e7										https://codetv.dev/series/web-dev-challenge/s2/e7-touch-grass
+
+/wdc/hackathon							https://codetv.dev/blog/web-dev-challenge-hackathon-s2e5-worst-dev-urges
+/wdc/hackathon/submit				https://forms.gle/k1AwazF2KriwXTTm7
+
+/wdc-giveaway								/wdc/hackathon
+/wdc-hackathon							/wdc/hackathon
+/wdc-hackathon-3-submit			https://forms.gle/hPkGDCb1R66TGocw9
+/wdc-hackathon-4-submit			https://forms.gle/BfQtaRbpZhZDAMKx6
+/wdc-hackathon-5-submit			https://forms.gle/48BA8qeHykdN5pXp9
+/wdc-hackathon-6-submit			https://forms.gle/qcCCEsHje82Te18w5
+/wdc-hackathon-7-submit			https://forms.gle/qgTgA1qhaAhgGcvZ6
+/wdc-hackathon-9-submit			https://forms.gle/ipSKpMXB58kS8z8M6
+/wdc-hackathon-10-submit		https://forms.gle/8Ftkir4ASAqXq3rQ7
+/wdc-hackathon-s2e1-submit	https://forms.gle/wCKLbCaiQHHFvYax7
+/wdc-hackathon-s2e2-submit	https://forms.gle/esXkSsNCLA3fDqdt5
+/wdc-hackathon-s2e3-submit	https://forms.gle/7aKhquYNduXTaJrE8
+/wdc-hackathon-s2e5-submit	https://forms.gle/k1AwazF2KriwXTTm7
+
+/wdc-slc										https://ti.to/epicweb/epicweb-conf-2025/with/web-dev-challenge#tickets
+
+# Google hackathon
+/google-hackathon				https://shortclick.link/amf3t5
+
+# Learn With Jason
+/lwj										https://codetv.dev/series/learn-with-jason
+/learn-with-jason				https://codetv.dev/series/learn-with-jason
+
+# Web Lunch
+/web-lunch							https://www.youtube.com/playlist?list=PLz8Iz-Fnk_eQKzDS0xO6FEA6ho8i3E3o2
+/web-lunch/s1e1					https://www.youtube.com/watch?v=hlRVMknHSqM&list=PLz8Iz-Fnk_eQKzDS0xO6FEA6ho8i3E3o2&index=1
+/web-lunch/s1e2					https://www.youtube.com/watch?v=mRd_1Bt9qrs&list=PLz8Iz-Fnk_eQKzDS0xO6FEA6ho8i3E3o2&index=2
+/web-lunch/s1e3					https://www.youtube.com/watch?v=PbWt0fdjvJo&list=PLz8Iz-Fnk_eQKzDS0xO6FEA6ho8i3E3o2&index=3
+/web-lunch/s1e4					https://www.youtube.com/watch?v=mMnm2BzOk1w&list=PLz8Iz-Fnk_eQKzDS0xO6FEA6ho8i3E3o2&index=4
+/web-lunch/s1e5					https://www.youtube.com/watch?v=VxltuByxdCo&list=PLz8Iz-Fnk_eQKzDS0xO6FEA6ho8i3E3o2&index=5
+
+# Leet Heat
+/leet-heat/apply				https://learnwithjason.notion.site/Web-Dev-Game-Show-Casting-Call-14622b3cab02803f9590ec00287fc50f?pvs=4
+/lh											https://codetv.dev/series/leet-heat/s1
+/leet-heat							https://codetv.dev/series/leet-heat/s1
+/leet-heat/s1e1					https://codetv.dev/series/leet-heat/s1/e1-austin-vs-sheng
+/lh/s1e1								https://codetv.dev/series/leet-heat/s1/e1-austin-vs-sheng
+/leet-heat/s1e2					https://codetv.dev/series/leet-heat/s1/e2-joel-vs-shruti
+/lh/s1e2								https://codetv.dev/series/leet-heat/s1/e2-joel-vs-shruti
+/leet-heat/s1e3					https://codetv.dev/series/leet-heat/s1/e3-shaundai-vs-vincent
+/lh/s1e3								https://codetv.dev/series/leet-heat/s1/e3-shaundai-vs-vincent
+/leet-heat/s1e4					https://codetv.dev/series/leet-heat/s1/e4-christopher-vs-jeremy
+/lh/s1e4								https://codetv.dev/series/leet-heat/s1/e4-christopher-vs-jeremy
+/leet-heat/s1e5					https://codetv.dev/series/leet-heat/s1/e5-natalie-vs-sammy
+/lh/s1e5								https://codetv.dev/series/leet-heat/s1/e5-natalie-vs-sammy
+/leet-heat/s1e6					https://codetv.dev/series/leet-heat/s1/e6-chris-vs-robert
+/lh/s1e6								https://codetv.dev/series/leet-heat/s1/e6-chris-vs-robert
+/leet-heat/s1e7					https://codetv.dev/series/leet-heat/s1/e7-brandon-vs-marcy
+/lh/s1e7								https://codetv.dev/series/leet-heat/s1/e7-brandon-vs-marcy
+/leet-heat/s1e8					https://codetv.dev/series/leet-heat/s1/e8-potch-vs-tru
+/lh/s1e8								https://codetv.dev/series/leet-heat/s1/e8-potch-vs-tru
+/leet-heat/s1e9					https://codetv.dev/series/leet-heat/s1/e9-andy-vs-alexis
+/lh/s1e9								https://codetv.dev/series/leet-heat/s1/e9-andy-vs-alexis
+/leet-heat/s1e10				https://codetv.dev/series/leet-heat/s1/e10-charles-vs-brittany
+/lh/s1e10								https://codetv.dev/series/leet-heat/s1/e10-charles-vs-brittany
+/leet-heat/s1e11				https://codetv.dev/series/leet-heat/s1/e11-tiger-vs-george
+/lh/s1e11								https://codetv.dev/series/leet-heat/s1/e11-tiger-vs-george
+/leet-heat/s1e12				https://codetv.dev/series/leet-heat/s1/e12-aisha-vs-janessa
+/lh/s1e12								https://codetv.dev/series/leet-heat/s1/e12-aisha-vs-janessa
+
+# sponsorship information
+/sponsor								https://partners.codetv.dev
+/custom-video						https://partners.codetv.dev
+/captions								https://www.streamtext.net/player?event=LearnWithJason
+
+# video shortcuts
+/feature-flags					/blog/feature-flags-react-devcycle
+/convex-actions					/blog/react-sms-to-database-convex-twilio-clerk
+/show-up								https://youtu.be/Y5ENi-4Nrh0
+/manufacture-luck				https://youtu.be/YKeVeG6h4AA
+
+# search is a command bar now thanks to Sarah Dayan and Algolia
+/search									/?search
+
+# sponsors
+/netlify								https://www.netlify.com/?utm_source=codetv&utm_medium=video&utm_campaign=sponsored
+/nx											https://nx.dev/?utm_source=Learn+with+Jason&utm_medium=link&utm_id=LWJ+2022+H1
+/new-relic							https://newrelic.com/?utm_source=codetv&utm_medium=video&utm_campaign=sponsored
+/nrwl										https://nrwl.io/?utm_source=codetv&utm_medium=video&utm_campaign=sponsored
+/pluralsight						https://www.pluralsight.com/?utm_source=codetv&utm_medium=video&utm_campaign=sponsored
+/backlight							https://backlight.dev/?utm_source=codetv&utm_medium=video&utm_campaign=sponsored
+/fauna									https://www.fauna.com/?utm_source=Jason+Lengstorf+&utm_medium=video&utm_campaign=Q3&utm_id=influencers
+/auth0									https://auth0.com/?utm_source=codetv&utm_medium=video&utm_campaign=sponsored
+/vetswhocode						https://vetswhocode.io/?utm_source=codetv&utm_medium=video&utm_campaign=sponsored
+/airplane								https://www.airplane.dev/?utm_source=codetv&utm_medium=tutorial&utm_campaign=content-moderation-dashboard
+/convex									https://www.convex.dev/?utm_source=codetv&utm_medium=video&utm_campaign=sponsored
+/clerk									https://clerk.com/?utm_medium=youtube&utm_source=codetv&utm_campaign=leet-heat
+/neon										https://neon.tech/?utm_source=codetv&utm_medium=video&utm_campaign=sponsored
+/codepen								https://codepen.io/?utm_source=codetv&utm_medium=video&utm_campaign=sponsored
+/courier								https://www.courier.com//?utm_source=codetv&utm_medium=tutorial&utm_campaign=notifications-tutorial
+/workos									https://workos.com/?utm_source=codetv&utm_medium=tutorial&utm_campaign=six-figure-saas
+/partykit								https://www.partykit.io/?utm_source=codetv&utm_medium=video&utm_campaign=4d1a
+/datastax								https://www.datastax.com/?utm_source=codetv&utm_medium=video&utm_campaign=4d1a
+/astra-db								https://docs.datastax.com/en/astra-db-serverless/index.html?utm_source=codetv&utm_medium=video&utm_campaign=4d1a
+/cloudinary							https://cloudinary.com/?ap=lwj
+/launchdarkly						https://launchdarkly.com/?utm_source=codetv&utm_medium=video&utm_campaign=galaxy-doc
+/aws										https://aws.amazon.com/?utm_source=codetv&utm_medium=video&utm_campaign=wdc
+/amplify								https://docs.amplify.aws/?utm_source=codetv&utm_medium=video&utm_campaign=wdc
+/slack									https://slack.com/?utm_source=codetv&utm_medium=video&utm_campaign=renderatl
+/reactiflux							https://www.reactiflux.com/tmir/?utm_source=codetv&utm_medium=video&utm_campaign=renderatl
+/tuple									https://tuple.app/?utm_source=codetv&utm_medium=video&utm_campaign=lwj
+/algolia								https://www.algolia.com/?utm_source=codetv&utm_medium=video&utm_campaign=web-dev-challenge
+/tigris									https://www.tigrisdata.com/?utm_source=codetv&utm_medium=video&utm_campaign=web-dev-challenge
+/fly										https://fly.io/?utm_source=codetv&utm_medium=video&utm_campaign=web-dev-challenge
+/gemini									https://gemini.google.com/?utm_source=codetv&utm_medium=video&utm_campaign=web-dev-challenge
+/mailchimp							https://mailchimp.com/?utm_source=codetv&utm_medium=video&utm_campaign=web-dev-challenge
+/renderatl							https://www.renderatl.com/?utm_source=codetv&utm_medium=video&utm_campaign=web-dev-challenge
+/sanity									https://www.sanity.io/lwj
+/webstorm								https://jb.gg/GetFreeWebStorm
+/mux										https://www.mux.com/?utm_source=codetv&utm_medium=video&utm_campaign=codetv-video-player
+/postman								https://www.postman.com/?utm_campaign=global_fy26q1_adhcrqs&utm_medium=sponsorship&utm_source=code_tv&utm_term=web_dev_challenge
+/temporal								https://temporal.io/?utm_source=codetv&utm_medium=video&utm_campaign=web-dev-challenge
+/g2i										https://www.g2i.co/why-g2i?utm_source=Youtube&utm_medium=Video&utm_campaign=Influencer+Campaign&utm_id=Jason+Lengstorf
+/nordcraft							https://nordcraft.com/?utm_source=codetv&utm_medium=video&utm_campaign=web-dev-challenge
+/intuit									https://intuit.avature.net/eventlisting?pipelineId=13447
+/apollo									https://www.apollographql.com/codetv/connectors?utm_source=codetv&utm_medium=video&utm_campaign=web-dev-challenge
+
+/benq										https://www.benq.com/en-us/campaign/best-coding-monitor-for-programmers.html?utm_source=influencer_codetv&utm_medium=affiliate&utm_campaign=lcd_programming_rd280u_na_2025_us_awareness
+/uplift									https://www.upliftdesk.com/?utm_source=codetv&utm_medium=video&utm_campaign=web-dev-challenge
+/keychron								https://www.keychron.com/products/keychron-k8-pro-qmk-via-wireless-mechanical-keyboard?ref=MKT&variant=39755425382489&utm_source=codetv&utm_medium=video&utm_campaign=web-dev-challenge
+/anglepoise							https://www.anglepoise.com/usa/?utm_source=codetv&utm_medium=video&utm_campaign=web-dev-challenge
+/ugmonk									https://ugmonk.com/?utm_source=codetv&utm_medium=video&utm_campaign=web-dev-challenge
+
+# Sentry shorts series
+/sentry-rage-click			https://blog.sentry.io/introducing-rage-and-dead-click-detection-for-session-replay/?utm_source=lwj&utm_medium=organic-social&utm_campaign=replay-fy24q4-evergreen&utm_content=video-lwj1-learnmore
+/sentry-replay					https://docs.sentry.io/product/session-replay/?utm_source=lwj&utm_medium=organic-social&utm_campaign=replay-fy24q4-evergreen&utm_content=video-lwj1-learnmore
+/sentry-codecov					https://sentry.io/for/code-coverage/?utm_source=lwj&utm_medium=organic-social&utm_campaign=codecov-fy24q4-evergreen&utm_content=video-lwj1-learnmore
+/sentry-cron-monitoring	https://sentry.io/for/crons-monitoring/?utm_source=lwj&utm_medium=organic-social&utm_campaign=crons-fy24q4-evergreen&utm_content=video-lwj1-learnmore
+/sentry-alerts					https://docs.sentry.io/product/alerts/?utm_source=lwj&utm_medium=organic-social&utm_campaign=alerts-fy24q4-evergreen&utm_content=video-lwj1-learnmore
+/sentry									https://sentry.io/?utm_source=lwj&utm_medium=organic-social&utm_campaign=web-lunch
+
+# affiliate links
+/daskeyboard	 					https://click.linksynergy.com/fs-bin/click?id=2xZxGRnahIM&offerid=1008802.89&type=3&subid=0&LSNSUBSITE=LSNSUBSITE									301
+
+# calendar stuff
+/calendar								https://calendar.google.com/calendar?cid=bGVuZ3N0b3JmLmNvbV85cGxqMW02dTl2dGRkbGRvaW5sMGhzMnZna0Bncm91cC5jYWxlbmRhci5nb29nbGUuY29t 	301!
+/cal										https://calendar.google.com/calendar?cid=bGVuZ3N0b3JmLmNvbV85cGxqMW02dTl2dGRkbGRvaW5sMGhzMnZna0Bncm91cC5jYWxlbmRhci5nb29nbGUuY29t		301!
+/book										https://calendly.com/codetv/livestream
+/30min									https://calendly.com/codetv/30min
+
+# this link goes to the active or next-scheduled live stream
+/live										https://youtube.com/@codetv-dev/live
+
+# if we get here, redirect to the main site where a 404 can be reported
+/*								 https://codetv.dev/:splat	 301!
