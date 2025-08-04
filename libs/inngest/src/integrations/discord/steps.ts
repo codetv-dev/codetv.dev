@@ -6,8 +6,8 @@ import {
 	removeRole,
 	sendDiscordMessage,
 	updateRole,
-	type SubscriptionLevel,
 } from '@codetv/discord';
+import { type SubscriptionLevel } from '@codetv/types';
 import { config } from './config.ts';
 import { userGetById } from '../clerk/steps.ts';
 

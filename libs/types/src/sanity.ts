@@ -84,9 +84,9 @@ export type Episode = {
   _rev: string;
   title?: string;
   slug?: Slug;
+  publish_date?: string;
   short_description?: string;
   description?: string;
-  publish_date?: string;
   people?: Array<{
     _ref: string;
     _type: "reference";
@@ -94,12 +94,12 @@ export type Episode = {
     _key: string;
     [internalGroqTypeReferenceTo]?: "person";
   }>;
-  episodeTags?: Array<{
+  sponsors?: Array<{
     _ref: string;
     _type: "reference";
     _weak?: boolean;
     _key: string;
-    [internalGroqTypeReferenceTo]?: "episodeTag";
+    [internalGroqTypeReferenceTo]?: "sponsor";
   }>;
   resources?: Array<{
     label?: string;
@@ -127,13 +127,6 @@ export type Episode = {
   };
   hidden?: "visible" | "hidden";
   featured?: "normal" | "featured";
-  sponsors?: Array<{
-    _ref: string;
-    _type: "reference";
-    _weak?: boolean;
-    _key: string;
-    [internalGroqTypeReferenceTo]?: "sponsor";
-  }>;
 };
 
 export type Collection = {

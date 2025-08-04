@@ -461,6 +461,13 @@
         },
         "optional": true
       },
+      "publish_date": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        },
+        "optional": true
+      },
       "short_description": {
         "type": "objectAttribute",
         "value": {
@@ -469,13 +476,6 @@
         "optional": true
       },
       "description": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "string"
-        },
-        "optional": true
-      },
-      "publish_date": {
         "type": "objectAttribute",
         "value": {
           "type": "string"
@@ -526,7 +526,7 @@
         },
         "optional": true
       },
-      "episodeTags": {
+      "sponsors": {
         "type": "objectAttribute",
         "value": {
           "type": "array",
@@ -554,7 +554,7 @@
                 "optional": true
               }
             },
-            "dereferencesTo": "episodeTag",
+            "dereferencesTo": "sponsor",
             "rest": {
               "type": "object",
               "attributes": {
@@ -761,50 +761,6 @@
               "value": "featured"
             }
           ]
-        },
-        "optional": true
-      },
-      "sponsors": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "array",
-          "of": {
-            "type": "object",
-            "attributes": {
-              "_ref": {
-                "type": "objectAttribute",
-                "value": {
-                  "type": "string"
-                }
-              },
-              "_type": {
-                "type": "objectAttribute",
-                "value": {
-                  "type": "string",
-                  "value": "reference"
-                }
-              },
-              "_weak": {
-                "type": "objectAttribute",
-                "value": {
-                  "type": "boolean"
-                },
-                "optional": true
-              }
-            },
-            "dereferencesTo": "sponsor",
-            "rest": {
-              "type": "object",
-              "attributes": {
-                "_key": {
-                  "type": "objectAttribute",
-                  "value": {
-                    "type": "string"
-                  }
-                }
-              }
-            }
-          }
         },
         "optional": true
       }
