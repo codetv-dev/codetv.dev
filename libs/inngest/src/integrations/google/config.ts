@@ -2,7 +2,9 @@ export const config = {
 	// these get replaced during build to work around the 4KB Lambda env limit
 	auth: {
 		serviceAccount: '${GOOGLE_API_SERVICE_ACCOUNT}',
-		privateKey: '${GOOGLE_API_PRIVATE_KEY}',
+		// we need the double quotes for this replacement
+		// prettier-ignore
+		privateKey: "${GOOGLE_API_PRIVATE_KEY}",
 	},
 	calendar: {
 		// this is the calendar that anyone can subscribe to for LWJ events
