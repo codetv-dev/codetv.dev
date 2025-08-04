@@ -1,61 +1,60 @@
 {
-  "installation": {
-    "version": "21.3.0"
-  },
-  "$schema": "./node_modules/nx/schemas/nx-schema.json",
-  "nxCloudId": "687c2f238281575f297adb33",
-  "targetDefaults": {
-    "build": {
-      "outputs": [
-        "{projectRoot}/dist"
-      ],
-      "cache": true
-    },
-    "typegen": {
-      "cache": true
-    }
-  },
-  "parallel": 5,
-  "plugins": [
-    {
-      "plugin": "@nx/js/typescript",
-      "options": {
-        "typecheck": {
-          "targetName": "typecheck"
-        },
-        "build": {
-          "targetName": "build",
-          "configName": "tsconfig.lib.json",
-          "buildDepsName": "build-deps",
-          "watchDepsName": "watch-deps"
-        }
-      },
-      "exclude": [
-        "libs/inngest/*",
-        "libs/cloudinary/*",
-        "libs/sanity/*",
-        "libs/clerk/*",
-        "libs/stripe/*",
-        "libs/discord/*",
-        "libs/kit/*"
-      ]
-    },
-    {
-      "plugin": "@nx/js/typescript",
-      "include": [
-        "libs/inngest/*",
-        "libs/cloudinary/*",
-        "libs/sanity/*",
-        "libs/clerk/*",
-        "libs/stripe/*",
-        "libs/discord/*",
-        "libs/kit/*"
-      ],
-      "options": {
-        "typecheck": {
-          "targetName": "typecheck"
-        }
-      }
-    }
-  ]
+	"installation": {
+		"version": "21.3.0"
+	},
+	"$schema": "./node_modules/nx/schemas/nx-schema.json",
+	"nxCloudId": "687c2f238281575f297adb33",
+	"targetDefaults": {
+		"build": {
+			"dependsOn": ["^build"],
+			"outputs": ["{projectRoot}/dist"],
+			"cache": true
+		},
+		"typegen": {
+			"cache": true
+		}
+	},
+	"parallel": 5,
+	"plugins": [
+		{
+			"plugin": "@nx/js/typescript",
+			"options": {
+				"typecheck": {
+					"targetName": "typecheck"
+				},
+				"build": {
+					"targetName": "build",
+					"configName": "tsconfig.lib.json",
+					"buildDepsName": "build-deps",
+					"watchDepsName": "watch-deps"
+				}
+			},
+			"exclude": [
+				"libs/inngest/*",
+				"libs/cloudinary/*",
+				"libs/sanity/*",
+				"libs/clerk/*",
+				"libs/stripe/*",
+				"libs/discord/*",
+				"libs/kit/*"
+			]
+		},
+		{
+			"plugin": "@nx/js/typescript",
+			"include": [
+				"libs/inngest/*",
+				"libs/cloudinary/*",
+				"libs/sanity/*",
+				"libs/clerk/*",
+				"libs/stripe/*",
+				"libs/discord/*",
+				"libs/kit/*"
+			],
+			"options": {
+				"typecheck": {
+					"targetName": "typecheck"
+				}
+			}
+		}
+	]
 }
