@@ -194,4 +194,4 @@ https://codetv-links.netlify.app/*		https://codetv.dev/:splat					301!
 /live										https://youtube.com/@codetv-dev/live
 
 # if we get here, redirect to the main site where a 404 can be reported
-/*								 https://codetv.dev/:splat	 301!
+/*								      https://codetv.dev/:splat	 301!
