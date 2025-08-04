@@ -1,5 +1,6 @@
 import {
 	handleWebhookUserCreatedOrUpdated,
+	userGetById,
 	userGetExternalAccountId,
 	userSubscriptionUpdate,
 } from './integrations/clerk/steps.js';
@@ -38,6 +39,7 @@ export { inngest } from './client.js';
 
 export const functions = [
 	handleWebhookUserCreatedOrUpdated,
+	userGetById,
 	userGetExternalAccountId,
 	userSubscriptionUpdate,
 	imageUpload,
