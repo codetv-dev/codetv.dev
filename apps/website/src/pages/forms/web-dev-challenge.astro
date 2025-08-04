@@ -114,7 +114,7 @@ if (result && !result.error) {
 								</select>
 							</div>
 
-							<div class="field">
+							<div class="field hidden" data-role="developer">
 								<p class="description">
 									CodeTV will reimburse you for travel and related expenses. You
 									will receive an email within a few days of filming with
@@ -127,7 +127,6 @@ if (result && !result.error) {
 										name="reimbursement"
 										id="reimbursement"
 										class="input checkbox"
-										required
 									/>
 									<label for="reimbursement">
 										I will book my travel and invoice CodeTV for reimbursement
@@ -136,7 +135,7 @@ if (result && !result.error) {
 							</div>
 						</section>
 
-						<section class="form-section">
+						<section class="form-section hidden"  data-role="developer advisor">
 							<div class="section-header">
 								<h2>Contact Information</h2>
 
@@ -198,7 +197,7 @@ if (result && !result.error) {
 							</div>
 						</section>
 
-						<section class="form-section">
+						<section class="form-section hidden"  data-role="developer advisor">
 							<div class="section-header">
 								<h2>Bio and links for publishing</h2>
 
@@ -287,7 +286,7 @@ if (result && !result.error) {
 							</div>
 						</section>
 
-						<section class="form-section">
+						<section class="form-section hidden"  data-role="developer advisor">
 							<div class="section-header">
 								<h2>Food Preferences</h2>
 								<p>
@@ -359,8 +358,8 @@ if (result && !result.error) {
 							</div>
 						</section>
 
-						<section class="form-section">
-							<button type="submit" class="button">Update Profile</button>
+						<section class="form-section hidden"  data-role="developer advisor">
+							<button type="submit" class="button">Submit</button>
 
 							<input type="hidden" name="id" value={userDetails._id} />
 							<input type="hidden" name="username" value={user?.username} />
@@ -474,6 +473,34 @@ if (result && !result.error) {
 	}
 
 	linksBioSetup();
+</script>
+
+<script>
+	import { z } from 'astro/zod';
+
+	// the form changes a little bit for devs vs. advisors
+	const Role = z.union([z.literal('developer'), z.literal('advisor')]).optional();
+	let role: z.infer<typeof Role>;
+
+	const roleSelector = document.querySelector('#role') as HTMLSelectElement;
+
+	roleSelector.addEventListener('change', () => {
+		role = Role.parse(roleSelector.value);
+
+		document.querySelectorAll(`[data-role]`).forEach((el) => {
+			el.classList.add('hidden');
+		});
+
+		document.querySelectorAll(`[data-role*="${role}"]`).forEach((el) => {
+			el.classList.remove('hidden');
+		});
+
+		if (role === 'developer') {
+			document.querySelector('#reimbursement')?.setAttribute('required', 'required');
+		} else {
+			document.querySelector('#reimbursement')?.removeAttribute('required');
+		}
+	});
 </script>
 
 <style>
@@ -670,5 +697,9 @@ if (result && !result.error) {
 				inline-size: 100%;
 			}
 		}
+	}
+
+	.hidden {
+		display: none;
 	}
 </style>
