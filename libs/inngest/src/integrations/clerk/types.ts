@@ -39,6 +39,16 @@ export const schema = {
 			]),
 		}),
 	},
+	'clerk/user.external-account.get-oauth-token': {
+		data: z.object({
+			userId: z.string(),
+			provider: z.union([
+				z.literal('google'),
+				z.literal('github'),
+				z.literal('discord'),
+			]),
+		}),
+	},
 	'clerk/user.get-by-id': {
 		data: z.object({
 			userId: z.string(),

@@ -65,6 +65,30 @@ export async function sendDiscordMessage({ content }: { content: string }) {
 	return data;
 }
 
+export async function addMemberToGuild({
+	memberId,
+	access_token,
+}: {
+	memberId: string;
+	access_token: string;
+}) {
+	const res = await fetch(
+		`https://discord.com/api/v10/guilds/${config.serverID}/members/${memberId}`,
+		{
+			method: 'PUT',
+			headers: config.headers,
+			body: JSON.stringify({ access_token }),
+		},
+	);
+
+	if (!res.ok) {
+		console.log(res);
+		throw new Error(res.statusText);
+	}
+
+	return res;
+}
+
 export async function updateRole({
 	memberId,
 	roleId,

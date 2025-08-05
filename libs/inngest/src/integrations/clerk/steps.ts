@@ -82,6 +82,25 @@ export const userGetExternalAccountId = inngest.createFunction(
 	},
 );
 
+export const userGetOAuthToken = inngest.createFunction(
+	{ id: 'clerk/user.external-account.get-oauth-token' },
+	[{ event: 'clerk/user.external-account.get-oauth-token' }],
+	async function ({ event, step }) {
+		const { userId, provider } = event.data;
+
+		return step.run('get-clerk-user-oauth-token', async () => {
+			const res = await clerk.users.getUserOauthAccessToken(userId, provider);
+			const token = res.data.at(0)?.token;
+
+			if (!token) {
+				throw new NonRetriableError('no OAuth token found');
+			}
+
+			return token;
+		});
+	},
+);
+
 export const userGetById = inngest.createFunction(
 	{ id: 'clerk/user.get-by-id' },
 	{ event: 'clerk/user.get-by-id' },

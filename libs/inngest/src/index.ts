@@ -2,12 +2,16 @@ import {
 	handleWebhookUserCreatedOrUpdated,
 	userGetById,
 	userGetExternalAccountId,
+	userGetOAuthToken,
 	userSubscriptionUpdate,
 } from './integrations/clerk/steps.js';
 import { imageUpload } from './integrations/cloudinary/steps.js';
 import {
-	messageSend,
+	addAlumniRole,
+	addMemberToServer,
 	discordUpdateUserRole,
+	getDiscordMemberId,
+	messageSend,
 } from './integrations/discord/steps.js';
 import {
 	bookableDatesGet,
@@ -37,14 +41,32 @@ import {
 
 export { inngest } from './client.js';
 
-export const functions = [
+/**
+ * The `any` here is to avoid TS7056
+ *
+ * Because there are so many functions here, we end up triggering this error:
+ *
+ * > error TS7056: The inferred type of this node exceeds the maximum length the
+ * > compiler will serialize. An explicit type annotation is needed.
+ *
+ * Since this is only exported for use in the Inngest endpoint (which we don’t
+ * interact with directly and therefore don’t need type checking for), we can
+ * get away with shenanigans like these.
+ *
+ * @see https://github.com/colinhacks/zod/issues/1040
+ */
+export const functions: any[] = [
 	handleWebhookUserCreatedOrUpdated,
 	userGetById,
 	userGetExternalAccountId,
+	userGetOAuthToken,
 	userSubscriptionUpdate,
 	imageUpload,
-	messageSend,
+	addAlumniRole,
+	addMemberToServer,
 	discordUpdateUserRole,
+	getDiscordMemberId,
+	messageSend,
 	bookableDatesGet,
 	calendarEventList,
 	eventsGetUnbookedDates,

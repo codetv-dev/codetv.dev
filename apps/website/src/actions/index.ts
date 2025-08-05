@@ -56,6 +56,25 @@ export const server = {
 				}
 			},
 		}),
+		addToDiscord: defineAction({
+			async handler(_, context) {
+				const user = await context.locals.currentUser();
+
+				if (!user) {
+					return false;
+				}
+
+				await inngest.send({
+					name: 'discord/user.alumni-role.add',
+					data: {
+						userId: user.id,
+						role: 'Web Dev Challenge Alumni',
+					},
+				});
+
+				return true;
+			},
+		}),
 	},
 	forms: {
 		wdc: defineAction({
@@ -116,12 +135,12 @@ export const server = {
 				const data = InputSchema.parse(rawInput);
 
 				try {
-					const result = await inngest.send({
+					await inngest.send({
 						name: 'codetv/forms.wdc.submit',
 						data,
 					});
 
-					return result;
+					return data;
 				} catch (err) {
 					console.log({ err });
 					return {
