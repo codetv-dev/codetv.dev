@@ -456,7 +456,7 @@ if (result && !result.error) {
 			linksContainer.appendChild(link);
 		}
 
-		addLinkBtn.addEventListener('click', (event) => {
+		addLinkBtn?.addEventListener('click', (event) => {
 			event.preventDefault();
 
 			addLink();
@@ -484,7 +484,7 @@ if (result && !result.error) {
 
 	const roleSelector = document.querySelector('#role') as HTMLSelectElement;
 
-	roleSelector.addEventListener('change', () => {
+	roleSelector?.addEventListener('change', () => {
 		role = Role.parse(roleSelector.value);
 
 		document.querySelectorAll(`[data-role]`).forEach((el) => {
