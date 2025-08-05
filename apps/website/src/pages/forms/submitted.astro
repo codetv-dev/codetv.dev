@@ -10,10 +10,6 @@ const result = await Astro.getActionResult(actions.forms.wdc);
 console.log({ result });
 
 const user = await Astro.locals.currentUser();
-
-const discordAcct = user?.externalAccounts.find(
-	(acct) => acct.provider === 'oauth_discord',
-);
 ---
 
 <Layout title="Web Dev Challenge Filming Questionnaire">
@@ -22,10 +18,17 @@ const discordAcct = user?.externalAccounts.find(
 			<section class="wrapper">
 				<h2>Thanks, {user?.firstName}!</h2>
 
-				<pre>{JSON.stringify({ test: true, result, discordAcct }, null, 2)}</pre>
 				<p>
-					Your response has been saved. You can update your bio, profile photo,
+					You’re all set. You can update your bio, profile photo,
 					and links at any time on <a href="/dashboard">your dashboard</a>.
+				</p>
+
+				<p>
+					If you have any questions, please don’t hesitate to ask via email,
+					phone, or 
+					<a href="https://discord.com/channels/936836444503310426/1402143551776882788">
+						in Discord
+					</a>.
 				</p>
 			</section>
 		</SignedIn>
@@ -48,6 +51,10 @@ const discordAcct = user?.externalAccounts.find(
 
 		@media (min-width: 750px) {
 			padding-block-start: 120px;
+		}
+
+		p {
+			margin-block-start: 16px;
 		}
 	}
 </style>

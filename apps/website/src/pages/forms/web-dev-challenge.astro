@@ -14,7 +14,7 @@ const userDetails = (await getPersonById(
 const result = Astro.getActionResult(actions.forms.wdc);
 
 if (result && !result.error) {
-	return Astro.redirect(`/forms/submitted`);
+	return Astro.redirect(`/forms/discord`);
 }
 ---
 

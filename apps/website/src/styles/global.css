@@ -133,6 +133,7 @@ a {
 
 .button {
 	background: var(--white);
+	border: none;
 	border-radius: 3px;
 	color: var(--black);
 	display: inline-block;
@@ -149,6 +150,12 @@ a {
 		background: var(--orange);
 		color: var(--black);
 		text-decoration: none;
+	}
+
+	&:disabled {
+		background: var(--white);
+		cursor: not-allowed;
+		opacity: 0.5;
 	}
 }
 

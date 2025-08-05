@@ -1,6 +1,7 @@
 ---
 import { SignedIn, SignedOut, SignIn } from '@clerk/astro/components';
 import Layout from '../../layouts/default.astro';
+import Aside from '../../components/aside.astro';
 
 const url = Astro.url;
 url.pathname = '/forms/web-dev-challenge';
@@ -17,24 +18,42 @@ const discordAcct = user?.externalAccounts.find(
 		<SignedIn>
 			<section class="wrapper">
         {discordAcct ? (
-          <h2>Your Discord account has been connected!</h2>
-
-          <pre>{JSON.stringify(discordAcct, null, 2)}</pre>
-
-					<button type="button" class="button" id="assign-discord-role">
-						Do the Thing
-					</button>
-        ) : (
           <h2>Join the CodeTV Discord</h2>
 
           <p>
-            Your response has been saved. You can update your bio, profile photo,
-            and links at any time on <a href="/dashboard">your dashboard</a>.
+						Last step: click the button below to join the CodeTV Discord (if you 
+						haven’t already) to get the Web Dev Challenge Alumni role and badge.
+					</p>
+
+					<button type="button" class="button" id="assign-discord-role">
+						Join
+					</button>
+
+					<Aside>
+						<p>
+							<strong>NOTE: This step is optional.</strong> If you don’t want to
+							join, you can safely close this tab.
+						</p>
+					</Aside>
+        ) : (
+          <h2>Connect Your Discord Account</h2>
+
+          <p>
+            If you use Discord, you can connect your account to get a "Web Dev 
+						Challenge Alumni" role and badge, plus access to a private channel 
+						to chat with other alumni.
           </p>
 
           <button type="button" class="button" id="add-discord">
             Connect Your Discord Account
           </button>
+
+					<Aside>
+						<p>
+							<strong>NOTE: This step is optional.</strong> If you don’t want to
+							join, you can safely close this tab.
+						</p>
+					</Aside>
         )}
 			</section>
 		</SignedIn>
@@ -46,9 +65,9 @@ const discordAcct = user?.externalAccounts.find(
 </Layout>
 
 <script>
-	import { PUBLIC_CLERK_PUBLISHABLE_KEY } from 'astro:env/client';
 	import { Clerk } from '@clerk/clerk-js';
-import { actions } from 'astro:actions';
+	import { PUBLIC_CLERK_PUBLISHABLE_KEY } from 'astro:env/client';
+	import { actions } from 'astro:actions';
 
 	const clerk = new Clerk(PUBLIC_CLERK_PUBLISHABLE_KEY);
 	await clerk.load();
@@ -69,10 +88,22 @@ import { actions } from 'astro:actions';
 			});
 	});
 
-	document.getElementById('assign-discord-role')?.addEventListener('click', async () => {
+	const assignBtn = document.getElementById('assign-discord-role');
+	
+	assignBtn?.addEventListener('click', async () => {
 		const result = await actions.user.addToDiscord();
 
-		console.log({ result });
+		if (!result) {
+			console.error('Error updating the role');
+			return;
+		}
+
+		assignBtn.textContent = 'Loading...';
+		assignBtn.setAttribute('disabled', 'disabled');
+
+		setTimeout(() => {
+			window.location.pathname = '/forms/submitted';
+		}, 1500);
 	});
 </script>
 
@@ -88,6 +119,10 @@ import { actions } from 'astro:actions';
 
 		@media (min-width: 750px) {
 			padding-block-start: 120px;
+		}
+
+		p {
+			margin-block-start: 16px;
 		}
 	}
 </style>
