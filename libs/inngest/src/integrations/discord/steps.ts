@@ -233,6 +233,7 @@ export const discordUpdateUserRole = inngest.createFunction(
 			maybeRemovePlatinumPromise,
 		]);
 
+		// TODO only send this message when the role is actually added above
 		// send a message to the updates feed channel
 		await step.invoke('send-discord-message', {
 			function: messageSend,

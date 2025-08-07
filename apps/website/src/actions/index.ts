@@ -149,6 +149,21 @@ export const server = {
 				}
 			},
 		}),
+		lwj: defineAction({
+			async handler(_, context) {
+				const user = await context.locals.currentUser();
+
+				if (!user) {
+					return false;
+				}
+
+				const { ids } = await inngest.send({
+					name: 'codetv/forms.lwj.book',
+				});
+
+				return ids;
+			},
+		}),
 	},
 	newsletter: {
 		subscribe: defineAction({

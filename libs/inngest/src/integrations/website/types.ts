@@ -29,4 +29,10 @@ export const schema = {
 		data: WebDevChallengeFormSubmit,
 	},
 	'codetv/forms.lwj.book': {},
+	'codetv/test-confirmation': {
+		data: z.object({
+			confirmationUUid: z.string(),
+			message: z.string(),
+		}),
+	},
 };

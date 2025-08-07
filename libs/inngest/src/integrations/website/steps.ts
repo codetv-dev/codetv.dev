@@ -100,8 +100,29 @@ export const handleLWJIntake = inngest.createFunction(
 		});
 
 		console.log(bookableShowDates);
+		// TODO how do we handle human in the loop workflows with Inngest
 
-		return;
+		// const confirmationUUid = 'abc123';
+		// await publish(
+		// 	testChannel().messages({
+		// 		message: 'Did this work?',
+		// 		confirmationUUid,
+		// 	}),
+		// );
+
+		// const confirmation = await step.waitForEvent('test-confirmation', {
+		// 	event: 'codetv/test-confirmation',
+		// 	timeout: '15m',
+		// 	if: `async.data.confirmationUUid == \"${confirmationUUid}\"`,
+		// });
+
+		// if (confirmation) {
+		// 	await step.run('log-the-output', async () => {
+		// 		return confirmation;
+		// 	});
+		// }
+
+		return bookableShowDates;
 
 		// TODO create a calendar event for the following people:
 		// submitter (guest), Jason, captioner (WCC), operations (Aodhan)
