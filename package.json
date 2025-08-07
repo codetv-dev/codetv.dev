@@ -7,9 +7,9 @@
 	},
 	"private": true,
 	"devDependencies": {
-		"@nx/js": "21.3.10",
-		"@types/node": "^24.1.0",
-		"nx": "21.3.10",
+		"@nx/js": "21.3.11",
+		"@types/node": "^24.2.0",
+		"nx": "21.3.11",
 		"prettier": "^3.6.2",
 		"prettier-plugin-astro": "^0.14.1"
 	}
