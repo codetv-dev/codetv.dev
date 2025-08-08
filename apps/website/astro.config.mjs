@@ -37,6 +37,7 @@ export default defineConfig({
 			PUBLIC_CLERK_PUBLISHABLE_KEY: envField.string({
 				access: 'public',
 				context: 'client',
+				default: '',
 			}),
 			MUX_JWT_SIGNING_KEY: envField.string({
 				access: 'secret',

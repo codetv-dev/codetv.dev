@@ -3,13 +3,25 @@ import { SignedIn, SignedOut } from "@clerk/astro/components";
 
 export const prerender = false;
 
-const user = await Astro.locals.currentUser();
+// TODO does this have any abuse vectors? I can't think of any, but...
+const hasClerk = typeof Astro.locals.currentUser === 'function';
+const user = hasClerk ? await Astro.locals.currentUser() : false;
 
 const loggedOutText =
 	Astro.cookies.get('has_codetv_account')?.value === 'true'
 		? 'Log In'
 		: 'Become a Supporter';
 ---
+
+{!hasClerk ? (
+	<a href="https://dashboard.clerk.com/last-active?path=api-keys" class="account">
+		Add API Keys
+		<img
+			src="https://res.cloudinary.com/jlengstorf/image/upload/q_auto/f_auto/c_fill,w_60,ar_1/v1738215366/codetv/codetv-avatar.png"
+			alt="loading"
+		/>
+	</a>
+) : (
 
 <SignedIn>
 	{user ? (
@@ -25,6 +37,7 @@ const loggedOutText =
 		{loggedOutText}
 	</a>
 </SignedOut>
+)}
 
 <style>
 	.account {
