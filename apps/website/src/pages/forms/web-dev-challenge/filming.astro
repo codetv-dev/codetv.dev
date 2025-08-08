@@ -1,0 +1,623 @@
+---
+import { SignedIn, SignedOut, SignIn } from '@clerk/astro/components';
+import { getPersonById } from '@codetv/sanity';
+import { actions } from 'astro:actions';
+import Layout from '../../../layouts/default.astro';
+import '../../../styles/forms.css';
+
+const user = await Astro.locals.currentUser();
+
+const userDetails = (await getPersonById(
+	{ user_id: user?.id ?? '' },
+	{ useCdn: false },
+)) ?? { _id: undefined, bio: '', links: [] };
+
+const result = Astro.getActionResult(actions.forms.wdc);
+
+if (result && !result.error) {
+	return Astro.redirect(`/forms/discord`);
+}
+---
+
+<Layout title="Web Dev Challenge Filming Questionnaire">
+	<main>
+		<SignedIn>
+			<section class="form-wrapper">
+				<div class="instructions">
+					<h1>Web Dev Challenge Filming Questionnaire</h1>
+					<p>
+						Thanks so much for being part of this series! This form covers
+						everything I need to plan and promote the episode.
+					</p>
+				</div>
+
+				<div class="form">
+					<form method="POST" action={actions.forms.wdc}>
+						<section class="form-section">
+							<div class="section-header">
+								<h2>Video release</h2>
+
+								<p>
+									I need your permission to use footage and photos of you in the
+									video and promotional materials for this video. I won't do
+									anything with your name or likeness that's not related to this
+									project without your prior consent.
+								</p>
+								<p>That said: brace yourself for legalese.</p>
+							</div>
+
+							<div class="video-release">
+								<p>
+									I hereby grant Learn With Jason, LLC DBA CodeTV (“CodeTV”) the
+									irrevocable right and permission to use photographs and/or
+									video recordings of me on CodeTV and other websites and in
+									promotional materials, educational materials, derivative
+									works, or for any other similar purpose without additional
+									compensation to me.
+								</p>
+
+								<p>
+									I understand and agree that such photographs and/or video
+									recordings of me may be placed on the Internet. I also
+									understand and agree that I may be identified by name and/or
+									title in printed, Internet or broadcast information that might
+									accompany the photographs and/or video recordings of me. I
+									waive the right to approve the final product. I agree that all
+									such portraits, pictures, photographs, video and audio
+									recordings, and any reproductions thereof, and all digital
+									files are and shall remain the property of CodeTV.
+								</p>
+
+								<p>
+									I hereby release, acquit and forever discharge CodeTV, its
+									current and former trustees, agents, officers and employees of
+									the above-named entities from any and all claims, demands,
+									rights, promises, damages and liabilities arising out of or in
+									connection with the use or distribution of said photographs
+									and/or video recordings, including but not limited to any
+									claims for invasion of privacy, appropriation of likeness or
+									defamation.
+								</p>
+
+								<p>
+									I hereby warrant that I am eighteen (18) years old or more and
+									competent to contract in my own name. This release is binding
+									on me and my heirs, assigns and personal representatives.
+								</p>
+							</div>
+
+							<div class="field">
+								<label for="signature"
+									>Enter your legal name to agree to these terms:</label
+								>
+								<input
+									type="text"
+									name="signature"
+									id="signature"
+									class="input"
+									placeholder="Legal name"
+									required
+								/>
+							</div>
+
+							<div class="field">
+								<label for="role">Confirm your role in the episode</label>
+								<p class="description">
+									We need different information from developers on the show and
+									from technical advisors. Please select the role you'll be
+									playing for this episode.
+								</p>
+
+								<select name="role" id="role" class="input select" required>
+									<option disabled selected>-- select an option --</option>
+									<option value="developer">Developer</option>
+									<option value="advisor">Advisor / Sponsor</option>
+								</select>
+							</div>
+
+							<div class="field hidden" data-role="developer">
+								<p class="description">
+									CodeTV will reimburse you for travel and related expenses. You
+									will receive an email within a few days of filming with
+									reimbursement instructions.
+								</p>
+
+								<div class="checkbox-group">
+									<input
+										type="checkbox"
+										name="reimbursement"
+										id="reimbursement"
+										class="input checkbox"
+									/>
+									<label for="reimbursement">
+										I will book my travel and invoice CodeTV for reimbursement
+									</label>
+								</div>
+							</div>
+						</section>
+
+						<section class="form-section hidden"  data-role="developer advisor">
+							<div class="section-header">
+								<h2>Contact Information</h2>
+
+								<p>
+									Your email and phone number are only used for coordination.
+								</p>
+							</div>
+
+							<div class="field">
+								<label for="email">Email Address</label>
+								<p class="description">
+									This is used for calendar invites and other communication
+									about filming.
+								</p>
+								<input
+									type="email"
+									name="email"
+									id="email"
+									class="input"
+									placeholder="you@example.com"
+									value={user?.primaryEmailAddress?.emailAddress ?? ''}
+									required
+								/>
+							</div>
+
+							<div class="field">
+								<label for="phone">Phone Number</label>
+								<p class="description">
+									This is used for coordination and in case of anything urgent.
+								</p>
+								<input
+									type="tel"
+									name="phone"
+									id="phone"
+									class="input"
+									placeholder={user?.primaryPhoneNumber?.phoneNumber ?? ''}
+									required
+								/>
+							</div>
+
+							<div class="field">
+								<p class="description">
+									Are you comfortable being added to a text group with the other
+									devs for coordinating shared rides, downtime activities, etc.?
+								</p>
+
+								<div class="checkbox-group">
+									<input
+										type="checkbox"
+										name="groupchat"
+										id="groupchat"
+										class="input checkbox"
+										checked
+									/>
+									<label for="groupchat">
+										Yes, please add me to the groupchat
+									</label>
+								</div>
+							</div>
+						</section>
+
+						<section class="form-section hidden"  data-role="developer advisor">
+							<div class="section-header">
+								<h2>Bio and links for publishing</h2>
+
+								<p>
+									The bio and links will be published with the video and used to
+									tag you in promotional materials. You’ll be able to update
+									your bio and links on your CodeTV profile at any time.
+								</p>
+							</div>
+
+							<div class="field">
+								<label for="bio">Bio</label>
+								<p class="description">
+									This will be publicly displayed on your profile (<a
+										href="https://codetv.dev/profile/jlengstorf"
+										target="_blank">example</a
+									>).
+								</p>
+
+								<textarea name="bio" id="bio" class="input textarea"
+									>{userDetails.bio}</textarea
+								>
+							</div>
+
+							<div class="field">
+								<label for="links">Links</label>
+								<p class="description">
+									These will be added to your CodeTV profile. If you’re
+									wondering which social links are most useful, CodeTV publishes
+									clips on Bluesky, LinkedIn, Instagram, YouTube, TikTok, and —
+									for now, at least — X.
+								</p>
+
+								<div class="links">
+									<dl class="existing-links link-field">
+										{
+											userDetails.links?.map((link, i: number) => (
+												<>
+													<dt class="link link-label" title={link.label}>
+														{link.label}
+													</dt>
+
+													<dd class="url">
+														<span title={link.url}>{link.url}</span>
+
+														<button class="remove-link">
+															<svg
+																xmlns="http://www.w3.org/2000/svg"
+																width="16"
+																height="16"
+																viewBox="0 0 24 24"
+																fill="none"
+																stroke="currentColor"
+																stroke-width="1.5"
+																stroke-linecap="round"
+																stroke-linejoin="round"
+																class="lucide lucide-trash"
+															>
+																<path d="M3 6h18" />
+																<path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+																<path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+															</svg>
+															<span class="sr-only">Delete Link</span>
+														</button>
+
+														<input
+															type="hidden"
+															name="link_label[]"
+															id={`link-label-${i}`}
+															value={link.label}
+														/>
+														<input
+															type="hidden"
+															name="link_url[]"
+															id={`link-url-${i}`}
+															value={link.url}
+														/>
+													</dd>
+												</>
+											))
+										}
+									</dl>
+								</div>
+
+								<button id="add-profile-link">+ add a link</button>
+							</div>
+						</section>
+
+						<section class="form-section hidden"  data-role="developer advisor">
+							<div class="section-header">
+								<h2>Food Preferences</h2>
+								<p>
+									We’ll be feeding you throughout the experience, so we need to
+									know how to accommodate your dietary requirements!
+								</p>
+							</div>
+
+							<div class="field">
+								<label for="dietaryRequirements">Dietary Requirements</label>
+								<p class="description">
+									E.g. vegetarian, dairy-free, allergic to shellfish. We need to
+									know this so you have options at the dinners and lunch!
+								</p>
+
+								<textarea
+									name="dietaryRequirements"
+									id="dietaryRequirements"
+									class="input textarea"></textarea>
+							</div>
+
+							<div class="field">
+								<label for="foodAdventurousness"
+									>How adventurous are you as an eater?</label
+								>
+								<p class="description">
+									Portland is one of the best food cities in the world. We have
+									world-class burgers and pizza, an embarrassment of New
+									American cuisine, as well as top-notch French, Indonesian,
+									Vietnamese, Thai, Haitian, and much more. We can feed you the
+									best version of a familiar classic, or something you’ve never
+									eaten before. Let us know what you’re down for.
+								</p>
+
+								<select
+									name="foodAdventurousness"
+									id="foodAdventurousness"
+									class="input select"
+									required
+								>
+									<option disabled selected>-- select an option --</option>
+									<option value="1">1 — picky, only like a few foods</option>
+									<option value="2">2</option>
+									<option value="3"
+										>3 — comfortable eating at most restaurants</option
+									>
+									<option value="4">4</option>
+									<option value="5"
+										>5 — geoduck? tripe? offal? bring it on</option
+									>
+								</select>
+							</div>
+
+							<div class="field">
+								<label for="coffee">Coffee Order</label>
+								<p class="description">
+									On the morning of filming, we'll do a coffee run. Let us know
+									what you'd like to drink (e.g. "12oz oat milk latte", "16oz
+									black coffee", "12oz green tea") and we'll make sure it's
+									ready for you.
+								</p>
+								<input
+									type="text"
+									name="coffee"
+									id="coffee"
+									class="input"
+									placeholder="12oz oat milk latte"
+								/>
+							</div>
+						</section>
+
+						<section class="form-section hidden"  data-role="developer advisor">
+							<button type="submit" class="button">Submit</button>
+
+							<input type="hidden" name="id" value={userDetails._id} />
+							<input type="hidden" name="username" value={user?.username} />
+						</section>
+					</form>
+				</div>
+			</section>
+		</SignedIn>
+
+		<SignedOut>
+			<SignIn fallbackRedirectUrl={Astro.url.toString()} />
+		</SignedOut>
+	</main>
+</Layout>
+
+<template id="link-template">
+	<div class="add-link">
+		<div>
+			<label for="link_label[]">Label</label>
+			<input
+				type="text"
+				id="link_label[]"
+				name="link_label[]"
+				data-type="link-input"
+				class="input link"
+				required
+			/>
+		</div>
+
+		<div>
+			<label for="link_url[]">URL</label>
+			<input
+				type="url"
+				id="link_url[]"
+				name="link_url[]"
+				data-type="link-input"
+				class="input link"
+				required
+			/>
+		</div>
+
+		<button class="remove-link">
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				width="16"
+				height="16"
+				viewBox="0 0 24 24"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="1.5"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+				class="lucide lucide-trash"
+				><path d="M3 6h18"></path><path
+					d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path
+					d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg
+			>
+			<span class="sr-only">Delete Link</span>
+		</button>
+	</div>
+</template>
+
+<script>
+	function linksBioSetup() {
+		// handle removing links
+		function addRemoveHandlers() {
+			const removeLinkBtns = document.querySelectorAll('.remove-link');
+			removeLinkBtns.forEach((btn) => {
+				function removeParent(event: Event) {
+					event.preventDefault();
+					event.stopImmediatePropagation();
+					btn.parentElement?.remove();
+				}
+
+				btn.removeEventListener('click', removeParent);
+				btn.addEventListener('click', removeParent);
+			});
+		}
+
+		addRemoveHandlers();
+
+		// handle adding additional links
+		const linkTemplate = document.querySelector(
+			'#link-template',
+		) as HTMLTemplateElement;
+		const linksContainer = document.querySelector('.links') as HTMLDivElement;
+		const addLinkBtn = document.querySelector(
+			'#add-profile-link',
+		) as HTMLButtonElement;
+
+		function addLink() {
+			const link = linkTemplate.content.cloneNode(true);
+
+			linksContainer.appendChild(link);
+		}
+
+		addLinkBtn?.addEventListener('click', (event) => {
+			event.preventDefault();
+
+			addLink();
+			addRemoveHandlers();
+		});
+
+		// disable form while waiting for update
+		const updateProfile = document.querySelector('.update-profile-form');
+
+		updateProfile?.addEventListener('submit', () => {
+			updateProfile.classList.add('submitting');
+			updateProfile.querySelector('button')?.setAttribute('disabled', 'true');
+		});
+	}
+
+	linksBioSetup();
+</script>
+
+<script>
+	import { z } from 'astro/zod';
+
+	// the form changes a little bit for devs vs. advisors
+	const Role = z.union([z.literal('developer'), z.literal('advisor')]).optional();
+	let role: z.infer<typeof Role>;
+
+	const roleSelector = document.querySelector('#role') as HTMLSelectElement;
+
+	roleSelector?.addEventListener('change', () => {
+		role = Role.parse(roleSelector.value);
+
+		document.querySelectorAll(`[data-role]`).forEach((el) => {
+			el.classList.add('hidden');
+		});
+
+		document.querySelectorAll(`[data-role*="${role}"]`).forEach((el) => {
+			el.classList.remove('hidden');
+		});
+
+		if (role === 'developer') {
+			document.querySelector('#reimbursement')?.setAttribute('required', 'required');
+		} else {
+			document.querySelector('#reimbursement')?.removeAttribute('required');
+		}
+	});
+</script>
+
+<style>
+	main {
+		background: var(--black);
+		padding: 40px 5cqw 60px;
+	}
+
+	p {
+		margin-block-start: 16px;
+
+		&:first-child {
+			margin-block-start: 0;
+		}
+	}
+
+	.video-release {
+		background: var(--bg);
+		border: 1px solid color-mix(in oklch, var(--text-muted) 25%, transparent);
+		border-radius: 3px;
+		display: block;
+		font-size: 0.875em;
+		margin-block-start: 16px;
+		max-block-size: 35dvb;
+		overflow-y: scroll;
+		padding: 8px;
+	}
+
+	.links {
+		margin-block-start: 16px;
+	}
+
+	.link-field {
+		align-items: first baseline;
+		display: grid;
+		gap: 8px 20px;
+		justify-content: space-between;
+
+		@media (min-width: 480px) {
+			grid-column-start: 2;
+			grid-template-columns: 80px minmax(0, 1fr);
+		}
+	}
+
+	.link-label {
+		display: block;
+		margin-block-start: 16px;
+
+		@media (min-width: 480px) {
+			margin-block-start: 0;
+			text-align: end;
+		}
+	}
+
+	.link {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.url {
+		align-items: flex-start;
+		display: flex;
+		gap: 8px;
+
+		span {
+			display: block;
+			max-inline-size: 85cqi;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+		}
+	}
+
+	.remove-link {
+		background: none;
+		border: none;
+		color: var(--text-muted);
+	}
+
+	#add-profile-link {
+		background: none;
+		border: none;
+		color: var(--text);
+		font-size: 0.875rem;
+		grid-column-start: 2;
+		inline-size: max-content;
+		margin-block-start: 16px;
+		transition: color 100ms linear;
+
+		@media (min-width: 480px) {
+			margin-inline-start: 92px;
+		}
+
+		&:is(:hover, :focus) {
+			color: var(--white);
+		}
+	}
+
+	.add-link {
+		align-items: last baseline;
+		display: grid;
+		gap: 20px;
+		margin-block-start: 16px;
+
+		@media (min-width: 480px) {
+			grid-template-columns: minmax(0, 1fr) minmax(0, 2fr) 30px;
+		}
+
+		label {
+			color: var(--text-muted);
+
+			input {
+				display: block;
+				inline-size: 100%;
+			}
+		}
+	}
+</style>
