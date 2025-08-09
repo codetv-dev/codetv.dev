@@ -59,6 +59,14 @@ export const handleWDCIntakeSubmit = inngest.createFunction(
 	},
 );
 
+// export const handleWDCHackathonSubmit = inngest.createFunction(
+// 	{ id: 'codetv/forms.wdc.hackathon' },
+// 	{ event: 'codetv/forms.wdc.hackathon' },
+// 	async function (x) {
+// 		console.log(x);
+// 	},
+// );
+
 export const handleLWJIntake = inngest.createFunction(
 	{ id: 'codetv/forms.lwj.book' },
 	{ event: 'codetv/forms.lwj.book' },
