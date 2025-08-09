@@ -182,4 +182,33 @@ export const server = {
 			},
 		}),
 	},
+	decks: {
+		unlock: defineAction({
+			accept: 'form',
+			input: z.object({
+				password: z.string(),
+				deckId: z.string(),
+			}),
+			async handler(input, context) {
+				// TODO move the passwords into a DB or CMS
+				const passwords: Record<string, string> = {
+					secret: 'sneaky',
+				};
+
+				if (input.password === passwords[input.deckId]) {
+					// TODO should probably figure out something slightly less guessable
+					// (to be clear, though, nothing in here will be SECRET secret)
+					context.cookies.set(`codetv:deck:${input.deckId}`, '1', {
+						httpOnly: true,
+						secure: true,
+						sameSite: 'strict',
+					});
+
+					return { hasAccess: true };
+				} else {
+					return { hasAccess: false };
+				}
+			},
+		}),
+	},
 };

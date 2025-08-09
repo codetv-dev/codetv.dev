@@ -1,0 +1,277 @@
+---
+import CodeTVLogo from '../assets/codetv-logo.svg';
+import UserButton from './user-button.astro';
+
+const nav = [{ path: '/', label: '← back to CodeTV' }];
+---
+
+<header>
+	<a href="/" rel="home">
+		<CodeTVLogo />
+	</a>
+
+	<nav>
+		{nav.map(({ path, label }) => <a href={path}>{label}</a>)}
+
+		<UserButton server:defer>
+			<Fragment slot="fallback">
+				<a href="#" class="account">
+					loading...
+					<img
+						src="https://res.cloudinary.com/jlengstorf/image/upload/q_auto/f_auto/c_fill,w_60,ar_1/v1738215366/codetv/codetv-avatar.png"
+						alt="loading"
+					/>
+				</a>
+			</Fragment>
+		</UserButton>
+	</nav>
+
+	<button class="menu-toggle">
+		<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+			<path
+				fill="#EDE9F6"
+				d="M0 1a1 1 0 0 1 1-1h22a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1H1a1 1 0 0 1-1-1V1ZM0 10a1 1 0 0 1 1-1h22a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1H1a1 1 0 0 1-1-1v-4Z"
+				style="fill:#ede9f6;fill:color(display-p3 .9294 .9137 .9647);fill-opacity:1"
+			></path>
+			<rect
+				width="24"
+				height="6"
+				y="18"
+				fill="#EDE9F6"
+				rx="1"
+				style="fill:#ede9f6;fill:color(display-p3 .9294 .9137 .9647);fill-opacity:1"
+			></rect>
+		</svg>
+	</button>
+</header>
+
+<script>
+	const nav = document.querySelector('nav');
+	const menuToggleBtn = document.querySelector('.menu-toggle');
+	const navSearchBtn = document.querySelector('[data-name="nav-search"]');
+
+	menuToggleBtn?.addEventListener('click', () => {
+		nav?.classList.toggle('open');
+	});
+
+	navSearchBtn?.addEventListener('click', (event) => {
+		event.preventDefault();
+
+		const search = document.querySelector(
+			'[data-name="main-search"]',
+		) as HTMLButtonElement;
+
+		(
+			document.querySelector('#menu:popover-open') as HTMLElement
+		)?.hidePopover();
+		search.click();
+	});
+</script>
+
+<style>
+	header {
+		align-items: center;
+		background: color-mix(in oklch, var(--black) 75%, transparent);
+		backdrop-filter: blur(20px);
+		block-size: 70px;
+		border: 1px solid color-mix(in oklch, var(--text-muted) 15%, transparent);
+		display: flex;
+		font-family: var(--font-family-heading);
+		font-size: 1.125rem;
+		inset-block-start: 0;
+		justify-content: space-between;
+		line-height: 1;
+		margin-inline: auto;
+		padding: 10px;
+		position: sticky;
+		z-index: 100;
+
+		@media (min-width: 1080px) {
+			border-radius: 8px;
+			box-shadow: 0 0 20px var(--black);
+			inset-block-start: 25px;
+			inline-size: min(90dvi + 20px, var(--max-width) + 20px);
+			margin-inline: calc(
+				(100% - min(90dvi + 20px, var(--max-width) + 20px)) / 2
+			);
+			position: fixed;
+		}
+	}
+
+	nav {
+		align-items: center;
+		background: color-mix(in oklch, var(--black) 95%, transparent);
+		block-size: calc(100dvb - 68px);
+		color: var(--white);
+		display: none;
+		font-weight: 500;
+		gap: 1rem 10px;
+		inline-size: 100dvi;
+		inset: 68px 0 0;
+		justify-content: center;
+		padding: 40px;
+		position: fixed;
+		text-align: center;
+		z-index: 100;
+
+		&.open {
+			display: block;
+		}
+
+		@media (min-width: 1080px) {
+			background: none;
+			block-size: revert;
+			display: flex;
+			flex-wrap: wrap;
+			gap: 10px;
+			inline-size: max-content;
+			inset: unset;
+			justify-content: start;
+			padding: 0 0 0 25px;
+			position: static;
+		}
+
+		a {
+			color: var(--white);
+			display: block;
+			line-height: 1.1;
+			padding: 15px 10px;
+			pointer-events: all;
+			text-decoration: none;
+			transition: opacity 150ms linear;
+
+			&.button {
+				margin: 0;
+			}
+		}
+
+		&:has(:focus, :active, :hover) {
+			a:not(:is(:focus, :hover)) {
+				opacity: 0.75;
+			}
+		}
+
+		.open-search {
+			align-items: baseline;
+			display: flex;
+			gap: 8px;
+			justify-content: center;
+			margin-inline: auto;
+			padding: 15px 20px;
+
+			@media (min-width: 1080px) {
+				margin-inline-start: 15px;
+				padding: 5px 20px;
+			}
+
+			svg {
+				display: block;
+				inline-size: 0.875rem;
+				position: relative;
+				inset-block-start: 0.1rem;
+			}
+
+			.small {
+				display: block;
+				/* font-size: 0.75rem; */
+			}
+
+			.large {
+				display: none;
+			}
+
+			@media (min-width: 1080px) {
+				.small {
+					display: none;
+				}
+
+				.large {
+					display: block;
+				}
+			}
+		}
+
+		.button {
+			color: var(--black);
+			font-size: clamp(0.875rem, 1.5cqi, 1rem);
+			letter-spacing: 0;
+		}
+	}
+
+	a {
+		text-decoration: none;
+
+		&[rel='home'] {
+			display: block;
+			max-block-size: 10cqi;
+			max-inline-size: 33.75%;
+
+			svg {
+				aspect-ratio: 211 / 50;
+				block-size: 8cqi;
+				display: block;
+				inline-size: 100%;
+				max-block-size: 50px;
+			}
+		}
+
+		/* nav &:not(.button, .open-search, .account) {
+			color: inherit;
+			display: none;
+
+			@media (min-width: 1080px) {
+				display: block;
+			}
+		} */
+	}
+
+	.account {
+		align-items: center;
+		border: 1px solid color-mix(in oklch, var(--text-muted) 15%, transparent);
+		border-radius: 5px;
+		display: flex;
+		font-family: var(--font-family);
+		font-size: 0.75rem;
+		gap: 10px;
+		inline-size: max-content;
+		margin-inline: auto;
+		padding: 15px 5px 15px 10px;
+		transition: background-color 100ms linear;
+
+		@media (min-width: 1080px) {
+			justify-content: space-between;
+			min-inline-size: 150px;
+			padding: 8px;
+		}
+
+		&:is(:hover, :focus) {
+			background-color: color-mix(in oklch, var(--text-muted) 25%, transparent);
+		}
+
+		img {
+			aspect-ratio: 1;
+			block-size: auto;
+			border-radius: 3px;
+			display: block;
+			inline-size: 30px;
+			object-fit: cover;
+			outline: 1px solid var(--text-muted);
+		}
+	}
+
+	.menu-toggle {
+		background: transparent;
+		border: none;
+		display: block;
+
+		svg {
+			aspect-ratio: 1;
+			block-size: 24px;
+			display: block;
+		}
+
+		@media (min-width: 1080px) {
+			display: none;
+		}
+	}
+</style>
