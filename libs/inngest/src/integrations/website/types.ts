@@ -16,6 +16,17 @@ export const WebDevChallengeFormSubmit = z.object({
 	links: z.array(z.object({ label: z.string(), url: z.string() })),
 });
 
+export const WebDevChallengeHackathonSubmit = z.object({
+	id: z.string(),
+	username: z.string(),
+	email: z.string(),
+	fullName: z.string(),
+	githubRepo: z.string(),
+	deployedApp: z.string(),
+	tocAgreement: z.boolean(),
+	doNotShare: z.boolean(),
+});
+
 export const schema = {
 	'codetv/user.profile.update': {
 		data: z.object({
@@ -27,6 +38,9 @@ export const schema = {
 	},
 	'codetv/forms.wdc.submit': {
 		data: WebDevChallengeFormSubmit,
+	},
+	'codetv/forms.wdc.hackathon': {
+		data: WebDevChallengeHackathonSubmit,
 	},
 	'codetv/forms.lwj.book': {},
 	'codetv/test-confirmation': {

@@ -71,6 +71,7 @@ button {
 
   .checkbox {
     inline-size: 20px;
+    min-width: 20px;
   }
 
   label {
