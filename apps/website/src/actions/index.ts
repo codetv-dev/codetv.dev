@@ -178,10 +178,7 @@ export const server = {
 					const data = InputSchema.parse(rawInput);
 
 					try {
-						// await inngest.send({
-						// 	name: 'codetv/forms.wdc.hackathon',
-						// 	data
-						// })
+						// Define the inngest event here
 						console.log(data);
 						return data;
 					} catch (err) {
