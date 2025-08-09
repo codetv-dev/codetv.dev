@@ -77,78 +77,119 @@ export const server = {
 		}),
 	},
 	forms: {
-		wdc: defineAction({
-			accept: 'form',
-			handler: async (formData) => {
-				const linkLabels = formData.getAll('link_label[]');
-				const linkUrls = formData.getAll('link_url[]');
-				const links = linkUrls
-					.map((url, i) => {
-						if (!url) {
-							return false;
-						}
-
+		wdc: {
+			filming: defineAction({
+				accept: 'form',
+				handler: async (formData) => {
+					const linkLabels = formData.getAll('link_label[]');
+					const linkUrls = formData.getAll('link_url[]');
+					const links = linkUrls
+						.map((url, i) => {
+							if (!url) {
+								return false;
+							}
+	
+							return {
+								label: linkLabels.at(i) ?? '',
+								url,
+							};
+						})
+						.filter((val) => val !== false);
+	
+					const rawInput = {
+						signature: formData.get('signature'),
+						role: formData.get('role'),
+						reimbursement: formData.get('reimbursement'),
+						email: formData.get('email'),
+						phone: formData.get('phone'),
+						groupchat: formData.get('groupchat'),
+						bio: formData.get('bio') ?? '',
+						links,
+						dietaryRequirements: formData.get('dietaryRequirements') ?? '',
+						foodAdventurousness: formData.get('foodAdventurousness'),
+						coffee: formData.get('coffee') ?? '',
+						id: formData.get('id'),
+						username: formData.get('username'),
+					};
+	
+					const InputSchema = z.object({
+						signature: z.string(),
+						role: z.union([z.literal('developer'), z.literal('advisor')]),
+						reimbursement: z.coerce.boolean(),
+						email: z.string(),
+						phone: z.string(),
+						groupchat: z.coerce.boolean(),
+						bio: z.string().optional(),
+						links: z.array(
+							z.object({
+								label: z.string(),
+								url: z.string(),
+							}),
+						),
+						dietaryRequirements: z.string().optional(),
+						foodAdventurousness: z.coerce.number(),
+						coffee: z.string().optional(),
+						id: z.string(),
+						username: z.string(),
+					});
+	
+					const data = InputSchema.parse(rawInput);
+	
+					try {
+						await inngest.send({
+							name: 'codetv/forms.wdc.submit',
+							data,
+						});
+	
+						return data;
+					} catch (err) {
+						console.log({ err });
 						return {
-							label: linkLabels.at(i) ?? '',
-							url,
+							error: err,
 						};
-					})
-					.filter((val) => val !== false);
+					}
+				},
+			}),
+			hackathon: defineAction({
+				accept: 'form',
+				handler: async (formData) => {
+					const rawInput = {
+						email: formData.get('email'),
+						fullName: formData.get('fullName'),
+						githubRepo: formData.get('githubRepo'),
+						deployedApp: formData.get('deployedApp'),
+						tocAgreement: formData.get('tocAgreement'),
+						doNotShare: formData.get('doNotShare'),
+						id: formData.get('id'),
+						username: formData.get('username'),
+					};
 
-				const rawInput = {
-					signature: formData.get('signature'),
-					role: formData.get('role'),
-					reimbursement: formData.get('reimbursement'),
-					email: formData.get('email'),
-					phone: formData.get('phone'),
-					groupchat: formData.get('groupchat'),
-					bio: formData.get('bio') ?? '',
-					links,
-					dietaryRequirements: formData.get('dietaryRequirements') ?? '',
-					foodAdventurousness: formData.get('foodAdventurousness'),
-					coffee: formData.get('coffee') ?? '',
-					id: formData.get('id'),
-					username: formData.get('username'),
-				};
-
-				const InputSchema = z.object({
-					signature: z.string(),
-					role: z.union([z.literal('developer'), z.literal('advisor')]),
-					reimbursement: z.coerce.boolean(),
-					email: z.string(),
-					phone: z.string(),
-					groupchat: z.coerce.boolean(),
-					bio: z.string().optional(),
-					links: z.array(
-						z.object({
-							label: z.string(),
-							url: z.string(),
-						}),
-					),
-					dietaryRequirements: z.string().optional(),
-					foodAdventurousness: z.coerce.number(),
-					coffee: z.string().optional(),
-					id: z.string(),
-					username: z.string(),
-				});
-
-				const data = InputSchema.parse(rawInput);
-
-				try {
-					await inngest.send({
-						name: 'codetv/forms.wdc.submit',
-						data,
+					const InputSchema = z.object({
+						email: z.string(),
+						fullName: z.string(),
+						githubRepo: z.string(),
+						deployedApp: z.string(),
+						tocAgreement: z.coerce.boolean(),
+						doNotShare: z.coerce.boolean(),
+						id: z.string(),
+						username: z.string(),
 					});
 
-					return data;
-				} catch (err) {
-					console.log({ err });
-					return {
-						error: err,
-					};
+					const data = InputSchema.parse(rawInput);
+
+					try {
+						// Define the inngest event here
+						console.log(data);
+						return data;
+					} catch (err) {
+						console.log({ err });
+						return {
+							error: err,
+						};
+					}
 				}
-			},
-		}),
+			}),
+		},
 		lwj: defineAction({
 			async handler(_, context) {
 				const user = await context.locals.currentUser();

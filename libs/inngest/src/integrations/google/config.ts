@@ -16,8 +16,14 @@ export const config = {
 			id: 'jason@codetv.dev',
 		},
 	},
-	sheet: {
-		id: '1ihOfKXacyKDmarkq1yrwSpodRvfncS-xpXSVJP5Zrnw',
-		range: 'Sheet1!A2',
+	sheets: {
+		filming: {
+			id: '1ihOfKXacyKDmarkq1yrwSpodRvfncS-xpXSVJP5Zrnw',
+			range: 'Sheet1!A2',
+		},
+		hackathon: {
+			id: '', //Generate a new sheet
+			range: 'Sheet1!A2',
+		}
 	},
 };

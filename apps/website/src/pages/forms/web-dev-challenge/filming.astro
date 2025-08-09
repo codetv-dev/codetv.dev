@@ -2,8 +2,8 @@
 import { SignedIn, SignedOut, SignIn } from '@clerk/astro/components';
 import { getPersonById } from '@codetv/sanity';
 import { actions } from 'astro:actions';
-import Layout from '../../layouts/default.astro';
-import '../../styles/forms.css';
+import Layout from '../../../layouts/default.astro';
+import '../../../styles/forms.css';
 
 const user = await Astro.locals.currentUser();
 
@@ -12,7 +12,7 @@ const userDetails = (await getPersonById(
 	{ useCdn: false },
 )) ?? { _id: undefined, bio: '', links: [] };
 
-const result = Astro.getActionResult(actions.forms.wdc);
+const result = Astro.getActionResult(actions.forms.wdc.filming);
 
 if (result && !result.error) {
 	return Astro.redirect(`/forms/discord`);
@@ -32,7 +32,7 @@ if (result && !result.error) {
 				</div>
 
 				<div class="form">
-					<form method="POST" action={actions.forms.wdc}>
+					<form method="POST" action={actions.forms.wdc.filming}>
 						<section class="form-section">
 							<div class="section-header">
 								<h2>Video release</h2>

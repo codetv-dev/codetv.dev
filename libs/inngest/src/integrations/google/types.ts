@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { WebDevChallengeFormSubmit } from '../website/types.ts';
+import { WebDevChallengeFormSubmit, WebDevChallengeHackathonSubmit } from '../website/types.ts';
 
 export const CalendarEvent = z.object({
 	kind: z.literal('calendar#event'),
@@ -78,6 +78,9 @@ export const schema = {
 	'google/token.generate': {},
 	'google/sheet.row.append': {
 		data: WebDevChallengeFormSubmit,
+	},
+	'google/hackathon.row.append': {
+		data: WebDevChallengeHackathonSubmit,
 	},
 	'google/calendar.events.list': {
 		data: z.object({

@@ -59,6 +59,23 @@ export const handleWDCIntakeSubmit = inngest.createFunction(
 	},
 );
 
+export const handleWDCHackathonSubmit = inngest.createFunction(
+	{ id: 'codetv/forms.wdc.hackathon' },
+	{ event: 'codetv/forms.wdc.hackathon' },
+	async function (x) {
+		/**
+		 * Not sure if I did this right as I'm doing some of it result unseen,
+		 * but I stubbed a google step function out called `hackathonSheetRowAppend`
+		 * which calls `appendValueForHackathon` in the `google/sheets.ts` file.
+		 * 
+		 * I've updated libs/inngest/src/integrations/google/config.ts, changing the `sheet`
+		 * property into an object for `filming` and `hackathon`. The latter of course needs a new id,
+		 * but the rest should work the same.
+		 */
+		console.log(x);
+	},
+);
+
 export const handleLWJIntake = inngest.createFunction(
 	{ id: 'codetv/forms.lwj.book' },
 	{ event: 'codetv/forms.lwj.book' },

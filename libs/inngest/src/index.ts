@@ -19,6 +19,7 @@ import {
 	eventsGetUnbookedDates,
 	hostFreeBusy,
 	sheetRowAppend,
+	hackathonSheetRowAppend,
 	tokenGenerate,
 } from './integrations/google/steps.js';
 import {
@@ -37,6 +38,7 @@ import {
 	handleLWJIntake,
 	handleUpdateUserProfile,
 	handleWDCIntakeSubmit,
+	handleWDCHackathonSubmit,
 } from './integrations/website/steps.js';
 
 export { inngest } from './client.js';
@@ -72,6 +74,7 @@ export const functions: any[] = [
 	eventsGetUnbookedDates,
 	hostFreeBusy,
 	sheetRowAppend,
+	hackathonSheetRowAppend,
 	tokenGenerate,
 	personGetByClerkId,
 	personUpdateDetails,
@@ -84,4 +87,5 @@ export const functions: any[] = [
 	handleLWJIntake,
 	handleUpdateUserProfile,
 	handleWDCIntakeSubmit,
+	handleWDCHackathonSubmit,
 ];
