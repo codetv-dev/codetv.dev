@@ -9,7 +9,7 @@ import {
 import { inngest } from '../../client.js';
 import { getGoogleAccessToken } from './api/auth.ts';
 import { getCalendarEvents, getHostFreeBusy } from './api/calendar.ts';
-import { appendValue } from './api/sheets.ts';
+import { appendValue, appendValueForHackathon } from './api/sheets.ts';
 import { CalendarEvent } from './types.ts';
 
 type CalendarEvent = z.infer<typeof CalendarEvent>;
@@ -49,6 +49,32 @@ export const sheetRowAppend = inngest.createFunction(
 				dietaryRequirements,
 				foodAdventurousness,
 				coffee,
+			});
+		});
+	},
+);
+
+export const hackathonSheetRowAppend = inngest.createFunction(
+	{ id: 'google/hackathon.row.append' },
+	{ event: 'google/hackathon.row.append' },
+	async ({ event, step }) => {
+		const {
+			email,
+			fullName,
+			githubRepo,
+			deployedApp,
+			tocAgreement,
+			doNotShare,
+		} = event.data;
+
+		return step.run('google/sheet.row.append', async () => {
+			return await appendValueForHackathon({
+				email,
+				fullName,
+				githubRepo,
+				deployedApp,
+				tocAgreement,
+				doNotShare,
 			});
 		});
 	},
