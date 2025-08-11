@@ -88,14 +88,14 @@ export const server = {
 							if (!url) {
 								return false;
 							}
-	
+
 							return {
 								label: linkLabels.at(i) ?? '',
 								url,
 							};
 						})
 						.filter((val) => val !== false);
-	
+
 					const rawInput = {
 						signature: formData.get('signature'),
 						role: formData.get('role'),
@@ -111,7 +111,7 @@ export const server = {
 						id: formData.get('id'),
 						username: formData.get('username'),
 					};
-	
+
 					const InputSchema = z.object({
 						signature: z.string(),
 						role: z.union([z.literal('developer'), z.literal('advisor')]),
@@ -132,15 +132,15 @@ export const server = {
 						id: z.string(),
 						username: z.string(),
 					});
-	
+
 					const data = InputSchema.parse(rawInput);
-	
+
 					try {
 						await inngest.send({
 							name: 'codetv/forms.wdc.submit',
 							data,
 						});
-	
+
 						return data;
 					} catch (err) {
 						console.log({ err });
@@ -164,22 +164,26 @@ export const server = {
 						username: formData.get('username'),
 					};
 
+					// TODO extract this into a shared type with the Inngest workflow
 					const InputSchema = z.object({
+						id: z.string(),
+						username: z.string(),
 						email: z.string(),
 						fullName: z.string(),
 						githubRepo: z.string(),
 						deployedApp: z.string(),
 						tocAgreement: z.coerce.boolean(),
 						doNotShare: z.coerce.boolean(),
-						id: z.string(),
-						username: z.string(),
 					});
 
-					const data = InputSchema.parse(rawInput);
-
 					try {
-						// Define the inngest event here
-						console.log(data);
+						const data = InputSchema.parse(rawInput);
+
+						await inngest.send({
+							name: 'codetv/forms.wdc.hackathon',
+							data,
+						});
+
 						return data;
 					} catch (err) {
 						console.log({ err });
@@ -187,7 +191,7 @@ export const server = {
 							error: err,
 						};
 					}
-				}
+				},
 			}),
 		},
 		lwj: defineAction({
