@@ -1,0 +1,544 @@
+---
+import Layout from '../../layouts/default.astro';
+import PageHeader from '../../components/page-header.astro';
+import YoutubeVideoPlayer from '../../components/youtube-video-player.astro';
+
+export const prerender = true;
+
+export const getStaticPaths = () => {
+	return [
+		{
+			params: { id: 'touch-grass-apollo' },
+		},
+	];
+};
+
+const data = {
+	hero: {
+		image: {
+			public_id: 'codetv-home-hero',
+			alt: 'A group of developers sitting on bleachers in the Web Dev Challenge demo set, watching two developers present their project',
+		},
+		line1: '“Touch Grass”',
+		line2: 'Take the Web Dev Challenge',
+	},
+	episode: {
+		youtube_id: 'rvr-xOwrY70',
+		title: 'Touch Grass — Web Dev Challenge S2.E7',
+	},
+};
+---
+
+<Layout title="tv for developers — CodeTV">
+	<main>
+		<PageHeader
+			image={data.hero.image}
+			line1={data.hero.line1}
+			line2={data.hero.line2}
+		/>
+
+		<section class="block overview two-column-asymmetrical">
+			<aside class="hackathon-details">
+				<dl>
+					<dt>Status</dt>
+					<dd><span class="status active"></span> Active</dd>
+
+					<dt>Deadline</dt>
+					<dd><time datetime="2025-08-18T00:00:00Z">Aug 28</time></dd>
+
+					<dt>Sponsor</dt>
+					<dd>
+						<img
+							src="https://res.cloudinary.com/jlengstorf/image/upload/v1753745865/Company_Apollo.png"
+							alt="Apollo"
+							class="sponsor-image"
+						/>
+					</dd>
+				</dl>
+
+				<a href="#submit-app" class="button">Submit Your App</a>
+			</aside>
+
+			<div class="challenge">
+				<div class="copy">
+					<p class="lede">
+						So much of the software out there today seems to be reducing our
+						connections — we talk to fewer people, have fewer reasons to go
+						outside, etc. — so let’s build apps that help connect us to the
+						physical world.
+					</p>
+					<p>
+						Face-to-face. IRL. Meatspace. Between no-contact deliveries and
+						every AI app trying to replace another human relationship — from
+						pair programming to therapy to romantic partners — it feels like so
+						much of the technology being produced right now is designed to
+						minimize, or even eliminate, our need to interact with other humans.
+					</p>
+					<p>
+						Let’s do our small part to change that. Your challenge is to build
+						an app that encourages people to connect with the physical world
+						and/or each other.
+					</p>
+					<p>
+						What helps you disconnect from the digital firehose and spend time
+						making offline connections? Go in whatever direction inspires you,
+						whether that’s a hobby, different ways to spend time together with
+						other people, connecting to nature, or something completely
+						different.
+					</p>
+					<p>
+						Your app should help ground your users and reconnect them to the
+						world beyond their screens.
+					</p>
+				</div>
+			</div>
+		</section>
+
+		<section class="block episode">
+			<h2>Watch the full episode for inspiration</h2>
+			<figure>
+				<YoutubeVideoPlayer
+					youtube_id={data.episode.youtube_id}
+					title={data.episode.title}
+				/>
+				<figcaption>
+					<span
+						>3 teams of devs tackle this challenge in Web Dev Challenge S2.E7</span
+					>
+					<a href="https://codetv.link/wdc/s2e7">Watch the episode &rarr;</a>
+				</figcaption>
+			</figure>
+		</section>
+
+		<section class="block rewards">
+			<h2>Submit an app to earn rewards</h2>
+
+			<div class="rewards-list">
+				<div class="reward">
+					<img src="https://picsum.photos/seed/1754961079903/316/160" alt="" />
+					<div class="details">
+						<h3>$50 Credit at the CodeTV Store</h3>
+						<p>
+							The first 5 submissions get store credit for CodeTV gear and
+							goodies.
+						</p>
+					</div>
+				</div>
+
+				<div class="reward">
+					<img src="https://picsum.photos/seed/1754961079800/316/160" alt="" />
+					<div class="details">
+						<h3>$50 Credit at the CodeTV Store</h3>
+						<p>
+							The first 5 submissions get store credit for CodeTV gear and
+							goodies.
+						</p>
+					</div>
+				</div>
+
+				<div class="reward">
+					<img src="https://picsum.photos/seed/1754961079801/316/160" alt="" />
+					<div class="details">
+						<h3>$50 Credit at the CodeTV Store</h3>
+						<p>
+							The first 5 submissions get store credit for CodeTV gear and
+							goodies.
+						</p>
+					</div>
+				</div>
+
+				<div class="reward">
+					<img src="https://picsum.photos/seed/1754961079802/316/160" alt="" />
+					<div class="details">
+						<h3>$50 Credit at the CodeTV Store</h3>
+						<p>
+							The first 5 submissions get store credit for CodeTV gear and
+							goodies.
+						</p>
+					</div>
+				</div>
+
+				<div class="reward">
+					<img src="https://picsum.photos/seed/1754961079803/316/160" alt="" />
+					<div class="details">
+						<h3>$50 Credit at the CodeTV Store</h3>
+						<p>
+							The first 5 submissions get store credit for CodeTV gear and
+							goodies.
+						</p>
+					</div>
+				</div>
+
+				<div class="reward">
+					<img src="https://picsum.photos/seed/1754961079904/316/160" alt="" />
+					<div class="details">
+						<h3>$50 Credit at the CodeTV Store</h3>
+						<p>
+							The first 5 submissions get store credit for CodeTV gear and
+							goodies.
+						</p>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<section class="block sponsor">
+			<p>
+				This challenge is brought to you by
+				<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 117 36"
+					><path
+						fill="#EDE9F6"
+						d="M18.888 10.684h-3.501L10.33 23.84h3.17l.82-2.238h4.784l-.864-2.455h-3.155l2.045-5.661 3.645 10.354h3.17l-5.057-13.156ZM72.094 23.84V10.684h2.81V21.37h5.546v2.47h-8.356Zm16.208 0V10.684h2.824V21.37h5.547v2.47h-8.37ZM56.505 13.038a4.223 4.223 0 0 1 4.222 4.231 4.223 4.223 0 0 1-4.222 4.232 4.223 4.223 0 0 1-4.22-4.232 4.232 4.232 0 0 1 4.22-4.231Zm0-2.571c-3.745 0-6.785 3.047-6.785 6.802 0 3.755 3.04 6.803 6.785 6.803 3.746 0 6.786-3.048 6.786-6.803s-3.04-6.802-6.786-6.802Zm53.106 2.57a4.223 4.223 0 0 1 4.221 4.232 4.223 4.223 0 0 1-4.221 4.232 4.224 4.224 0 0 1-4.222-4.232 4.224 4.224 0 0 1 4.222-4.231Zm0-2.57c-3.746 0-6.786 3.047-6.786 6.802 0 3.755 3.04 6.803 6.786 6.803 3.746 0 6.786-3.048 6.786-6.803s-3.04-6.802-6.786-6.802Zm-71.36.217h-6.123V23.84h2.795v-4.534h3.328c2.334 0 4.222-1.979 4.222-4.319 0-2.325-1.888-4.303-4.222-4.303Zm0 6.05h-3.328v-3.48h3.328c.908 0 1.657.824 1.657 1.733 0 .91-.749 1.748-1.657 1.748Z"
+						style="fill:var(--text-emphasized);fill-opacity:1"></path><path
+						fill="#EDE9F6"
+						d="M29.722 27.826a.71.71 0 0 0-.59.304s-.634.722-.966 1.069a15.692 15.692 0 0 1-4.97 3.365A15.422 15.422 0 0 1 17.1 33.79a15.68 15.68 0 0 1-6.094-1.227 15.534 15.534 0 0 1-4.97-3.365 15.737 15.737 0 0 1-3.357-4.983 15.524 15.524 0 0 1-1.225-6.109c0-2.123.418-4.174 1.225-6.11a15.304 15.304 0 0 1 3.342-4.982 15.693 15.693 0 0 1 4.97-3.365 15.422 15.422 0 0 1 6.095-1.227c2.118 0 4.164.419 6.094 1.227a15.672 15.672 0 0 1 3.746 2.253c-.057.174-.1.376-.1.578a1.773 1.773 0 1 0 3.544 0c0-.982-.793-1.776-1.772-1.776a1.5 1.5 0 0 0-.678.144A16.987 16.987 0 0 0 17.087.964C7.65.964 0 8.633 0 18.107S7.65 35.25 17.101 35.25c5.288 0 10-2.398 13.14-6.181a.736.736 0 0 0 .216-.506c-.014-.404-.346-.736-.735-.736Z"
+						style="fill:var(--text-emphasized);fill-opacity:1"></path></svg
+				>
+			</p>
+
+			<a href="https://codetv.link/apollo" class="button secondary">
+				learn more &rarr;
+			</a>
+		</section>
+
+		<section class="block resources two-column-asymmetrical">
+			<div class="heading">
+				<h2>Resources</h2>
+			</div>
+
+			<div class="list">
+				<div class="list-item">
+					<p class="list-item-text">
+						<a href="#resource">Learn more about Apollo Connectors &rarr;</a>
+					</p>
+					<p class="list-item-description">
+						Read the documentation and see examples of Apollo Connectors in
+						action.
+					</p>
+				</div>
+
+				<div class="list-item">
+					<p class="list-item-text">
+						<a href="#resource">Learn more about Apollo Connectors &rarr;</a>
+					</p>
+					<p class="list-item-description">
+						Read the documentation and see examples of Apollo Connectors in
+						action.
+					</p>
+				</div>
+			</div>
+		</section>
+
+		<section class="block rules two-column-asymmetrical">
+			<div class="heading">
+				<h2>The Rules</h2>
+			</div>
+
+			<div class="list">
+				<div class="list-item border">
+					<p class="list-item-text">#1: Meet the Brief</p>
+					<p class="list-item-description">
+						Build an app to help people reconnect with the world outside their
+						screens.
+					</p>
+				</div>
+
+				<div class="list-item border">
+					<p class="list-item-text">#2: Use the Required Tool</p>
+					<p class="list-item-description">
+						Include Apollo Connectors as part of your app build.
+					</p>
+				</div>
+
+				<div class="list-item border">
+					<p class="list-item-text">#3: Find a Friend (or Don’t)</p>
+					<p class="list-item-description">
+						These challenges are more fun with a friend, or build on your own.
+					</p>
+				</div>
+
+				<div class="list-item border">
+					<p class="list-item-text">#4: Time-Box the Build</p>
+					<p class="list-item-description">
+						Take 30 minutes to plan your app, and 4 hours to build it.¹
+					</p>
+				</div>
+
+				<div class="list-item border">
+					<p class="list-item-text">#5: Publish the source code</p>
+					<p class="list-item-description">
+						Release your app’s code on GitHub or a similar open source platform.
+					</p>
+				</div>
+
+				<div class="list-item border">
+					<p class="list-item-text">
+						#6: Submit before 11:59pm @ August 18, 2025
+					</p>
+					<p class="list-item-description">
+						Submit your app before the deadline to qualify for rewards.
+					</p>
+				</div>
+
+				<div class="list-fine-print">
+					¹ The time limit is intended to make this a quick project that can fit
+					most schedules. That being said, if you decide to spend more time on
+					this, we’ll never let a silly thing like rules stand in the way of a
+					good time.
+				</div>
+			</div>
+		</section>
+
+		<section class="block submit"></section>
+
+		<section class="block faq"></section>
+	</main>
+</Layout>
+
+<style>
+	.block {
+		background: var(--black);
+		container: block / inline-size;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 20px;
+		justify-content: center;
+		padding-block: 40px;
+		padding-inline: max((100% - var(--max-width)) / 2, 5%);
+	}
+
+	.two-column-asymmetrical {
+		align-items: start;
+		display: grid;
+		gap: 40px;
+		grid-template-columns: 300px minmax(0, 640px);
+
+		.heading {
+			justify-self: end;
+
+			h2 {
+				font-weight: 400;
+
+				&::after {
+					content: ' →';
+				}
+			}
+		}
+	}
+
+	.overview {
+	}
+
+	.hackathon-details {
+		background: var(--bg);
+		border: 0.5px solid color-mix(in oklch, var(--gray-600), transparent);
+		border-radius: 3px;
+		display: flex;
+		flex-direction: column;
+		gap: 40px;
+		justify-content: space-between;
+		padding: 16px;
+
+		dl {
+			align-items: center;
+			display: grid;
+			font-size: 0.75em;
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+			grid-template-rows: repeat(3, minmax(0, 40px));
+			letter-spacing: 0.25em;
+			text-transform: uppercase;
+		}
+
+		dt {
+			color: var(--text-muted);
+		}
+
+		dd {
+			align-items: center;
+			color: var(--text-emphasized);
+			display: flex;
+			gap: 8px;
+			justify-content: end;
+
+			.status {
+				block-size: 12px;
+				border-radius: 50%;
+				display: block;
+				inline-size: 12px;
+
+				&.active {
+					background: #79f664;
+				}
+			}
+		}
+
+		.button {
+			text-align: center;
+		}
+	}
+
+	.challenge {
+		padding-inline: 16px;
+	}
+
+	h2 {
+		font-family: var(--font-family-heading);
+		font-size: clamp(1.75rem, 3.75cqi, 4.25rem);
+		font-weight: normal;
+		line-height: 1;
+		margin: 0;
+	}
+
+	.copy {
+		display: flex;
+		flex-direction: column;
+		gap: 16px;
+
+		.lede {
+			color: var(--text-emphasized);
+			font-size: 1.5em;
+			font-weight: 300;
+			line-height: 1.25;
+		}
+	}
+
+	figure {
+		inline-size: min(90cqi, 980px);
+
+		lite-youtube {
+			block-size: auto;
+			max-inline-size: 100%;
+		}
+
+		figcaption {
+			color: var(--text-muted);
+			display: flex;
+			font-size: 0.875em;
+			justify-content: space-between;
+			padding-block: 8px;
+
+			a {
+				color: var(--text-emphasized);
+				font-weight: 500;
+				text-decoration: none;
+			}
+		}
+	}
+
+	.rewards {
+		flex-direction: column;
+		align-items: center;
+	}
+
+	.rewards-list {
+		display: grid;
+		gap: 16px;
+		grid-template-columns: repeat(3, minmax(0, 316px));
+	}
+
+	.reward {
+		background: var(--bg);
+		border: 0.5px solid color-mix(in oklch, var(--gray-600), transparent);
+		border-radius: 3px;
+		display: flex;
+		flex-direction: column;
+		gap: 16px;
+
+		img {
+			border-block-end: 0.5px solid
+				color-mix(in oklch, var(--gray-600), transparent);
+			border-radius: 3px 3px 0 0;
+		}
+
+		.details {
+			display: flex;
+			flex-direction: column;
+			gap: 8px;
+			padding: 0 16px 16px;
+		}
+
+		h3 {
+			font-size: clamp(1em, 3.5cqi, 1.125em);
+			line-height: 1.1;
+			margin: 0;
+		}
+	}
+
+	.sponsor {
+		align-items: center;
+		background: var(--bg);
+		border-block: 0.5px solid
+			color-mix(in oklch, var(--orange) 20%, transparent);
+		color: var(--text-emphasized);
+		display: flex;
+		gap: 24px;
+
+		p {
+			align-items: center;
+			display: flex;
+			gap: 8px;
+		}
+
+		svg {
+			block-size: 32px;
+			margin-block-start: 4px;
+		}
+
+		.button {
+			margin: 0;
+		}
+	}
+
+	.list {
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
+	}
+
+	.list-item {
+		display: flex;
+		flex-direction: column;
+		gap: 4px;
+		padding: 8px 16px;
+
+		&.border {
+			background: var(--bg);
+			border: 0.5px solid color-mix(in oklch, var(--gray-600), transparent);
+			border-radius: 3px;
+			padding: 16px;
+		}
+	}
+
+	.list-item-text {
+		color: var(--text-emphasized);
+		font-weight: 500;
+		line-height: 1.1;
+
+		a {
+			color: inherit;
+			text-decoration: none;
+
+			&:is(:hover, :active, :hover) {
+				text-decoration: underline;
+			}
+		}
+	}
+
+	.list-item-description {
+		color: var(--text-muted);
+		line-height: 1.25;
+	}
+
+	.list-fine-print {
+		color: var(--text-muted);
+		font-size: 0.75em;
+		padding-inline: 16px;
+	}
+</style>
+
+<style is:global>
+	.hero > h1 > .line-2 {
+		font-size: 0.5em !important;
+		letter-spacing: -0.01em !important;
+	}
+</style>
