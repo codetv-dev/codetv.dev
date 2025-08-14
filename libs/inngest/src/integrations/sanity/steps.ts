@@ -1,10 +1,10 @@
+import type { PersonByClerkIdQueryResult } from '@codetv/types';
 import {
 	createPerson,
 	getPersonByClerkId,
 	updatePerson,
 	updatePersonFromClerk,
 	updatePersonSubscription,
-	type PersonByClerkIdQueryResult,
 } from '@codetv/sanity';
 import { inngest } from '../../client.js';
 
