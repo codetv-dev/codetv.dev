@@ -1,0 +1,122 @@
+---
+slug: astro-css-overrides-layers
+pubDate: 2025-08-14
+
+title: >
+  Override CSS in Astro components without !important hacks using layers
+description: >
+  TKTK description
+
+# share:
+# image: [optional] will be generated if left blank
+# title: [optional] use this to customize the title on social media previews
+# text: [optional] use this to customize the description on social media previews
+---
+
+import Figure from '../../components/figure.astro';
+import Aside from '../../components/aside.astro';
+
+Recently I was working on a shared Astro component and found an edge case that required me to override the CSS of the Astro component from within the page that imported it.
+
+Initially, I thought this would require an `!important` hack, but then I remembered it's not 2021 anymore and there's a better way: [CSS layers](https://developer.mozilla.org/en-US/docs/Web/CSS/@layer).
+
+## Overrides are tough with scoped styles in Astro components
+
+One of my favorite features of Astro is [how it handles CSS in components](https://docs.astro.build/en/guides/styling/). The way they do this is by adding a `data-` attribute to each DOM element, which is added to CSS selectors to scope them to only the component where they're used.
+
+You can see this by inspecting the build output in your browser.
+
+<Figure caption="Astro sites use data attributes to scope CSS selectors to specific components.">
+	![screenshot of the CodeTV website with the dev tools open, highlighting the second line of text in the page header to show the data attribute added by Astro](https://res.cloudinary.com/jlengstorf/image/upload/f_auto/q_auto/v1755195418/codetv-astro-scoped-styles.png)
+</Figure>
+
+In most cases, this is exactly what I want to happen. But there's one downside: the data attribute _increases the specificity of the selector_, which means my attempt to override the styles from the page where we use the component didn't work.
+
+```astro title="src/pages/hackathon/[id].astro" mark={24-28}
+---
+import Layout from '../../layouts/default.astro';
+import PageHeader from '../../components/page-header.astro';
+// ...
+---
+
+<Layout title="tv for developers — CodeTV">
+	<main>
+		<PageHeader
+			image={data.hero.image}
+			line1={data.hero.line1}
+			line2={data.hero.line2}
+		/>
+
+		<!-- ... -->
+	</main>
+</Layout>
+
+<style>
+	/* ... */
+</style>
+
+<style is:global>
+	/* this doesn’t work! would require !important */
+	.hero .line-2 {
+		font-size: 0.5em;
+		letter-spacing: -0.01em;
+	}
+</style>
+```
+
+## The old way: `!important`
+
+Previously, I would have reluctantly slapped an `!important` at the end of these overrides. It's heavy-handed and feels kinda gross, but it works. Them's the breaks.
+
+```css
+/* old approach, feels dirty */
+.hero .line-2 {
+	font-size: 0.5em !important; /* :( */
+	letter-spacing: -0.01em !important; /* :( */
+}
+```
+
+But it's not 2021 anymore! We have a better option: enter [CSS layers](https://developer.mozilla.org/en-US/docs/Web/CSS/@layer).
+
+## The new way: CSS layers
+
+Since March 2022, `@layer` is part of [Baseline](https://developer.mozilla.org/en-US/docs/Glossary/Baseline/Compatibility)
+
+```astro title="src/pages/hackathon/[id].astro"
+---
+import Layout from '../../layouts/default.astro';
+import PageHeader from '../../components/page-header.astro';
+// omitted
+---
+
+<Layout title="tv for developers — CodeTV">
+	<main>
+		<PageHeader
+			image={data.hero.image}
+			line1={data.hero.line1}
+			line2={data.hero.line2}
+		/>
+
+		<!-- omitted -->
+	</main>
+</Layout>
+
+<style>
+	/* omitted */
+</style>
+
+<style is:global>
+	@layer overrides {
+		.hero .line-2 {
+			font-size: 0.5em;
+			letter-spacing: -0.01em;
+		}
+	}
+</style>
+```
+
+
+
+<Figure caption ="The adjusted layout prevents the second line from wrapping and keeps the page more legible.">
+	![the same landing page with the second line adjusted to be smaller, which prevents wrapping and is more legible](https://res.cloudinary.com/jlengstorf/image/upload/f_auto/q_auto/v1755193337/codetv-landing-page-good-layout.png)
+</Figure>
