@@ -30,93 +30,177 @@ You can see this by inspecting the build output in your browser.
 	![screenshot of the CodeTV website with the dev tools open, highlighting the second line of text in the page header to show the data attribute added by Astro](https://res.cloudinary.com/jlengstorf/image/upload/f_auto/q_auto/v1755195418/codetv-astro-scoped-styles.png)
 </Figure>
 
-In most cases, this is exactly what I want to happen. But there's one downside: the data attribute _increases the specificity of the selector_, which means my attempt to override the styles from the page where we use the component didn't work.
+In most cases, this is exactly what I want to happen. But there's one downside: **the Astro data attribute _increases the specificity of the selector_, which means an attempt to override the styles from the page importing the component won't work.**
 
-```astro title="src/pages/hackathon/[id].astro" mark={24-28}
+## Minimal reproduction of CSS override challenges is Astro
+
+To see the problem in action, let's imagine a simple Astro site that has a layout, a heading component, and a page that imports that heading component.
+
+```astro title="src/components/layout.astro"
 ---
-import Layout from '../../layouts/default.astro';
-import PageHeader from '../../components/page-header.astro';
-// ...
+const { title } = Astro.props;
 ---
 
-<Layout title="tv for developers — CodeTV">
-	<main>
-		<PageHeader
-			image={data.hero.image}
-			line1={data.hero.line1}
-			line2={data.hero.line2}
-		/>
-
-		<!-- ... -->
-	</main>
-</Layout>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="viewport" content="width=device-width" />
+		<meta name="generator" content={Astro.generator} />
+		<title>{title}</title>
+	</head>
+	<body>
+		<slot />
+	</body>
+</html>
 
 <style>
-	/* ... */
+	html,
+	body {
+		font-family: system-ui, sans-serif;
+		margin: 20px;
+		text-align: center;
+	}
 </style>
 
-<style is:global>
-	/* this doesn’t work! would require !important */
-	.hero .line-2 {
-		font-size: 0.5em;
-		letter-spacing: -0.01em;
+```
+
+```astro title="src/components/heading.astro"
+---
+const { title } = Astro.props;
+---
+
+<h1 class="heading">{title}</h1>
+
+<style>
+	.heading {
+		color: red;
 	}
 </style>
 ```
 
-## The old way: `!important`
+```astro title="src/pages/index.astro"
+---
+import Layout from '../components/layout.astro';
+import Heading from '../components/heading.astro';
 
-Previously, I would have reluctantly slapped an `!important` at the end of these overrides. It's heavy-handed and feels kinda gross, but it works. Them's the breaks.
+const title = 'Style overrides in Astro with CSS layers';
+---
 
-```css
-/* old approach, feels dirty */
-.hero .line-2 {
-	font-size: 0.5em !important; /* :( */
-	letter-spacing: -0.01em !important; /* :( */
-}
+<Layout title={title}>
+	<Heading title={title} />
+</Layout>
+```
+
+## CSS overrides in Astro the old way: `!important`
+
+Previously, I would have reluctantly slapped an `!important` at the end of the override. It's heavy-handed and feels kinda gross, but it works. Them's the breaks.
+
+```astro title="src/pages/index.astro" mark={14-15}
+---
+import Layout from '../components/layout.astro';
+import Heading from '../components/heading.astro';
+
+const title = 'Style overrides in Astro with CSS layers';
+---
+
+<Layout title={title}>
+	<Heading title={title} />
+</Layout>
+
+<style is:global>
+	.heading {
+		/* not ideal */
+		color: blue !important;
+	}
+</style>
 ```
 
 But it's not 2021 anymore! We have a better option: enter [CSS layers](https://developer.mozilla.org/en-US/docs/Web/CSS/@layer).
 
 ## The new way: CSS layers
 
-Since March 2022, `@layer` is part of [Baseline](https://developer.mozilla.org/en-US/docs/Glossary/Baseline/Compatibility)
+Since March 2022, `@layer` is part of [Baseline](https://developer.mozilla.org/en-US/docs/Glossary/Baseline/Compatibility).
 
-```astro title="src/pages/hackathon/[id].astro"
+This means we can assign a given rule or rules to a named layer. For example, we can define a layer called `component` for our heading component styles:
+
+```astro title="src/components/heading.astro" ins={8,12}
 ---
-import Layout from '../../layouts/default.astro';
-import PageHeader from '../../components/page-header.astro';
-// omitted
+const { title } = Astro.props;
 ---
 
-<Layout title="tv for developers — CodeTV">
-	<main>
-		<PageHeader
-			image={data.hero.image}
-			line1={data.hero.line1}
-			line2={data.hero.line2}
-		/>
-
-		<!-- omitted -->
-	</main>
-</Layout>
+<h1 class="heading">{title}</h1>
 
 <style>
-	/* omitted */
+	@layer component {
+		.heading {
+			color: red;
+		}
+	}
 </style>
+
+```
+
+Next, we can define an additional layer called `overrides` in the page that imports the component:
+
+```astro title="src/pages/index.astro" ins={13,16,18} del={15}
+---
+import Layout from '../components/layout.astro';
+import Heading from '../components/heading.astro';
+
+const title = 'Style overrides in Astro with CSS layers';
+---
+
+<Layout title={title}>
+	<Heading title={title} />
+</Layout>
 
 <style is:global>
 	@layer overrides {
-		.hero .line-2 {
-			font-size: 0.5em;
-			letter-spacing: -0.01em;
+		.heading {
+			color: blue !important;
+			color: blue;
 		}
 	}
 </style>
 ```
 
+Because these layers are arbitrarily named, there's no magic involved — we can either rely on the layers to be applied in the order they were defined (which will get _very_ confusing with components), or we can manually define the layer order.
 
+To manually define the layer order, add a `@layer` declaration to the top of the layout component that tells the browser to render the component styles first, then apply the overrides:
 
-<Figure caption ="The adjusted layout prevents the second line from wrapping and keeps the page more legible.">
-	![the same landing page with the second line adjusted to be smaller, which prevents wrapping and is more legible](https://res.cloudinary.com/jlengstorf/image/upload/f_auto/q_auto/v1755193337/codetv-landing-page-good-layout.png)
-</Figure>
+```astro title="src/components/layout.astro" ins={19}
+---
+const { title } = Astro.props;
+---
+
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="viewport" content="width=device-width" />
+		<meta name="generator" content={Astro.generator} />
+		<title>{title}</title>
+	</head>
+	<body>
+		<slot />
+	</body>
+</html>
+
+<style>
+	@layer component, overrides;
+
+	html,
+	body {
+		font-family: system-ui, sans-serif;
+		margin: 20px;
+		text-align: center;
+	}
+</style>
+```
+
+<Aside>
+  **A note on where to declare the layer stack.** My current understanding is that the `@layer` stack needs to appear before any of the CSS that references layers in order to work properly, so declaring layer order at the top of your layout is probably safest. If someone knows for sure how this works, please let me know and I'll update this section.
+</Aside>
+
+Because of how cascade layers work, we don't need the `!important` hack to override the component styles because our layer order tells the browser that the overrides take precedence.
