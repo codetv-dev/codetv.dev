@@ -46,9 +46,10 @@ https://codetv-links.netlify.app/*		https://codetv.dev/:splat					301!
 /wdc/s2e5										https://codetv.dev/series/web-dev-challenge/s2/e5-worst-developer-urges
 /wdc/s2e6										https://codetv.dev/series/web-dev-challenge/s2/e6-future-of-ai-native-ux
 /wdc/s2e7										https://codetv.dev/series/web-dev-challenge/s2/e7-touch-grass
+/wdc/s2e8										https://codetv.dev/series/web-dev-challenge/s2/e8-personal-software
 
-/wdc/hackathon							https://codetv.dev/blog/web-dev-challenge-hackathon-s2e7-touch-grass
-/wdc/hackathon/submit				https://forms.gle/kjhm9desbh5THB5K6
+/wdc/hackathon							https://community.postman.com/t/hackathon-create-a-personal-app-win-500-2-weeks/84437?utm_content=web_dev_challenge_hackathon&utm_campaign=global_growth_user_fy26q3_community-content&utm_medium=codetv&utm_source=youtube&content=codetvhackathon
+/wdc/hackathon/submit				https://community.postman.com/t/hackathon-create-a-personal-app-win-500-2-weeks/84437?utm_content=web_dev_challenge_hackathon&utm_campaign=global_growth_user_fy26q3_community-content&utm_medium=codetv&utm_source=youtube&content=codetvhackathon
 
 /wdc-giveaway								/wdc/hackathon
 /wdc-hackathon							/wdc/hackathon
