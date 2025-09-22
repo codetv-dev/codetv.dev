@@ -47,6 +47,7 @@ https://codetv-links.netlify.app/*		https://codetv.dev/:splat					301!
 /wdc/s2e6										https://codetv.dev/series/web-dev-challenge/s2/e6-future-of-ai-native-ux
 /wdc/s2e7										https://codetv.dev/series/web-dev-challenge/s2/e7-touch-grass
 /wdc/s2e8										https://codetv.dev/series/web-dev-challenge/s2/e8-personal-software
+/wdc/s2e9										https://codetv.dev/series/web-dev-challenge/s2/e9-most-important-app
 
 /wdc/hackathon							https://community.postman.com/t/hackathon-create-a-personal-app-win-500-2-weeks/84437?utm_content=web_dev_challenge_hackathon&utm_campaign=global_growth_user_fy26q3_community-content&utm_medium=codetv&utm_source=youtube&content=codetvhackathon
 /wdc/hackathon/submit				https://community.postman.com/t/hackathon-create-a-personal-app-win-500-2-weeks/84437?utm_content=web_dev_challenge_hackathon&utm_campaign=global_growth_user_fy26q3_community-content&utm_medium=codetv&utm_source=youtube&content=codetvhackathon
@@ -168,6 +169,7 @@ https://codetv-links.netlify.app/*		https://codetv.dev/:splat					301!
 /nordcraft							https://nordcraft.com/?utm_source=codetv&utm_medium=video&utm_campaign=web-dev-challenge
 /intuit									https://intuit.avature.net/eventlisting?pipelineId=13447
 /apollo									https://www.apollographql.com/codetv/connectors?utm_source=codetv&utm_medium=video&utm_campaign=web-dev-challenge
+/hashbrown							https://hashbrown.dev/?utm_source=codetv&utm_medium=video&utm_campaign=web-dev-challenge
 
 /benq										https://www.benq.com/en-us/campaign/best-coding-monitor-for-programmers.html?utm_source=influencer_codetv&utm_medium=affiliate&utm_campaign=lcd_programming_rd280u_na_2025_us_awareness
 /uplift									https://www.upliftdesk.com/?utm_source=codetv&utm_medium=video&utm_campaign=web-dev-challenge
@@ -191,6 +193,9 @@ https://codetv-links.netlify.app/*		https://codetv.dev/:splat					301!
 /cal										https://calendar.google.com/calendar?cid=bGVuZ3N0b3JmLmNvbV85cGxqMW02dTl2dGRkbGRvaW5sMGhzMnZna0Bncm91cC5jYWxlbmRhci5nb29nbGUuY29t		301!
 /book										https://calendly.com/codetv/livestream
 /30min									https://calendly.com/codetv/30min
+
+# corrections
+/series/web-dev-challenge/s2/most-important-app   /series/web-dev-challenge/s2/e9-most-important-app    301!
 
 # this link goes to the active or next-scheduled live stream
 /live										https://youtube.com/@codetv-dev/live
