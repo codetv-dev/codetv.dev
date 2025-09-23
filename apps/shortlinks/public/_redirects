@@ -49,7 +49,7 @@ https://codetv-links.netlify.app/*		https://codetv.dev/:splat					301!
 /wdc/s2e8										https://codetv.dev/series/web-dev-challenge/s2/e8-personal-software
 /wdc/s2e9										https://codetv.dev/series/web-dev-challenge/s2/e9-most-important-app
 
-/wdc/hackathon							https://forms.gle/BCzYMR61epV6RgRFA
+/wdc/hackathon							https://codetv.dev/blog/web-dev-challenge-hackathon-s2e9-breakfast-apps
 /wdc/hackathon/submit				https://forms.gle/BCzYMR61epV6RgRFA
 
 /wdc-giveaway								/wdc/hackathon
