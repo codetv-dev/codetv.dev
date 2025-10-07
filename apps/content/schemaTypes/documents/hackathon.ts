@@ -59,7 +59,7 @@ export const hackathon = defineType({
       title: 'Share Image',
       description: 'Image for social media sharing',
       options: {hotspot: true},
-      validation: (Rule) => Rule.required().error('Share image is required for social media'),
+      // validation: (Rule) => Rule.required().error('Share image is required for social media'),
       group: 'seo',
     }),
     defineField({
