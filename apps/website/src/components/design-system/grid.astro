@@ -1,0 +1,38 @@
+---
+export interface Props {
+	columns?: number;
+}
+
+const { columns = 3 } = Astro.props;
+---
+
+<div class="grid">
+	<slot />
+</div>
+
+<style define:vars={{ columns }}>
+	.grid {
+		--gap: 8px;
+		--width: var(--grid-width, 100cqi);
+		--column-width: calc(
+			(var(--width) - (var(--gap) * (var(--columns) - 1))) / var(--columns)
+		);
+
+		display: grid;
+		gap: var(--gap);
+		justify-content: center;
+		max-inline-size: 90cqi;
+
+		@media (min-width: 600px) {
+			grid-template-columns: repeat(
+				auto-fit,
+				minmax(0, calc(50% - var(--gap) / 2))
+			);
+		}
+
+		@media (min-width: 1024px) {
+			grid-template-columns: repeat(auto-fit, minmax(0, var(--column-width)));
+			inline-size: var(--width);
+		}
+	}
+</style>
