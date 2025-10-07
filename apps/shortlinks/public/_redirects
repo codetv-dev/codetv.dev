@@ -50,8 +50,8 @@ https://codetv-links.netlify.app/*		https://codetv.dev/:splat					301!
 /wdc/s2e9										https://codetv.dev/series/web-dev-challenge/s2/e9-most-important-app
 /wdc/s2e10									https://codetv.dev/series/web-dev-challenge/s2/e10-no-keyboards-allowed
 
-/wdc/hackathon							https://codetv.dev/blog/web-dev-challenge-hackathon-s2e10-no-keyboards-allowed
-/wdc/hackathon/submit				https://forms.gle/7E61WsSgNG4UuB778
+/wdc/hackathon							https://nokeyboardsallowed.dev/
+/wdc/hackathon/submit				https://docs.google.com/forms/d/e/1FAIpQLSevu6FJQFlKCUQOiIDYymD8QhtmfQMo3ua-SqaYRT62ym7aFQ/viewform
 
 /wdc-giveaway								/wdc/hackathon
 /wdc-hackathon							/wdc/hackathon
@@ -69,7 +69,7 @@ https://codetv-links.netlify.app/*		https://codetv.dev/:splat					301!
 /wdc-hackathon-s2e5-submit	https://forms.gle/k1AwazF2KriwXTTm7
 /wdc-hackathon-s2e7-submit	https://forms.gle/kjhm9desbh5THB5K6
 /wdc-hackathon-s2e9-submit	https://forms.gle/BCzYMR61epV6RgRFA
-/wdc-hackathon-s2e10-submit	https://forms.gle/7E61WsSgNG4UuB778
+/wdc-hackathon-s2e10-submit	https://docs.google.com/forms/d/e/1FAIpQLSevu6FJQFlKCUQOiIDYymD8QhtmfQMo3ua-SqaYRT62ym7aFQ/viewform
 
 /wdc-slc										https://ti.to/epicweb/epicweb-conf-2025/with/web-dev-challenge#tickets
 
