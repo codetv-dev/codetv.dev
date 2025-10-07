@@ -67,6 +67,14 @@ export const episode = defineType({
       group: 'details',
     }),
     defineField({
+      name: 'hackathons',
+      type: 'array',
+      title: 'Related Hackathons',
+      description: 'Hackathons that this episode is associated with',
+      of: [defineArrayMember({type: 'reference', to: [{type: 'hackathon'}]})],
+      group: 'details',
+    }),
+    defineField({
       name: 'resources',
       type: 'array',
       title: 'Resources & Links',

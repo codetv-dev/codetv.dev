@@ -24,14 +24,19 @@ export default defineConfig({
       structure: (S) => {
         return S.list()
           .title('Content')
-          .items(
-            S.documentTypeListItems().filter(
+          .items([
+            ...S.documentTypeListItems().filter(
               (li) =>
                 !['Episode', 'Collection', 'Episode Tag', 'Video asset'].includes(
                   li.getTitle() ?? '',
                 ),
             ),
-          )
+            S.divider(),
+            S.listItem()
+              .title('Episodes')
+              .schemaType('episode')
+              .child(S.documentTypeList('episode').title('Episodes')),
+          ])
       },
     }),
   ],
