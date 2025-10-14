@@ -1,5 +1,5 @@
-import {defineField, defineType} from 'sanity'
-import {RocketIcon} from '@sanity/icons'
+import {defineArrayMember, defineField, defineType} from 'sanity'
+import {RocketIcon, PlayIcon} from '@sanity/icons'
 
 export const hackathon = defineType({
   name: 'hackathon',
@@ -54,12 +54,28 @@ export const hackathon = defineType({
       group: 'content',
     }),
     defineField({
+      name: 'episodes',
+      type: 'array',
+      title: 'Related Episodes',
+      description: 'Episodes associated with this hackathon',
+      of: [
+        defineArrayMember({
+          type: 'reference',
+          to: [{type: 'episode'}],
+          options: {
+            disableNew: true,
+          },
+        }),
+      ],
+      group: 'content',
+    }),
+    defineField({
       name: 'share_image',
       type: 'cloudinary.asset',
       title: 'Share Image',
       description: 'Image for social media sharing',
       options: {hotspot: true},
-      // validation: (Rule) => Rule.required().error('Share image is required for social media'),
+      validation: (Rule) => Rule.required().error('Share image is required for social media'),
       group: 'seo',
     }),
     defineField({
