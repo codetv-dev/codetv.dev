@@ -201,6 +201,9 @@ https://codetv-links.netlify.app/*		https://codetv.dev/:splat					301!
 /book										https://calendly.com/codetv/livestream
 /30min									https://calendly.com/codetv/30min
 
+# DevSquares
+/ds										https://devsquares.codetv.dev/webu/
+
 # this link goes to the active or next-scheduled live stream
 /live										https://youtube.com/@codetv-dev/live
 
