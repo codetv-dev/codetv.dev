@@ -13,6 +13,19 @@
  */
 
 // Source: schema.json
+export type ResourceItem = {
+	_type: 'resourceItem';
+	title?: string;
+	description?: string;
+	url?: string;
+};
+
+export type RuleItem = {
+	_type: 'ruleItem';
+	title?: string;
+	description?: string;
+};
+
 export type RewardItem = {
 	_type: 'rewardItem';
 	title?: string;
@@ -130,6 +143,16 @@ export type Hackathon = {
 		_weak?: boolean;
 		[internalGroqTypeReferenceTo]?: 'faq';
 	};
+	rules?: Array<
+		{
+			_key: string;
+		} & RuleItem
+	>;
+	resources?: Array<
+		{
+			_key: string;
+		} & ResourceItem
+	>;
 	share_image?: CloudinaryAsset;
 	hidden?: 'visible' | 'hidden';
 	featured?: 'normal' | 'featured';
@@ -528,6 +551,8 @@ export type SanityAssetSourceData = {
 };
 
 export type AllSanitySchemaTypes =
+	| ResourceItem
+	| RuleItem
 	| RewardItem
 	| FaqItem
 	| EpisodeImage

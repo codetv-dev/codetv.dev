@@ -9,6 +9,8 @@ import {episodeTag} from './documents/tags'
 import {episodeImage} from './objects/episode-image'
 import faqItem from './objects/faq-item'
 import rewardItem from './objects/reward-item'
+import ruleItem from './objects/rule-item'
+import resourceItem from './objects/resource-item'
 
 function slugify(str: string) {
   return String(str)
@@ -271,4 +273,6 @@ export const schemaTypes = [
   episodeImage,
   faqItem,
   rewardItem,
+  ruleItem,
+  resourceItem,
 ]

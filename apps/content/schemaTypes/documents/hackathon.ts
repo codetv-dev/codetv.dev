@@ -117,6 +117,28 @@ export const hackathon = defineType({
       group: 'content',
     }),
     defineField({
+      name: 'rules',
+      type: 'array',
+      title: 'Rules',
+      description: 'Hackathon rules and guidelines',
+      of: [{type: 'ruleItem'}],
+      options: {
+        sortable: true,
+      },
+      group: 'content',
+    }),
+    defineField({
+      name: 'resources',
+      type: 'array',
+      title: 'Resources',
+      description: 'Helpful resources for hackathon participants',
+      of: [{type: 'resourceItem'}],
+      options: {
+        sortable: true,
+      },
+      group: 'content',
+    }),
+    defineField({
       name: 'share_image',
       type: 'cloudinary.asset',
       title: 'Share Image',
