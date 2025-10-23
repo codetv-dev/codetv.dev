@@ -512,6 +512,7 @@ const hackathonBySlugQuery = groq`
     'slug': slug.current,
     description,
     body,
+    submissionForm,
     'episode': episodes[0]-> {
       title,
       'slug': slug.current,

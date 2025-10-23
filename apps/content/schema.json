@@ -601,6 +601,13 @@
         },
         "optional": true
       },
+      "submissionForm": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        },
+        "optional": true
+      },
       "rewards": {
         "type": "objectAttribute",
         "value": {

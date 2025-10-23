@@ -81,6 +81,17 @@ export const hackathon = defineType({
       group: 'content',
     }),
     defineField({
+      name: 'submissionForm',
+      type: 'url',
+      title: 'Submission Form',
+      description: 'URL to the submission form for this hackathon',
+      validation: (Rule) =>
+        Rule.required()
+          .uri({scheme: ['http', 'https']})
+          .error('Submission form must be a valid URL'),
+      group: 'content',
+    }),
+    defineField({
       name: 'rewards',
       type: 'reference',
       title: 'Rewards',
