@@ -40,6 +40,17 @@ export const hackathon = defineType({
       group: 'content',
     }),
     defineField({
+      name: 'deadline',
+      type: 'datetime',
+      title: 'Deadline',
+      description: 'When this hackathon submission deadline is',
+      options: {
+        timeStep: 30,
+      },
+      validation: (Rule) => Rule.required().error('Deadline is required'),
+      group: 'content',
+    }),
+    defineField({
       name: 'description',
       type: 'text',
       description: 'Brief overview for previews and SEO',
