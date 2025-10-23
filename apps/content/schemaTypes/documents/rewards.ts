@@ -1,24 +1,24 @@
 import {defineField, defineType} from 'sanity'
-import { BookIcon } from '@sanity/icons'
+import {StarIcon} from '@sanity/icons'
 
-export const faq = defineType({
-  name: 'faq',
+export const rewards = defineType({
+  name: 'rewards',
   type: 'document',
-  title: 'FAQ',
-  icon: BookIcon,
+  title: 'Rewards',
+  icon: StarIcon,
   fields: [
     defineField({
       name: 'name',
       type: 'string',
       title: 'Name',
-      description: 'Internal name for this FAQ collection',
+      description: 'Internal name for this rewards collection',
       validation: (Rule) => Rule.required().error('Name is required'),
     }),
     defineField({
       name: 'slug',
       type: 'slug',
       title: 'Slug',
-      description: 'URL-friendly identifier for this FAQ',
+      description: 'URL-friendly identifier for this rewards collection',
       options: {
         source: 'name',
         maxLength: 96,
@@ -27,10 +27,10 @@ export const faq = defineType({
     }),
     defineField({
       name: 'items',
-      title: 'FAQ Items',
+      title: 'Reward Items',
       type: 'array',
-      description: 'Frequently Asked Questions (auto-generated or manually added for SEO)',
-      of: [{type: 'faqItem'}],
+      description: 'Individual rewards in this collection',
+      of: [{type: 'rewardItem'}],
       options: {
         sortable: true,
       },
@@ -44,7 +44,7 @@ export const faq = defineType({
     prepare({title, items}) {
       const itemCount = items?.length || 0
       return {
-        title: title || 'Untitled FAQ',
+        title: title || 'Untitled Rewards',
         subtitle: `${itemCount} items`,
       }
     },

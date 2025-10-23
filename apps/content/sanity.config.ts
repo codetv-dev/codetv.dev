@@ -27,7 +27,7 @@ export default defineConfig({
           .items([
             ...S.documentTypeListItems().filter(
               (li) =>
-                !['Episode', 'Collection', 'Episode Tag', 'Video asset'].includes(
+                !['Episode', 'Collection', 'Episode Tag', 'Video asset', 'Rewards', 'FAQ'].includes(
                   li.getTitle() ?? '',
                 ),
             ),
@@ -40,6 +40,10 @@ export default defineConfig({
               .title('FAQs')
               .schemaType('faq')
               .child(S.documentTypeList('faq').title('FAQs')),
+            S.listItem()
+              .title('Rewards')
+              .schemaType('rewards')
+              .child(S.documentTypeList('rewards').title('Rewards')),
           ])
       },
     }),
