@@ -1,32 +1,35 @@
 ---
 // TODO: should this be a field in the CMS to make it easier to announce things?
-
-// disable for now
-return null;
 ---
 
-<aside>
+<aside class="eyebrow">
 	<p>
-		<strong>Heads up!</strong>
-		This site is in beta and may have issues. Please report bugs, missing functionality,
-		etc.
-		<a href="https://github.com/codetv-dev/codetv.dev/issues"> on GitHub </a>
+		<strong>Join the challenge:</strong>
+		build an app that uses something other than a keyboard and mouse to control it!
+		<a href="https://nokeyboardsallowed.dev/">Get details&nbsp;&rarr;</a>
 	</p>
 </aside>
 
 <style>
 	aside {
-		backdrop-filter: blur(2rem) saturate(120%);
-		-webkit-backdrop-filter: blur(2rem) saturate(120%);
-		background: color-mix(in oklch, var(--yellow-500) 60%, transparent);
+		background: var(--yellow-500);
 		border-block-end: 0.5px solid var(--text-muted);
-		color: var(--text-strong);
-		font-size: 0.75rem;
+		color: var(--black);
+		font-size: 0.625rem;
 		inset-block-start: 0;
 		inset-inline: 0;
-		padding: 0.5rem max((100dvi - 1080px) / 2, 5dvi);
-		position: sticky;
+		padding: 8px max((100dvi - var(--max-width)) / 2, 5dvi);
+		position: fixed;
 		text-align: center;
+		z-index: 1000;
+
+		@media (min-width: 480px) {
+			font-size: 0.75rem;
+		}
+
+		strong {
+			color: inherit;
+		}
 
 		a {
 			color: inherit;

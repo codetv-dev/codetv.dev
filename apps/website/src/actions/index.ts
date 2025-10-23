@@ -2,6 +2,7 @@ import { defineAction } from 'astro:actions';
 import { z } from 'astro:content';
 import { inngest } from '@codetv/inngest';
 import { addSubscriber } from '@codetv/kit';
+import { getPersonById } from '@codetv/sanity';
 
 export const server = {
 	user: {
@@ -79,7 +80,7 @@ export const server = {
 	forms: {
 		wdc: defineAction({
 			accept: 'form',
-			handler: async (formData) => {
+			handler: async (formData, context) => {
 				const linkLabels = formData.getAll('link_label[]');
 				const linkUrls = formData.getAll('link_url[]');
 				const links = linkUrls
@@ -110,6 +111,22 @@ export const server = {
 					id: formData.get('id'),
 					username: formData.get('username'),
 				};
+
+				// if someone created a new account, the Sanity ID might not exist
+				// in time to populate the form, so grab it here
+				if (!rawInput.id) {
+					const user = await context.locals.currentUser();
+					const userDetails = await getPersonById(
+						{ user_id: user?.id ?? '' },
+						{ useCdn: false },
+					);
+
+					if (!userDetails?._id) {
+						throw new Error(`missing Sanity ID for ${rawInput.signature}`);
+					}
+
+					rawInput.id = userDetails._id;
+				}
 
 				const InputSchema = z.object({
 					signature: z.string(),
