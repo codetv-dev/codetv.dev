@@ -36,6 +36,10 @@ export default defineConfig({
               .title('Episodes')
               .schemaType('episode')
               .child(S.documentTypeList('episode').title('Episodes')),
+            S.listItem()
+              .title('FAQs')
+              .schemaType('faq')
+              .child(S.documentTypeList('faq').title('FAQs')),
           ])
       },
     }),

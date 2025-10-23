@@ -3,8 +3,10 @@ import {PlayIcon, UserIcon, TagIcon, ImageIcon, FolderIcon, StarIcon} from '@san
 import {person} from './documents/person'
 import {episode} from './documents/episode'
 import {hackathon} from './documents/hackathon'
+import {faq} from './documents/faq'
 import {episodeTag} from './documents/tags'
 import {episodeImage} from './objects/episode-image'
+import faqItem from './objects/faq-item'
 
 function slugify(str: string) {
   return String(str)
@@ -259,8 +261,10 @@ export const schemaTypes = [
   collection,
   episode,
   hackathon,
+  faq,
   person,
   sponsor,
   episodeTag,
   episodeImage,
+  faqItem,
 ]
