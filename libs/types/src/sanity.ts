@@ -110,6 +110,7 @@ export type Hackathon = {
 	title?: string;
 	slug?: Slug;
 	pubDate?: string;
+	deadline?: string;
 	description?: string;
 	body?: string;
 	episodes?: Array<{
@@ -1070,38 +1071,50 @@ export type AllHackathonsQueryResult = Array<{
 	hidden: 'hidden' | 'visible' | null;
 }>;
 // Variable: hackathonBySlugQuery
-// Query: *[_type == "hackathon" && slug.current == $slug][0] {    _id,    title,    'slug': slug.current,    pubDate,    description,    body,    episodes[]-> {      _id,      title,      'slug': slug.current,      short_description,      publish_date,      'thumbnail': {        'public_id': video.thumbnail.public_id,        'width': video.thumbnail.width,        'height': video.thumbnail.height,        'alt': video.thumbnail_alt,      },      video {        youtube_id,        mux_video,      },      'collection': *[_type=="collection" && references(^._id)][0] {        'slug': slug.current,        title,      },      'series': *[_type=="collection" && references(^._id)][0].series->{        'slug': slug.current,        title,      },    },    share_image {      public_id,      width,      height,    },    featured,    hidden  }
+// Query: *[_type == "hackathon" && slug.current == $slug][0] {    _id,    title,    'slug': slug.current,    description,    body,    'episode': episodes[0]-> {      title,      'slug': slug.current,      'thumbnail': {        'public_id': video.thumbnail.public_id,        'width': video.thumbnail.width,        'height': video.thumbnail.height,        'alt': video.thumbnail_alt,      },    },    'rewardsData': rewards-> {      name,      items[] {        title,        description,        image {          public_id,          width,          height,        }      }    },    'faqData': faq-> {      name,      items[] {        question,        answer,      }    },    rules[] {      title,      description,    },    resources[] {      title,      description,      url,    },    share_image {      public_id,      width,      height,    },    featured,    hidden  }
 export type HackathonBySlugQueryResult = {
 	_id: string;
 	title: string | null;
 	slug: string | null;
-	pubDate: string | null;
 	description: string | null;
 	body: string | null;
-	episodes: Array<{
-		_id: string;
+	episode: {
 		title: string | null;
 		slug: string | null;
-		short_description: string | null;
-		publish_date: string | null;
 		thumbnail: {
 			public_id: string | null;
 			width: number | null;
 			height: number | null;
 			alt: string | null;
 		};
-		video: {
-			youtube_id: string | null;
-			mux_video: MuxVideo | null;
-		} | null;
-		collection: {
-			slug: string | null;
+	} | null;
+	rewardsData: {
+		name: string | null;
+		items: Array<{
 			title: string | null;
-		} | null;
-		series: {
-			slug: string | null;
-			title: string | null;
-		} | null;
+			description: string | null;
+			image: {
+				public_id: string | null;
+				width: number | null;
+				height: number | null;
+			} | null;
+		}> | null;
+	} | null;
+	faqData: {
+		name: string | null;
+		items: Array<{
+			question: string | null;
+			answer: string | null;
+		}> | null;
+	} | null;
+	rules: Array<{
+		title: string | null;
+		description: string | null;
+	}> | null;
+	resources: Array<{
+		title: string | null;
+		description: string | null;
+		url: string | null;
 	}> | null;
 	share_image: {
 		public_id: string | null;
@@ -1131,6 +1144,6 @@ declare module '@sanity/client' {
 		'\n  *[_type == "person" && user_id == $user_id][0] {\n    _id,\n    name,\n    slug,\n    user_id,\n  }\n': PersonByClerkIdQueryResult;
 		'\n  *[_type == "person" && subscription.status == "active"] | order(subscription.date asc) {\n    _id,\n    name,\n    photo {\n      public_id,\n      height,\n      width,\n    },\n    \'username\': slug.current,\n    subscription {\n      level,\n      status\n    }\n  }\n': SupportersQueryResult;
 		"\n  *[_type == \"hackathon\" && hidden != \"hidden\"] | order(pubDate desc) {\n    _id,\n    title,\n    'slug': slug.current,\n    pubDate,\n    description,\n    body,\n    episodes[]-> {\n      _id,\n      title,\n      'slug': slug.current,\n      short_description,\n      publish_date,\n      'thumbnail': {\n        'public_id': video.thumbnail.public_id,\n        'width': video.thumbnail.width,\n        'height': video.thumbnail.height,\n        'alt': video.thumbnail_alt,\n      }\n    },\n    share_image {\n      public_id,\n      width,\n      height,\n    },\n    featured,\n    hidden\n  }\n": AllHackathonsQueryResult;
-		"\n  *[_type == \"hackathon\" && slug.current == $slug][0] {\n    _id,\n    title,\n    'slug': slug.current,\n    pubDate,\n    description,\n    body,\n    episodes[]-> {\n      _id,\n      title,\n      'slug': slug.current,\n      short_description,\n      publish_date,\n      'thumbnail': {\n        'public_id': video.thumbnail.public_id,\n        'width': video.thumbnail.width,\n        'height': video.thumbnail.height,\n        'alt': video.thumbnail_alt,\n      },\n      video {\n        youtube_id,\n        mux_video,\n      },\n      'collection': *[_type==\"collection\" && references(^._id)][0] {\n        'slug': slug.current,\n        title,\n      },\n      'series': *[_type==\"collection\" && references(^._id)][0].series->{\n        'slug': slug.current,\n        title,\n      },\n    },\n    share_image {\n      public_id,\n      width,\n      height,\n    },\n    featured,\n    hidden\n  }\n": HackathonBySlugQueryResult;
+		"\n  *[_type == \"hackathon\" && slug.current == $slug][0] {\n    _id,\n    title,\n    'slug': slug.current,\n    description,\n    body,\n    'episode': episodes[0]-> {\n      title,\n      'slug': slug.current,\n      'thumbnail': {\n        'public_id': video.thumbnail.public_id,\n        'width': video.thumbnail.width,\n        'height': video.thumbnail.height,\n        'alt': video.thumbnail_alt,\n      },\n    },\n    'rewardsData': rewards-> {\n      name,\n      items[] {\n        title,\n        description,\n        image {\n          public_id,\n          width,\n          height,\n        }\n      }\n    },\n    'faqData': faq-> {\n      name,\n      items[] {\n        question,\n        answer,\n      }\n    },\n    rules[] {\n      title,\n      description,\n    },\n    resources[] {\n      title,\n      description,\n      url,\n    },\n    share_image {\n      public_id,\n      width,\n      height,\n    },\n    featured,\n    hidden\n  }\n": HackathonBySlugQueryResult;
 	}
 }

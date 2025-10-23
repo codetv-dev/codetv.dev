@@ -510,33 +510,45 @@ const hackathonBySlugQuery = groq`
     _id,
     title,
     'slug': slug.current,
-    pubDate,
     description,
     body,
-    episodes[]-> {
-      _id,
+    'episode': episodes[0]-> {
       title,
       'slug': slug.current,
-      short_description,
-      publish_date,
       'thumbnail': {
         'public_id': video.thumbnail.public_id,
         'width': video.thumbnail.width,
         'height': video.thumbnail.height,
         'alt': video.thumbnail_alt,
       },
-      video {
-        youtube_id,
-        mux_video,
-      },
-      'collection': *[_type=="collection" && references(^._id)][0] {
-        'slug': slug.current,
+    },
+    'rewardsData': rewards-> {
+      name,
+      items[] {
         title,
-      },
-      'series': *[_type=="collection" && references(^._id)][0].series->{
-        'slug': slug.current,
-        title,
-      },
+        description,
+        image {
+          public_id,
+          width,
+          height,
+        }
+      }
+    },
+    'faqData': faq-> {
+      name,
+      items[] {
+        question,
+        answer,
+      }
+    },
+    rules[] {
+      title,
+      description,
+    },
+    resources[] {
+      title,
+      description,
+      url,
     },
     share_image {
       public_id,
