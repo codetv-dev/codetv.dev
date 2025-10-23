@@ -100,36 +100,6 @@ export type Person = {
 	user_id?: string;
 };
 
-export type Rewards = {
-	_id: string;
-	_type: 'rewards';
-	_createdAt: string;
-	_updatedAt: string;
-	_rev: string;
-	name?: string;
-	slug?: Slug;
-	items?: Array<
-		{
-			_key: string;
-		} & RewardItem
-	>;
-};
-
-export type Faq = {
-	_id: string;
-	_type: 'faq';
-	_createdAt: string;
-	_updatedAt: string;
-	_rev: string;
-	name?: string;
-	slug?: Slug;
-	items?: Array<
-		{
-			_key: string;
-		} & FaqItem
-	>;
-};
-
 export type Hackathon = {
 	_id: string;
 	_type: 'hackathon';
@@ -148,9 +118,51 @@ export type Hackathon = {
 		_key: string;
 		[internalGroqTypeReferenceTo]?: 'episode';
 	}>;
+	rewards?: {
+		_ref: string;
+		_type: 'reference';
+		_weak?: boolean;
+		[internalGroqTypeReferenceTo]?: 'rewards';
+	};
+	faq?: {
+		_ref: string;
+		_type: 'reference';
+		_weak?: boolean;
+		[internalGroqTypeReferenceTo]?: 'faq';
+	};
 	share_image?: CloudinaryAsset;
 	hidden?: 'visible' | 'hidden';
 	featured?: 'normal' | 'featured';
+};
+
+export type Faq = {
+	_id: string;
+	_type: 'faq';
+	_createdAt: string;
+	_updatedAt: string;
+	_rev: string;
+	name?: string;
+	slug?: Slug;
+	items?: Array<
+		{
+			_key: string;
+		} & FaqItem
+	>;
+};
+
+export type Rewards = {
+	_id: string;
+	_type: 'rewards';
+	_createdAt: string;
+	_updatedAt: string;
+	_rev: string;
+	name?: string;
+	slug?: Slug;
+	items?: Array<
+		{
+			_key: string;
+		} & RewardItem
+	>;
 };
 
 export type Episode = {
@@ -522,9 +534,9 @@ export type AllSanitySchemaTypes =
 	| EpisodeTag
 	| Sponsor
 	| Person
-	| Rewards
-	| Faq
 	| Hackathon
+	| Faq
+	| Rewards
 	| Episode
 	| Collection
 	| Series

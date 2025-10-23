@@ -70,6 +70,53 @@ export const hackathon = defineType({
       group: 'content',
     }),
     defineField({
+      name: 'rewards',
+      type: 'reference',
+      title: 'Rewards',
+      description: 'Rewards collection for this hackathon',
+      to: [{type: 'rewards'}],
+      options: {
+        disableNew: true,
+        filter: '_type == "rewards"',
+      },
+      initialValue: async (_props: any, {getClient}: any) => {
+        const client = getClient({apiVersion: '2024-01-01'})
+        const rewardsId = await client.fetch(
+          '*[_type == "rewards" && slug.current == $slug][0]._id',
+          {
+            slug: 'hackathon-rewards',
+          },
+        )
+        if (rewardsId) {
+          return {_ref: rewardsId}
+        }
+        return {_ref: ''}
+      },
+      group: 'content',
+    }),
+    defineField({
+      name: 'faq',
+      type: 'reference',
+      title: 'FAQ',
+      description: 'FAQ collection for this hackathon',
+      to: [{type: 'faq'}],
+      options: {
+        disableNew: true,
+        filter: '_type == "faq"',
+      },
+      initialValue: async (_props: any, {getClient}: any) => {
+        const client = getClient({apiVersion: '2024-01-01'})
+        const faqId = await client.fetch('*[_type == "faq" && slug.current == $slug][0]._id', {
+          slug: 'hackathon-faq',
+        })
+        if (faqId) {
+          return {_ref: faqId}
+        }
+        return {_ref: ''}
+      },
+      group: 'content',
+    }),
+    defineField({
       name: 'share_image',
       type: 'cloudinary.asset',
       title: 'Share Image',
