@@ -65,18 +65,6 @@ export type EpisodeTag = {
 	description?: string;
 };
 
-export type Sponsor = {
-	_id: string;
-	_type: 'sponsor';
-	_createdAt: string;
-	_updatedAt: string;
-	_rev: string;
-	title?: string;
-	slug?: Slug;
-	logo?: CloudinaryAsset;
-	link?: string;
-};
-
 export type Person = {
 	_id: string;
 	_type: 'person';
@@ -143,6 +131,12 @@ export type Hackathon = {
 		_weak?: boolean;
 		[internalGroqTypeReferenceTo]?: 'faq';
 	};
+	sponsors?: {
+		_ref: string;
+		_type: 'reference';
+		_weak?: boolean;
+		[internalGroqTypeReferenceTo]?: 'sponsor';
+	};
 	rules?: Array<
 		{
 			_key: string;
@@ -156,6 +150,18 @@ export type Hackathon = {
 	share_image?: CloudinaryAsset;
 	hidden?: 'visible' | 'hidden';
 	featured?: 'normal' | 'featured';
+};
+
+export type Sponsor = {
+	_id: string;
+	_type: 'sponsor';
+	_createdAt: string;
+	_updatedAt: string;
+	_rev: string;
+	title?: string;
+	slug?: Slug;
+	logo?: CloudinaryAsset;
+	link?: string;
 };
 
 export type Faq = {
@@ -557,9 +563,9 @@ export type AllSanitySchemaTypes =
 	| FaqItem
 	| EpisodeImage
 	| EpisodeTag
-	| Sponsor
 	| Person
 	| Hackathon
+	| Sponsor
 	| Faq
 	| Rewards
 	| Episode
