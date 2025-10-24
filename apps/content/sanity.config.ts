@@ -27,15 +27,22 @@ export default defineConfig({
           .items([
             ...S.documentTypeListItems().filter(
               (li) =>
-                !['Episode', 'Collection', 'Episode Tag', 'Video asset', 'Rewards', 'FAQ'].includes(
-                  li.getTitle() ?? '',
-                ),
+                ![
+                  'Episode',
+                  'Collection',
+                  'Episode Tag',
+                  'Video asset',
+                  'Rewards',
+                  'FAQ',
+                  'Rules',
+                  'Hackathon',
+                ].includes(li.getTitle() ?? ''),
             ),
             S.divider(),
             S.listItem()
-              .title('Episodes')
-              .schemaType('episode')
-              .child(S.documentTypeList('episode').title('Episodes')),
+              .title('Hackathons')
+              .schemaType('hackathon')
+              .child(S.documentTypeList('hackathon').title('Hackathons')),
             S.listItem()
               .title('FAQs')
               .schemaType('faq')
@@ -44,6 +51,15 @@ export default defineConfig({
               .title('Rewards')
               .schemaType('rewards')
               .child(S.documentTypeList('rewards').title('Rewards')),
+            S.listItem()
+              .title('Rules')
+              .schemaType('rules')
+              .child(S.documentTypeList('rules').title('Rules')),
+            S.divider(),
+            S.listItem()
+              .title('Episodes')
+              .schemaType('episode')
+              .child(S.documentTypeList('episode').title('Episodes')),
           ])
       },
     }),
