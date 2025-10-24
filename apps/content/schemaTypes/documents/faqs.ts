@@ -20,6 +20,14 @@ export const faq = defineType({
       validation: (Rule) => Rule.required().min(20).max(1000),
     }),
     defineField({
+      name: 'weight',
+      title: 'Weight',
+      type: 'number',
+      description: 'Used to determine the order of FAQs (lower numbers appear first)',
+      validation: (Rule) => Rule.required().integer().min(0),
+      initialValue: 0,
+    }),
+    defineField({
       name: 'setAsDefault',
       title: 'Set as Default',
       type: 'boolean',
@@ -31,11 +39,13 @@ export const faq = defineType({
     select: {
       title: 'question',
       subtitle: 'answer',
+      defaultSetting: 'setAsDefault',
     },
     prepare(selection) {
-      const {title, subtitle} = selection
+      const {title, subtitle, defaultSetting} = selection
+      const defaultStatus = defaultSetting ? '(Default)' : ''
       return {
-        title,
+        title: `${defaultStatus} ${title}`,
         subtitle: subtitle ? `${subtitle.substring(0, 60)}...` : '',
       }
     },

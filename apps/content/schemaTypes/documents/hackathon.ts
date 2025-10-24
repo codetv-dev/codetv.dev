@@ -93,48 +93,55 @@ export const hackathon = defineType({
     }),
     defineField({
       name: 'rewards',
-      type: 'reference',
+      type: 'array',
       title: 'Rewards',
       description: 'Rewards collection for this hackathon',
-      to: [{type: 'rewards'}],
-      options: {
-        disableNew: true,
-        filter: '_type == "rewards"',
-      },
+      of: [
+        defineArrayMember({
+          type: 'reference',
+          to: [{type: 'rewards'}],
+          options: {
+            disableNew: true,
+          },
+        }),
+      ],
       initialValue: async (_props: any, {getClient}: any) => {
         const client = getClient({apiVersion: '2024-01-01'})
-        const rewardsId = await client.fetch(
-          '*[_type == "rewards" && slug.current == $slug][0]._id',
-          {
-            slug: 'hackathon-rewards',
-          },
+        const defaultRewards = await client.fetch(
+          '*[_type == "rewards" && setAsDefault == true] | order(weight asc) { _id }',
         )
-        if (rewardsId) {
-          return {_ref: rewardsId}
-        }
-        return {_ref: ''}
+        return defaultRewards.map((reward: {_id: string}) => ({
+          _type: 'reference',
+          _ref: reward._id,
+          _key: reward._id,
+        }))
       },
       group: 'content',
     }),
     defineField({
       name: 'faq',
-      type: 'reference',
+      type: 'array',
       title: 'FAQ',
       description: 'FAQ collection for this hackathon',
-      to: [{type: 'faq'}],
-      options: {
-        disableNew: true,
-        filter: '_type == "faq"',
-      },
+      of: [
+        defineArrayMember({
+          type: 'reference',
+          to: [{type: 'faq'}],
+          options: {
+            disableNew: true,
+          },
+        }),
+      ],
       initialValue: async (_props: any, {getClient}: any) => {
         const client = getClient({apiVersion: '2024-01-01'})
-        const faqId = await client.fetch('*[_type == "faq" && slug.current == $slug][0]._id', {
-          slug: 'hackathon-faq',
-        })
-        if (faqId) {
-          return {_ref: faqId}
-        }
-        return {_ref: ''}
+        const defaultFaqs = await client.fetch(
+          '*[_type == "faq" && setAsDefault == true] | order(weight asc) { _id }',
+        )
+        return defaultFaqs.map((faq: {_id: string}) => ({
+          _type: 'reference',
+          _ref: faq._id,
+          _key: faq._id,
+        }))
       },
       group: 'content',
     }),
@@ -152,13 +159,28 @@ export const hackathon = defineType({
     }),
     defineField({
       name: 'rules',
-      type: 'reference',
+      type: 'array',
       title: 'Rules',
       description: 'Rules collection for this hackathon',
-      to: [{type: 'rules'}],
-      options: {
-        disableNew: true,
-        filter: '_type == "rules"',
+      of: [
+        defineArrayMember({
+          type: 'reference',
+          to: [{type: 'rules'}],
+          options: {
+            disableNew: true,
+          },
+        }),
+      ],
+      initialValue: async (_props: any, {getClient}: any) => {
+        const client = getClient({apiVersion: '2024-01-01'})
+        const defaultRules = await client.fetch(
+          '*[_type == "rules" && setAsDefault == true] | order(weight asc) { _id }',
+        )
+        return defaultRules.map((rule: {_id: string}) => ({
+          _type: 'reference',
+          _ref: rule._id,
+          _key: rule._id,
+        }))
       },
       group: 'content',
     }),
