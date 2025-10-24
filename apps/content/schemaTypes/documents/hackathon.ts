@@ -152,12 +152,13 @@ export const hackathon = defineType({
     }),
     defineField({
       name: 'rules',
-      type: 'array',
+      type: 'reference',
       title: 'Rules',
-      description: 'Hackathon rules and guidelines',
-      of: [{type: 'ruleItem'}],
+      description: 'Rules collection for this hackathon',
+      to: [{type: 'rules'}],
       options: {
-        sortable: true,
+        disableNew: true,
+        filter: '_type == "rules"',
       },
       group: 'content',
     }),

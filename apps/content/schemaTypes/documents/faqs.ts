@@ -1,9 +1,11 @@
+import {HelpCircleIcon} from '@sanity/icons'
 import {defineField, defineType} from 'sanity'
 
-export default defineType({
-  name: 'faqItem',
-  title: 'FAQ Item',
-  type: 'object',
+export const faq = defineType({
+  name: 'faq',
+  title: 'FAQ',
+  type: 'document',
+  icon: HelpCircleIcon,
   fields: [
     defineField({
       name: 'question',
@@ -16,6 +18,13 @@ export default defineType({
       title: 'Answer',
       type: 'text',
       validation: (Rule) => Rule.required().min(20).max(1000),
+    }),
+    defineField({
+      name: 'setAsDefault',
+      title: 'Set as Default',
+      type: 'boolean',
+      description: 'Check this to use this FAQ as a default for all new hackathons created',
+      initialValue: false,
     }),
   ],
   preview: {

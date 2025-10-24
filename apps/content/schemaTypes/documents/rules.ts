@@ -1,9 +1,11 @@
+import {ListIcon} from '@sanity/icons'
 import {defineField, defineType} from 'sanity'
 
-export default defineType({
-  name: 'ruleItem',
-  title: 'Rule Item',
-  type: 'object',
+export const rules = defineType({
+  name: 'rules',
+  title: 'Rules',
+  type: 'document',
+  icon: ListIcon,
   fields: [
     defineField({
       name: 'title',
@@ -16,6 +18,13 @@ export default defineType({
       title: 'Description',
       type: 'text',
       validation: (Rule) => Rule.required().min(10).max(500),
+    }),
+    defineField({
+      name: 'setAsDefault',
+      title: 'Set as Default',
+      type: 'boolean',
+      description: 'Check this to use this rule as a default for all new hackathons created',
+      initialValue: false,
     }),
   ],
   preview: {

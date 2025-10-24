@@ -3,49 +3,48 @@ import {StarIcon} from '@sanity/icons'
 
 export const rewards = defineType({
   name: 'rewards',
-  type: 'document',
   title: 'Rewards',
+  type: 'document',
   icon: StarIcon,
   fields: [
     defineField({
-      name: 'name',
+      name: 'title',
+      title: 'Title',
       type: 'string',
-      title: 'Name',
-      description: 'Internal name for this rewards collection',
-      validation: (Rule) => Rule.required().error('Name is required'),
+      validation: (Rule) => Rule.required().min(3).max(100),
     }),
     defineField({
-      name: 'slug',
-      type: 'slug',
-      title: 'Slug',
-      description: 'URL-friendly identifier for this rewards collection',
-      options: {
-        source: 'name',
-        maxLength: 96,
-      },
-      validation: (Rule) => Rule.required().error('Slug is required for URL generation'),
+      name: 'description',
+      title: 'Description',
+      type: 'text',
+      validation: (Rule) => Rule.required().min(10).max(500),
     }),
     defineField({
-      name: 'items',
-      title: 'Reward Items',
-      type: 'array',
-      description: 'Individual rewards in this collection',
-      of: [{type: 'rewardItem'}],
-      options: {
-        sortable: true,
-      },
+      name: 'image',
+      title: 'Image',
+      type: 'cloudinary.asset',
+      options: {hotspot: true},
+      validation: (Rule) => Rule.required().error('Image is required'),
+    }),
+    defineField({
+      name: 'setAsDefault',
+      title: 'Set as Default',
+      type: 'boolean',
+      description: 'Check this to use this reward as a default for all new hackathons created',
+      initialValue: false,
     }),
   ],
   preview: {
     select: {
-      title: 'name',
-      items: 'items',
+      title: 'title',
+      subtitle: 'description',
+      media: 'image',
     },
-    prepare({title, items}) {
-      const itemCount = items?.length || 0
+    prepare(selection) {
+      const {title, subtitle} = selection
       return {
-        title: title || 'Untitled Rewards',
-        subtitle: `${itemCount} items`,
+        title,
+        subtitle: subtitle ? `${subtitle.substring(0, 60)}...` : '',
       }
     },
   },
