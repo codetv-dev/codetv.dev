@@ -218,19 +218,6 @@ export const hackathon = defineType({
       initialValue: 'visible',
       group: 'seo',
     }),
-    defineField({
-      name: 'featured',
-      type: 'string',
-      options: {
-        list: [
-          {title: 'Normal', value: 'normal'},
-          {title: 'Featured', value: 'featured'},
-        ],
-        layout: 'radio',
-      },
-      initialValue: 'normal',
-      group: 'seo',
-    }),
   ],
   preview: {
     select: {
