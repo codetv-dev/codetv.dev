@@ -136,7 +136,7 @@ if (result && !result.error) {
 							</div>
 						</section>
 
-						<section class="form-section hidden" data-role="developer advisor">
+						<section class="form-section hidden"  data-role="developer advisor">
 							<div class="section-header">
 								<h2>Contact Information</h2>
 
@@ -198,7 +198,7 @@ if (result && !result.error) {
 							</div>
 						</section>
 
-						<section class="form-section hidden" data-role="developer advisor">
+						<section class="form-section hidden"  data-role="developer advisor">
 							<div class="section-header">
 								<h2>Bio and links for publishing</h2>
 
@@ -287,7 +287,7 @@ if (result && !result.error) {
 							</div>
 						</section>
 
-						<section class="form-section hidden" data-role="developer advisor">
+						<section class="form-section hidden"  data-role="developer advisor">
 							<div class="section-header">
 								<h2>Food Preferences</h2>
 								<p>
@@ -359,7 +359,7 @@ if (result && !result.error) {
 							</div>
 						</section>
 
-						<section class="form-section hidden" data-role="developer advisor">
+						<section class="form-section hidden"  data-role="developer advisor">
 							<button type="submit" class="button">Submit</button>
 
 							<input type="hidden" name="id" value={userDetails._id} />
@@ -371,10 +371,7 @@ if (result && !result.error) {
 		</SignedIn>
 
 		<SignedOut>
-			<SignIn
-				signUpForceRedirectUrl={Astro.url.toString()}
-				forceRedirectUrl={Astro.url.toString()}
-			/>
+			<SignIn fallbackRedirectUrl={Astro.url.toString()} />
 		</SignedOut>
 	</main>
 </Layout>
@@ -483,9 +480,7 @@ if (result && !result.error) {
 	import { z } from 'astro/zod';
 
 	// the form changes a little bit for devs vs. advisors
-	const Role = z
-		.union([z.literal('developer'), z.literal('advisor')])
-		.optional();
+	const Role = z.union([z.literal('developer'), z.literal('advisor')]).optional();
 	let role: z.infer<typeof Role>;
 
 	const roleSelector = document.querySelector('#role') as HTMLSelectElement;
@@ -502,9 +497,7 @@ if (result && !result.error) {
 		});
 
 		if (role === 'developer') {
-			document
-				.querySelector('#reimbursement')
-				?.setAttribute('required', 'required');
+			document.querySelector('#reimbursement')?.setAttribute('required', 'required');
 		} else {
 			document.querySelector('#reimbursement')?.removeAttribute('required');
 		}
