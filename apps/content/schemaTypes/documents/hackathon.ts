@@ -147,14 +147,8 @@ export const hackathon = defineType({
     }),
     defineField({
       name: 'sponsors',
-      type: 'reference',
-      title: 'Sponsors',
-      description: 'Sponsors for this hackathon',
-      to: [{type: 'sponsor'}],
-      options: {
-        disableNew: true,
-        filter: '_type == "sponsor"',
-      },
+      type: 'array',
+      of: [defineArrayMember({type: 'reference', to: [{type: 'sponsor'}]})],
       group: 'content',
     }),
     defineField({
