@@ -523,6 +523,15 @@ const hackathonBySlugQuery = groq`
         'alt': video.thumbnail_alt,
       },
     },
+    'sponsors': sponsors[]->{
+      title,
+      logo {
+        public_id,
+        width,
+        height
+      },
+      link,
+    },
     'rewardsData': rewards[]-> {
       title,
       description,
