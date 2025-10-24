@@ -20,25 +20,6 @@ export type ResourceItem = {
 	url?: string;
 };
 
-export type RuleItem = {
-	_type: 'ruleItem';
-	title?: string;
-	description?: string;
-};
-
-export type RewardItem = {
-	_type: 'rewardItem';
-	title?: string;
-	description?: string;
-	image?: CloudinaryAsset;
-};
-
-export type FaqItem = {
-	_type: 'faqItem';
-	question?: string;
-	answer?: string;
-};
-
 export type EpisodeImage = {
 	_type: 'episodeImage';
 	asset?: {
@@ -101,6 +82,43 @@ export type Person = {
 	user_id?: string;
 };
 
+export type Rules = {
+	_id: string;
+	_type: 'rules';
+	_createdAt: string;
+	_updatedAt: string;
+	_rev: string;
+	title?: string;
+	description?: string;
+	weight?: number;
+	setAsDefault?: boolean;
+};
+
+export type Rewards = {
+	_id: string;
+	_type: 'rewards';
+	_createdAt: string;
+	_updatedAt: string;
+	_rev: string;
+	title?: string;
+	description?: string;
+	image?: CloudinaryAsset;
+	weight?: number;
+	setAsDefault?: boolean;
+};
+
+export type Faq = {
+	_id: string;
+	_type: 'faq';
+	_createdAt: string;
+	_updatedAt: string;
+	_rev: string;
+	question?: string;
+	answer?: string;
+	weight?: number;
+	setAsDefault?: boolean;
+};
+
 export type Hackathon = {
 	_id: string;
 	_type: 'hackathon';
@@ -121,29 +139,33 @@ export type Hackathon = {
 		[internalGroqTypeReferenceTo]?: 'episode';
 	}>;
 	submissionForm?: string;
-	rewards?: {
+	rewards?: Array<{
 		_ref: string;
 		_type: 'reference';
 		_weak?: boolean;
+		_key: string;
 		[internalGroqTypeReferenceTo]?: 'rewards';
-	};
-	faq?: {
+	}>;
+	faq?: Array<{
 		_ref: string;
 		_type: 'reference';
 		_weak?: boolean;
+		_key: string;
 		[internalGroqTypeReferenceTo]?: 'faq';
-	};
+	}>;
 	sponsors?: {
 		_ref: string;
 		_type: 'reference';
 		_weak?: boolean;
 		[internalGroqTypeReferenceTo]?: 'sponsor';
 	};
-	rules?: Array<
-		{
-			_key: string;
-		} & RuleItem
-	>;
+	rules?: Array<{
+		_ref: string;
+		_type: 'reference';
+		_weak?: boolean;
+		_key: string;
+		[internalGroqTypeReferenceTo]?: 'rules';
+	}>;
 	resources?: Array<
 		{
 			_key: string;
@@ -151,7 +173,6 @@ export type Hackathon = {
 	>;
 	share_image?: CloudinaryAsset;
 	hidden?: 'visible' | 'hidden';
-	featured?: 'normal' | 'featured';
 };
 
 export type Sponsor = {
@@ -164,36 +185,6 @@ export type Sponsor = {
 	slug?: Slug;
 	logo?: CloudinaryAsset;
 	link?: string;
-};
-
-export type Faq = {
-	_id: string;
-	_type: 'faq';
-	_createdAt: string;
-	_updatedAt: string;
-	_rev: string;
-	name?: string;
-	slug?: Slug;
-	items?: Array<
-		{
-			_key: string;
-		} & FaqItem
-	>;
-};
-
-export type Rewards = {
-	_id: string;
-	_type: 'rewards';
-	_createdAt: string;
-	_updatedAt: string;
-	_rev: string;
-	name?: string;
-	slug?: Slug;
-	items?: Array<
-		{
-			_key: string;
-		} & RewardItem
-	>;
 };
 
 export type Episode = {
@@ -560,16 +551,14 @@ export type SanityAssetSourceData = {
 
 export type AllSanitySchemaTypes =
 	| ResourceItem
-	| RuleItem
-	| RewardItem
-	| FaqItem
 	| EpisodeImage
 	| EpisodeTag
 	| Person
+	| Rules
+	| Rewards
+	| Faq
 	| Hackathon
 	| Sponsor
-	| Faq
-	| Rewards
 	| Episode
 	| Collection
 	| Series
@@ -1068,7 +1057,7 @@ export type AllHackathonsQueryResult = Array<{
 		width: number | null;
 		height: number | null;
 	} | null;
-	featured: 'featured' | 'normal' | null;
+	featured: null;
 	hidden: 'hidden' | 'visible' | null;
 }>;
 // Variable: hackathonBySlugQuery
@@ -1090,28 +1079,11 @@ export type HackathonBySlugQueryResult = {
 			alt: string | null;
 		};
 	} | null;
-	rewardsData: {
-		name: string | null;
-		items: Array<{
-			title: string | null;
-			description: string | null;
-			image: {
-				public_id: string | null;
-				width: number | null;
-				height: number | null;
-			} | null;
-		}> | null;
-	} | null;
-	faqData: {
-		name: string | null;
-		items: Array<{
-			question: string | null;
-			answer: string | null;
-		}> | null;
-	} | null;
+	rewardsData: null;
+	faqData: null;
 	rules: Array<{
-		title: string | null;
-		description: string | null;
+		title: null;
+		description: null;
 	}> | null;
 	resources: Array<{
 		title: string | null;
@@ -1123,7 +1095,7 @@ export type HackathonBySlugQueryResult = {
 		width: number | null;
 		height: number | null;
 	} | null;
-	featured: 'featured' | 'normal' | null;
+	featured: null;
 	hidden: 'hidden' | 'visible' | null;
 } | null;
 
