@@ -523,28 +523,25 @@ const hackathonBySlugQuery = groq`
         'alt': video.thumbnail_alt,
       },
     },
-    'rewardsData': rewards-> {
-      name,
-      items[] {
-        title,
-        description,
-        image {
-          public_id,
-          width,
-          height,
-        }
-      }
-    },
-    'faqData': faq-> {
-      name,
-      items[] {
-        question,
-        answer,
-      }
-    },
-    rules[] {
+    'rewardsData': rewards[]-> {
       title,
       description,
+      image {
+        public_id,
+        width,
+        height,
+      },
+      weight
+    },
+    'faqData': faq[]-> {
+      question,
+      answer,
+      weight
+    },
+    rules[]-> {
+      title,
+      description,
+      weight
     },
     resources[] {
       title,
@@ -556,7 +553,6 @@ const hackathonBySlugQuery = groq`
       width,
       height,
     },
-    featured,
     hidden
   }
 `;
