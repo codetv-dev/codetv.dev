@@ -500,7 +500,6 @@ const allHackathonsQuery = groq`
       width,
       height,
     },
-    featured,
     hidden
   }
 `;

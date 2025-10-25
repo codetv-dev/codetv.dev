@@ -218,22 +218,19 @@ export const hackathon = defineType({
       title: 'title',
       pubDate: 'pubDate',
       hidden: 'hidden',
-      featured: 'featured',
     },
-    prepare({title, pubDate, hidden, featured}) {
+    prepare({title, pubDate, hidden}) {
       const date = pubDate ? new Date(pubDate).toLocaleDateString() : 'No date'
       const status = hidden === 'hidden' ? ' (Hidden)' : ''
-      const featuredStatus = featured === 'featured' ? ' ⭐' : ''
 
       return {
         title: title || 'Untitled Hackathon',
-        subtitle: `${date}${status}${featuredStatus}`,
+        subtitle: `${date}${status}`,
         media: RocketIcon,
       }
     },
   },
   initialValue: () => ({
     hidden: 'visible',
-    featured: 'normal',
   }),
 })
