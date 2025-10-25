@@ -13,6 +13,13 @@
  */
 
 // Source: schema.json
+export type ResourceItem = {
+	_type: 'resourceItem';
+	title?: string;
+	description?: string;
+	url?: string;
+};
+
 export type EpisodeImage = {
 	_type: 'episodeImage';
 	asset?: {
@@ -87,6 +94,100 @@ export type Person = {
 	user_id?: string;
 };
 
+export type Rules = {
+	_id: string;
+	_type: 'rules';
+	_createdAt: string;
+	_updatedAt: string;
+	_rev: string;
+	title?: string;
+	description?: string;
+	weight?: number;
+	setAsDefault?: boolean;
+};
+
+export type Rewards = {
+	_id: string;
+	_type: 'rewards';
+	_createdAt: string;
+	_updatedAt: string;
+	_rev: string;
+	title?: string;
+	description?: string;
+	image?: CloudinaryAsset;
+	weight?: number;
+	setAsDefault?: boolean;
+};
+
+export type Faq = {
+	_id: string;
+	_type: 'faq';
+	_createdAt: string;
+	_updatedAt: string;
+	_rev: string;
+	question?: string;
+	answer?: string;
+	weight?: number;
+	setAsDefault?: boolean;
+};
+
+export type Hackathon = {
+	_id: string;
+	_type: 'hackathon';
+	_createdAt: string;
+	_updatedAt: string;
+	_rev: string;
+	title?: string;
+	slug?: Slug;
+	pubDate?: string;
+	deadline?: string;
+	description?: string;
+	body?: string;
+	episodes?: Array<{
+		_ref: string;
+		_type: 'reference';
+		_weak?: boolean;
+		_key: string;
+		[internalGroqTypeReferenceTo]?: 'episode';
+	}>;
+	submissionForm?: string;
+	rewards?: Array<{
+		_ref: string;
+		_type: 'reference';
+		_weak?: boolean;
+		_key: string;
+		[internalGroqTypeReferenceTo]?: 'rewards';
+	}>;
+	faq?: Array<{
+		_ref: string;
+		_type: 'reference';
+		_weak?: boolean;
+		_key: string;
+		[internalGroqTypeReferenceTo]?: 'faq';
+	}>;
+	sponsors?: Array<{
+		_ref: string;
+		_type: 'reference';
+		_weak?: boolean;
+		_key: string;
+		[internalGroqTypeReferenceTo]?: 'sponsor';
+	}>;
+	rules?: Array<{
+		_ref: string;
+		_type: 'reference';
+		_weak?: boolean;
+		_key: string;
+		[internalGroqTypeReferenceTo]?: 'rules';
+	}>;
+	resources?: Array<
+		{
+			_key: string;
+		} & ResourceItem
+	>;
+	share_image?: CloudinaryAsset;
+	hidden?: 'visible' | 'hidden';
+};
+
 export type Episode = {
 	_id: string;
 	_type: 'episode';
@@ -111,6 +212,13 @@ export type Episode = {
 		_weak?: boolean;
 		_key: string;
 		[internalGroqTypeReferenceTo]?: 'sponsor';
+	}>;
+	hackathons?: Array<{
+		_ref: string;
+		_type: 'reference';
+		_weak?: boolean;
+		_key: string;
+		[internalGroqTypeReferenceTo]?: 'hackathon';
 	}>;
 	resources?: Array<{
 		label?: string;
@@ -443,10 +551,15 @@ export type SanityAssetSourceData = {
 };
 
 export type AllSanitySchemaTypes =
+	| ResourceItem
 	| EpisodeImage
 	| EpisodeTag
 	| Sponsor
 	| Person
+	| Rules
+	| Rewards
+	| Faq
+	| Hackathon
 	| Episode
 	| Collection
 	| Series
@@ -918,6 +1031,96 @@ export type SupportersQueryResult = Array<{
 			| null;
 	} | null;
 }>;
+// Variable: allHackathonsQuery
+// Query: *[_type == "hackathon" && hidden != "hidden"] | order(pubDate desc) {    _id,    title,    'slug': slug.current,    pubDate,    description,    body,    episodes[]-> {      _id,      title,      'slug': slug.current,      short_description,      publish_date,      'thumbnail': {        'public_id': video.thumbnail.public_id,        'width': video.thumbnail.width,        'height': video.thumbnail.height,        'alt': video.thumbnail_alt,      }    },    share_image {      public_id,      width,      height,    },    featured,    hidden  }
+export type AllHackathonsQueryResult = Array<{
+	_id: string;
+	title: string | null;
+	slug: string | null;
+	pubDate: string | null;
+	description: string | null;
+	body: string | null;
+	episodes: Array<{
+		_id: string;
+		title: string | null;
+		slug: string | null;
+		short_description: string | null;
+		publish_date: string | null;
+		thumbnail: {
+			public_id: string | null;
+			width: number | null;
+			height: number | null;
+			alt: string | null;
+		};
+	}> | null;
+	share_image: {
+		public_id: string | null;
+		width: number | null;
+		height: number | null;
+	} | null;
+	featured: null;
+	hidden: 'hidden' | 'visible' | null;
+}>;
+// Variable: hackathonBySlugQuery
+// Query: *[_type == "hackathon" && slug.current == $slug][0] {    _id,    title,    'slug': slug.current,    description,    body,    submissionForm,    'episode': episodes[0]-> {      title,      'slug': slug.current,      'thumbnail': {        'public_id': video.thumbnail.public_id,        'width': video.thumbnail.width,        'height': video.thumbnail.height,        'alt': video.thumbnail_alt,      },    },    'sponsors': sponsors[]->{      title,      logo {        public_id,        width,        height      },      link,    },    'rewardsData': rewards[]-> {      title,      description,      image {        public_id,        width,        height,      },      weight    },    'faqData': faq[]-> {      question,      answer,      weight    },    rules[]-> {      title,      description,      weight    },    resources[] {      title,      description,      url,    },    share_image {      public_id,      width,      height,    },    hidden  }
+export type HackathonBySlugQueryResult = {
+	_id: string;
+	title: string | null;
+	slug: string | null;
+	description: string | null;
+	body: string | null;
+	submissionForm: string | null;
+	episode: {
+		title: string | null;
+		slug: string | null;
+		thumbnail: {
+			public_id: string | null;
+			width: number | null;
+			height: number | null;
+			alt: string | null;
+		};
+	} | null;
+	sponsors: Array<{
+		title: string | null;
+		logo: {
+			public_id: string | null;
+			width: number | null;
+			height: number | null;
+		} | null;
+		link: string | null;
+	}> | null;
+	rewardsData: Array<{
+		title: string | null;
+		description: string | null;
+		image: {
+			public_id: string | null;
+			width: number | null;
+			height: number | null;
+		} | null;
+		weight: number | null;
+	}> | null;
+	faqData: Array<{
+		question: string | null;
+		answer: string | null;
+		weight: number | null;
+	}> | null;
+	rules: Array<{
+		title: string | null;
+		description: string | null;
+		weight: number | null;
+	}> | null;
+	resources: Array<{
+		title: string | null;
+		description: string | null;
+		url: string | null;
+	}> | null;
+	share_image: {
+		public_id: string | null;
+		width: number | null;
+		height: number | null;
+	} | null;
+	hidden: 'hidden' | 'visible' | null;
+} | null;
 
 // Query TypeMap
 import '@sanity/client';
@@ -937,5 +1140,7 @@ declare module '@sanity/client' {
 		"\n  *[_type == \"person\" && slug.current == $slug][0] {\n    _id,\n    name,\n    \"slug\": slug.current,\n    photo {\n      public_id,\n      height,\n      width,\n    },\n    bio,\n    links[],\n    user_id,\n    \"episodes\": *[_type == \"episode\" && references(^._id) && hidden != true && (defined(video.youtube_id) || defined(video.mux_video))] {\n      title,\n      'slug': slug.current,\n      short_description,\n      publish_date,\n      'thumbnail': {\n        'public_id': video.thumbnail.public_id,\n        'alt': video.thumbnail_alt,\n        'width': video.thumbnail.width,\n        'height': video.thumbnail.height,\n      },\n      video {\n        youtube_id,\n      },\n      'collection': *[_type==\"collection\" && references(^._id)][0] {\n        'slug': slug.current,\n        title,\n        'episodeSlugs': episodes[]->slug.current,\n      },\n      'series': *[_type==\"collection\" && references(^._id)][0].series->{\n        'slug': slug.current,\n        title,\n      },\n    } | order(publish_date desc)[0...6]\n  }\n": PersonBySlugQueryResult;
 		'\n  *[_type == "person" && user_id == $user_id][0] {\n    _id,\n    name,\n    slug,\n    user_id,\n  }\n': PersonByClerkIdQueryResult;
 		'\n  *[_type == "person" && subscription.status == "active"] | order(subscription.date asc) {\n    _id,\n    name,\n    photo {\n      public_id,\n      height,\n      width,\n    },\n    \'username\': slug.current,\n    subscription {\n      level,\n      status\n    }\n  }\n': SupportersQueryResult;
+		"\n  *[_type == \"hackathon\" && hidden != \"hidden\"] | order(pubDate desc) {\n    _id,\n    title,\n    'slug': slug.current,\n    pubDate,\n    description,\n    body,\n    episodes[]-> {\n      _id,\n      title,\n      'slug': slug.current,\n      short_description,\n      publish_date,\n      'thumbnail': {\n        'public_id': video.thumbnail.public_id,\n        'width': video.thumbnail.width,\n        'height': video.thumbnail.height,\n        'alt': video.thumbnail_alt,\n      }\n    },\n    share_image {\n      public_id,\n      width,\n      height,\n    },\n    featured,\n    hidden\n  }\n": AllHackathonsQueryResult;
+		"\n  *[_type == \"hackathon\" && slug.current == $slug][0] {\n    _id,\n    title,\n    'slug': slug.current,\n    description,\n    body,\n    submissionForm,\n    'episode': episodes[0]-> {\n      title,\n      'slug': slug.current,\n      'thumbnail': {\n        'public_id': video.thumbnail.public_id,\n        'width': video.thumbnail.width,\n        'height': video.thumbnail.height,\n        'alt': video.thumbnail_alt,\n      },\n    },\n    'sponsors': sponsors[]->{\n      title,\n      logo {\n        public_id,\n        width,\n        height\n      },\n      link,\n    },\n    'rewardsData': rewards[]-> {\n      title,\n      description,\n      image {\n        public_id,\n        width,\n        height,\n      },\n      weight\n    },\n    'faqData': faq[]-> {\n      question,\n      answer,\n      weight\n    },\n    rules[]-> {\n      title,\n      description,\n      weight\n    },\n    resources[] {\n      title,\n      description,\n      url,\n    },\n    share_image {\n      public_id,\n      width,\n      height,\n    },\n    hidden\n  }\n": HackathonBySlugQueryResult;
 	}
 }
