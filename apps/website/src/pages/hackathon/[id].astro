@@ -41,7 +41,7 @@ const deadlineFormatted = deadline
 	? deadline.toLocaleDateString('en-US', {
 			month: 'short',
 			day: 'numeric',
-	  })
+		})
 	: 'TBD';
 
 // Get first sponsor if available
@@ -52,11 +52,11 @@ const heroImage = hackathon.share_image
 	? {
 			public_id: hackathon.share_image.public_id!,
 			alt: hackathon.title || 'Hackathon',
-	  }
+		}
 	: {
 			public_id: 'codetv-home-hero',
 			alt: 'CodeTV Web Dev Challenge',
-	  };
+		};
 
 // SEO meta
 const pageTitle = `${hackathon.title} — CodeTV`;
@@ -99,7 +99,9 @@ console.log('Hackathon data check:', {
 
 						<dt>Deadline</dt>
 						<dd>
-							<time datetime={hackathon.deadline || ''}>{deadlineFormatted}</time>
+							<time datetime={hackathon.deadline || ''}
+								>{deadlineFormatted}</time
+							>
 						</dd>
 
 						{
@@ -134,11 +136,7 @@ console.log('Hackathon data check:', {
 
 			<div class="text-block challenge">
 				<div class="copy">
-					{
-						hackathon.description && (
-							<p class="lede">{hackathon.description}</p>
-						)
-					}
+					{hackathon.description && <p class="lede">{hackathon.description}</p>}
 					{bodyHtml && <div class="body-content" set:html={bodyHtml} />}
 				</div>
 			</div>
@@ -156,8 +154,12 @@ console.log('Hackathon data check:', {
 							/>
 						) : hackathon.episode.video?.mux ? (
 							<MuxVideoPlayer
-								playback_id={hackathon.episode.video.mux[0]?.id || ''}
+								playback_ids={hackathon.episode.video.mux.map((v) => ({
+									id: v.id ?? '',
+									policy: v.policy as 'public' | 'signed',
+								}))}
 								title={hackathon.episode.title || 'Watch the episode'}
+								publish_date={null}
 							/>
 						) : null}
 						<figcaption>
