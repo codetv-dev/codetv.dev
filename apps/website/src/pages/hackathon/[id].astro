@@ -268,10 +268,23 @@ console.log('Hackathon data check:', {
 		{
 			hackathon.submissionForm && (
 				<Block name="submit" emphasized>
-					<h2>Show us what you built!</h2>
-					<a href={hackathon.submissionForm} class="button">
-						Submit Your App
-					</a>
+					<div class="heading">
+						<h2>Show us what you built!</h2>
+					</div>
+					<div class="content">
+						<div class="text-container">
+							<p>
+								When your app is ready, click this button to submit your app.
+								Apps must be submitted through this form before the deadline to
+								qualify for rewards.
+							</p>
+						</div>
+					</div>
+					<div class="button-container">
+						<a href={hackathon.submissionForm} class="button">
+							Submit Your App
+						</a>
+					</div>
 				</Block>
 			)
 		}
@@ -488,17 +501,104 @@ console.log('Hackathon data check:', {
 		padding-inline: 16px;
 	}
 
-	[data-name='submit'] {
-		text-align: center;
-
-		.button {
-			margin-block-start: 24px;
-		}
-	}
+	/* Fix the submit block centering completely */
 </style>
 
 <style is:global>
 	@layer overrides {
+		/* Force the submit block to be properly centered on all screens */
+		.block[data-name='submit'] {
+			display: flex !important;
+			flex-direction: column !important;
+			align-items: center !important;
+			justify-content: center !important;
+			flex-wrap: nowrap !important;
+			text-align: center;
+		}
+
+		[data-name='submit'] .heading {
+			width: 100%;
+			margin-bottom: 1rem;
+		}
+
+		[data-name='submit'] .content {
+			width: 100%;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			margin-bottom: 1rem;
+		}
+
+		[data-name='submit'] .text-container {
+			max-width: 70ch;
+		}
+
+		[data-name='submit'] .button-container {
+			width: 100%;
+			display: flex !important;
+			justify-content: center !important;
+			align-items: center !important;
+		}
+
+		[data-name='submit'] .button {
+			/* CTA BUTTON exact specs */
+			display: flex;
+			flex-direction: row;
+			justify-content: center;
+			align-items: center;
+			padding: 16px 24px;
+			gap: 10px;
+
+			width: 300px;
+			height: 57px;
+
+			background: #f0b525;
+			border-radius: 3px;
+			border: none;
+
+			/* Typography */
+			color: #000;
+			font-size: 1.75rem;
+			font-weight: 600;
+			text-transform: uppercase;
+			letter-spacing: 0.05em;
+			text-decoration: none;
+
+			/* Hover state */
+			transition: background 0.2s ease;
+		}
+
+		[data-name='submit'] .button:hover {
+			background: #d89f20;
+		}
+
+		/* Ensure it works at ALL screen sizes */
+		@media (min-width: 1px) {
+			.block[data-name='submit'] {
+				display: flex !important;
+				flex-direction: column !important;
+				align-items: center !important;
+				justify-content: center !important;
+			}
+		}
+
+		@media (min-width: 800px) {
+			.block[data-name='submit'] {
+				display: flex !important;
+				flex-direction: column !important;
+				align-items: center !important;
+				justify-content: center !important;
+			}
+		}
+
+		@media (min-width: 1024px) {
+			.block[data-name='submit'] {
+				display: flex !important;
+				flex-direction: column !important;
+				align-items: center !important;
+				justify-content: center !important;
+			}
+		}
 		.hero {
 			--hero-max-width: 1800px;
 			--hero-max-height: 771px;
