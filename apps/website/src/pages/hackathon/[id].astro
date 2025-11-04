@@ -47,16 +47,25 @@ const deadlineFormatted = deadline
 // Get first sponsor if available
 const primarySponsor = hackathon.sponsors?.[0];
 
-// Hero image - use share_image or default
-const heroImage = hackathon.share_image
+// Hero image - use hero_image, fall back to share_image, then default
+const heroImage = hackathon.hero_image
 	? {
-			public_id: hackathon.share_image.public_id!,
+			public_id: hackathon.hero_image.public_id!,
 			alt: hackathon.title || 'Hackathon',
 		}
-	: {
-			public_id: 'codetv-home-hero',
-			alt: 'CodeTV Web Dev Challenge',
-		};
+	: hackathon.share_image
+		? {
+				public_id: hackathon.share_image.public_id!,
+				alt: hackathon.title || 'Hackathon',
+			}
+		: {
+				public_id: 'codetv-home-hero',
+				alt: 'CodeTV Web Dev Challenge',
+			};
+
+// Hero title - use hero_title or fall back to title
+const heroTitle =
+	`"${hackathon.hero_title}"` || hackathon.title || 'Web Dev Challenge';
 
 // SEO meta
 const pageTitle = `${hackathon.title} — CodeTV`;
@@ -83,8 +92,8 @@ console.log('Hackathon data check:', {
 	<main>
 		<PageHeader
 			image={heroImage}
-			line1={hackathon.title || 'Web Dev Challenge'}
-			line2="Join the Challenge"
+			line1={heroTitle}
+			line2="Join the Web Dev Challenge"
 		/>
 
 		<Block name="overview" variant="two-column-asymmetrical">
@@ -490,6 +499,25 @@ console.log('Hackathon data check:', {
 
 <style is:global>
 	@layer overrides {
+		.hero {
+			--hero-max-width: 1800px;
+			--hero-max-height: 771px;
+
+			container-type: inline-size;
+			max-inline-size: var(--hero-max-width);
+			margin-inline: auto;
+
+			img {
+				max-block-size: var(--hero-max-height);
+				max-inline-size: 100%;
+			}
+
+			h1 {
+				inline-size: 90%;
+				font-size: clamp(1rem, 10cqi, 11rem);
+			}
+		}
+
 		.hero .line-2 {
 			font-size: 0.5em;
 			letter-spacing: -0.01em;
