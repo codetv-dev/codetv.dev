@@ -8,7 +8,6 @@ import {rewards} from './documents/rewards'
 import {rules} from './documents/rules'
 import {episodeTag} from './documents/tags'
 import {episodeImage} from './objects/episode-image'
-import faqItem from './objects/faq-item'
 import resourceItem from './objects/resource-item'
 
 function slugify(str: string) {

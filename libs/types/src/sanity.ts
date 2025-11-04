@@ -143,6 +143,8 @@ export type Hackathon = {
 	deadline?: string;
 	description?: string;
 	body?: string;
+	hero_image?: CloudinaryAsset;
+	hero_title?: string;
 	episodes?: Array<{
 		_ref: string;
 		_type: 'reference';
@@ -1041,6 +1043,12 @@ export type AllHackathonsQueryResult = Array<{
 	deadline: string | null;
 	description: string | null;
 	body: string | null;
+	hero_image: {
+		public_id: string | null;
+		width: number | null;
+		height: number | null;
+	} | null;
+	hero_title: string | null;
 	episodes: Array<{
 		_id: string;
 		title: string | null;
@@ -1072,6 +1080,12 @@ export type HackathonBySlugQueryResult = {
 	pubDate: string | null;
 	deadline: string | null;
 	submissionForm: string | null;
+	hero_image: {
+		public_id: string | null;
+		width: number | null;
+		height: number | null;
+	} | null;
+	hero_title: string | null;
 	episode: {
 		title: string | null;
 		slug: string | null;

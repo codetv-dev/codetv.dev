@@ -58,6 +58,22 @@ export const hackathon = defineType({
       group: 'content',
     }),
     defineField({
+      name: 'hero_image',
+      type: 'cloudinary.asset',
+      title: 'Hero Image',
+      description: 'Large hero image displayed at the top of the hackathon page',
+      options: {hotspot: true},
+      group: 'content',
+    }),
+    defineField({
+      name: 'hero_title',
+      type: 'string',
+      title: 'Hero Title',
+      description:
+        'Optional custom title for the hero section (defaults to hackathon title if not provided)',
+      group: 'content',
+    }),
+    defineField({
       name: 'body',
       type: 'markdown',
       description: 'Full hackathon details, rules, and content',

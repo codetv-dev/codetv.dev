@@ -483,6 +483,12 @@ const allHackathonsQuery = groq`
     deadline,
     description,
     body,
+    hero_image {
+      public_id,
+      width,
+      height,
+    },
+    hero_title,
     episodes[]-> {
       _id,
       title,
@@ -515,6 +521,12 @@ const hackathonBySlugQuery = groq`
     pubDate,
     deadline,
     submissionForm,
+    hero_image {
+      public_id,
+      width,
+      height,
+    },
+    hero_title,
     'episode': episodes[0]-> {
       title,
       'slug': slug.current,
