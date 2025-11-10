@@ -51,15 +51,14 @@ const pastHackathons = hackathons.filter((h) => {
 
 							return (
 								<Card
-									title={hackathon.title || 'Hackathon'}
+									title={hackathon.title}
 									link={`/hackathon/${hackathon.slug}`}
-									linkText="View Challenge"
 								>
 									{hackathon.share_image?.public_id && (
 										<img
 											slot="img"
 											src={`https://res.cloudinary.com/jlengstorf/image/upload/w_800,f_auto,q_auto/${hackathon.share_image.public_id}`}
-											alt={hackathon.title || 'Hackathon'}
+											alt={hackathon.title}
 										/>
 									)}
 									<div class="hackathon-meta">
@@ -95,15 +94,14 @@ const pastHackathons = hackathons.filter((h) => {
 
 							return (
 								<Card
-									title={hackathon.title || 'Hackathon'}
+									title={hackathon.title}
 									link={`/hackathon/${hackathon.slug}`}
-									linkText="View Details"
 								>
 									{hackathon.share_image?.public_id && (
 										<img
 											slot="img"
 											src={`https://res.cloudinary.com/jlengstorf/image/upload/w_600,f_auto,q_auto/${hackathon.share_image.public_id}`}
-											alt={hackathon.title || 'Hackathon'}
+											alt={hackathon.title}
 										/>
 									)}
 									<div class="hackathon-meta">

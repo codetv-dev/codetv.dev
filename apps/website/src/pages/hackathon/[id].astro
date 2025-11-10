@@ -9,6 +9,7 @@ import Block from '../../components/design-system/block.astro';
 import { getAllHackathons, getHackathonBySlug } from '@codetv/sanity';
 import type { HackathonBySlugQueryResult } from '@codetv/types';
 import { marked } from 'marked';
+import { createImageUrl, generateDefaultImage } from '@codetv/cloudinary';
 
 export const prerender = true;
 
@@ -52,20 +53,24 @@ let heroImagePublicId =
 
 const heroImage = {
 	public_id: heroImagePublicId || 'codetv-home-hero',
-	alt: hackathon.title || 'CodeTV Web Dev Challenge',
+	alt: hackathon.title,
 };
 
 // Hero title - use hero_title or fall back to title
-const heroTitle =
-	`"${hackathon.hero_title}"` || hackathon.title || 'Web Dev Challenge';
+const heroTitle = `"${hackathon.hero_title}"` || hackathon.title;
 
 // SEO meta
 const pageTitle = `${hackathon.title} — CodeTV`;
 const pageDescription =
 	hackathon.description || 'Join the CodeTV Web Dev Challenge hackathon';
+
 const pageImage = hackathon.share_image?.public_id
-	? `https://res.cloudinary.com/jlengstorf/image/upload/w_1600,h_900,c_fill,f_auto,q_auto/${hackathon.share_image.public_id}`
-	: 'https://res.cloudinary.com/jlengstorf/image/upload/f_auto/q_auto/v1738215362/codetv/codetv-default-cover.png';
+	? createImageUrl(hackathon.share_image.public_id, {
+			width: 1600,
+			height: 900,
+			crop: 'fill',
+		})
+	: generateDefaultImage({ text: hackathon.title });
 
 // Parse markdown body
 const bodyHtml = hackathon.body ? await marked.parse(hackathon.body) : '';

@@ -137,7 +137,7 @@ export type Hackathon = {
 	_createdAt: string;
 	_updatedAt: string;
 	_rev: string;
-	title?: string;
+	title: string;
 	slug?: Slug;
 	pubDate?: string;
 	deadline?: string;
@@ -1037,7 +1037,7 @@ export type SupportersQueryResult = Array<{
 // Query: *[_type == "hackathon" && hidden != "hidden"] | order(pubDate desc) {    _id,    title,    'slug': slug.current,    pubDate,    deadline,    description,    body,    episodes[]-> {      _id,      title,      'slug': slug.current,      short_description,      publish_date,      'thumbnail': {        'public_id': video.thumbnail.public_id,        'width': video.thumbnail.width,        'height': video.thumbnail.height,        'alt': video.thumbnail_alt,      }    },    share_image {      public_id,      width,      height,    },    hidden  }
 export type AllHackathonsQueryResult = Array<{
 	_id: string;
-	title: string | null;
+	title: string;
 	slug: string | null;
 	pubDate: string | null;
 	deadline: string | null;
@@ -1073,7 +1073,7 @@ export type AllHackathonsQueryResult = Array<{
 // Query: *[_type == "hackathon" && slug.current == $slug][0] {    _id,    title,    'slug': slug.current,    description,    body,    pubDate,    deadline,    submissionForm,    'episode': episodes[0]-> {      title,      'slug': slug.current,      'thumbnail': {        'public_id': video.thumbnail.public_id,        'width': video.thumbnail.width,        'height': video.thumbnail.height,        'alt': video.thumbnail_alt,      },      video {        youtube_id,        'mux': mux_video.asset->data.playback_ids,      }    },    'sponsors': sponsors[]->{      title,      logo {        public_id,        width,        height      },      link,    },    'rewardsData': rewards[]-> {      title,      description,      image {        public_id,        width,        height,      },      weight    } | order(weight asc),    'faqData': faq[]-> {      question,      answer,      weight    } | order(weight asc),    rules[]-> {      title,      description,      weight    } | order(weight asc),    resources[] {      title,      description,      url,    },    share_image {      public_id,      width,      height,    },    hidden  }
 export type HackathonBySlugQueryResult = {
 	_id: string;
-	title: string | null;
+	title: string;
 	slug: string | null;
 	description: string | null;
 	body: string | null;
