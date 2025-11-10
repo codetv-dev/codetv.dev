@@ -1,8 +1,7 @@
 ---
 import Layout from '../../layouts/default.astro';
 import PageHeader from '../../components/page-header.astro';
-import YoutubeVideoPlayer from '../../components/youtube-video-player.astro';
-import MuxVideoPlayer from '../../components/mux-video-player.astro';
+import VideoPlayer from '../../components/video-player.astro';
 import Grid from '../../components/design-system/grid.astro';
 import Card from '../../components/design-system/card.astro';
 import List from '../../components/design-system/list.astro';
@@ -48,20 +47,13 @@ const deadlineFormatted = deadline
 const primarySponsor = hackathon.sponsors?.[0];
 
 // Hero image - use hero_image, fall back to share_image, then default
-const heroImage = hackathon.hero_image
-	? {
-			public_id: hackathon.hero_image.public_id!,
-			alt: hackathon.title || 'Hackathon',
-		}
-	: hackathon.share_image
-		? {
-				public_id: hackathon.share_image.public_id!,
-				alt: hackathon.title || 'Hackathon',
-			}
-		: {
-				public_id: 'codetv-home-hero',
-				alt: 'CodeTV Web Dev Challenge',
-			};
+let heroImagePublicId =
+	hackathon.hero_image?.public_id || hackathon.share_image?.public_id;
+
+const heroImage = {
+	public_id: heroImagePublicId || 'codetv-home-hero',
+	alt: hackathon.title || 'CodeTV Web Dev Challenge',
+};
 
 // Hero title - use hero_title or fall back to title
 const heroTitle =
@@ -156,21 +148,22 @@ console.log('Hackathon data check:', {
 				<Block name="episode">
 					<h2>Watch the full episode for inspiration</h2>
 					<figure>
-						{hackathon.episode.video?.youtube_id ? (
-							<YoutubeVideoPlayer
-								youtube_id={hackathon.episode.video.youtube_id}
-								title={hackathon.episode.title || 'Watch the episode'}
+						{(hackathon.episode.video?.youtube_id ||
+							hackathon.episode.video?.mux) && (
+							<VideoPlayer
+								video={{
+									youtube_id: hackathon.episode.video.youtube_id,
+									mux: hackathon.episode.video.mux?.map((v) => ({
+										id: v.id ?? '',
+										policy: v.policy as 'public' | 'signed',
+									})),
+									captions: null,
+									title: hackathon.episode.title,
+									publish_date: null,
+									thumbnail: hackathon.episode.thumbnail,
+								}}
 							/>
-						) : hackathon.episode.video?.mux ? (
-							<MuxVideoPlayer
-								playback_ids={hackathon.episode.video.mux.map((v) => ({
-									id: v.id ?? '',
-									policy: v.policy as 'public' | 'signed',
-								}))}
-								title={hackathon.episode.title || 'Watch the episode'}
-								publish_date={null}
-							/>
-						) : null}
+						)}
 						<figcaption>
 							<span>
 								Watch the challenge in action to jumpstart your creativity
