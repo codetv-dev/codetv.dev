@@ -117,7 +117,9 @@ console.log('Hackathon data check:', {
 									<dd>
 										{primarySponsor.logo?.public_id ? (
 											<img
-												src={`https://res.cloudinary.com/jlengstorf/image/upload/w_200,f_auto,q_auto/${primarySponsor.logo.public_id}`}
+												src={createImageUrl(primarySponsor.logo.public_id, {
+													width: 200,
+												})}
 												alt={primarySponsor.title || 'Sponsor'}
 												class="sponsor-image"
 											/>
@@ -131,7 +133,7 @@ console.log('Hackathon data check:', {
 					</dl>
 
 					{
-						hackathon.submissionForm && (
+						isActive && hackathon.submissionForm && (
 							<a href={hackathon.submissionForm} class="button">
 								Submit Your App
 							</a>
@@ -190,13 +192,13 @@ console.log('Hackathon data check:', {
 					<Grid columns={3}>
 						{hackathon.rewardsData.map((reward) => (
 							<Card title={reward.title || ''}>
-								{reward.image?.public_id && (
-									<img
-										slot="img"
-										src={`https://res.cloudinary.com/jlengstorf/image/upload/w_400,f_auto,q_auto/${reward.image.public_id}`}
-										alt={reward.title || 'Reward'}
-									/>
-								)}
+								{reward.image?.public_id && <img
+									slot="img"
+									src={createImageUrl(reward.image.public_id, {
+										width: 400,
+									})}
+									alt={reward.title || 'Reward'}
+								/>}
 								<p>{reward.description}</p>
 							</Card>
 						))}
@@ -264,7 +266,7 @@ console.log('Hackathon data check:', {
 		}
 
 		{
-			hackathon.submissionForm && (
+			isActive && hackathon.submissionForm && (
 				<Block name="submit" emphasized>
 					<div class="heading">
 						<h2>Show us what you built!</h2>
