@@ -548,11 +548,11 @@ const primarySponsor = hasSponsors ? sponsors?.[0] : null;
 	@layer overrides {
 		/* Force the submit block to be properly centered on all screens */
 		.block[data-name='submit'] {
-			display: flex !important;
-			flex-direction: column !important;
-			align-items: center !important;
-			justify-content: center !important;
-			flex-wrap: nowrap !important;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			flex-wrap: nowrap;
 			text-align: center;
 		}
 
@@ -575,22 +575,17 @@ const primarySponsor = hasSponsors ? sponsors?.[0] : null;
 
 		[data-name='submit'] .button-container {
 			width: 100%;
-			display: flex !important;
-			justify-content: center !important;
-			align-items: center !important;
+			display: flex;
+			justify-content: center;
+			align-items: center;
 		}
 
 		[data-name='submit'] .button {
-			/* CTA BUTTON exact specs */
 			display: flex;
-			flex-direction: row;
 			justify-content: center;
 			align-items: center;
-			padding: 16px 24px;
-			gap: 10px;
-
-			width: 300px;
-			height: 57px;
+			inline-size: 300px;
+			block-size: 57px;
 
 			background: #f0b525;
 			border-radius: 3px;
@@ -600,7 +595,6 @@ const primarySponsor = hasSponsors ? sponsors?.[0] : null;
 			color: #000;
 			font-size: 1.75rem;
 			font-weight: 600;
-			text-transform: uppercase;
 			letter-spacing: 0.05em;
 			text-decoration: none;
 
@@ -610,34 +604,6 @@ const primarySponsor = hasSponsors ? sponsors?.[0] : null;
 
 		[data-name='submit'] .button:hover {
 			background: #d89f20;
-		}
-
-		/* Ensure it works at ALL screen sizes */
-		@media (min-width: 1px) {
-			.block[data-name='submit'] {
-				display: flex !important;
-				flex-direction: column !important;
-				align-items: center !important;
-				justify-content: center !important;
-			}
-		}
-
-		@media (min-width: 800px) {
-			.block[data-name='submit'] {
-				display: flex !important;
-				flex-direction: column !important;
-				align-items: center !important;
-				justify-content: center !important;
-			}
-		}
-
-		@media (min-width: 1024px) {
-			.block[data-name='submit'] {
-				display: flex !important;
-				flex-direction: column !important;
-				align-items: center !important;
-				justify-content: center !important;
-			}
 		}
 		.hero {
 			--hero-max-width: 1800px;
