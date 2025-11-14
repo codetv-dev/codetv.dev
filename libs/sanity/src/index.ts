@@ -480,8 +480,15 @@ const allHackathonsQuery = groq`
     title,
     'slug': slug.current,
     pubDate,
+    deadline,
     description,
     body,
+    hero_image {
+      public_id,
+      width,
+      height,
+    },
+    hero_title,
     episodes[]-> {
       _id,
       title,
@@ -511,7 +518,15 @@ const hackathonBySlugQuery = groq`
     'slug': slug.current,
     description,
     body,
+    pubDate,
+    deadline,
     submissionForm,
+    hero_image {
+      public_id,
+      width,
+      height,
+    },
+    hero_title,
     'episode': episodes[0]-> {
       title,
       'slug': slug.current,
@@ -521,6 +536,10 @@ const hackathonBySlugQuery = groq`
         'height': video.thumbnail.height,
         'alt': video.thumbnail_alt,
       },
+      video {
+        youtube_id,
+        'mux': mux_video.asset->data.playback_ids,
+      }
     },
     'sponsors': sponsors[]->{
       title,
@@ -540,17 +559,17 @@ const hackathonBySlugQuery = groq`
         height,
       },
       weight
-    },
+    } | order(weight asc),
     'faqData': faq[]-> {
       question,
       answer,
       weight
-    },
+    } | order(weight asc),
     rules[]-> {
       title,
       description,
       weight
-    },
+    } | order(weight asc),
     resources[] {
       title,
       description,

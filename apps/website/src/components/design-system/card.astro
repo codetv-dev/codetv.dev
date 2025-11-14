@@ -2,15 +2,33 @@
 export interface Props {
 	title?: string;
 	variant?: 'primary' | 'secondary';
+	link?: string;
 }
 
-const { title, variant = 'primary' } = Astro.props;
+const { title, variant = 'primary', link } = Astro.props;
 ---
 
 <div class:list={['card', { secondary: variant === 'secondary' }]}>
-	<slot name="img" />
+	{
+		link && (
+			<a href={link} class="card-image-link">
+				<slot name="img" />
+			</a>
+		)
+	}
+	{!link && <slot name="img" />}
 	<div class="details">
-		<div class="title">{title ? <h3>{title}</h3> : <slot name="title" />}</div>
+		<div class="title">
+			{
+				title && link && (
+					<h3>
+						<a href={link}>{title}</a>
+					</h3>
+				)
+			}
+			{title && !link && <h3>{title}</h3>}
+			{!title && <slot name="title" />}
+		</div>
 		<div class="description">
 			<slot />
 		</div>
@@ -44,7 +62,7 @@ const { title, variant = 'primary' } = Astro.props;
 			}
 		}
 
-		&:has(> img) {
+		&:has(> img, > .card-image-link) {
 			gap: 16px;
 
 			img {
@@ -52,6 +70,15 @@ const { title, variant = 'primary' } = Astro.props;
 					color-mix(in oklch, var(--gray-600), transparent);
 				border-radius: 3px 3px 0 0;
 				max-inline-size: 100%;
+			}
+
+			.card-image-link {
+				display: block;
+				line-height: 0;
+
+				img {
+					display: block;
+				}
 			}
 
 			.details {
