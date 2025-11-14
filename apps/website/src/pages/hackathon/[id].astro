@@ -44,8 +44,6 @@ const deadlineFormatted = deadline
 		})
 	: 'TBD';
 
-// Get first sponsor if available
-const primarySponsor = hackathon.sponsors?.[0];
 
 // Hero image - use hero_image, fall back to share_image, then default
 let heroImagePublicId =
@@ -75,14 +73,56 @@ const pageImage = hackathon.share_image?.public_id
 // Parse markdown body
 const bodyHtml = hackathon.body ? await marked.parse(hackathon.body) : '';
 
-// Debug: Log what data we have
-console.log('Hackathon data check:', {
-	hasRewards: hackathon.rewardsData?.length,
-	hasRules: hackathon.rules?.length,
-	hasResources: hackathon.resources?.length,
-	hasFaq: hackathon.faqData?.length,
-	hasSponsors: hackathon.sponsors?.length,
-});
+// TODO: Fix the Sanity Typegen so that object fields aren't all typed as optional
+// Check if there are any resources, rules, faq, sponsors, or rewards
+const hasResources = hackathon.resources && hackathon.resources.length > 0;
+const resources = hasResources ? hackathon.resources?.map((resource) => ({
+	title: resource.title || '',
+		description: resource.description || '',
+		url: resource.url || '',
+	}))
+	: null;
+
+const hasRules = hackathon.rules && hackathon.rules.length > 0;
+const rules = hasRules ? hackathon.rules?.map((rule) => ({
+	title: rule.title || '',
+	description: rule.description || '',
+	weight: rule.weight || 0,
+	}))
+	: null;
+
+const hasFaq = hackathon.faqData && hackathon.faqData.length > 0;
+const faq = hasFaq ? hackathon.faqData?.map((faq) => ({
+	question: faq.question || '',
+	answer: faq.answer || '',
+	weight: faq.weight || 0,
+	}))
+	: null;
+
+const hasSponsors = hackathon.sponsors && hackathon.sponsors.length > 0;
+const sponsors = hasSponsors ? hackathon.sponsors?.map((sponsor) => ({
+	title: sponsor.title || '',
+	logo: {
+		public_id: sponsor.logo?.public_id || '',
+	},
+	link: sponsor.link || '',
+	}))
+	: null;
+
+const hasRewards = hackathon.rewardsData && hackathon.rewardsData.length > 0;
+const rewards = hasRewards ? hackathon.rewardsData?.map((reward) => ({
+	title: reward.title || '',
+	description: reward.description || '',
+	image: {
+		public_id: reward.image?.public_id || '',
+	},
+	weight: reward.weight || 0,
+	}))
+	: null;
+
+
+// Get first sponsor if available
+const primarySponsor = hasSponsors ? sponsors?.[0] : null;
 ---
 
 <Layout title={pageTitle} description={pageDescription} image={pageImage}>
@@ -115,7 +155,7 @@ console.log('Hackathon data check:', {
 								<>
 									<dt>Sponsor</dt>
 									<dd>
-										{primarySponsor.logo?.public_id ? (
+										{primarySponsor.logo.public_id ? (
 											<img
 												src={createImageUrl(primarySponsor.logo.public_id, {
 													width: 200,
@@ -185,12 +225,12 @@ console.log('Hackathon data check:', {
 		}
 
 		{
-			hackathon.rewardsData && hackathon.rewardsData.length > 0 && (
+			hasRewards && (
 				<Block name="rewards">
 					<h2>Submit an app to earn rewards</h2>
 
 					<Grid columns={3}>
-						{hackathon.rewardsData.map((reward) => (
+						{hasRewards && rewards?.map((reward) => (
 							<Card title={reward.title || ''}>
 								{reward.image?.public_id && <img
 									slot="img"
@@ -226,36 +266,36 @@ console.log('Hackathon data check:', {
 			)
 		}
 
-		{
-			hackathon.resources && hackathon.resources.length > 0 && (
-				<Block name="resources" variant="two-column-asymmetrical">
-					<div class="heading">
-						<h2>Resources</h2>
-					</div>
+{
+	hasResources && (
+		<Block name="resources" variant="two-column-asymmetrical">
+			<div class="heading">
+				<h2>Resources</h2>
+			</div>
 
-					<List>
-						{hackathon.resources.map((resource) => (
-							<Card variant="secondary">
-								<p slot="title">
-									<a href={resource.url || '#'}>{resource.title} &rarr;</a>
-								</p>
-								<p>{resource.description}</p>
-							</Card>
-						))}
-					</List>
-				</Block>
-			)
-		}
+			<List>
+				{hasResources && resources?.map((resource) => (
+					<Card variant="secondary">
+						<p slot="title">
+							<a href={resource.url}>{resource.title} &rarr;</a>
+						</p>
+						<p>{resource.description}</p>
+					</Card>
+				))}
+			</List>
+		</Block>
+	)
+}
 
 		{
-			hackathon.rules && hackathon.rules.length > 0 && (
+			hasRules && (
 				<Block name="rules" variant="two-column-asymmetrical">
 					<div class="heading">
 						<h2>The Rules</h2>
 					</div>
 
 					<List>
-						{hackathon.rules.map((rule, index) => (
+						{hasRules && rules?.map((rule, index) => (
 							<Card title={`#${index + 1}: ${rule.title}`}>
 								<p>{rule.description}</p>
 							</Card>
@@ -290,14 +330,14 @@ console.log('Hackathon data check:', {
 		}
 
 		{
-			hackathon.faqData && hackathon.faqData.length > 0 && (
+			hasFaq && (
 				<Block name="faq" variant="two-column-asymmetrical">
 					<div class="heading">
 						<h2>FAQ</h2>
 					</div>
 
 					<List>
-						{hackathon.faqData.map((faq) => (
+						{hasFaq && faq?.map((faq) => (
 							<Card variant="secondary" title={faq.question || ''}>
 								<p>{faq.answer}</p>
 							</Card>
