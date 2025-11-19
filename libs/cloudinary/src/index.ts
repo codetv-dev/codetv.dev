@@ -1,4 +1,4 @@
-import { v2, type TransformationOptions } from 'cloudinary';
+import { type ImageTransformationOptions, v2 } from 'cloudinary';
 
 export type { UploadApiResponse } from 'cloudinary';
 
@@ -22,11 +22,11 @@ export const cloudinary = v2;
 
 export function createImageUrl(
 	public_id: string,
-	transformations: TransformationOptions = {},
+	transformations: ImageTransformationOptions = {},
 ) {
-	const base_transformation: TransformationOptions = {
+	const base_transformation: ImageTransformationOptions = {
 		quality: 'auto',
-		format: 'auto',
+		format: transformations.format ?? 'auto',
 	};
 
 	const url = cloudinary.url(public_id, {
