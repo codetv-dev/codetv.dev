@@ -9,6 +9,7 @@
 /lh                         /series/leet-heat
 /leet-heat                  /series/leet-heat
 /series/leet-heat           /series/leet-heat/s1          301!
+/series/web-lunch           /series/web-lunch/s1          301!
 
 # LWJ episode redirects
 /let-s-learn-minecraft      /series/learn-with-jason/s3
@@ -19,11 +20,11 @@
 /support                                  /dashboard/sign-up                  301!
 
 /series/unspoken-tech                     /series/web-lunch                   301!
-/series/unspoken-tech/adam-argyle         /series/web-lunch/adam-argyle       301!
-/series/unspoken-tech/maggie-appleton     /series/web-lunch/maggie-appleton   301!
-/series/unspoken-tech/rachel-lee-nabors   /series/web-lunch/rachel-lee-nabors 301!
-/series/unspoken-tech/salma-alam-naylor   /series/web-lunch/salma-alam-naylor 301!
-/series/unspoken-tech/sunil-pai           /series/web-lunch/sunil-pai         301!
+/series/unspoken-tech/s1/adam-argyle         /series/web-lunch/s1/adam-argyle       301!
+/series/unspoken-tech/s1/maggie-appleton     /series/web-lunch/s1/maggie-appleton   301!
+/series/unspoken-tech/s1/rachel-lee-nabors   /series/web-lunch/s1/rachel-lee-nabors 301!
+/series/unspoken-tech/s1/salma-alam-naylor   /series/web-lunch/s1/salma-alam-naylor 301!
+/series/unspoken-tech/s1/sunil-pai           /series/web-lunch/s1/sunil-pai         301!
 
 /series/web-dev-challenge/s2/most-important-app   /series/web-dev-challenge/s2/e9-most-important-app    301!
 /what-s-new-in-redux-toolkit-2-0      /series/learn-with-jason/s7/what-s-new-in-redux-toolkit-2-0
