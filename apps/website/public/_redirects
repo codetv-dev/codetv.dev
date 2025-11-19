@@ -15,8 +15,15 @@
 /series/leet-heat/s1/christopher-vs-jeremy /series/leet-heat/s1/e4-christopher-vs-jeremy
 
 # Old pages
-/partners                             https://partners.codetv.dev   301!
-/support                              /dashboard/sign-up            301!
+/partners                                 https://partners.codetv.dev         301!
+/support                                  /dashboard/sign-up                  301!
+
+/series/unspoken-tech                     /series/web-lunch                   301!
+/series/unspoken-tech/adam-argyle         /series/web-lunch/adam-argyle       301!
+/series/unspoken-tech/maggie-appleton     /series/web-lunch/maggie-appleton   301!
+/series/unspoken-tech/rachel-lee-nabors   /series/web-lunch/rachel-lee-nabors 301!
+/series/unspoken-tech/salma-alam-naylor   /series/web-lunch/salma-alam-naylor 301!
+/series/unspoken-tech/sunil-pai           /series/web-lunch/sunil-pai         301!
 
 /what-s-new-in-redux-toolkit-2-0      /series/learn-with-jason/s7/what-s-new-in-redux-toolkit-2-0
 /blog/oklch-better-color-css-browse   /blog/oklch-better-color-css-browser
