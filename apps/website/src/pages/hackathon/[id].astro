@@ -7,7 +7,6 @@ import Card from '../../components/design-system/card.astro';
 import List from '../../components/design-system/list.astro';
 import Block from '../../components/design-system/block.astro';
 import { getAllHackathons, getHackathonBySlug } from '@codetv/sanity';
-import type { HackathonBySlugQueryResult } from '@codetv/types';
 import { marked } from 'marked';
 import { createImageUrl, generateDefaultImage } from '@codetv/cloudinary';
 
@@ -44,7 +43,6 @@ const deadlineFormatted = deadline
 		})
 	: 'TBD';
 
-
 // Hero image - use hero_image, fall back to share_image, then default
 let heroImagePublicId =
 	hackathon.hero_image?.public_id || hackathon.share_image?.public_id;
@@ -54,13 +52,9 @@ const heroImage = {
 	alt: hackathon.title,
 };
 
-// Hero title - use hero_title or fall back to title
-const heroTitle = `"${hackathon.hero_title}"` || hackathon.title;
-
 // SEO meta
 const pageTitle = `${hackathon.title} — CodeTV`;
-const pageDescription =
-	hackathon.description || 'Join the CodeTV Web Dev Challenge hackathon';
+const pageDescription = hackathon.description;
 
 const pageImage = hackathon.share_image?.public_id
 	? createImageUrl(hackathon.share_image.public_id, {
@@ -73,53 +67,56 @@ const pageImage = hackathon.share_image?.public_id
 // Parse markdown body
 const bodyHtml = hackathon.body ? await marked.parse(hackathon.body) : '';
 
-// TODO: Fix the Sanity Typegen so that object fields aren't all typed as optional
 // Check if there are any resources, rules, faq, sponsors, or rewards
 const hasResources = hackathon.resources && hackathon.resources.length > 0;
-const resources = hasResources ? hackathon.resources?.map((resource) => ({
-	title: resource.title || '',
-		description: resource.description || '',
-		url: resource.url || '',
-	}))
+const resources = hasResources
+	? hackathon.resources?.map((resource) => ({
+			title: resource.title || '',
+			description: resource.description || '',
+			url: resource.url || '',
+		}))
 	: null;
 
 const hasRules = hackathon.rules && hackathon.rules.length > 0;
-const rules = hasRules ? hackathon.rules?.map((rule) => ({
-	title: rule.title || '',
-	description: rule.description || '',
-	weight: rule.weight || 0,
-	}))
+const rules = hasRules
+	? hackathon.rules?.map((rule) => ({
+			title: rule.title || '',
+			description: rule.description || '',
+			weight: rule.weight || 0,
+		}))
 	: null;
 
 const hasFaq = hackathon.faqData && hackathon.faqData.length > 0;
-const faq = hasFaq ? hackathon.faqData?.map((faq) => ({
-	question: faq.question || '',
-	answer: faq.answer || '',
-	weight: faq.weight || 0,
-	}))
+const faq = hasFaq
+	? hackathon.faqData?.map((faq) => ({
+			question: faq.question || '',
+			answer: faq.answer || '',
+			weight: faq.weight || 0,
+		}))
 	: null;
 
 const hasSponsors = hackathon.sponsors && hackathon.sponsors.length > 0;
-const sponsors = hasSponsors ? hackathon.sponsors?.map((sponsor) => ({
-	title: sponsor.title || '',
-	logo: {
-		public_id: sponsor.logo?.public_id || '',
-	},
-	link: sponsor.link || '',
-	}))
+const sponsors = hasSponsors
+	? hackathon.sponsors?.map((sponsor) => ({
+			title: sponsor.title || '',
+			logo: {
+				public_id: sponsor.logo?.public_id || '',
+			},
+			link: sponsor.link || '',
+		}))
 	: null;
 
 const hasRewards = hackathon.rewardsData && hackathon.rewardsData.length > 0;
-const rewards = hasRewards ? hackathon.rewardsData?.map((reward) => ({
-	title: reward.title || '',
-	description: reward.description || '',
-	image: {
-		public_id: reward.image?.public_id || '',
-	},
-	weight: reward.weight || 0,
-	}))
+const rewards = hasRewards
+	? hackathon.rewardsData?.map((reward) => ({
+			title: reward.title || '',
+			description: reward.description || '',
+			image: {
+				public_id: reward.image?.public_id || '',
+			},
+			weight: reward.weight || 0,
+		}))
 	: null;
-
 
 // Get first sponsor if available
 const primarySponsor = hasSponsors ? sponsors?.[0] : null;
@@ -129,7 +126,7 @@ const primarySponsor = hasSponsors ? sponsors?.[0] : null;
 	<main>
 		<PageHeader
 			image={heroImage}
-			line1={heroTitle}
+			line1={hackathon.title}
 			line2="Join the Web Dev Challenge"
 		/>
 
@@ -230,18 +227,21 @@ const primarySponsor = hasSponsors ? sponsors?.[0] : null;
 					<h2>Submit an app to earn rewards</h2>
 
 					<Grid columns={3}>
-						{hasRewards && rewards?.map((reward) => (
-							<Card title={reward.title || ''}>
-								{reward.image?.public_id && <img
-									slot="img"
-									src={createImageUrl(reward.image.public_id, {
-										width: 400,
-									})}
-									alt={reward.title || 'Reward'}
-								/>}
-								<p>{reward.description}</p>
-							</Card>
-						))}
+						{hasRewards &&
+							rewards?.map((reward) => (
+								<Card title={reward.title || ''}>
+									{reward.image?.public_id && (
+										<img
+											slot="img"
+											src={createImageUrl(reward.image.public_id, {
+												width: 400,
+											})}
+											alt={reward.title || 'Reward'}
+										/>
+									)}
+									<p>{reward.description}</p>
+								</Card>
+							))}
 					</Grid>
 				</Block>
 			)
@@ -253,7 +253,16 @@ const primarySponsor = hasSponsors ? sponsors?.[0] : null;
 					<div class="inline">
 						<p>
 							This challenge is brought to you by{' '}
-							<strong>{primarySponsor.title}</strong>
+							{primarySponsor.logo.public_id ? (
+								<img
+									src={createImageUrl(primarySponsor.logo.public_id, {
+										format: 'svg',
+									})}
+									alt={primarySponsor.title}
+								/>
+							) : (
+								<span>{primarySponsor.title}</span>
+							)}
 						</p>
 
 						{primarySponsor.link && (
@@ -266,26 +275,27 @@ const primarySponsor = hasSponsors ? sponsors?.[0] : null;
 			)
 		}
 
-{
-	hasResources && (
-		<Block name="resources" variant="two-column-asymmetrical">
-			<div class="heading">
-				<h2>Resources</h2>
-			</div>
+		{
+			hasResources && (
+				<Block name="resources" variant="two-column-asymmetrical">
+					<div class="heading">
+						<h2>Resources</h2>
+					</div>
 
-			<List>
-				{hasResources && resources?.map((resource) => (
-					<Card variant="secondary">
-						<p slot="title">
-							<a href={resource.url}>{resource.title} &rarr;</a>
-						</p>
-						<p>{resource.description}</p>
-					</Card>
-				))}
-			</List>
-		</Block>
-	)
-}
+					<List>
+						{hasResources &&
+							resources?.map((resource) => (
+								<Card variant="secondary">
+									<p slot="title">
+										<a href={resource.url}>{resource.title} &rarr;</a>
+									</p>
+									<p>{resource.description}</p>
+								</Card>
+							))}
+					</List>
+				</Block>
+			)
+		}
 
 		{
 			hasRules && (
@@ -295,11 +305,12 @@ const primarySponsor = hasSponsors ? sponsors?.[0] : null;
 					</div>
 
 					<List>
-						{hasRules && rules?.map((rule, index) => (
-							<Card title={`#${index + 1}: ${rule.title}`}>
-								<p>{rule.description}</p>
-							</Card>
-						))}
+						{hasRules &&
+							rules?.map((rule, index) => (
+								<Card title={`#${index + 1}: ${rule.title}`}>
+									<p>{rule.description}</p>
+								</Card>
+							))}
 					</List>
 				</Block>
 			)
@@ -337,11 +348,12 @@ const primarySponsor = hasSponsors ? sponsors?.[0] : null;
 					</div>
 
 					<List>
-						{hasFaq && faq?.map((faq) => (
-							<Card variant="secondary" title={faq.question || ''}>
-								<p>{faq.answer}</p>
-							</Card>
-						))}
+						{hasFaq &&
+							faq?.map((faq) => (
+								<Card variant="secondary" title={faq.question || ''}>
+									<p>{faq.answer}</p>
+								</Card>
+							))}
 					</List>
 				</Block>
 			)
@@ -429,18 +441,22 @@ const primarySponsor = hasSponsors ? sponsors?.[0] : null;
 			flex-direction: column;
 			gap: 16px;
 
+			:is(h2, h3) {
+				line-height: 1.1;
+			}
+
 			h2 {
-				font-size: clamp(1.5rem, 3cqi, 2.5rem);
+				font-size: clamp(1.5rem, 2.5cqi, 2.25rem);
 				margin-block-start: 32px;
 			}
 
 			h3 {
-				font-size: clamp(1.25rem, 2.5cqi, 2rem);
+				font-size: clamp(1.25rem, 2.25cqi, 2rem);
 				margin-block-start: 24px;
 			}
 
 			p {
-				line-height: 1.6;
+				line-height: 1.45;
 			}
 
 			ul,
@@ -457,14 +473,6 @@ const primarySponsor = hasSponsors ? sponsors?.[0] : null;
 
 			a {
 				color: var(--text-link);
-				text-decoration: underline;
-				text-decoration-color: var(--text-muted);
-				text-underline-offset: 4px;
-				transition: text-decoration-color 0.2s;
-
-				&:hover {
-					text-decoration-color: var(--text-link);
-				}
 			}
 
 			code {
