@@ -1,5 +1,8 @@
 import { inngest } from '../../client.js';
-import { personUpdateDetails } from '../sanity/steps.ts';
+import {
+	getCurrentActiveHackathon,
+	personUpdateDetails,
+} from '../sanity/steps.ts';
 import {
 	bookableDatesGet,
 	calendarEventList,
@@ -8,7 +11,8 @@ import {
 	sheetRowAppend,
 	tokenGenerate,
 } from '../google/steps.ts';
-import { messageSend } from '../discord/steps.ts';
+import { getDiscordMemberId, messageSend } from '../discord/steps.ts';
+import { userGetById } from '../clerk/steps.ts';
 
 export const handleUpdateUserProfile = inngest.createFunction(
 	{ id: 'codetv/user.profile.update' },
@@ -134,5 +138,36 @@ export const handleLWJIntake = inngest.createFunction(
 		// TODO generate social images for the episode
 		// TODO create an event in the Discord after ^^ is complete
 		// TODO create a draft event in Sanity (release?)
+	},
+);
+
+export const handleHackathonSubmission = inngest.createFunction(
+	{ id: 'codetv/forms.hackathon.submission' },
+	{ event: 'codetv/forms.hackathon.submission' },
+	async function ({ event, step }) {
+		await step.run('log-the-output', async () => {
+			return event.data;
+		});
+
+		const user = await step.invoke('get-user-by-id', {
+			function: userGetById,
+			data: {
+				userId: event.data.userId,
+			},
+		});
+
+		const hackathon = await step.invoke('get-current-active-hackathon', {
+			function: getCurrentActiveHackathon,
+			data: {},
+		});
+
+		const discordUserId = await step.invoke('get-discord-user-id', {
+			function: getDiscordMemberId,
+			data: {
+				user: user,
+			},
+		});
+
+		return event.data;
 	},
 );

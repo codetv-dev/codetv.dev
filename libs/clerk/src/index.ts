@@ -11,9 +11,21 @@ export const ClerkWebhookUser = z.object({
 	image_url: z.string(),
 });
 
-const secretKey = process.env.CLERK_SECRET_KEY;
+let _clerkClient: ReturnType<typeof createClerkClient> | null = null;
 
-export const clerk = createClerkClient({ secretKey });
+// Lazy initialize the Clerk client for inngest workflows
+export function getClerkClient() {
+	if (!_clerkClient) {
+		const secretKey = process.env.CLERK_SECRET_KEY;
+		if (!secretKey) {
+			throw new Error('CLERK_SECRET_KEY is not set');
+		}
+		_clerkClient = createClerkClient({ secretKey });
+	}
+	return _clerkClient;
+}
+
+export const clerk = getClerkClient();
 
 export async function loadUsersByIDs(ids: Array<string>) {
 	const result = await clerk.users.getUserList({

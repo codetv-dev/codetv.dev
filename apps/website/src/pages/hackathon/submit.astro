@@ -1,5 +1,6 @@
 ---
 import { SignedIn, SignedOut, SignIn } from '@clerk/astro/components';
+import { inngest } from '@codetv/inngest';
 import Layout from '../../layouts/default.astro';
 import '../../styles/forms.css';
 
@@ -27,16 +28,17 @@ if (Astro.request.method === 'POST' && user) {
 		if (!email || !fullName || !githubRepo || !deployedUrl || !agreeTerms) {
 			error = 'Please fill in all required fields and agree to the terms.';
 		} else {
-			// TODO: Add your form submission logic here
-			// e.g., send to a database, trigger an Inngest workflow, etc.
-			console.log({
-				userId: user.id,
-				email,
-				fullName,
-				githubRepo,
-				deployedUrl,
-				agreeTerms: !!agreeTerms,
-				optOutSponsorship: !!optOutSponsorship,
+			await inngest.send({
+				name: 'codetv/forms.hackathon.submission',
+				data: {
+					userId: user.id,
+					email,
+					fullName,
+					githubRepo,
+					deployedUrl,
+					agreeTerms: !!agreeTerms,
+					optOutSponsorship: !!optOutSponsorship,
+				},
 			});
 
 			submitted = true;

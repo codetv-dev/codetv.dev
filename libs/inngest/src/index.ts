@@ -35,6 +35,7 @@ import {
 	retrieveStripeSubscription,
 } from './integrations/stripe/steps.js';
 import {
+	handleHackathonSubmission,
 	handleLWJIntake,
 	handleUpdateUserProfile,
 	handleWDCIntakeSubmit,
@@ -83,6 +84,7 @@ export const functions: any[] = [
 	handleWebhookStripeSubscriptionCompleted,
 	retrieveStripeProduct,
 	retrieveStripeSubscription,
+	handleHackathonSubmission,
 	handleLWJIntake,
 	handleUpdateUserProfile,
 	handleWDCIntakeSubmit,
