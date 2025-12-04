@@ -22,6 +22,7 @@ import {
 	tokenGenerate,
 } from './integrations/google/steps.js';
 import {
+	hackathonSubmissionCreate,
 	personGetByClerkId,
 	personUpdateDetails,
 	personUpdateSubscription,
@@ -76,6 +77,7 @@ export const functions: any[] = [
 	sheetRowAppend,
 	tokenGenerate,
 	getCurrentActiveHackathon,
+	hackathonSubmissionCreate,
 	personGetByClerkId,
 	personUpdateDetails,
 	personUpdateSubscription,

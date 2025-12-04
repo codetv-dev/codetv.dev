@@ -75,4 +75,16 @@ export const schema = {
 			productName: z.string(),
 		}),
 	},
+	'sanity/hackathon-submission.create': {
+		data: z.object({
+			hackathonId: z.string(),
+			personId: z.string().optional(),
+			email: z.string(),
+			fullName: z.string(),
+			githubRepo: z.string(),
+			deployedUrl: z.string(),
+			agreeTerms: z.boolean(),
+			optOutSponsorship: z.boolean(),
+		}),
+	},
 };

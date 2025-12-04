@@ -1,5 +1,6 @@
 import {
 	createPerson,
+	createHackathonSubmission,
 	getPersonByClerkId,
 	updatePerson,
 	updatePersonFromClerk,
@@ -21,7 +22,7 @@ export const getCurrentActiveHackathon = inngest.createFunction(
 export const personGetByClerkId = inngest.createFunction(
 	{
 		id: 'sanity/person.get-by-clerk-id',
-		description:	
+		description:
 			'Loads a person from Sanity using their Clerk user ID, if one exists.',
 	},
 	{ event: 'sanity/person.get-by-clerk-id' },
@@ -78,6 +79,16 @@ export const personUpdateSubscription = inngest.createFunction(
 				level: event.data.productName,
 				date: new Date(),
 			});
+		});
+	},
+);
+
+export const hackathonSubmissionCreate = inngest.createFunction(
+	{ id: 'sanity/hackathon-submission.create' },
+	{ event: 'sanity/hackathon-submission.create' },
+	async ({ event, step }) => {
+		return step.run('sanity/create-hackathon-submission', async () => {
+			return createHackathonSubmission(event.data);
 		});
 	},
 );

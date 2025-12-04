@@ -1,6 +1,8 @@
 import { inngest } from '../../client.js';
 import {
 	getCurrentActiveHackathon,
+	hackathonSubmissionCreate,
+	personGetByClerkId,
 	personUpdateDetails,
 } from '../sanity/steps.ts';
 import {
@@ -161,6 +163,13 @@ export const handleHackathonSubmission = inngest.createFunction(
 			data: {},
 		});
 
+		const person = await step.invoke('get-sanity-person', {
+			function: personGetByClerkId,
+			data: {
+				clerkUserId: event.data.userId,
+			},
+		});
+
 		const discordUserId = await step.invoke('get-discord-user-id', {
 			function: getDiscordMemberId,
 			data: {
@@ -168,6 +177,20 @@ export const handleHackathonSubmission = inngest.createFunction(
 			},
 		});
 
-		return event.data;
+		const submission = await step.invoke('create-hackathon-submission', {
+			function: hackathonSubmissionCreate,
+			data: {
+				hackathonId: hackathon?._id ?? '',
+				personId: person?._id,
+				email: event.data.email,
+				fullName: event.data.fullName,
+				githubRepo: event.data.githubRepo,
+				deployedUrl: event.data.deployedUrl,
+				agreeTerms: event.data.agreeTerms,
+				optOutSponsorship: event.data.optOutSponsorship,
+			},
+		});
+
+		return submission;
 	},
 );

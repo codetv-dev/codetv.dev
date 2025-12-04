@@ -917,3 +917,29 @@ export async function updatePerson(
 ) {
 	return client.patch(id).set(set).commit({ autoGenerateArrayKeys: true });
 }
+
+export async function createHackathonSubmission(submission: {
+	hackathonId: string;
+	personId?: string;
+	email: string;
+	fullName: string;
+	githubRepo: string;
+	deployedUrl: string;
+	agreeTerms: boolean;
+	optOutSponsorship: boolean;
+}) {
+	return client.create({
+		_type: 'hackathonSubmission',
+		hackathon: { _type: 'reference', _ref: submission.hackathonId },
+		person: submission.personId
+			? { _type: 'reference', _ref: submission.personId }
+			: undefined,
+		email: submission.email,
+		fullName: submission.fullName,
+		githubRepo: submission.githubRepo,
+		deployedUrl: submission.deployedUrl,
+		agreeTerms: submission.agreeTerms,
+		optOutSponsorship: submission.optOutSponsorship,
+		submittedAt: new Date().toISOString(),
+	});
+}
