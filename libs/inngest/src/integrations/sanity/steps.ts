@@ -14,7 +14,7 @@ export const getCurrentActiveHackathon = inngest.createFunction(
 	{ id: 'sanity/hackathon.get-current-active' },
 	{ event: 'sanity/hackathon.get-current-active' },
 	async function ({ event }): Promise<HackathonBySlugQueryResult | null> {
-		return getActiveHackathon();
+		return await getActiveHackathon();
 	},
 );
 

@@ -847,11 +847,17 @@ export async function getHackathonBySlug(params: { slug: string }) {
 }
 
 export async function getActiveHackathon() {
-	return client.fetch<HackathonBySlugQueryResult>(
+	const hackathon = await client.fetch<HackathonBySlugQueryResult>(
 		activeHackathonQuery,
 		{},
 		{ useCdn: true },
 	);
+
+	if (!hackathon) {
+		return null;
+	}
+
+	return hackathon;
 }
 
 export async function createPerson(

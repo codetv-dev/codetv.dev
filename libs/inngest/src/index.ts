@@ -26,6 +26,7 @@ import {
 	personUpdateDetails,
 	personUpdateSubscription,
 	personUpsert,
+	getCurrentActiveHackathon,
 } from './integrations/sanity/steps.js';
 import {
 	handleStripeSubscriptionUpdatedWebhook,
@@ -73,6 +74,7 @@ export const functions: any[] = [
 	hostFreeBusy,
 	sheetRowAppend,
 	tokenGenerate,
+	getCurrentActiveHackathon,
 	personGetByClerkId,
 	personUpdateDetails,
 	personUpdateSubscription,
