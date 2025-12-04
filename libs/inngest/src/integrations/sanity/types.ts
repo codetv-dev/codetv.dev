@@ -1,6 +1,9 @@
 import { z } from 'zod';
 
 export const schema = {
+	'sanity/hackathon.get-current-active': {
+		data: z.object({}),
+	},
 	'sanity/person.get-by-clerk-id': {
 		data: z.object({
 			clerkUserId: z.string(),

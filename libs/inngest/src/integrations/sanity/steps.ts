@@ -4,14 +4,24 @@ import {
 	updatePerson,
 	updatePersonFromClerk,
 	updatePersonSubscription,
+	getActiveHackathon,
 	type PersonByClerkIdQueryResult,
 } from '@codetv/sanity';
 import { inngest } from '../../client.js';
+import { HackathonBySlugQueryResult } from '@codetv/types';
+
+export const getCurrentActiveHackathon = inngest.createFunction(
+	{ id: 'sanity/hackathon.get-current-active' },
+	{ event: 'sanity/hackathon.get-current-active' },
+	async function ({ event }): Promise<HackathonBySlugQueryResult | null> {
+		return getActiveHackathon();
+	},
+);
 
 export const personGetByClerkId = inngest.createFunction(
 	{
 		id: 'sanity/person.get-by-clerk-id',
-		description:
+		description:	
 			'Loads a person from Sanity using their Clerk user ID, if one exists.',
 	},
 	{ event: 'sanity/person.get-by-clerk-id' },
