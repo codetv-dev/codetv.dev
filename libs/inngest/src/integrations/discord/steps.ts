@@ -124,6 +124,50 @@ export const addMemberToServer = inngest.createFunction(
 	},
 );
 
+export type BadgeType = 'hackathon_participant';
+
+export const addUserBadge = inngest.createFunction(
+	{ id: 'discord/user.badge.add' },
+	{ event: 'discord/user.badge.add' },
+	async function ({ event, step }) {
+		const { memberId, badge } = event.data;
+
+		const discordMember = await step.run('discord/user.get', async () => {
+			try {
+				return await getMember(memberId);
+			} catch {
+				return null;
+			}
+		});
+
+		if (!discordMember) {
+			return {
+				message: `User ${memberId} is not in the server, skipping badge`,
+			};
+		}
+
+		const roleId = await step.run('discord/badge-role.get', async () => {
+			switch (badge as BadgeType) {
+				case 'hackathon_participant':
+					return config.roles.hackathon_participant;
+
+				default:
+					throw new NonRetriableError('unknown badge', { cause: badge });
+			}
+		});
+
+		return step.run('discord/user.badge.apply', async () => {
+			if (discordMember.roles.includes(roleId)) {
+				return {
+					message: `${discordMember.user.username} already has badge ${badge}`,
+				};
+			}
+
+			return updateRole({ memberId, roleId });
+		});
+	},
+);
+
 export const discordUpdateUserRole = inngest.createFunction(
 	{ id: 'discord/update-user-role' },
 	[{ event: 'clerk/user.created' }, { event: 'clerk/user.updated' }],

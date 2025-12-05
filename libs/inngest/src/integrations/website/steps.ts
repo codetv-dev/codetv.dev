@@ -13,7 +13,11 @@ import {
 	sheetRowAppend,
 	tokenGenerate,
 } from '../google/steps.ts';
-import { getDiscordMemberId, messageSend } from '../discord/steps.ts';
+import {
+	addUserBadge,
+	getDiscordMemberId,
+	messageSend,
+} from '../discord/steps.ts';
 import { userGetById } from '../clerk/steps.ts';
 
 export const handleUpdateUserProfile = inngest.createFunction(
@@ -188,6 +192,14 @@ export const handleHackathonSubmission = inngest.createFunction(
 				deployedUrl: event.data.deployedUrl,
 				agreeTerms: event.data.agreeTerms,
 				optOutSponsorship: event.data.optOutSponsorship,
+			},
+		});
+
+		await step.invoke('add-hackathon-badge', {
+			function: addUserBadge,
+			data: {
+				memberId: discordUserId,
+				badge: 'hackathon_participant',
 			},
 		});
 

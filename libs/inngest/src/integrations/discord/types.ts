@@ -47,4 +47,10 @@ export const schema = {
 			message: z.string(),
 		}),
 	},
+	'discord/user.badge.add': {
+		data: z.object({
+			memberId: z.string(),
+			badge: z.literal('hackathon_participant'),
+		}),
+	},
 };
