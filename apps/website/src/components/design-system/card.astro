@@ -89,7 +89,7 @@ const { title, variant = 'primary', link } = Astro.props;
 		.title {
 			color: var(--text-emphasized);
 			font-size: 1em;
-			font-weight: 500;
+			font-weight: 400;
 			line-height: 1.25;
 			margin: 0;
 
@@ -106,6 +106,8 @@ const { title, variant = 'primary', link } = Astro.props;
 
 			:is(h1, h2, h3, h4, h5, h6) {
 				font-size: clamp(1em, 3.5cqi, 1.125em);
+				font-variation-settings: 'wdth' 100;
+				font-weight: 500;
 				line-height: 1.1;
 			}
 
@@ -123,8 +125,10 @@ const { title, variant = 'primary', link } = Astro.props;
 			color: var(--text-muted);
 			display: flex;
 			flex-direction: column;
+			font-optical-sizing: auto;
+			font-weight: 300;
 			gap: var(--gap);
-			line-height: 1.25;
+			line-height: 1.35;
 
 			> * {
 				color: inherit;

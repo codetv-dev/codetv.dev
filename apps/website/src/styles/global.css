@@ -1,5 +1,7 @@
 @layer design-system, global, site-base, overrides;
 
+@import url('https://fonts.googleapis.com/css2?family=Mona+Sans:ital,wdth,wght@0,75..125,200..900;1,75..125,200..900&display=swap');
+
 @font-face {
 	font-display: swap;
 	font-family: 'heading-font';
@@ -39,12 +41,6 @@
 		--purple-500: oklch(62.12% 0.259 305.9);
 		--purple-600: oklch(56.68% 0.281 302.97);
 
-		--blue-500: oklch(56.81% 0.154 252.65);
-		--blue-600: oklch(46.53% 0.155 255.48);
-
-		--text-strong: var(--gray-600);
-		--text-link: var(--blue-500);
-
 		/* UPDATED COLOR PALETTE */
 		--gray-000: #080217;
 		--gray-100: #18151f;
@@ -62,6 +58,7 @@
 		--text: var(--gray-700);
 		--text-muted: var(--gray-600);
 		--text-emphasized: var(--gray-800);
+		--text-link: var(--blue);
 
 		--font-family: system-ui, sans-serif;
 		--font-family-heading: heading-font, impact, system-ui, sans-serif;
@@ -81,6 +78,7 @@
 	:is(h1, h2, h3, h4, h5, h6) {
 		color: var(--text-emphasized);
 		font-weight: 600;
+		font-variation-settings: 'wdth' 75;
 		letter-spacing: -0.02em;
 		line-height: 1.35;
 		text-wrap: pretty;

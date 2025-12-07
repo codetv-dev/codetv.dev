@@ -137,16 +137,6 @@ const blogs = (
 			padding: 180px max((100% - 900px) / 2, 5%);
 		}
 
-		.post-preview:not(:first-of-type) {
-			margin-block-start: 80px;
-		}
-
-		.post-preview:has(.image) {
-			display: grid;
-			gap: 20px;
-			grid-template-columns: min(400px, 50%) 1fr;
-		}
-
 		.image {
 			display: block;
 		}
@@ -166,27 +156,5 @@ const blogs = (
 		font-family: var(--font-family);
 		font-size: clamp(1em, 1.5cqi, 2em);
 		line-height: 1.1;
-	}
-
-	.post-preview h2 a {
-		color: inherit;
-		text-decoration: none;
-	}
-
-	.post-preview p {
-		margin: 5px 0 10px;
-	}
-
-	.post-preview .read-more {
-		align-items: center;
-		color: var(--purple-600);
-		display: flex;
-		font-size: 0.8em;
-		font-weight: 400;
-		gap: 5px;
-		justify-content: flex-end;
-		text-align: right;
-		text-transform: uppercase;
-		text-decoration: none;
 	}
 </style>

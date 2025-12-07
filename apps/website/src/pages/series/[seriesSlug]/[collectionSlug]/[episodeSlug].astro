@@ -2,10 +2,7 @@
 import { format } from 'date-fns';
 import { marked } from 'marked';
 import { Image } from '@unpic/astro';
-import {
-	getAllEpisodes,
-	getEpisodeTranscriptBySlug,
-} from '@codetv/sanity';
+import { getAllEpisodes, getEpisodeTranscriptBySlug } from '@codetv/sanity';
 import {
 	createImageUrl,
 	generateDefaultImage,
@@ -559,7 +556,7 @@ if (episode.video && !episode.video.youtube_id && episode.video.mux) {
 	}
 
 	.season-link {
-		color: var(--text-strong);
+		color: var(--text-emphasized);
 		font-weight: 600;
 		text-decoration: none;
 

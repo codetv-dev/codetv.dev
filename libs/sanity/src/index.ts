@@ -493,6 +493,7 @@ const allHackathonsQuery = groq`
       _id,
       title,
       'slug': slug.current,
+      'path': "/series/" + *[_type=="collection" && references(^._id)][0].series->slug.current + "/" + *[_type=="collection" && references(^._id)][0].slug.current + "/" + slug.current,
       short_description,
       publish_date,
       'thumbnail': {
@@ -530,6 +531,7 @@ const hackathonBySlugQuery = groq`
     'episode': episodes[0]-> {
       title,
       'slug': slug.current,
+      'path': "/series/" + *[_type=="collection" && references(^._id)][0].series->slug.current + "/" + *[_type=="collection" && references(^._id)][0].slug.current + "/" + slug.current,
       'thumbnail': {
         'public_id': video.thumbnail.public_id,
         'width': video.thumbnail.width,

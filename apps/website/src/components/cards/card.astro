@@ -141,6 +141,7 @@ if (image.src) {
 			font-size: 1rem;
 			gap: 8px;
 			line-height: 1.45;
+			padding: 0 8px 8px;
 			position: relative;
 			z-index: 10;
 		}
@@ -148,8 +149,8 @@ if (image.src) {
 		.tagline {
 			color: var(--text-muted);
 			display: flex;
-			font-family: var(--font-family-heading);
-			font-size: clamp(0.75em, 4cqi, 1.125em);
+			font-size: 0.75em;
+			font-variation-settings: 'wdth' 80;
 			font-weight: normal;
 			gap: 10px;
 			line-height: 0.7;
@@ -175,7 +176,7 @@ if (image.src) {
 
 		.details {
 			display: flex;
-			font-size: clamp(0.75em, 5cqi, 1.125em);
+			font-size: 1em;
 			font-weight: 500;
 			gap: 20px;
 			line-height: 1.25;
@@ -191,8 +192,9 @@ if (image.src) {
 			color: var(--white);
 			display: inline-block;
 			font-family: var(--font-family);
-			font-size: clamp(0.875em, 5cqi, 1.125em);
-			font-weight: normal;
+			font-size: 0.75em;
+			font-variation-settings: 'wdth' 100;
+			font-weight: 200;
 			line-height: 0.9;
 			padding: 0;
 			text-decoration: none;

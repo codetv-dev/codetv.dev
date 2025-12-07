@@ -156,6 +156,7 @@ const primarySponsor = hasSponsors ? sponsors?.[0] : null;
 											<img
 												src={createImageUrl(primarySponsor.logo.public_id, {
 													width: 200,
+													format: 'svg',
 												})}
 												alt={primarySponsor.title || 'Sponsor'}
 												class="sponsor-image"
@@ -212,9 +213,7 @@ const primarySponsor = hasSponsors ? sponsors?.[0] : null;
 							<span>
 								Watch the challenge in action to jumpstart your creativity
 							</span>
-							<a href={`/series/web-dev-challenge/${hackathon.episode.slug}`}>
-								Watch the episode &rarr;
-							</a>
+							<a href={hackathon.episode.path}>Watch the episode &rarr;</a>
 						</figcaption>
 					</figure>
 				</Block>
@@ -259,6 +258,7 @@ const primarySponsor = hasSponsors ? sponsors?.[0] : null;
 										format: 'svg',
 									})}
 									alt={primarySponsor.title}
+									class="sponsor-image"
 								/>
 							) : (
 								<span>{primarySponsor.title}</span>
@@ -406,7 +406,7 @@ const primarySponsor = hasSponsors ? sponsors?.[0] : null;
 		}
 
 		.sponsor-image {
-			max-block-size: 40px;
+			block-size: 50px;
 			inline-size: auto;
 		}
 
@@ -427,7 +427,7 @@ const primarySponsor = hasSponsors ? sponsors?.[0] : null;
 	.copy {
 		display: flex;
 		flex-direction: column;
-		gap: 16px;
+		gap: 32px;
 
 		.lede {
 			color: var(--text-emphasized);
@@ -439,20 +439,24 @@ const primarySponsor = hasSponsors ? sponsors?.[0] : null;
 		.body-content {
 			display: flex;
 			flex-direction: column;
-			gap: 16px;
+			gap: 8px;
 
 			:is(h2, h3) {
+				font-weight: 600;
+				font-variation-settings: 'wdth' 75;
 				line-height: 1.1;
+
+				&:not(:first-child) {
+					margin-block-start: 24px;
+				}
 			}
 
 			h2 {
 				font-size: clamp(1.5rem, 2.5cqi, 2.25rem);
-				margin-block-start: 32px;
 			}
 
 			h3 {
 				font-size: clamp(1.25rem, 2.25cqi, 2rem);
-				margin-block-start: 24px;
 			}
 
 			p {
@@ -524,8 +528,9 @@ const primarySponsor = hasSponsors ? sponsors?.[0] : null;
 			gap: 8px;
 		}
 
-		svg {
-			block-size: 32px;
+		svg,
+		.sponsor-image {
+			block-size: 45px;
 			inline-size: auto;
 			margin-block-start: 4px;
 		}
@@ -554,6 +559,10 @@ const primarySponsor = hasSponsors ? sponsors?.[0] : null;
 
 <style is:global>
 	@layer overrides {
+		.block[data-name='episode'] {
+			padding-inline: calc((100dvi - 960px) / 2);
+		}
+
 		/* Force the submit block to be properly centered on all screens */
 		.block[data-name='submit'] {
 			display: flex;
@@ -620,6 +629,7 @@ const primarySponsor = hasSponsors ? sponsors?.[0] : null;
 			container-type: inline-size;
 			max-inline-size: var(--hero-max-width);
 			margin-inline: auto;
+			position: relative;
 
 			img {
 				max-block-size: var(--hero-max-height);
@@ -629,6 +639,19 @@ const primarySponsor = hasSponsors ? sponsors?.[0] : null;
 			h1 {
 				inline-size: 90%;
 				font-size: clamp(1rem, 10cqi, 11rem);
+				z-index: 10;
+			}
+
+			&::after {
+				background: linear-gradient(
+					to top,
+					color-mix(in oklch, var(--black), transparent 0%),
+					color-mix(in oklch, var(--black), transparent 100%) 40%
+				);
+				content: '';
+				inset: 0;
+				position: absolute;
+				z-index: 1;
 			}
 		}
 
