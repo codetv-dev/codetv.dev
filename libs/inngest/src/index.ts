@@ -9,6 +9,7 @@ import { imageUpload } from './integrations/cloudinary/steps.js';
 import {
 	addAlumniRole,
 	addMemberToServer,
+	addUserBadge,
 	discordUpdateUserRole,
 	getDiscordMemberId,
 	messageSend,
@@ -67,6 +68,7 @@ export const functions: any[] = [
 	imageUpload,
 	addAlumniRole,
 	addMemberToServer,
+	addUserBadge,
 	discordUpdateUserRole,
 	getDiscordMemberId,
 	messageSend,

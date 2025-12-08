@@ -1,4 +1,4 @@
-import { createClerkClient } from '@clerk/backend';
+import { createClerkClient, type ClerkClient } from '@clerk/backend';
 import { z } from 'zod';
 
 export { type User } from '@clerk/backend';
@@ -11,21 +11,28 @@ export const ClerkWebhookUser = z.object({
 	image_url: z.string(),
 });
 
-let _clerkClient: ReturnType<typeof createClerkClient> | null = null;
+// Lazy initialization to ensure env vars are loaded at runtime
+let _clerk: ClerkClient | null = null;
 
-// Lazy initialize the Clerk client for inngest workflows
-export function getClerkClient() {
-	if (!_clerkClient) {
+function getClerk(): ClerkClient {
+	if (!_clerk) {
 		const secretKey = process.env.CLERK_SECRET_KEY;
 		if (!secretKey) {
-			throw new Error('CLERK_SECRET_KEY is not set');
+			throw new Error(
+				'CLERK_SECRET_KEY is not set. Make sure to add it to your .env file.',
+			);
 		}
-		_clerkClient = createClerkClient({ secretKey });
+		_clerk = createClerkClient({ secretKey });
 	}
-	return _clerkClient;
+	return _clerk;
 }
 
-export const clerk = getClerkClient();
+// Proxy that lazily initializes the clerk client on first access
+export const clerk = new Proxy({} as ClerkClient, {
+	get(_target, prop) {
+		return getClerk()[prop as keyof ClerkClient];
+	},
+});
 
 export async function loadUsersByIDs(ids: Array<string>) {
 	const result = await clerk.users.getUserList({

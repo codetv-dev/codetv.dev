@@ -14,6 +14,6 @@ export const config = {
 		wdc_alumni: '1270945994015637525',
 		lh_alumni: '1388760763853967383',
 		lwj_alumni: '1191930314155638804',
-		hackathon_participant: 'TODO_ADD_ROLE_ID',
+		hackathon_participant: '1403224671612305628',
 	},
 };
