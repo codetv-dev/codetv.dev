@@ -132,6 +132,22 @@ export const person = defineType({
       ],
       group: 'hackathons',
     }),
+    defineField({
+      name: 'hackathonSubmissions',
+      type: 'array',
+      title: 'Hackathon Submissions',
+      description: 'Submissions this person has made to hackathons',
+      of: [
+        defineArrayMember({
+          type: 'reference',
+          to: [{type: 'hackathonSubmission'}],
+          options: {
+            disableNew: true,
+          },
+        }),
+      ],
+      group: 'hackathons',
+    }),
   ],
   __experimental_formPreviewTitle: false,
   preview: {

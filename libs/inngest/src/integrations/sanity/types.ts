@@ -87,4 +87,16 @@ export const schema = {
 			optOutSponsorship: z.boolean(),
 		}),
 	},
+	'sanity/person.associate-with-hackathon': {
+		data: z.object({
+			personId: z.string(),
+			hackathonId: z.string(),
+		}),
+	},
+	'sanity/person.associate-with-hackathon-submission': {
+		data: z.object({
+			personId: z.string(),
+			submissionId: z.string(),
+		}),
+	},
 };

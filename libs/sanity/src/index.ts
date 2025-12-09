@@ -943,3 +943,40 @@ export async function createHackathonSubmission(submission: {
 		submittedAt: new Date().toISOString(),
 	});
 }
+
+export async function associatePersonWithHackathon(
+	personId: string,
+	hackathonId: string,
+): Promise<{ alreadyAssociated: boolean }> {
+	// Check if person is already associated with this hackathon
+	const existingAssociation = await client.fetch<{ _id: string } | null>(
+		groq`*[_type == "person" && _id == $personId && $hackathonId in hackathons[]._ref][0] { _id }`,
+		{ personId, hackathonId },
+	);
+
+	if (existingAssociation) {
+		return { alreadyAssociated: true };
+	}
+
+	// Add the hackathon reference to the person's hackathons array
+	await client
+		.patch(personId)
+		.setIfMissing({ hackathons: [] })
+		.append('hackathons', [{ _type: 'reference', _ref: hackathonId }])
+		.commit({ autoGenerateArrayKeys: true });
+
+	return { alreadyAssociated: false };
+}
+
+export async function associatePersonWithHackathonSubmission(
+	personId: string,
+	submissionId: string,
+) {
+	return client
+		.patch(personId)
+		.setIfMissing({ hackathonSubmissions: [] })
+		.append('hackathonSubmissions', [
+			{ _type: 'reference', _ref: submissionId },
+		])
+		.commit({ autoGenerateArrayKeys: true });
+}

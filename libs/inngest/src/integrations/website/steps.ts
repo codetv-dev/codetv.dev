@@ -2,6 +2,8 @@ import { inngest } from '../../client.js';
 import {
 	getCurrentActiveHackathon,
 	hackathonSubmissionCreate,
+	personAssociateWithHackathon,
+	personAssociateWithHackathonSubmission,
 	personGetByClerkId,
 	personUpdateDetails,
 } from '../sanity/steps.ts';
@@ -195,6 +197,28 @@ export const handleHackathonSubmission = inngest.createFunction(
 				optOutSponsorship: event.data.optOutSponsorship,
 			},
 		});
+
+		// Associate person with hackathon (if not already associated)
+		if (person?._id && hackathon?._id) {
+			await step.invoke('associate-person-with-hackathon', {
+				function: personAssociateWithHackathon,
+				data: {
+					personId: person._id,
+					hackathonId: hackathon._id,
+				},
+			});
+		}
+
+		// Associate person with hackathon submission
+		if (person?._id && submission?._id) {
+			await step.invoke('associate-person-with-hackathon-submission', {
+				function: personAssociateWithHackathonSubmission,
+				data: {
+					personId: person._id,
+					submissionId: submission._id,
+				},
+			});
+		}
 
 		await step.invoke('add-hackathon-badge', {
 			function: addUserBadge,

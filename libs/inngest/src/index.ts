@@ -24,12 +24,14 @@ import {
 	tokenGenerate,
 } from './integrations/google/steps.js';
 import {
+	getCurrentActiveHackathon,
 	hackathonSubmissionCreate,
+	personAssociateWithHackathon,
+	personAssociateWithHackathonSubmission,
 	personGetByClerkId,
 	personUpdateDetails,
 	personUpdateSubscription,
 	personUpsert,
-	getCurrentActiveHackathon,
 } from './integrations/sanity/steps.js';
 import {
 	handleStripeSubscriptionUpdatedWebhook,
@@ -82,6 +84,8 @@ export const functions: any[] = [
 	tokenGenerate,
 	getCurrentActiveHackathon,
 	hackathonSubmissionCreate,
+	personAssociateWithHackathon,
+	personAssociateWithHackathonSubmission,
 	personGetByClerkId,
 	personUpdateDetails,
 	personUpdateSubscription,
