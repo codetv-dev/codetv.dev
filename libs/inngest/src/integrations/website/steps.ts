@@ -9,6 +9,7 @@ import {
 	bookableDatesGet,
 	calendarEventList,
 	eventsGetUnbookedDates,
+	hackathonSheetRowAppend,
 	hostFreeBusy,
 	sheetRowAppend,
 	tokenGenerate,
@@ -200,6 +201,19 @@ export const handleHackathonSubmission = inngest.createFunction(
 			data: {
 				memberId: discordUserId,
 				badge: 'hackathon_participant',
+			},
+		});
+
+		await step.invoke('append-row-to-hackathon-google-sheet', {
+			function: hackathonSheetRowAppend,
+			data: {
+				userId: event.data.userId,
+				fullName: event.data.fullName,
+				email: event.data.email,
+				githubRepo: event.data.githubRepo,
+				deployedUrl: event.data.deployedUrl,
+				agreeTerms: event.data.agreeTerms,
+				optOutSponsorship: event.data.optOutSponsorship,
 			},
 		});
 

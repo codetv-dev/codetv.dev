@@ -62,3 +62,60 @@ export async function appendValue({
 
 	return `https://docs.google.com/spreadsheets/d/${config.sheet.id}/edit`;
 }
+
+export async function appendHackathonValue({
+	userId,
+	fullName,
+	email,
+	githubRepo,
+	deployedUrl,
+	agreeTerms,
+	optOutSponsorship,
+}: {
+	userId: string;
+	fullName: string;
+	email: string;
+	githubRepo: string;
+	deployedUrl: string;
+	agreeTerms: boolean;
+	optOutSponsorship: boolean;
+}) {
+	const accessToken = await getGoogleAccessToken();
+
+	const entry = [
+		new Date().toLocaleString(),
+		fullName,
+		email,
+		githubRepo,
+		deployedUrl,
+		agreeTerms,
+		optOutSponsorship,
+	];
+
+	const res = await fetch(
+		`https://sheets.googleapis.com/v4/spreadsheets/${config.hackathonSheet.id}/values/${config.hackathonSheet.range}:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS`,
+		{
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				Authorization: `Bearer ${accessToken}`,
+			},
+			body: JSON.stringify({
+				values: [entry],
+			}),
+		},
+	);
+
+	if (!res.ok) {
+		const errorBody = await res.json().catch(() => null);
+		return {
+			error: {
+				status: res.status,
+				statusText: res.statusText,
+				details: errorBody,
+			},
+		};
+	}
+
+	return `https://docs.google.com/spreadsheets/d/${config.hackathonSheet.id}/edit`;
+}
