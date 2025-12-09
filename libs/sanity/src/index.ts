@@ -586,6 +586,79 @@ const hackathonBySlugQuery = groq`
   }
 `;
 
+const activeHackathonQuery = groq`
+  *[_type == "hackathon" && hidden != "hidden" && dateTime(pubDate) <= dateTime(now()) && dateTime(deadline) > dateTime(now())] | order(pubDate desc)[0] {
+    _id,
+    title,
+    'slug': slug.current,
+    description,
+    body,
+    pubDate,
+    deadline,
+    submissionForm,
+    hero_image {
+      public_id,
+      width,
+      height,
+    },
+    hero_title,
+    'episode': episodes[0]-> {
+      title,
+      'slug': slug.current,
+      'thumbnail': {
+        'public_id': video.thumbnail.public_id,
+        'width': video.thumbnail.width,
+        'height': video.thumbnail.height,
+        'alt': video.thumbnail_alt,
+      },
+      video {
+        youtube_id,
+        'mux': mux_video.asset->data.playback_ids,
+      }
+    },
+    'sponsors': sponsors[]->{
+      title,
+      logo {
+        public_id,
+        width,
+        height
+      },
+      link,
+    },
+    'rewardsData': rewards[]-> {
+      title,
+      description,
+      image {
+        public_id,
+        width,
+        height,
+      },
+      weight
+    } | order(weight asc),
+    'faqData': faq[]-> {
+      question,
+      answer,
+      weight
+    } | order(weight asc),
+    rules[]-> {
+      title,
+      description,
+      weight
+    } | order(weight asc),
+    resources[] {
+      title,
+      description,
+      url,
+    },
+    share_image {
+      public_id,
+      width,
+      height,
+    },
+    hidden
+  }
+`;
+
 export async function getAllSeries() {
 	return client.fetch<AllSeriesQueryResult>(
 		allSeriesQuery,
@@ -775,6 +848,20 @@ export async function getHackathonBySlug(params: { slug: string }) {
 	return hackathon;
 }
 
+export async function getActiveHackathon() {
+	const hackathon = await client.fetch<HackathonBySlugQueryResult>(
+		activeHackathonQuery,
+		{},
+		{ useCdn: true },
+	);
+
+	if (!hackathon) {
+		return null;
+	}
+
+	return hackathon;
+}
+
 export async function createPerson(
 	name: string,
 	user_id: string,
@@ -831,4 +918,67 @@ export async function updatePerson(
 	},
 ) {
 	return client.patch(id).set(set).commit({ autoGenerateArrayKeys: true });
+}
+
+export async function createHackathonSubmission(submission: {
+	hackathonId: string;
+	personId?: string;
+	email: string;
+	fullName: string;
+	githubRepo: string;
+	deployedUrl: string;
+	agreeTerms: boolean;
+	optOutSponsorship: boolean;
+}) {
+	return client.create({
+		_type: 'hackathonSubmission',
+		hackathon: { _type: 'reference', _ref: submission.hackathonId },
+		person: submission.personId
+			? { _type: 'reference', _ref: submission.personId }
+			: undefined,
+		email: submission.email,
+		fullName: submission.fullName,
+		githubRepo: submission.githubRepo,
+		deployedUrl: submission.deployedUrl,
+		agreeTerms: submission.agreeTerms,
+		optOutSponsorship: submission.optOutSponsorship,
+		submittedAt: new Date().toISOString(),
+	});
+}
+
+export async function associatePersonWithHackathon(
+	personId: string,
+	hackathonId: string,
+): Promise<{ alreadyAssociated: boolean }> {
+	// Check if person is already associated with this hackathon
+	const existingAssociation = await client.fetch<{ _id: string } | null>(
+		groq`*[_type == "person" && _id == $personId && $hackathonId in hackathons[]._ref][0] { _id }`,
+		{ personId, hackathonId },
+	);
+
+	if (existingAssociation) {
+		return { alreadyAssociated: true };
+	}
+
+	// Add the hackathon reference to the person's hackathons array
+	await client
+		.patch(personId)
+		.setIfMissing({ hackathons: [] })
+		.append('hackathons', [{ _type: 'reference', _ref: hackathonId }])
+		.commit({ autoGenerateArrayKeys: true });
+
+	return { alreadyAssociated: false };
+}
+
+export async function associatePersonWithHackathonSubmission(
+	personId: string,
+	submissionId: string,
+) {
+	return client
+		.patch(personId)
+		.setIfMissing({ hackathonSubmissions: [] })
+		.append('hackathonSubmissions', [
+			{ _type: 'reference', _ref: submissionId },
+		])
+		.commit({ autoGenerateArrayKeys: true });
 }
