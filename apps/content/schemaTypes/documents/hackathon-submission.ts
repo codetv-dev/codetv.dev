@@ -23,44 +23,20 @@ export const hackathonSubmission = defineType({
       description: 'The person who submitted this entry',
     }),
     defineField({
-      name: 'email',
-      type: 'string',
-      title: 'Email',
-      validation: (Rule) => Rule.required().email().error('Valid email is required'),
-    }),
-    defineField({
-      name: 'fullName',
-      type: 'string',
-      title: 'Full Name',
-      validation: (Rule) => Rule.required().error('Full name is required'),
-    }),
-    defineField({
       name: 'githubRepo',
       type: 'url',
       title: 'GitHub Repository',
       description: 'Link to the source code repository',
-      validation: (Rule) => Rule.required().uri({scheme: ['https']}).error('GitHub repo URL is required'),
+      validation: (Rule) =>
+        Rule.required()
+          .uri({scheme: ['https']})
+          .error('GitHub repo URL is required'),
     }),
     defineField({
       name: 'deployedUrl',
       type: 'url',
       title: 'Deployed URL',
       description: 'Link to the deployed web app',
-      validation: (Rule) => Rule.required().uri({scheme: ['http', 'https']}).error('Deployed URL is required'),
-    }),
-    defineField({
-      name: 'agreeTerms',
-      type: 'boolean',
-      title: 'Agreed to Terms',
-      description: 'Whether the submitter agreed to terms and conditions',
-      initialValue: false,
-    }),
-    defineField({
-      name: 'optOutSponsorship',
-      type: 'boolean',
-      title: 'Opted Out of Sponsorship',
-      description: 'Whether the submitter opted out of having their app showcased by sponsors',
-      initialValue: false,
     }),
     defineField({
       name: 'submittedAt',
@@ -72,7 +48,7 @@ export const hackathonSubmission = defineType({
   ],
   preview: {
     select: {
-      fullName: 'fullName',
+      fullName: 'person.name',
       hackathonTitle: 'hackathon.title',
       submittedAt: 'submittedAt',
     },
@@ -87,4 +63,3 @@ export const hackathonSubmission = defineType({
     },
   },
 })
-
