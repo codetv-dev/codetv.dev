@@ -921,12 +921,8 @@ export async function updatePerson(
 export async function createHackathonSubmission(submission: {
 	hackathonId: string;
 	personId?: string;
-	email: string;
-	fullName: string;
 	githubRepo: string;
-	deployedUrl: string;
-	agreeTerms: boolean;
-	optOutSponsorship: boolean;
+	deployedUrl?: string;
 }) {
 	return client.create({
 		_type: 'hackathonSubmission',
@@ -934,12 +930,8 @@ export async function createHackathonSubmission(submission: {
 		person: submission.personId
 			? { _type: 'reference', _ref: submission.personId }
 			: undefined,
-		email: submission.email,
-		fullName: submission.fullName,
 		githubRepo: submission.githubRepo,
-		deployedUrl: submission.deployedUrl,
-		agreeTerms: submission.agreeTerms,
-		optOutSponsorship: submission.optOutSponsorship,
+		deployedUrl: submission.deployedUrl ?? undefined,
 		submittedAt: new Date().toISOString(),
 	});
 }
