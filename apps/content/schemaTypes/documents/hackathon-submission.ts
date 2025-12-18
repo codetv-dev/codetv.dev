@@ -39,6 +39,12 @@ export const hackathonSubmission = defineType({
       description: 'Link to the deployed web app',
     }),
     defineField({
+      name: 'demoVideo',
+      type: 'url',
+      title: 'Demo Video',
+      description: 'Link to a demo video (YouTube, Loom, etc.)',
+    }),
+    defineField({
       name: 'submittedAt',
       type: 'datetime',
       title: 'Submitted At',

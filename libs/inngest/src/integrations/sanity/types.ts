@@ -83,6 +83,7 @@ export const schema = {
 			fullName: z.string(),
 			githubRepo: z.string(),
 			deployedUrl: z.string(),
+			demoVideo: z.string().optional(),
 			agreeTerms: z.boolean(),
 			optOutSponsorship: z.boolean(),
 		}),

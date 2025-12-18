@@ -40,6 +40,7 @@ export const sheetRowAppend = inngest.createFunction(
 					email,
 					githubRepo,
 					deployedUrl,
+					demoVideo,
 					agreeTerms,
 					optOutSponsorship,
 				} = event.data as any;
@@ -50,6 +51,7 @@ export const sheetRowAppend = inngest.createFunction(
 					email,
 					githubRepo,
 					deployedUrl,
+					demoVideo,
 					agreeTerms,
 					optOutSponsorship,
 				});

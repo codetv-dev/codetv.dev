@@ -85,6 +85,7 @@ export async function appendHackathonValue({
 	email,
 	githubRepo,
 	deployedUrl,
+	demoVideo,
 	agreeTerms,
 	optOutSponsorship,
 }: {
@@ -93,6 +94,7 @@ export async function appendHackathonValue({
 	email: string;
 	githubRepo: string;
 	deployedUrl: string;
+	demoVideo?: string;
 	agreeTerms: boolean;
 	optOutSponsorship: boolean;
 }) {
@@ -101,6 +103,7 @@ export async function appendHackathonValue({
 		email,
 		githubRepo,
 		deployedUrl,
+		demoVideo,
 		agreeTerms,
 		optOutSponsorship,
 	]);

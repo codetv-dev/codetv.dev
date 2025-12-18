@@ -856,6 +856,7 @@ export async function createHackathonSubmission(submission: {
 	personId?: string;
 	githubRepo: string;
 	deployedUrl?: string;
+	demoVideo?: string;
 }) {
 	return client.create({
 		_type: 'hackathonSubmission',
@@ -865,6 +866,7 @@ export async function createHackathonSubmission(submission: {
 			: undefined,
 		githubRepo: submission.githubRepo,
 		deployedUrl: submission.deployedUrl ?? undefined,
+		demoVideo: submission.demoVideo ?? undefined,
 		submittedAt: new Date().toISOString(),
 	});
 }
