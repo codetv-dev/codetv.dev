@@ -141,3 +141,33 @@ export async function removeRole({
 
 	return res;
 }
+
+/**
+ * Adds a role to a member if they don't already have it.
+ * Returns a result object indicating whether the role was added or already existed.
+ */
+export async function addRoleIfMissing({
+	memberId,
+	roleId,
+	member,
+}: {
+	memberId: string;
+	roleId: string;
+	/** Optional pre-fetched member data to avoid redundant API call */
+	member?: { roles: string[]; user: { id: string; username: string } };
+}): Promise<{ added: boolean; message: string }> {
+	const discordMember = member ?? (await getMember(memberId));
+
+	if (discordMember.roles.includes(roleId)) {
+		return {
+			added: false,
+			message: `${discordMember.user.username} already has role ${roleId}`,
+		};
+	}
+
+	await updateRole({ memberId, roleId });
+	return {
+		added: true,
+		message: `Added role ${roleId} to ${discordMember.user.username}`,
+	};
+}

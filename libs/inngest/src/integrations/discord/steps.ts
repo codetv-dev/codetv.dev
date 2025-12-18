@@ -2,11 +2,11 @@ import { NonRetriableError } from 'inngest';
 import { inngest } from '../../client.js';
 import {
 	addMemberToGuild,
+	addRoleIfMissing,
 	getMember,
 	getRoleId,
 	removeRole,
 	sendDiscordMessage,
-	updateRole,
 } from '@codetv/discord';
 import { type SubscriptionLevel } from '@codetv/types';
 import { config } from './config.ts';
@@ -93,13 +93,7 @@ export const addAlumniRole = inngest.createFunction(
 		});
 
 		return step.run('discord/user.roles.add', async () => {
-			if (discordMember.roles.includes(roleId)) {
-				return {
-					message: `${discordMember.user.username} already has role ${roleId}`,
-				};
-			}
-
-			return updateRole({ memberId, roleId });
+			return addRoleIfMissing({ memberId, roleId, member: discordMember });
 		});
 	},
 );
@@ -157,13 +151,7 @@ export const addUserBadge = inngest.createFunction(
 		});
 
 		return step.run('discord/user.badge.apply', async () => {
-			if (discordMember.roles.includes(roleId)) {
-				return {
-					message: `${discordMember.user.username} already has badge ${badge}`,
-				};
-			}
-
-			return updateRole({ memberId, roleId });
+			return addRoleIfMissing({ memberId, roleId, member: discordMember });
 		});
 	},
 );
@@ -203,13 +191,7 @@ export const discordUpdateUserRole = inngest.createFunction(
 
 		// update the user's role on Discord
 		const maybeAddRolePromise = step.run('discord/user.roles.add', async () => {
-			if (discordMember.roles.includes(roleId)) {
-				return {
-					message: `${discordMember.user.username} already has role ${roleId}`,
-				};
-			}
-
-			return updateRole({ memberId, roleId });
+			return addRoleIfMissing({ memberId, roleId, member: discordMember });
 		});
 
 		// remove other roles on Discord
