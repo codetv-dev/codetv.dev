@@ -20,7 +20,6 @@ import {
 	eventsGetUnbookedDates,
 	hostFreeBusy,
 	sheetRowAppend,
-	hackathonSheetRowAppend,
 	tokenGenerate,
 } from './integrations/google/steps.js';
 import {
@@ -80,7 +79,6 @@ export const functions: any[] = [
 	eventsGetUnbookedDates,
 	hostFreeBusy,
 	sheetRowAppend,
-	hackathonSheetRowAppend,
 	tokenGenerate,
 	getCurrentActiveHackathon,
 	hackathonSubmissionCreate,

@@ -11,7 +11,6 @@ import {
 	bookableDatesGet,
 	calendarEventList,
 	eventsGetUnbookedDates,
-	hackathonSheetRowAppend,
 	hostFreeBusy,
 	sheetRowAppend,
 	tokenGenerate,
@@ -158,24 +157,25 @@ export const handleHackathonSubmission = inngest.createFunction(
 			return event.data;
 		});
 
-		const user = await step.invoke('get-user-by-id', {
-			function: userGetById,
-			data: {
-				userId: event.data.userId,
-			},
-		});
-
-		const hackathon = await step.invoke('get-current-active-hackathon', {
-			function: getCurrentActiveHackathon,
-			data: {},
-		});
-
-		const person = await step.invoke('get-sanity-person', {
-			function: personGetByClerkId,
-			data: {
-				clerkUserId: event.data.userId,
-			},
-		});
+		// Parallelize independent data fetches
+		const [user, hackathon, person] = await Promise.all([
+			step.invoke('get-user-by-id', {
+				function: userGetById,
+				data: {
+					userId: event.data.userId,
+				},
+			}),
+			step.invoke('get-current-active-hackathon', {
+				function: getCurrentActiveHackathon,
+				data: {},
+			}),
+			step.invoke('get-sanity-person', {
+				function: personGetByClerkId,
+				data: {
+					clerkUserId: event.data.userId,
+				},
+			}),
+		]);
 
 		const discordUserId = await step.invoke('get-discord-user-id', {
 			function: getDiscordMemberId,
@@ -229,8 +229,9 @@ export const handleHackathonSubmission = inngest.createFunction(
 		});
 
 		await step.invoke('append-row-to-hackathon-google-sheet', {
-			function: hackathonSheetRowAppend,
+			function: sheetRowAppend,
 			data: {
+				formType: 'hackathon' as const,
 				userId: event.data.userId,
 				fullName: event.data.fullName,
 				email: event.data.email,

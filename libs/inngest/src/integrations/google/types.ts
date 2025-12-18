@@ -80,10 +80,12 @@ export const FreeBusy = z.object({
 export const schema = {
 	'google/token.generate': {},
 	'google/sheet.row.append': {
-		data: WebDevChallengeFormSubmit,
-	},
-	'google/hackathon.sheet.row.append': {
-		data: HackathonSubmission,
+		data: z.union([
+			WebDevChallengeFormSubmit.extend({
+				formType: z.literal('wdc').optional(),
+			}),
+			HackathonSubmission.extend({ formType: z.literal('hackathon') }),
+		]),
 	},
 	'google/calendar.events.list': {
 		data: z.object({

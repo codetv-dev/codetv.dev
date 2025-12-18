@@ -26,58 +26,58 @@ export const sheetRowAppend = inngest.createFunction(
 	{ id: 'google/sheet.row.append' },
 	{ event: 'google/sheet.row.append' },
 	async ({ event, step }) => {
-		const {
-			signature,
-			role,
-			reimbursement,
-			email,
-			phone,
-			groupchat,
-			dietaryRequirements,
-			foodAdventurousness,
-			coffee,
-		} = event.data;
+		const isHackathon =
+			'formType' in event.data && event.data.formType === 'hackathon';
+		const stepName = isHackathon
+			? 'google/hackathon.sheet.row.append'
+			: 'google/sheet.row.append';
 
-		return step.run('google/sheet.row.append', async () => {
-			return await appendValue({
-				signature,
-				role,
-				reimbursement,
-				email,
-				phone,
-				groupchat,
-				dietaryRequirements,
-				foodAdventurousness,
-				coffee,
-			});
-		});
-	},
-);
+		return step.run(stepName, async () => {
+			if (isHackathon) {
+				const {
+					userId,
+					fullName,
+					email,
+					githubRepo,
+					deployedUrl,
+					agreeTerms,
+					optOutSponsorship,
+				} = event.data as any;
 
-export const hackathonSheetRowAppend = inngest.createFunction(
-	{ id: 'google/hackathon.sheet.row.append' },
-	{ event: 'google/hackathon.sheet.row.append' },
-	async ({ event, step }) => {
-		const {
-			userId,
-			fullName,
-			email,
-			githubRepo,
-			deployedUrl,
-			agreeTerms,
-			optOutSponsorship,
-		} = event.data;
+				return await appendHackathonValue({
+					userId,
+					fullName,
+					email,
+					githubRepo,
+					deployedUrl,
+					agreeTerms,
+					optOutSponsorship,
+				});
+			} else {
+				const {
+					signature,
+					role,
+					reimbursement,
+					email,
+					phone,
+					groupchat,
+					dietaryRequirements,
+					foodAdventurousness,
+					coffee,
+				} = event.data as any;
 
-		return step.run('google/hackathon.sheet.row.append', async () => {
-			return await appendHackathonValue({
-				userId,
-				fullName,
-				email,
-				githubRepo,
-				deployedUrl,
-				agreeTerms,
-				optOutSponsorship,
-			});
+				return await appendValue({
+					signature,
+					role,
+					reimbursement,
+					email,
+					phone,
+					groupchat,
+					dietaryRequirements,
+					foodAdventurousness,
+					coffee,
+				});
+			}
 		});
 	},
 );
