@@ -177,70 +177,73 @@ export const handleHackathonSubmission = inngest.createFunction(
 			}),
 		]);
 
-		const discordUserId = await step.invoke('get-discord-user-id', {
-			function: getDiscordMemberId,
-			data: {
-				user: user,
-			},
-		});
-
-		const submission = await step.invoke('create-hackathon-submission', {
-			function: hackathonSubmissionCreate,
-			data: {
-				hackathonId: hackathon?._id ?? '',
-				personId: person?._id,
-				email: event.data.email,
-				fullName: event.data.fullName,
-				githubRepo: event.data.githubRepo,
-				deployedUrl: event.data.deployedUrl,
-				agreeTerms: event.data.agreeTerms,
-				optOutSponsorship: event.data.optOutSponsorship,
-			},
-		});
-
-		// Associate person with hackathon (if not already associated)
-		if (person?._id && hackathon?._id) {
-			await step.invoke('associate-person-with-hackathon', {
-				function: personAssociateWithHackathon,
+		const [discordUserId, submission] = await Promise.all([
+			step.invoke('get-discord-user-id', {
+				function: getDiscordMemberId,
 				data: {
-					personId: person._id,
-					hackathonId: hackathon._id,
+					user: user,
 				},
-			});
-		}
-
-		// Associate person with hackathon submission
-		if (person?._id && submission?._id) {
-			await step.invoke('associate-person-with-hackathon-submission', {
-				function: personAssociateWithHackathonSubmission,
+			}),
+			step.invoke('create-hackathon-submission', {
+				function: hackathonSubmissionCreate,
 				data: {
-					personId: person._id,
-					submissionId: submission._id,
+					hackathonId: hackathon?._id ?? '',
+					personId: person?._id,
+					email: event.data.email,
+					fullName: event.data.fullName,
+					githubRepo: event.data.githubRepo,
+					deployedUrl: event.data.deployedUrl,
+					agreeTerms: event.data.agreeTerms,
+					optOutSponsorship: event.data.optOutSponsorship,
 				},
-			});
-		}
+			}),
+		]);
 
-		await step.invoke('add-hackathon-badge', {
-			function: addUserBadge,
-			data: {
-				memberId: discordUserId,
-				badge: 'hackathon_participant',
-			},
-		});
-
-		await step.invoke('append-row-to-hackathon-google-sheet', {
-			function: sheetRowAppend,
-			data: {
-				formType: 'hackathon' as const,
-				userId: event.data.userId,
-				fullName: event.data.fullName,
-				email: event.data.email,
-				githubRepo: event.data.githubRepo,
-				deployedUrl: event.data.deployedUrl,
-				agreeTerms: event.data.agreeTerms,
-				optOutSponsorship: event.data.optOutSponsorship,
-			},
-		});
+		// Parallelize all remaining operations that depend on the results above
+		await Promise.all([
+			// Associate person with hackathon (if not already associated)
+			person?._id && hackathon?._id
+				? step.invoke('associate-person-with-hackathon', {
+						function: personAssociateWithHackathon,
+						data: {
+							personId: person._id,
+							hackathonId: hackathon._id,
+						},
+					})
+				: Promise.resolve(),
+			// Associate person with hackathon submission
+			person?._id && submission?._id
+				? step.invoke('associate-person-with-hackathon-submission', {
+						function: personAssociateWithHackathonSubmission,
+						data: {
+							personId: person._id,
+							submissionId: submission._id,
+						},
+					})
+				: Promise.resolve(),
+			// Add hackathon participant badge on Discord
+			step.invoke('add-hackathon-badge', {
+				function: addUserBadge,
+				data: {
+					memberId: discordUserId,
+					badge: 'hackathon_participant',
+				},
+			}),
+			// Log submission to Google Sheet
+			step.invoke('append-row-to-hackathon-google-sheet', {
+				function: sheetRowAppend,
+				data: {
+					formType: 'hackathon' as const,
+					userId: event.data.userId,
+					fullName: event.data.fullName,
+					email: event.data.email,
+					githubRepo: event.data.githubRepo,
+					deployedUrl: event.data.deployedUrl,
+					agreeTerms: event.data.agreeTerms,
+					optOutSponsorship: event.data.optOutSponsorship,
+				},
+			}),
+		]);
 
 		return submission;
 	},
