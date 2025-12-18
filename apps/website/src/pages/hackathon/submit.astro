@@ -25,7 +25,7 @@ if (Astro.request.method === 'POST' && user) {
 		const optOutSponsorship = formData.get('optOutSponsorship');
 
 		// Basic validation
-		if (!email || !fullName || !githubRepo || !deployedUrl || !agreeTerms) {
+		if (!email || !fullName || !githubRepo || !agreeTerms) {
 			error = 'Please fill in all required fields and agree to the terms.';
 		} else {
 			await inngest.send({
@@ -35,7 +35,7 @@ if (Astro.request.method === 'POST' && user) {
 					email,
 					fullName,
 					githubRepo,
-					deployedUrl,
+					deployedUrl: deployedUrl ?? '',
 					agreeTerms: !!agreeTerms,
 					optOutSponsorship: !!optOutSponsorship,
 				},
@@ -128,7 +128,7 @@ if (Astro.request.method === 'POST' && user) {
 
 									<div class="field">
 										<label for="deployedUrl">
-											Please provide a link to the deployed web app
+											Optional: Provide a link to the deployed web app
 										</label>
 										<p class="description">
 											If your app uses services that cost money, such as OpenAI,
@@ -142,7 +142,6 @@ if (Astro.request.method === 'POST' && user) {
 											id="deployedUrl"
 											class="input"
 											placeholder="https://your-app.netlify.app"
-											required
 										/>
 									</div>
 								</section>
