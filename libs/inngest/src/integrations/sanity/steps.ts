@@ -11,12 +11,11 @@ import {
 	type PersonByClerkIdQueryResult,
 } from '@codetv/sanity';
 import { inngest } from '../../client.js';
-import { HackathonBySlugQueryResult } from '@codetv/types';
 
 export const getCurrentActiveHackathon = inngest.createFunction(
 	{ id: 'sanity/hackathon.get-current-active' },
 	{ event: 'sanity/hackathon.get-current-active' },
-	async function ({ event }): Promise<HackathonBySlugQueryResult | null> {
+	async function ({ event }): Promise<{ _id: string } | null> {
 		return await getActiveHackathon();
 	},
 );

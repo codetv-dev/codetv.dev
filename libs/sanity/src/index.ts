@@ -586,74 +586,7 @@ const hackathonBySlugQuery = groq`
 
 const activeHackathonQuery = groq`
   *[_type == "hackathon" && hidden != "hidden" && dateTime(pubDate) <= dateTime(now()) && dateTime(deadline) > dateTime(now())] | order(pubDate desc)[0] {
-    _id,
-    title,
-    'slug': slug.current,
-    description,
-    body,
-    pubDate,
-    deadline,
-    submissionForm,
-    hero_image {
-      public_id,
-      width,
-      height,
-    },
-    hero_title,
-    'episode': episodes[0]-> {
-      title,
-      'slug': slug.current,
-      'thumbnail': {
-        'public_id': video.thumbnail.public_id,
-        'width': video.thumbnail.width,
-        'height': video.thumbnail.height,
-        'alt': video.thumbnail_alt,
-      },
-      video {
-        youtube_id,
-        'mux': mux_video.asset->data.playback_ids,
-      }
-    },
-    'sponsors': sponsors[]->{
-      title,
-      logo {
-        public_id,
-        width,
-        height
-      },
-      link,
-    },
-    'rewardsData': rewards[]-> {
-      title,
-      description,
-      image {
-        public_id,
-        width,
-        height,
-      },
-      weight
-    } | order(weight asc),
-    'faqData': faq[]-> {
-      question,
-      answer,
-      weight
-    } | order(weight asc),
-    rules[]-> {
-      title,
-      description,
-      weight
-    } | order(weight asc),
-    resources[] {
-      title,
-      description,
-      url,
-    },
-    share_image {
-      public_id,
-      width,
-      height,
-    },
-    hidden
+    _id
   }
 `;
 
@@ -847,7 +780,7 @@ export async function getHackathonBySlug(params: { slug: string }) {
 }
 
 export async function getActiveHackathon() {
-	const hackathon = await client.fetch<HackathonBySlugQueryResult>(
+	const hackathon = await client.fetch<{ _id: string } | null>(
 		activeHackathonQuery,
 		{},
 		{ useCdn: true },
