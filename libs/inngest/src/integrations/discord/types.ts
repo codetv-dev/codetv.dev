@@ -47,17 +47,6 @@ export const schema = {
 	'discord/user.role.add': {
 		data: UserRoleUpdate,
 	},
-	// Legacy events - deprecated, use discord/user.role.add instead
-	'discord/user.alumni-role.add': {
-		data: z.object({
-			userId: z.string(),
-			role: z.union([
-				z.literal('Web Dev Challenge Alumni'),
-				z.literal('Leet Heat Alumni'),
-				z.literal('Learn With Jason Alumni'),
-			]),
-		}),
-	},
 	'discord/guild.member.add': {
 		data: z.object({
 			userId: z.string(),
@@ -75,13 +64,6 @@ export const schema = {
 	'discord/message.send': {
 		data: z.object({
 			message: z.string(),
-		}),
-	},
-	// Legacy event - deprecated, use discord/user.role.add instead
-	'discord/user.badge.add': {
-		data: z.object({
-			memberId: z.string(),
-			badge: z.literal('hackathon_participant'),
 		}),
 	},
 };
