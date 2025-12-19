@@ -1,6 +1,9 @@
 import { z } from 'zod';
 
 export const schema = {
+	'sanity/hackathon.get-current-active': {
+		data: z.object({}),
+	},
 	'sanity/person.get-by-clerk-id': {
 		data: z.object({
 			clerkUserId: z.string(),
@@ -70,6 +73,31 @@ export const schema = {
 			stripeCustomerId: z.string(),
 			subscriptionStatus: z.string(),
 			productName: z.string(),
+		}),
+	},
+	'sanity/hackathon-submission.create': {
+		data: z.object({
+			hackathonId: z.string(),
+			personId: z.string().optional(),
+			email: z.string(),
+			fullName: z.string(),
+			githubRepo: z.string(),
+			deployedUrl: z.string(),
+			demoVideo: z.string().optional(),
+			agreeTerms: z.boolean(),
+			optOutSponsorship: z.boolean(),
+		}),
+	},
+	'sanity/person.associate-with-hackathon': {
+		data: z.object({
+			personId: z.string(),
+			hackathonId: z.string(),
+		}),
+	},
+	'sanity/person.associate-with-hackathon-submission': {
+		data: z.object({
+			personId: z.string(),
+			submissionId: z.string(),
 		}),
 	},
 };

@@ -1,12 +1,24 @@
 import {
 	createPerson,
+	createHackathonSubmission,
 	getPersonByClerkId,
 	updatePerson,
 	updatePersonFromClerk,
 	updatePersonSubscription,
+	getActiveHackathon,
+	associatePersonWithHackathon,
+	associatePersonWithHackathonSubmission,
 	type PersonByClerkIdQueryResult,
 } from '@codetv/sanity';
 import { inngest } from '../../client.js';
+
+export const getCurrentActiveHackathon = inngest.createFunction(
+	{ id: 'sanity/hackathon.get-current-active' },
+	{ event: 'sanity/hackathon.get-current-active' },
+	async function ({ event }): Promise<{ _id: string } | null> {
+		return await getActiveHackathon();
+	},
+);
 
 export const personGetByClerkId = inngest.createFunction(
 	{
@@ -69,5 +81,44 @@ export const personUpdateSubscription = inngest.createFunction(
 				date: new Date(),
 			});
 		});
+	},
+);
+
+export const hackathonSubmissionCreate = inngest.createFunction(
+	{ id: 'sanity/hackathon-submission.create' },
+	{ event: 'sanity/hackathon-submission.create' },
+	async ({ event, step }): Promise<{ _id: string }> => {
+		return step.run('sanity/create-hackathon-submission', async () => {
+			return createHackathonSubmission(event.data);
+		});
+	},
+);
+
+export const personAssociateWithHackathon = inngest.createFunction(
+	{ id: 'sanity/person.associate-with-hackathon' },
+	{ event: 'sanity/person.associate-with-hackathon' },
+	async ({ event, step }) => {
+		return step.run('sanity/associate-person-with-hackathon', async () => {
+			return associatePersonWithHackathon(
+				event.data.personId,
+				event.data.hackathonId,
+			);
+		});
+	},
+);
+
+export const personAssociateWithHackathonSubmission = inngest.createFunction(
+	{ id: 'sanity/person.associate-with-hackathon-submission' },
+	{ event: 'sanity/person.associate-with-hackathon-submission' },
+	async ({ event, step }) => {
+		return step.run(
+			'sanity/associate-person-with-hackathon-submission',
+			async () => {
+				return associatePersonWithHackathonSubmission(
+					event.data.personId,
+					event.data.submissionId,
+				);
+			},
+		);
 	},
 );

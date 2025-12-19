@@ -1,0 +1,420 @@
+---
+import { SignedIn, SignedOut, SignIn } from '@clerk/astro/components';
+import { inngest } from '@codetv/inngest';
+import Layout from '../../layouts/default.astro';
+import '../../styles/forms.css';
+
+export const prerender = false;
+
+const url = Astro.url;
+const user = await Astro.locals.currentUser();
+
+// Handle form submission
+let submitted = false;
+let error: string | null = null;
+
+if (Astro.request.method === 'POST' && user) {
+	try {
+		const formData = await Astro.request.formData();
+
+		const email = formData.get('email')?.toString();
+		const fullName = formData.get('fullName')?.toString();
+		const githubRepo = formData.get('githubRepo')?.toString();
+		const deployedUrl = formData.get('deployedUrl')?.toString();
+		const demoVideo = formData.get('demoVideo')?.toString();
+		const agreeTerms = formData.get('agreeTerms');
+		const optOutSponsorship = formData.get('optOutSponsorship');
+
+		// Basic validation
+		if (!email || !fullName || !githubRepo || !agreeTerms) {
+			error = 'Please fill in all required fields and agree to the terms.';
+		} else {
+			await inngest.send({
+				name: 'codetv/forms.hackathon.submission',
+				data: {
+					userId: user.id,
+					email,
+					fullName,
+					githubRepo,
+					deployedUrl: deployedUrl ?? '',
+					demoVideo: demoVideo ?? undefined,
+					agreeTerms: !!agreeTerms,
+					optOutSponsorship: !!optOutSponsorship,
+				},
+			});
+
+			submitted = true;
+		}
+	} catch (e) {
+		error = 'Something went wrong. Please try again.';
+		console.error(e);
+	}
+}
+---
+
+<Layout title="Web Dev Challenge Submission - CodeTV">
+	<main>
+		<SignedIn>
+			<section class="form-wrapper">
+				{
+					submitted ? (
+						<div class="success-message">
+							<h1>Thanks for submitting!</h1>
+							<p>
+								Your submission has been received. We'll review it and reach out
+								if you're selected for promotional items.
+							</p>
+							<p>Keep an eye on your inbox for updates!</p>
+							<a href="/hackathon" class="button">
+								Back to Hackathons
+							</a>
+						</div>
+					) : (
+						<>
+							<div class="instructions">
+								<h1>Web Dev Challenge Submission</h1>
+								<p>
+									Submit your app to the Web Dev Challenge! Fill out the form
+									below to enter your submission for review.
+								</p>
+							</div>
+
+							{error && <p class="error">{error}</p>}
+
+							<form method="POST" class="submission-form">
+								<section class="form-section">
+									<div class="field">
+										<label for="email">Email</label>
+										<input
+											type="email"
+											name="email"
+											id="email"
+											class="input"
+											placeholder="your@email.com"
+											value={user?.primaryEmailAddress?.emailAddress ?? ''}
+											required
+										/>
+									</div>
+
+									<div class="field">
+										<label for="fullName">Full name</label>
+										<input
+											type="text"
+											name="fullName"
+											id="fullName"
+											class="input"
+											placeholder="Your answer"
+											value={user?.fullName ?? ''}
+											required
+										/>
+									</div>
+
+									<div class="field">
+										<label for="githubRepo">
+											Please provide a link to the GitHub repo where this web
+											app's source code is published
+										</label>
+										<p class="description">
+											Please ensure that all credentials are moved to
+											environment variables before committing your code!
+										</p>
+										<input
+											type="url"
+											name="githubRepo"
+											id="githubRepo"
+											class="input"
+											placeholder="https://github.com/username/repo"
+											required
+										/>
+									</div>
+
+								<div class="field">
+									<label for="deployedUrl">
+										Optional: Provide a link to the deployed web app
+									</label>
+									<p class="description">
+										If your app uses services that cost money, such as OpenAI,
+										please be mindful of any financial risk if you publish the
+										URL to a wide audience and set alerts and spending limits
+										to avoid unexpected bills.
+									</p>
+									<input
+										type="url"
+										name="deployedUrl"
+										id="deployedUrl"
+										class="input"
+										placeholder="https://your-app.netlify.app"
+									/>
+								</div>
+
+								<div class="field">
+									<label for="demoVideo">
+										Optional: Provide a link to a demo video
+									</label>
+									<p class="description">
+										Share a video walkthrough of your app (YouTube, Loom, etc.)
+										to help showcase your submission.
+									</p>
+									<input
+										type="url"
+										name="demoVideo"
+										id="demoVideo"
+										class="input"
+										placeholder="https://www.youtube.com/watch?v=..."
+									/>
+								</div>
+							</section>
+
+								<section class="form-section">
+									<div class="field">
+										<label>
+											By submitting your entry, you agree to the below terms and
+											conditions
+										</label>
+
+										<div class="terms-box">
+											<p>
+												This promotion is operated by Learn with Jason LLC DBA
+												CodeTV, an Oregon limited liability company ("CodeTV"),
+												and this promotion will be accessible for a limited
+												amount of time, ending on December 16, 2024 at 11:59 pm
+												Pacific time (the "Submission Deadline"). This promotion
+												is intended only for users who are 18 years of age or
+												older in countries where such promotions are allowed. If
+												you are not at least 18 years of age or older, you may
+												not participate, and if you attempt to do so, we reserve
+												the right to refuse your entry.
+											</p>
+
+											<p>
+												You, the participant, may submit one free entry for this
+												promotion by providing CodeTV with your email address,
+												and by building an original open-source application (the
+												"App") and submitting the App to CodeTV by the
+												Submission Deadline through a web form created by
+												CodeTV. CodeTV will provide a software tool from one of
+												CodeTV's approved sponsors, and you must use the
+												sponsor's tool to build your App. You must provide
+												CodeTV with a URL of your App so that CodeTV can verify
+												its accessibility and functionality. Any code you use to
+												develop your App must be open sourced on{' '}
+												<a href="https://github.com" target="_blank">
+													GitHub
+												</a>
+												, and you must provide CodeTV with a link to the GitHub
+												code as part of your submission. Your App must not
+												contain any information that violates any third party's
+												intellectual property right or any other applicable
+												laws. You are not required to make any purchases or
+												provide any other forms of consideration in order to
+												participate. CodeTV claims no rights in the App you
+												build.
+											</p>
+
+											<p>
+												By providing your email address and submitting your
+												entry, you will be eligible to receive promotional items
+												from CodeTV and its sponsors. Within 2 weeks of the
+												Submission Deadline, CodeTV will notify devs who will
+												receive promotional items by email at their provided
+												email address. The recipients must respond within 2
+												weeks of being notified, and when responding the
+												recipients must provide CodeTV with their preferred
+												shipping address in eligible shipping destinations. If
+												no response is received, or the recipient's shipping
+												address is in a location CodeTV is unable to ship to,
+												the recipient is no longer eligible to receive
+												promotional items, and CodeTV reserves the right to
+												select a different recipient.
+											</p>
+
+											<p>
+												Receipt of promotional items is determined by the order
+												of submissions. CodeTV reserves the right to cancel,
+												suspend or modify this promotion, particularly if any
+												problem prevents the promotion from being conducted as
+												intended. By entering into this promotion, you agree to
+												release and hold harmless CodeTV from any claims
+												associated with the promotion, and you further agree to
+												indemnify CodeTV from any third-party claims alleging
+												that your App contains any information in violation of a
+												third party's intellectual property rights. CodeTV is
+												not responsible and cannot be held responsible for
+												technical errors or other things that may prevent the
+												promotion from being conducted as planned.
+											</p>
+
+											<p>
+												By submitting your email address to CodeTV as part of
+												this promotion, you agree and consent that you may be
+												contacted by CodeTV or one of CodeTV's successors or
+												assigns to notify you if you are selected as a winner,
+												send you updates about future CodeTV promotions, and
+												send you other CodeTV news. You may opt out of any
+												emails from CodeTV by clicking the unsubscribe button at
+												the bottom of any email received from CodeTV.
+												Additionally, CodeTV will share your name and email
+												address with the sponsor of this promotion. By
+												submitting your name and email address to CodeTV as part
+												of this promotion, you agree and consent to allow CodeTV
+												to share your name and email address with the sponsor of
+												this promotion. Once shared, CodeTV will have no control
+												over how the sponsor communicates with you or what the
+												sponsor does with your name and email address; you must
+												communicate directly with the sponsor to manage any
+												communications with the sponsor.
+											</p>
+
+											<p>
+												You further agree that, unless you affirmatively opt out
+												by unchecking the box in the entry form, the sponsor of
+												this promotion may display your App at its discretion as
+												an example of how to use their tool or technology to
+												build an app.
+											</p>
+										</div>
+
+										<div class="checkbox-group">
+											<input
+												type="checkbox"
+												name="agreeTerms"
+												id="agreeTerms"
+												class="input checkbox"
+												required
+											/>
+											<label for="agreeTerms">
+												I agree to the terms and conditions
+											</label>
+										</div>
+									</div>
+
+									<div class="field">
+										<p class="opt-out-label">
+											Only check this box if you DO NOT want your app to be
+											shared by the sponsor
+										</p>
+
+										<div class="checkbox-group">
+											<input
+												type="checkbox"
+												name="optOutSponsorship"
+												id="optOutSponsorship"
+												class="input checkbox"
+											/>
+											<label for="optOutSponsorship">
+												I DO NOT want the sponsor to showcase my web app as an
+												example of using their tool
+											</label>
+										</div>
+									</div>
+								</section>
+
+								<section class="form-section">
+									<button type="submit" class="button submit-btn">
+										Submit
+									</button>
+								</section>
+							</form>
+						</>
+					)
+				}
+			</section>
+		</SignedIn>
+
+		<SignedOut>
+			<SignIn forceRedirectUrl={url.toString()} />
+		</SignedOut>
+	</main>
+</Layout>
+
+<style>
+	main {
+		background: var(--black);
+		padding: 40px 5cqw 60px;
+		min-block-size: 80dvh;
+	}
+
+	h1 {
+		font-family: var(--font-family-heading);
+		font-size: clamp(1.5rem, 4cqi, 2.5rem);
+		line-height: 1.1;
+		margin-block-end: 16px;
+	}
+
+	.instructions {
+		margin-block-end: 32px;
+
+		p {
+			color: var(--text-muted);
+			margin-block-start: 8px;
+		}
+	}
+
+	.terms-box {
+		background: var(--bg);
+		border: 1px solid color-mix(in oklch, var(--text-muted) 25%, transparent);
+		border-radius: 3px;
+		display: block;
+		font-size: 0.875em;
+		margin-block: 16px;
+		max-block-size: 300px;
+		overflow-y: auto;
+		padding: 16px;
+
+		p {
+			margin-block-start: 16px;
+
+			&:first-child {
+				margin-block-start: 0;
+			}
+		}
+
+		a {
+			color: var(--blue);
+		}
+	}
+
+	.opt-out-label {
+		color: var(--text-emphasized);
+		font-weight: 500;
+		margin-block-end: 8px;
+	}
+
+	.submit-btn {
+		font-size: 1.25rem;
+		inline-size: 100%;
+		margin-block-start: 24px;
+		padding: 12px 24px;
+		text-align: center;
+
+		@media (min-width: 480px) {
+			inline-size: auto;
+		}
+	}
+
+	.success-message {
+		text-align: center;
+		padding-block: 60px;
+
+		h1 {
+			margin-block-end: 24px;
+		}
+
+		p {
+			color: var(--text);
+			margin-block: 16px;
+			max-inline-size: 50ch;
+			margin-inline: auto;
+		}
+
+		.button {
+			margin-block-start: 32px;
+		}
+	}
+
+	.submission-form {
+		.form-section:first-of-type {
+			padding-block-start: 0;
+		}
+	}
+</style>

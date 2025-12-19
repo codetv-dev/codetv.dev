@@ -17,16 +17,35 @@ export const ClerkUser = z.object({
 	),
 });
 
+// Consolidated role types for updateUserRole
+export const AlumniRole = z.enum([
+	'wdc_alumni',
+	'lh_alumni',
+	'lwj_alumni',
+]);
+
+export const BadgeRole = z.enum([
+	'hackathon_participant',
+]);
+
+export const UserRoleUpdate = z.discriminatedUnion('type', [
+	z.object({
+		type: z.literal('alumni'),
+		userId: z.string(),
+		role: AlumniRole,
+	}),
+	z.object({
+		type: z.literal('badge'),
+		memberId: z.string(),
+		role: BadgeRole,
+	}),
+]);
+
+export type UserRoleUpdateData = z.infer<typeof UserRoleUpdate>;
+
 export const schema = {
-	'discord/user.alumni-role.add': {
-		data: z.object({
-			userId: z.string(),
-			role: z.union([
-				z.literal('Web Dev Challenge Alumni'),
-				z.literal('Leet Heat Alumni'),
-				z.literal('Learn With Jason Alumni'),
-			]),
-		}),
+	'discord/user.role.add': {
+		data: UserRoleUpdate,
 	},
 	'discord/guild.member.add': {
 		data: z.object({

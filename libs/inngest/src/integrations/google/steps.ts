@@ -9,7 +9,7 @@ import {
 import { inngest } from '../../client.js';
 import { getGoogleAccessToken } from './api/auth.ts';
 import { getCalendarEvents, getHostFreeBusy } from './api/calendar.ts';
-import { appendValue } from './api/sheets.ts';
+import { appendValue, appendHackathonValue } from './api/sheets.ts';
 import { CalendarEvent } from './types.ts';
 
 type CalendarEvent = z.infer<typeof CalendarEvent>;
@@ -26,30 +26,60 @@ export const sheetRowAppend = inngest.createFunction(
 	{ id: 'google/sheet.row.append' },
 	{ event: 'google/sheet.row.append' },
 	async ({ event, step }) => {
-		const {
-			signature,
-			role,
-			reimbursement,
-			email,
-			phone,
-			groupchat,
-			dietaryRequirements,
-			foodAdventurousness,
-			coffee,
-		} = event.data;
+		const isHackathon =
+			'formType' in event.data && event.data.formType === 'hackathon';
+		const stepName = isHackathon
+			? 'google/hackathon.sheet.row.append'
+			: 'google/sheet.row.append';
 
-		return step.run('google/sheet.row.append', async () => {
-			return await appendValue({
-				signature,
-				role,
-				reimbursement,
-				email,
-				phone,
-				groupchat,
-				dietaryRequirements,
-				foodAdventurousness,
-				coffee,
-			});
+		return step.run(stepName, async () => {
+			if (isHackathon) {
+				const {
+					userId,
+					fullName,
+					email,
+					githubRepo,
+					deployedUrl,
+					demoVideo,
+					agreeTerms,
+					optOutSponsorship,
+				} = event.data as any;
+
+				return await appendHackathonValue({
+					userId,
+					fullName,
+					email,
+					githubRepo,
+					deployedUrl,
+					demoVideo,
+					agreeTerms,
+					optOutSponsorship,
+				});
+			} else {
+				const {
+					signature,
+					role,
+					reimbursement,
+					email,
+					phone,
+					groupchat,
+					dietaryRequirements,
+					foodAdventurousness,
+					coffee,
+				} = event.data as any;
+
+				return await appendValue({
+					signature,
+					role,
+					reimbursement,
+					email,
+					phone,
+					groupchat,
+					dietaryRequirements,
+					foodAdventurousness,
+					coffee,
+				});
+			}
 		});
 	},
 );

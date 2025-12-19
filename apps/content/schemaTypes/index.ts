@@ -3,6 +3,7 @@ import {PlayIcon, UserIcon, TagIcon, ImageIcon, FolderIcon, StarIcon} from '@san
 import {person} from './documents/person'
 import {episode} from './documents/episode'
 import {hackathon} from './documents/hackathon'
+import {hackathonSubmission} from './documents/hackathon-submission'
 import {faq} from './documents/faqs'
 import {rewards} from './documents/rewards'
 import {rules} from './documents/rules'
@@ -263,6 +264,7 @@ export const schemaTypes = [
   collection,
   episode,
   hackathon,
+  hackathonSubmission,
   faq,
   rewards,
   rules,
