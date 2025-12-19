@@ -16,9 +16,9 @@ import {
 	tokenGenerate,
 } from '../google/steps.ts';
 import {
-	addUserBadge,
 	getDiscordMemberId,
 	messageSend,
+	updateUserRole,
 } from '../discord/steps.ts';
 import { userGetById } from '../clerk/steps.ts';
 
@@ -224,10 +224,11 @@ export const handleHackathonSubmission = inngest.createFunction(
 				: Promise.resolve(),
 			// Add hackathon participant badge on Discord
 			step.invoke('add-hackathon-badge', {
-				function: addUserBadge,
+				function: updateUserRole,
 				data: {
+					type: 'badge',
 					memberId: discordUserId,
-					badge: 'hackathon_participant',
+					role: 'hackathon_participant',
 				},
 			}),
 			// Log submission to Google Sheet

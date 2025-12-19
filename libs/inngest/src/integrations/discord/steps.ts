@@ -44,59 +44,6 @@ export const getDiscordMemberId = inngest.createFunction(
 	},
 );
 
-export const addAlumniRole = inngest.createFunction(
-	{ id: 'discord/user.alumni-role.add' },
-	[{ event: 'discord/user.alumni-role.add' }],
-	async function ({ event, step }) {
-		const { userId, role } = event.data;
-
-		const user = await step.invoke('get-current-user', {
-			function: userGetById,
-			data: {
-				userId,
-			},
-		});
-
-		const memberId = await step.invoke('discord-get-user-id', {
-			function: getDiscordMemberId,
-			data: {
-				user,
-			},
-		});
-
-		const discordMember = await step.run('discord/user.get', async () => {
-			return getMember(memberId);
-		});
-
-		const roleId = await step.run('discord/role.get', async () => {
-			switch (role) {
-				case 'Web Dev Challenge Alumni':
-					return config.roles.wdc_alumni;
-
-				case 'Leet Heat Alumni':
-					return config.roles.lh_alumni;
-
-				case 'Learn With Jason Alumni':
-					return config.roles.lwj_alumni;
-
-				default:
-					throw new NonRetriableError('unknown role', role);
-			}
-		});
-
-		await step.invoke('discord-add-user-to-server', {
-			function: addMemberToServer,
-			data: {
-				userId,
-				memberId,
-			},
-		});
-
-		return step.run('discord/user.roles.add', async () => {
-			return addRoleIfMissing({ memberId, roleId, member: discordMember });
-		});
-	},
-);
 
 export const addMemberToServer = inngest.createFunction(
 	{ id: 'discord/guild.member.add' },
@@ -120,39 +67,72 @@ export const addMemberToServer = inngest.createFunction(
 
 export type BadgeType = 'hackathon_participant';
 
-export const addUserBadge = inngest.createFunction(
-	{ id: 'discord/user.badge.add' },
-	{ event: 'discord/user.badge.add' },
+
+
+/**
+ * Consolidated function for adding roles to Discord users.
+ * Handles both alumni roles (by userId) and badge roles (by memberId).
+ */
+export const updateUserRole = inngest.createFunction(
+	{ id: 'discord/user.role.add' },
+	{ event: 'discord/user.role.add' },
 	async function ({ event, step }) {
-		const { memberId, badge } = event.data;
+		const data = event.data;
 
-		const discordMember = await step.run('discord/user.get', async () => {
-			try {
-				return await getMember(memberId);
-			} catch {
-				return null;
-			}
-		});
-
-		if (!discordMember) {
-			return {
-				message: `User ${memberId} is not in the server, skipping badge`,
-			};
+		// Get the role ID from config
+		const roleId = config.roles[data.role];
+		if (!roleId) {
+			throw new NonRetriableError(`Unknown role: ${data.role}`);
 		}
 
-		const roleId = await step.run('discord/badge-role.get', async () => {
-			switch (badge as BadgeType) {
-				case 'hackathon_participant':
-					return config.roles.hackathon_participant;
+		if (data.type === 'alumni') {
+			// Alumni flow: userId -> get user -> get memberId -> ensure in server -> add role
+			const user = await step.invoke('get-current-user', {
+				function: userGetById,
+				data: { userId: data.userId },
+			});
 
-				default:
-					throw new NonRetriableError('unknown badge', { cause: badge });
+			const memberId = await step.invoke('discord-get-user-id', {
+				function: getDiscordMemberId,
+				data: { user },
+			});
+
+			const discordMember = await step.run('discord/user.get', async () => {
+				return getMember(memberId);
+			});
+
+			await step.invoke('discord-add-user-to-server', {
+				function: addMemberToServer,
+				data: { userId: data.userId, memberId },
+			});
+
+			return step.run('discord/user.role.apply', async () => {
+				return addRoleIfMissing({ memberId, roleId, member: discordMember });
+			});
+		} else {
+			// Badge flow: memberId -> check if in server -> add role (skip if not in server)
+			const discordMember = await step.run('discord/user.get', async () => {
+				try {
+					return await getMember(data.memberId);
+				} catch {
+					return null;
+				}
+			});
+
+			if (!discordMember) {
+				return {
+					message: `User ${data.memberId} is not in the server, skipping role`,
+				};
 			}
-		});
 
-		return step.run('discord/user.badge.apply', async () => {
-			return addRoleIfMissing({ memberId, roleId, member: discordMember });
-		});
+			return step.run('discord/user.role.apply', async () => {
+				return addRoleIfMissing({
+					memberId: data.memberId,
+					roleId,
+					member: discordMember,
+				});
+			});
+		}
 	},
 );
 

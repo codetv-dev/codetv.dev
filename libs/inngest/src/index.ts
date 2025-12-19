@@ -7,12 +7,11 @@ import {
 } from './integrations/clerk/steps.js';
 import { imageUpload } from './integrations/cloudinary/steps.js';
 import {
-	addAlumniRole,
 	addMemberToServer,
-	addUserBadge,
 	discordUpdateUserRole,
 	getDiscordMemberId,
 	messageSend,
+	updateUserRole,
 } from './integrations/discord/steps.js';
 import {
 	bookableDatesGet,
@@ -68,12 +67,11 @@ export const functions: any[] = [
 	userGetOAuthToken,
 	userSubscriptionUpdate,
 	imageUpload,
-	addAlumniRole,
 	addMemberToServer,
-	addUserBadge,
 	discordUpdateUserRole,
 	getDiscordMemberId,
 	messageSend,
+	updateUserRole,
 	bookableDatesGet,
 	calendarEventList,
 	eventsGetUnbookedDates,

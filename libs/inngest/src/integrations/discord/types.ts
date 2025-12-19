@@ -17,7 +17,37 @@ export const ClerkUser = z.object({
 	),
 });
 
+// Consolidated role types for updateUserRole
+export const AlumniRole = z.enum([
+	'wdc_alumni',
+	'lh_alumni',
+	'lwj_alumni',
+]);
+
+export const BadgeRole = z.enum([
+	'hackathon_participant',
+]);
+
+export const UserRoleUpdate = z.discriminatedUnion('type', [
+	z.object({
+		type: z.literal('alumni'),
+		userId: z.string(),
+		role: AlumniRole,
+	}),
+	z.object({
+		type: z.literal('badge'),
+		memberId: z.string(),
+		role: BadgeRole,
+	}),
+]);
+
+export type UserRoleUpdateData = z.infer<typeof UserRoleUpdate>;
+
 export const schema = {
+	'discord/user.role.add': {
+		data: UserRoleUpdate,
+	},
+	// Legacy events - deprecated, use discord/user.role.add instead
 	'discord/user.alumni-role.add': {
 		data: z.object({
 			userId: z.string(),
@@ -47,6 +77,7 @@ export const schema = {
 			message: z.string(),
 		}),
 	},
+	// Legacy event - deprecated, use discord/user.role.add instead
 	'discord/user.badge.add': {
 		data: z.object({
 			memberId: z.string(),
