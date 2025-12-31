@@ -3,9 +3,13 @@ export interface Props {
 	title?: string;
 	variant?: 'primary' | 'secondary';
 	link?: string;
+	toggle?: boolean;
 }
 
-const { title, variant = 'primary', link } = Astro.props;
+const { title, variant = 'primary', link, toggle = false } = Astro.props;
+
+const Element = toggle ? 'details' : 'div';
+const TitleElement = toggle ? 'summary' : 'div';
 ---
 
 <div class:list={['card', { secondary: variant === 'secondary' }]}>
@@ -17,8 +21,8 @@ const { title, variant = 'primary', link } = Astro.props;
 		)
 	}
 	{!link && <slot name="img" />}
-	<div class="details">
-		<div class="title">
+	<Element class="details">
+		<TitleElement class="title">
 			{
 				title && link && (
 					<h3>
@@ -28,11 +32,11 @@ const { title, variant = 'primary', link } = Astro.props;
 			}
 			{title && !link && <h3>{title}</h3>}
 			{!title && <slot name="title" />}
-		</div>
+		</TitleElement>
 		<div class="description">
 			<slot />
 		</div>
-	</div>
+	</Element>
 </div>
 
 <style>
@@ -109,6 +113,11 @@ const { title, variant = 'primary', link } = Astro.props;
 				font-variation-settings: 'wdth' 100;
 				font-weight: 500;
 				line-height: 1.1;
+
+				summary & {
+					display: inline-block;
+					margin-inline-start: 4px;
+				}
 			}
 
 			a {
