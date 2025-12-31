@@ -1,0 +1,216 @@
+---
+import Layout from '../../layouts/default.astro';
+import PageHeader from '../../components/page-header.astro';
+import Grid from '../../components/design-system/grid.astro';
+import Card from '../../components/design-system/card.astro';
+import Block from '../../components/design-system/block.astro';
+import { getAllHackathons } from '@codetv/sanity';
+
+export const prerender = true;
+
+const hackathons = await getAllHackathons();
+
+// Separate active and past hackathons
+const now = new Date();
+const activeHackathons = hackathons.filter((h) => {
+	const deadline = h.deadline ? new Date(h.deadline) : null;
+	return deadline && now < deadline;
+});
+
+const pastHackathons = hackathons.filter((h) => {
+	const deadline = h.deadline ? new Date(h.deadline) : null;
+	return !deadline || now >= deadline;
+});
+---
+
+<Layout title="Hackathons — CodeTV">
+	<main>
+		<PageHeader
+			image={{ public_id: 'codetv-home-hero', alt: 'CodeTV Hackathons' }}
+			line1="Web Dev Challenge"
+			line2="Hackathons"
+		/>
+
+		{
+			activeHackathons.length > 0 && (
+				<Block name="active-hackathons">
+					<h2>Active Hackathons</h2>
+					<p class="section-intro">
+						Join these challenges and build something amazing!
+					</p>
+
+					<Grid columns={2}>
+						{activeHackathons.map((hackathon) => {
+							const deadline = hackathon.deadline
+								? new Date(hackathon.deadline).toLocaleDateString('en-US', {
+										month: 'short',
+										day: 'numeric',
+										year: 'numeric',
+								  })
+								: 'TBD';
+
+							return (
+								<Card
+									title={hackathon.title}
+									link={`/hackathon/${hackathon.slug}`}
+								>
+									{hackathon.share_image?.public_id && (
+										<img
+											slot="img"
+											src={`https://res.cloudinary.com/jlengstorf/image/upload/w_800,f_auto,q_auto/${hackathon.share_image.public_id}`}
+											alt={hackathon.title}
+										/>
+									)}
+									<div class="hackathon-meta">
+										<span class="status active">● Active</span>
+										<span class="deadline">Deadline: {deadline}</span>
+									</div>
+									<p>{hackathon.description}</p>
+								</Card>
+							);
+						})}
+					</Grid>
+				</Block>
+			)
+		}
+
+		{
+			pastHackathons.length > 0 && (
+				<Block name="past-hackathons">
+					<h2>Past Hackathons</h2>
+					<p class="section-intro">
+						Check out previous challenges and see what others built.
+					</p>
+
+					<Grid columns={3}>
+						{pastHackathons.map((hackathon) => {
+							const deadline = hackathon.deadline
+								? new Date(hackathon.deadline).toLocaleDateString('en-US', {
+										month: 'short',
+										day: 'numeric',
+										year: 'numeric',
+								  })
+								: 'Completed';
+
+							return (
+								<Card
+									title={hackathon.title}
+									link={`/hackathon/${hackathon.slug}`}
+								>
+									{hackathon.share_image?.public_id && (
+										<img
+											slot="img"
+											src={`https://res.cloudinary.com/jlengstorf/image/upload/w_600,f_auto,q_auto/${hackathon.share_image.public_id}`}
+											alt={hackathon.title}
+										/>
+									)}
+									<div class="hackathon-meta">
+										<span class="status closed">● Closed</span>
+										<span class="deadline">{deadline}</span>
+									</div>
+									<p>{hackathon.description}</p>
+								</Card>
+							);
+						})}
+					</Grid>
+				</Block>
+			)
+		}
+
+		{
+			hackathons.length === 0 && (
+				<Block name="no-hackathons">
+					<div class="empty-state">
+						<h2>No Hackathons Yet</h2>
+						<p>Check back soon for upcoming challenges!</p>
+					</div>
+				</Block>
+			)
+		}
+	</main>
+</Layout>
+
+<style>
+	h2 {
+		font-family: var(--font-family-heading);
+		font-size: clamp(1.75rem, 3.75cqi, 4.25rem);
+		font-weight: normal;
+		line-height: 1;
+		margin: 0 0 16px 0;
+	}
+
+	.section-intro {
+		color: var(--text-muted);
+		font-size: 1.125em;
+		margin: 0 0 32px 0;
+		max-width: 60ch;
+	}
+
+	.hackathon-meta {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 16px;
+		margin-bottom: 12px;
+		font-size: 0.875em;
+		font-weight: 500;
+	}
+
+	.status {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+
+		&.active {
+			color: #79f664;
+		}
+
+		&.closed {
+			color: var(--text-muted);
+		}
+	}
+
+	.deadline {
+		color: var(--text-muted);
+	}
+
+	.empty-state {
+		text-align: center;
+		padding: 80px 20px;
+
+		h2 {
+			margin-bottom: 16px;
+		}
+
+		p {
+			color: var(--text-muted);
+			font-size: 1.125em;
+		}
+	}
+</style>
+
+<style is:global>
+	@layer overrides {
+		.hero .line-2 {
+			font-size: 0.5em;
+			letter-spacing: -0.01em;
+		}
+
+		[data-name='active-hackathons'],
+		[data-name='past-hackathons'] {
+			--grid-width: 1200px;
+
+			h2 {
+				text-align: center;
+			}
+
+			.section-intro {
+				text-align: center;
+				margin-inline: auto;
+			}
+		}
+	}
+</style>
+

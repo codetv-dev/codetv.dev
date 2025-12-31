@@ -1,5 +1,5 @@
-import {defineField, defineType} from 'sanity'
-import {LinkIcon, UserIcon} from '@sanity/icons'
+import {defineArrayMember, defineField, defineType} from 'sanity'
+import {LinkIcon, RocketIcon} from '@sanity/icons'
 
 function slugify(str: string) {
   return String(str)
@@ -30,6 +30,7 @@ export const person = defineType({
   groups: [
     {name: 'profile', title: 'Profile', default: true},
     {name: 'social', title: 'Social & Links'},
+    {name: 'hackathons', title: 'Hackathons'},
     {name: 'subscription', title: 'Subscription Data'},
   ],
   fields: [
@@ -114,6 +115,38 @@ export const person = defineType({
       type: 'string',
       description: 'Read-only data from Clerk',
       group: 'subscription',
+    }),
+    defineField({
+      name: 'hackathons',
+      type: 'array',
+      title: 'Hackathon Participation',
+      description: 'Hackathons this person has participated in',
+      of: [
+        defineArrayMember({
+          type: 'reference',
+          to: [{type: 'hackathon'}],
+          options: {
+            disableNew: true,
+          },
+        }),
+      ],
+      group: 'hackathons',
+    }),
+    defineField({
+      name: 'hackathonSubmissions',
+      type: 'array',
+      title: 'Hackathon Submissions',
+      description: 'Submissions this person has made to hackathons',
+      of: [
+        defineArrayMember({
+          type: 'reference',
+          to: [{type: 'hackathonSubmission'}],
+          options: {
+            disableNew: true,
+          },
+        }),
+      ],
+      group: 'hackathons',
     }),
   ],
   __experimental_formPreviewTitle: false,

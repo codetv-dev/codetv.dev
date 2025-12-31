@@ -1,35 +1,33 @@
 ---
 // TODO: should this be a field in the CMS to make it easier to announce things?
+
+// disable for now
+return null;
 ---
 
-<aside class="eyebrow">
+<aside>
 	<p>
 		<strong>Who you gonna call?</strong>
 		Create a hotline and/or submit your best ideas to win prizes!
-		<a href="/blog/web-dev-challenge-hackathon-s2e11-code-powered-phone-hotline">Get details&nbsp;&rarr;</a>
+		<a href="/blog/web-dev-challenge-hackathon-s2e11-code-powered-phone-hotline"
+			>Get details&nbsp;&rarr;</a
+		>
 	</p>
 </aside>
 
 <style>
 	aside {
-		background: var(--yellow-500);
+		backdrop-filter: blur(2rem) saturate(120%);
+		-webkit-backdrop-filter: blur(2rem) saturate(120%);
+		background: color-mix(in oklch, var(--yellow-500) 60%, transparent);
 		border-block-end: 0.5px solid var(--text-muted);
-		color: var(--black);
-		font-size: 0.625rem;
+		color: var(--text-emphasized);
+		font-size: 0.75rem;
 		inset-block-start: 0;
 		inset-inline: 0;
-		padding: 8px max((100dvi - var(--max-width)) / 2, 5dvi);
-		position: fixed;
+		padding: 0.5rem max((100dvi - 1080px) / 2, 5dvi);
+		position: sticky;
 		text-align: center;
-		z-index: 1000;
-
-		@media (min-width: 480px) {
-			font-size: 0.75rem;
-		}
-
-		strong {
-			color: inherit;
-		}
 
 		a {
 			color: inherit;

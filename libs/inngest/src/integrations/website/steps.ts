@@ -1,5 +1,12 @@
 import { inngest } from '../../client.js';
-import { personUpdateDetails } from '../sanity/steps.ts';
+import {
+	getCurrentActiveHackathon,
+	hackathonSubmissionCreate,
+	personAssociateWithHackathon,
+	personAssociateWithHackathonSubmission,
+	personGetByClerkId,
+	personUpdateDetails,
+} from '../sanity/steps.ts';
 import {
 	bookableDatesGet,
 	calendarEventList,
@@ -8,7 +15,12 @@ import {
 	sheetRowAppend,
 	tokenGenerate,
 } from '../google/steps.ts';
-import { messageSend } from '../discord/steps.ts';
+import {
+	getDiscordMemberId,
+	messageSend,
+	updateUserRole,
+} from '../discord/steps.ts';
+import { userGetById } from '../clerk/steps.ts';
 
 export const handleUpdateUserProfile = inngest.createFunction(
 	{ id: 'codetv/user.profile.update' },
@@ -134,5 +146,108 @@ export const handleLWJIntake = inngest.createFunction(
 		// TODO generate social images for the episode
 		// TODO create an event in the Discord after ^^ is complete
 		// TODO create a draft event in Sanity (release?)
+	},
+);
+
+export const handleHackathonSubmission = inngest.createFunction(
+	{ id: 'codetv/forms.hackathon.submission' },
+	{ event: 'codetv/forms.hackathon.submission' },
+	async function ({ event, step }) {
+		await step.run('log-the-output', async () => {
+			return event.data;
+		});
+
+		// Parallelize independent data fetches
+		const [user, hackathon, person] = await Promise.all([
+			step.invoke('get-user-by-id', {
+				function: userGetById,
+				data: {
+					userId: event.data.userId,
+				},
+			}),
+			step.invoke('get-current-active-hackathon', {
+				function: getCurrentActiveHackathon,
+				data: {},
+			}),
+			step.invoke('get-sanity-person', {
+				function: personGetByClerkId,
+				data: {
+					clerkUserId: event.data.userId,
+				},
+			}),
+		]);
+
+		const [discordUserId, submission] = await Promise.all([
+			step.invoke('get-discord-user-id', {
+				function: getDiscordMemberId,
+				data: {
+					user: user,
+				},
+			}),
+			step.invoke('create-hackathon-submission', {
+				function: hackathonSubmissionCreate,
+				data: {
+					hackathonId: hackathon?._id ?? '',
+					personId: person?._id,
+					email: event.data.email,
+					fullName: event.data.fullName,
+					githubRepo: event.data.githubRepo,
+					deployedUrl: event.data.deployedUrl,
+					demoVideo: event.data.demoVideo,
+					agreeTerms: event.data.agreeTerms,
+					optOutSponsorship: event.data.optOutSponsorship,
+				},
+			}),
+		]);
+
+		// Parallelize all remaining operations that depend on the results above
+		await Promise.all([
+			// Associate person with hackathon (if not already associated)
+			person?._id && hackathon?._id
+				? step.invoke('associate-person-with-hackathon', {
+						function: personAssociateWithHackathon,
+						data: {
+							personId: person._id,
+							hackathonId: hackathon._id,
+						},
+					})
+				: Promise.resolve(),
+			// Associate person with hackathon submission
+			person?._id && submission?._id
+				? step.invoke('associate-person-with-hackathon-submission', {
+						function: personAssociateWithHackathonSubmission,
+						data: {
+							personId: person._id,
+							submissionId: submission._id,
+						},
+					})
+				: Promise.resolve(),
+			// Add hackathon participant badge on Discord
+			step.invoke('add-hackathon-badge', {
+				function: updateUserRole,
+				data: {
+					type: 'badge',
+					memberId: discordUserId,
+					role: 'hackathon_participant',
+				},
+			}),
+			// Log submission to Google Sheet
+			step.invoke('append-row-to-hackathon-google-sheet', {
+				function: sheetRowAppend,
+				data: {
+					formType: 'hackathon' as const,
+					userId: event.data.userId,
+					fullName: event.data.fullName,
+					email: event.data.email,
+					githubRepo: event.data.githubRepo,
+					deployedUrl: event.data.deployedUrl,
+					demoVideo: event.data.demoVideo,
+					agreeTerms: event.data.agreeTerms,
+					optOutSponsorship: event.data.optOutSponsorship,
+				},
+			}),
+		]);
+
+		return submission;
 	},
 );

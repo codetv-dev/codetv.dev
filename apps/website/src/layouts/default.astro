@@ -1,5 +1,5 @@
 ---
-import Eyebrow from '../components/eyebrow.astro';
+// import Eyebrow from '../components/eyebrow.astro';
 import Header from '../components/header.astro';
 import Footer from '../components/footer.astro';
 import '../styles/global.css';
@@ -62,7 +62,7 @@ const {
 		></script>
 	</head>
 	<body>
-		<Eyebrow />
+		<!-- <Eyebrow /> -->
 		<Header />
 
 		<slot />
@@ -112,25 +112,6 @@ const {
 		*/
 		:not(#menu a) {
 			pointer-events: none;
-		}
-	}
-
-	@layer overrides {
-		body:has(.eyebrow) {
-			padding-top: 32px;
-
-			.page-header {
-				/* TODO: fix this with actual layers implementation */
-				inset-block-start: 60px !important;
-
-				@media (min-width: 480px) {
-					inset-block-start: 50px !important;
-				}
-
-				@media (min-width: 940px) {
-					inset-block-start: 40px !important;
-				}
-			}
 		}
 	}
 

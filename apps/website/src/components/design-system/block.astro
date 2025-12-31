@@ -1,0 +1,78 @@
+---
+export interface Props {
+	variant?: 'default' | 'two-column-asymmetrical';
+	emphasized?: boolean;
+	name?: string;
+}
+
+const { variant = 'default', emphasized = false, name } = Astro.props;
+---
+
+<section
+	class:list={[
+		'block',
+		{
+			'two-column-asymmetrical': variant === 'two-column-asymmetrical',
+			emphasized,
+		},
+	]}
+	data-name={name}
+>
+	<slot />
+</section>
+
+<style>
+	@layer design-system {
+		.block {
+			background: var(--black);
+			container: block / inline-size;
+			display: flex;
+			flex-wrap: wrap;
+			gap: 20px;
+			justify-content: center;
+			padding-block: 40px;
+			padding-inline: max((100% - var(--max-width)) / 2, 2.5%);
+
+			&.two-column-asymmetrical {
+				align-items: start;
+				display: grid;
+				gap: 40px;
+
+				.heading {
+					justify-self: center;
+
+					h2 {
+						font-weight: 400;
+					}
+				}
+
+				@media (min-width: 800px) {
+					grid-template-columns: 240px minmax(0, 640px);
+
+					.heading {
+						justify-self: end;
+
+						h2 {
+							font-weight: 400;
+
+							&::after {
+								content: ' →';
+							}
+						}
+					}
+				}
+			}
+
+			.copy-block {
+				padding-inline: 16px;
+			}
+
+			&.emphasized {
+				background: var(--bg);
+				border-block: 0.5px solid
+					color-mix(in oklch, var(--orange) 20%, transparent);
+				color: var(--text-emphasized);
+			}
+		}
+	}
+</style>

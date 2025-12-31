@@ -20,4 +20,8 @@ export const config = {
 		id: '1ihOfKXacyKDmarkq1yrwSpodRvfncS-xpXSVJP5Zrnw',
 		range: 'Sheet1!A2',
 	},
+	hackathonSheet: {
+		id: '1VD4HwrKnChg_eIPg8aMjYCxFQJqMZPIwCMbY9qltgUs',
+		range: 'Sheet1!A2',
+	},
 };

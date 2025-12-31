@@ -7,11 +7,11 @@ import {
 } from './integrations/clerk/steps.js';
 import { imageUpload } from './integrations/cloudinary/steps.js';
 import {
-	addAlumniRole,
 	addMemberToServer,
 	discordUpdateUserRole,
 	getDiscordMemberId,
 	messageSend,
+	updateUserRole,
 } from './integrations/discord/steps.js';
 import {
 	bookableDatesGet,
@@ -22,6 +22,10 @@ import {
 	tokenGenerate,
 } from './integrations/google/steps.js';
 import {
+	getCurrentActiveHackathon,
+	hackathonSubmissionCreate,
+	personAssociateWithHackathon,
+	personAssociateWithHackathonSubmission,
 	personGetByClerkId,
 	personUpdateDetails,
 	personUpdateSubscription,
@@ -34,6 +38,7 @@ import {
 	retrieveStripeSubscription,
 } from './integrations/stripe/steps.js';
 import {
+	handleHackathonSubmission,
 	handleLWJIntake,
 	handleUpdateUserProfile,
 	handleWDCIntakeSubmit,
@@ -62,17 +67,21 @@ export const functions: any[] = [
 	userGetOAuthToken,
 	userSubscriptionUpdate,
 	imageUpload,
-	addAlumniRole,
 	addMemberToServer,
 	discordUpdateUserRole,
 	getDiscordMemberId,
 	messageSend,
+	updateUserRole,
 	bookableDatesGet,
 	calendarEventList,
 	eventsGetUnbookedDates,
 	hostFreeBusy,
 	sheetRowAppend,
 	tokenGenerate,
+	getCurrentActiveHackathon,
+	hackathonSubmissionCreate,
+	personAssociateWithHackathon,
+	personAssociateWithHackathonSubmission,
 	personGetByClerkId,
 	personUpdateDetails,
 	personUpdateSubscription,
@@ -81,6 +90,7 @@ export const functions: any[] = [
 	handleWebhookStripeSubscriptionCompleted,
 	retrieveStripeProduct,
 	retrieveStripeSubscription,
+	handleHackathonSubmission,
 	handleLWJIntake,
 	handleUpdateUserProfile,
 	handleWDCIntakeSubmit,

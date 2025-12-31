@@ -29,34 +29,38 @@ const imgUrl = createImageUrl(image.public_id, {
 </section>
 
 <style>
-	.hero {
-		position: relative;
+	@layer site-base {
+		.hero {
+			position: relative;
 
-		h1 {
-			font-size: clamp(1rem, 11cqi, 11rem);
-			inline-size: min(90%, 1450px);
-			inset-block-end: 0;
-			line-height: 0.8;
-			margin: 0 max(5%, (100% - 1450px) / 2);
-			position: absolute;
-			text-box-trim: trim-both;
-			text-shadow: 0 1px 3px color-mix(in oklch, var(--black) 50%, transparent);
-			word-spacing: 0.1em;
+			h1 {
+				font-size: clamp(1rem, 11cqi, 11rem);
+				font-weight: 400;
+				inline-size: min(90%, 1450px);
+				inset-block-end: 0;
+				line-height: 0.8;
+				margin: 0 max(5%, (100% - 1450px) / 2);
+				position: absolute;
+				text-box-trim: trim-both;
+				text-shadow: 0 1px 3px
+					color-mix(in oklch, var(--black) 50%, transparent);
+				word-spacing: 0.1em;
 
-			.line-1,
-			.line-2 {
+				.line-1,
+				.line-2 {
+					display: block;
+				}
+
+				.line-2 {
+					color: var(--orange);
+					font-size: 0.92em;
+					text-align: end;
+				}
+			}
+
+			img {
 				display: block;
 			}
-
-			.line-2 {
-				color: var(--orange);
-				font-size: 0.92em;
-				text-align: end;
-			}
-		}
-
-		img {
-			display: block;
 		}
 	}
 </style>

@@ -59,19 +59,18 @@ const series = await getFeaturedSeries();
 									public_id: ep.thumbnail.public_id!,
 									alt: ep.thumbnail.alt!,
 								}}
-								tagline={new Date(ep.publish_date!).toLocaleDateString(
-									'en-US',
-									{
-										month: 'short',
-										day: 'numeric',
-									},
-								)}
 								title={ep.series}
 								link={ep.path}
 								linkText="Watch Now"
 								youtube_id={ep.youtube_id}
 							>
 								<Fragment slot="details">
+									<p class="episode-date">
+										{new Date(ep.publish_date!).toLocaleDateString('en-US', {
+											month: 'short',
+											day: 'numeric',
+										})}
+									</p>
 									<p class="episode-number">{ep.episodeNumber}</p>
 									<p class="episode-title">{ep.title}</p>
 								</Fragment>
@@ -108,7 +107,7 @@ const series = await getFeaturedSeries();
 						link={s.path}
 						linkText="See Episodes"
 					>
-						<Fragment slot="tagline">
+						<Fragment slot="details">
 							<p class="season-count">{seasons}</p>
 							<p class="episode-count">{episodes}</p>
 						</Fragment>

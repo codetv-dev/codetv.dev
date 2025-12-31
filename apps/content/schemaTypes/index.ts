@@ -2,8 +2,14 @@ import {defineField, defineType} from 'sanity'
 import {PlayIcon, UserIcon, TagIcon, ImageIcon, FolderIcon, StarIcon} from '@sanity/icons'
 import {person} from './documents/person'
 import {episode} from './documents/episode'
+import {hackathon} from './documents/hackathon'
+import {hackathonSubmission} from './documents/hackathon-submission'
+import {faq} from './documents/faqs'
+import {rewards} from './documents/rewards'
+import {rules} from './documents/rules'
 import {episodeTag} from './documents/tags'
 import {episodeImage} from './objects/episode-image'
+import resourceItem from './objects/resource-item'
 
 function slugify(str: string) {
   return String(str)
@@ -253,4 +259,18 @@ const sponsor = defineType({
   },
 })
 
-export const schemaTypes = [series, collection, episode, person, sponsor, episodeTag, episodeImage]
+export const schemaTypes = [
+  series,
+  collection,
+  episode,
+  hackathon,
+  hackathonSubmission,
+  faq,
+  rewards,
+  rules,
+  person,
+  sponsor,
+  episodeTag,
+  episodeImage,
+  resourceItem,
+]

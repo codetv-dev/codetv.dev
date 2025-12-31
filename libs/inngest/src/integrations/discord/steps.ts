@@ -2,11 +2,11 @@ import { NonRetriableError } from 'inngest';
 import { inngest } from '../../client.js';
 import {
 	addMemberToGuild,
+	addRoleIfMissing,
 	getMember,
 	getRoleId,
 	removeRole,
 	sendDiscordMessage,
-	updateRole,
 } from '@codetv/discord';
 import { type SubscriptionLevel } from '@codetv/types';
 import { config } from './config.ts';
@@ -44,65 +44,6 @@ export const getDiscordMemberId = inngest.createFunction(
 	},
 );
 
-export const addAlumniRole = inngest.createFunction(
-	{ id: 'discord/user.alumni-role.add' },
-	[{ event: 'discord/user.alumni-role.add' }],
-	async function ({ event, step }) {
-		const { userId, role } = event.data;
-
-		const user = await step.invoke('get-current-user', {
-			function: userGetById,
-			data: {
-				userId,
-			},
-		});
-
-		const memberId = await step.invoke('discord-get-user-id', {
-			function: getDiscordMemberId,
-			data: {
-				user,
-			},
-		});
-
-		const discordMember = await step.run('discord/user.get', async () => {
-			return getMember(memberId);
-		});
-
-		const roleId = await step.run('discord/role.get', async () => {
-			switch (role) {
-				case 'Web Dev Challenge Alumni':
-					return config.roles.wdc_alumni;
-
-				case 'Leet Heat Alumni':
-					return config.roles.lh_alumni;
-
-				case 'Learn With Jason Alumni':
-					return config.roles.lwj_alumni;
-
-				default:
-					throw new NonRetriableError('unknown role', role);
-			}
-		});
-
-		await step.invoke('discord-add-user-to-server', {
-			function: addMemberToServer,
-			data: {
-				userId,
-				memberId,
-			},
-		});
-
-		return step.run('discord/user.roles.add', async () => {
-			if (discordMember.roles.includes(roleId)) {
-				return {
-					message: `${discordMember.user.username} already has role ${roleId}`,
-				};
-			}
-
-			return updateRole({ memberId, roleId });
-		});
-	},
-);
 
 export const addMemberToServer = inngest.createFunction(
 	{ id: 'discord/guild.member.add' },
@@ -121,6 +62,77 @@ export const addMemberToServer = inngest.createFunction(
 		return step.run('add-member-to-discord-server', async () => {
 			return addMemberToGuild({ memberId, access_token });
 		});
+	},
+);
+
+export type BadgeType = 'hackathon_participant';
+
+
+
+/**
+ * Consolidated function for adding roles to Discord users.
+ * Handles both alumni roles (by userId) and badge roles (by memberId).
+ */
+export const updateUserRole = inngest.createFunction(
+	{ id: 'discord/user.role.add' },
+	{ event: 'discord/user.role.add' },
+	async function ({ event, step }) {
+		const data = event.data;
+
+		// Get the role ID from config
+		const roleId = config.roles[data.role];
+		if (!roleId) {
+			throw new NonRetriableError(`Unknown role: ${data.role}`);
+		}
+
+		if (data.type === 'alumni') {
+			// Alumni flow: userId -> get user -> get memberId -> ensure in server -> add role
+			const user = await step.invoke('get-current-user', {
+				function: userGetById,
+				data: { userId: data.userId },
+			});
+
+			const memberId = await step.invoke('discord-get-user-id', {
+				function: getDiscordMemberId,
+				data: { user },
+			});
+
+			const discordMember = await step.run('discord/user.get', async () => {
+				return getMember(memberId);
+			});
+
+			await step.invoke('discord-add-user-to-server', {
+				function: addMemberToServer,
+				data: { userId: data.userId, memberId },
+			});
+
+			return step.run('discord/user.role.apply', async () => {
+				return addRoleIfMissing({ memberId, roleId, member: discordMember });
+			});
+		} else {
+			// Badge flow: memberId -> check if in server -> add role (skip if not in server)
+			const discordMember = await step.run('discord/user.get', async () => {
+				try {
+					return await getMember(data.memberId);
+				} catch {
+					return null;
+				}
+			});
+
+			if (!discordMember) {
+				return {
+					message: `User ${data.memberId} is not in the server, skipping role`,
+				};
+			}
+
+			return step.run('discord/user.role.apply', async () => {
+				return addRoleIfMissing({
+					memberId: data.memberId,
+					roleId,
+					member: discordMember,
+				});
+			});
+		}
 	},
 );
 
@@ -159,13 +171,7 @@ export const discordUpdateUserRole = inngest.createFunction(
 
 		// update the user's role on Discord
 		const maybeAddRolePromise = step.run('discord/user.roles.add', async () => {
-			if (discordMember.roles.includes(roleId)) {
-				return {
-					message: `${discordMember.user.username} already has role ${roleId}`,
-				};
-			}
-
-			return updateRole({ memberId, roleId });
+			return addRoleIfMissing({ memberId, roleId, member: discordMember });
 		});
 
 		// remove other roles on Discord

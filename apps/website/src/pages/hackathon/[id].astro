@@ -1,0 +1,658 @@
+---
+import Layout from '../../layouts/default.astro';
+import PageHeader from '../../components/page-header.astro';
+import VideoPlayer from '../../components/video-player.astro';
+import Grid from '../../components/design-system/grid.astro';
+import Card from '../../components/design-system/card.astro';
+import List from '../../components/design-system/list.astro';
+import Block from '../../components/design-system/block.astro';
+import { getAllHackathons, getHackathonBySlug } from '@codetv/sanity';
+import { marked } from 'marked';
+import { createImageUrl, generateDefaultImage } from '@codetv/cloudinary';
+
+export const prerender = true;
+
+export async function getStaticPaths() {
+	const hackathons = await getAllHackathons();
+
+	return hackathons.map((hackathon) => ({
+		params: { id: hackathon.slug },
+		props: { slug: hackathon.slug },
+	}));
+}
+
+const { slug } = Astro.props;
+const hackathon = await getHackathonBySlug({ slug: slug! });
+
+if (!hackathon) {
+	return Astro.redirect('/404');
+}
+
+// Calculate status based on deadline
+const now = new Date();
+const deadline = hackathon.deadline ? new Date(hackathon.deadline) : null;
+const isActive = deadline ? now < deadline : false;
+const statusText = isActive ? 'Active' : 'Closed';
+const statusClass = isActive ? 'active' : 'closed';
+
+// Format deadline for display
+const deadlineFormatted = deadline
+	? deadline.toLocaleDateString('en-US', {
+			month: 'short',
+			day: 'numeric',
+		})
+	: 'TBD';
+
+// Hero image - use hero_image, fall back to share_image, then default
+let heroImagePublicId =
+	hackathon.hero_image?.public_id || hackathon.share_image?.public_id;
+
+const heroImage = {
+	public_id: heroImagePublicId || 'codetv-home-hero',
+	alt: hackathon.title,
+};
+
+// SEO meta
+const pageTitle = `${hackathon.title} — CodeTV`;
+const pageDescription = hackathon.description;
+
+const pageImage = hackathon.share_image?.public_id
+	? createImageUrl(hackathon.share_image.public_id, {
+			width: 1600,
+			height: 900,
+			crop: 'fill',
+		})
+	: generateDefaultImage({ text: hackathon.title });
+
+// Parse markdown body
+const bodyHtml = hackathon.body ? await marked.parse(hackathon.body) : '';
+
+// Check if there are any resources, rules, faq, sponsors, or rewards
+const hasResources = hackathon.resources && hackathon.resources.length > 0;
+const resources = hasResources
+	? hackathon.resources?.map((resource) => ({
+			title: resource.title || '',
+			description: resource.description || '',
+			url: resource.url || '',
+		}))
+	: null;
+
+const hasRules = hackathon.rules && hackathon.rules.length > 0;
+const rules = hasRules
+	? hackathon.rules?.map((rule) => ({
+			title: rule.title || '',
+			description: rule.description || '',
+			weight: rule.weight || 0,
+		}))
+	: null;
+
+const hasFaq = hackathon.faqData && hackathon.faqData.length > 0;
+const faq = hasFaq
+	? hackathon.faqData?.map((faq) => ({
+			question: faq.question || '',
+			answer: faq.answer || '',
+			weight: faq.weight || 0,
+		}))
+	: null;
+
+const hasSponsors = hackathon.sponsors && hackathon.sponsors.length > 0;
+const sponsors = hasSponsors
+	? hackathon.sponsors?.map((sponsor) => ({
+			title: sponsor.title || '',
+			logo: {
+				public_id: sponsor.logo?.public_id || '',
+			},
+			link: sponsor.link || '',
+		}))
+	: null;
+
+const hasRewards = hackathon.rewardsData && hackathon.rewardsData.length > 0;
+const rewards = hasRewards
+	? hackathon.rewardsData?.map((reward) => ({
+			title: reward.title || '',
+			description: reward.description || '',
+			image: {
+				public_id: reward.image?.public_id || '',
+			},
+			weight: reward.weight || 0,
+		}))
+	: null;
+
+// Get first sponsor if available
+const primarySponsor = hasSponsors ? sponsors?.[0] : null;
+---
+
+<Layout title={pageTitle} description={pageDescription} image={pageImage}>
+	<main>
+		<PageHeader
+			image={heroImage}
+			line1={hackathon.title}
+			line2="Join the Web Dev Challenge"
+		/>
+
+		<Block name="overview" variant="two-column-asymmetrical">
+			<Card>
+				<aside class="hackathon-details">
+					<dl>
+						<dt>Status</dt>
+						<dd>
+							<span class={`status ${statusClass}`}></span>
+							{statusText}
+						</dd>
+
+						<dt>Deadline</dt>
+						<dd>
+							<time datetime={hackathon.deadline || ''}
+								>{deadlineFormatted}</time
+							>
+						</dd>
+
+						{
+							primarySponsor && (
+								<>
+									<dt>Sponsor</dt>
+									<dd>
+										{primarySponsor.logo.public_id ? (
+											<img
+												src={createImageUrl(primarySponsor.logo.public_id, {
+													width: 200,
+													format: 'svg',
+												})}
+												alt={primarySponsor.title || 'Sponsor'}
+												class="sponsor-image"
+											/>
+										) : (
+											<span>{primarySponsor.title}</span>
+										)}
+									</dd>
+								</>
+							)
+						}
+					</dl>
+
+					{
+						isActive && hackathon.submissionForm && (
+							<a href={hackathon.submissionForm} class="button">
+								Submit Your App
+							</a>
+						)
+					}
+				</aside>
+			</Card>
+
+			<div class="text-block challenge">
+				<div class="copy">
+					{hackathon.description && <p class="lede">{hackathon.description}</p>}
+					{bodyHtml && <div class="body-content" set:html={bodyHtml} />}
+				</div>
+			</div>
+		</Block>
+
+		{
+			hackathon.episode && (
+				<Block name="episode">
+					<h2>Watch the full episode for inspiration</h2>
+					<figure>
+						{(hackathon.episode.video?.youtube_id ||
+							hackathon.episode.video?.mux) && (
+							<VideoPlayer
+								video={{
+									youtube_id: hackathon.episode.video.youtube_id,
+									mux: hackathon.episode.video.mux?.map((v) => ({
+										id: v.id ?? '',
+										policy: v.policy as 'public' | 'signed',
+									})),
+									captions: null,
+									title: hackathon.episode.title,
+									publish_date: null,
+									thumbnail: hackathon.episode.thumbnail,
+								}}
+							/>
+						)}
+						<figcaption>
+							<span>
+								Watch the challenge in action to jumpstart your creativity
+							</span>
+							<a href={hackathon.episode.path}>Watch the episode &rarr;</a>
+						</figcaption>
+					</figure>
+				</Block>
+			)
+		}
+
+		{
+			hasRewards && (
+				<Block name="rewards">
+					<h2>Submit an app to earn rewards</h2>
+
+					<Grid columns={3}>
+						{hasRewards &&
+							rewards?.map((reward) => (
+								<Card title={reward.title || ''}>
+									{reward.image?.public_id && (
+										<img
+											slot="img"
+											src={createImageUrl(reward.image.public_id, {
+												width: 400,
+											})}
+											alt={reward.title || 'Reward'}
+										/>
+									)}
+									<p>{reward.description}</p>
+								</Card>
+							))}
+					</Grid>
+				</Block>
+			)
+		}
+
+		{
+			primarySponsor && (
+				<Block name="sponsor" emphasized>
+					<div class="inline">
+						<p>
+							This challenge is brought to you by{' '}
+							{primarySponsor.logo.public_id ? (
+								<img
+									src={createImageUrl(primarySponsor.logo.public_id, {
+										format: 'svg',
+									})}
+									alt={primarySponsor.title}
+									class="sponsor-image"
+								/>
+							) : (
+								<span>{primarySponsor.title}</span>
+							)}
+						</p>
+
+						{primarySponsor.link && (
+							<a href={primarySponsor.link} class="button secondary">
+								learn more &rarr;
+							</a>
+						)}
+					</div>
+				</Block>
+			)
+		}
+
+		{
+			hasResources && (
+				<Block name="resources" variant="two-column-asymmetrical">
+					<div class="heading">
+						<h2>Resources</h2>
+					</div>
+
+					<List>
+						{hasResources &&
+							resources?.map((resource) => (
+								<Card variant="secondary">
+									<p slot="title">
+										<a href={resource.url}>{resource.title} &rarr;</a>
+									</p>
+									<p>{resource.description}</p>
+								</Card>
+							))}
+					</List>
+				</Block>
+			)
+		}
+
+		{
+			hasRules && (
+				<Block name="rules" variant="two-column-asymmetrical">
+					<div class="heading">
+						<h2>The Rules</h2>
+					</div>
+
+					<List>
+						{hasRules &&
+							rules?.map((rule, index) => (
+								<Card title={`#${index + 1}: ${rule.title}`}>
+									<p>{rule.description}</p>
+								</Card>
+							))}
+					</List>
+				</Block>
+			)
+		}
+
+		{
+			isActive && hackathon.submissionForm && (
+				<Block name="submit" emphasized>
+					<div class="heading">
+						<h2>Show us what you built!</h2>
+					</div>
+					<div class="content">
+						<div class="text-container">
+							<p>
+								When your app is ready, click this button to submit your app.
+								Apps must be submitted through this form before the deadline to
+								qualify for rewards.
+							</p>
+						</div>
+					</div>
+					<div class="button-container">
+						<a href={hackathon.submissionForm} class="button">
+							Submit Your App
+						</a>
+					</div>
+				</Block>
+			)
+		}
+
+		{
+			hasFaq && (
+				<Block name="faq" variant="two-column-asymmetrical">
+					<div class="heading">
+						<h2>FAQ</h2>
+					</div>
+
+					<List>
+						{hasFaq &&
+							faq?.map((faq) => (
+								<Card variant="secondary" title={faq.question || ''} toggle>
+									<p>{faq.answer}</p>
+								</Card>
+							))}
+					</List>
+				</Block>
+			)
+		}
+	</main>
+</Layout>
+
+<style>
+	.hackathon-details {
+		display: flex;
+		flex-direction: column;
+		gap: 40px;
+		justify-content: space-between;
+
+		dl {
+			align-items: center;
+			display: grid;
+			font-size: 0.75em;
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+			grid-template-rows: repeat(3, minmax(0, 40px));
+			letter-spacing: 0.25em;
+			text-transform: uppercase;
+		}
+
+		dt {
+			color: var(--text-muted);
+		}
+
+		dd {
+			align-items: center;
+			color: var(--text-emphasized);
+			display: flex;
+			gap: 8px;
+			justify-content: end;
+
+			.status {
+				block-size: 12px;
+				border-radius: 50%;
+				display: block;
+				inline-size: 12px;
+
+				&.active {
+					background: #79f664;
+				}
+
+				&.closed {
+					background: #ff6b6b;
+				}
+			}
+		}
+
+		.sponsor-image {
+			block-size: 50px;
+			inline-size: auto;
+		}
+
+		.button {
+			inline-size: 100%;
+			text-align: center;
+		}
+	}
+
+	h2 {
+		font-family: var(--font-family-heading);
+		font-size: clamp(1.75rem, 3.75cqi, 4.25rem);
+		font-weight: normal;
+		line-height: 1;
+		margin: 0;
+	}
+
+	.copy {
+		display: flex;
+		flex-direction: column;
+		gap: 32px;
+
+		.lede {
+			color: var(--text-emphasized);
+			font-size: 1.25em;
+			font-weight: 300;
+			line-height: 1.25;
+		}
+
+		.body-content {
+			display: flex;
+			flex-direction: column;
+			gap: 8px;
+
+			ul,
+			ol {
+				padding-inline-start: 24px;
+				display: flex;
+				flex-direction: column;
+				gap: 8px;
+			}
+
+			li {
+				line-height: 1.6;
+			}
+
+			a {
+				color: var(--text-link);
+			}
+
+			code {
+				background: var(--background-offset);
+				padding: 2px 6px;
+				border-radius: 4px;
+				font-size: 0.9em;
+			}
+
+			strong {
+				font-weight: 600;
+			}
+		}
+	}
+
+	figure {
+		inline-size: min(90cqi, 980px);
+
+		lite-youtube {
+			block-size: auto;
+			max-inline-size: 100%;
+		}
+
+		figcaption {
+			color: var(--text-muted);
+			display: flex;
+			font-size: 0.875em;
+			justify-content: space-between;
+			padding-block: 8px;
+
+			a {
+				color: var(--text-emphasized);
+				font-weight: 500;
+				text-decoration: none;
+			}
+		}
+	}
+
+	.inline {
+		align-items: center;
+		display: flex;
+		flex-direction: column;
+		gap: 24px;
+
+		p {
+			align-items: center;
+			display: flex;
+			flex-direction: column;
+			gap: 8px;
+		}
+
+		svg,
+		.sponsor-image {
+			block-size: 45px;
+			inline-size: auto;
+			margin-block-start: 4px;
+		}
+
+		.button {
+			margin: 0;
+		}
+
+		@media (min-width: 1024px) {
+			flex-direction: row;
+
+			p {
+				flex-direction: row;
+			}
+		}
+	}
+
+	.list-fine-print {
+		color: var(--text-muted);
+		font-size: 0.75em;
+		padding-inline: 16px;
+	}
+
+	/* Fix the submit block centering completely */
+</style>
+
+<style is:global>
+	@layer overrides {
+		.block[data-name='episode'] {
+			padding-inline: calc((100dvi - 960px) / 2);
+		}
+
+		/* Force the submit block to be properly centered on all screens */
+		.block[data-name='submit'] {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			flex-wrap: nowrap;
+			text-align: center;
+		}
+
+		[data-name='submit'] .heading {
+			width: 100%;
+			margin-bottom: 1rem;
+		}
+
+		[data-name='submit'] .content {
+			width: 100%;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			margin-bottom: 1rem;
+		}
+
+		[data-name='submit'] .text-container {
+			max-width: 70ch;
+		}
+
+		[data-name='submit'] .button-container {
+			width: 100%;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+		}
+
+		[data-name='submit'] .button {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			inline-size: 300px;
+			block-size: 57px;
+
+			background: #f0b525;
+			border-radius: 3px;
+			border: none;
+
+			/* Typography */
+			color: #000;
+			font-size: 1.75rem;
+			font-weight: 600;
+			letter-spacing: 0.05em;
+			text-decoration: none;
+
+			/* Hover state */
+			transition: background 0.2s ease;
+		}
+
+		[data-name='submit'] .button:hover {
+			background: #d89f20;
+		}
+		.hero {
+			--hero-max-width: 1800px;
+			--hero-max-height: 771px;
+
+			container-type: inline-size;
+			max-inline-size: var(--hero-max-width);
+			margin-inline: auto;
+			position: relative;
+
+			img {
+				max-block-size: var(--hero-max-height);
+				max-inline-size: 100%;
+			}
+
+			h1 {
+				inline-size: 90%;
+				font-size: clamp(1rem, 10cqi, 11rem);
+				z-index: 10;
+			}
+
+			&::after {
+				background: linear-gradient(
+					to top,
+					color-mix(in oklch, var(--black), transparent 0%),
+					color-mix(in oklch, var(--black), transparent 100%) 40%
+				);
+				content: '';
+				inset: 0;
+				position: absolute;
+				z-index: 1;
+			}
+		}
+
+		.hero .line-2 {
+			font-size: 0.5em;
+			letter-spacing: -0.01em;
+		}
+
+		[data-name='overview'] {
+			justify-items: center;
+
+			.card {
+				min-inline-size: 240px;
+			}
+		}
+
+		[data-name='rewards'] {
+			--grid-width: 980px;
+
+			align-items: center;
+			display: flex;
+			flex-direction: column;
+			gap: 16px;
+		}
+	}
+</style>
