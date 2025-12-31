@@ -8,8 +8,8 @@ import {
 	getActiveHackathon,
 	associatePersonWithHackathon,
 	associatePersonWithHackathonSubmission,
-	type PersonByClerkIdQueryResult,
 } from '@codetv/sanity';
+import type { PersonByClerkIdQueryResult } from '@codetv/types';
 import { inngest } from '../../client.js';
 
 export const getCurrentActiveHackathon = inngest.createFunction(
