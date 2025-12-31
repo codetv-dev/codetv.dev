@@ -350,7 +350,7 @@ const primarySponsor = hasSponsors ? sponsors?.[0] : null;
 					<List>
 						{hasFaq &&
 							faq?.map((faq) => (
-								<Card variant="secondary" title={faq.question || ''}>
+								<Card variant="secondary" title={faq.question || ''} toggle>
 									<p>{faq.answer}</p>
 								</Card>
 							))}
@@ -440,28 +440,6 @@ const primarySponsor = hasSponsors ? sponsors?.[0] : null;
 			display: flex;
 			flex-direction: column;
 			gap: 8px;
-
-			:is(h2, h3) {
-				font-weight: 600;
-				font-variation-settings: 'wdth' 75;
-				line-height: 1.1;
-
-				&:not(:first-child) {
-					margin-block-start: 24px;
-				}
-			}
-
-			h2 {
-				font-size: clamp(1.5rem, 2.5cqi, 2.25rem);
-			}
-
-			h3 {
-				font-size: clamp(1.25rem, 2.25cqi, 2rem);
-			}
-
-			p {
-				line-height: 1.45;
-			}
 
 			ul,
 			ol {
@@ -664,7 +642,7 @@ const primarySponsor = hasSponsors ? sponsors?.[0] : null;
 			justify-items: center;
 
 			.card {
-				min-inline-size: 280px;
+				min-inline-size: 240px;
 			}
 		}
 
