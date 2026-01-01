@@ -69,6 +69,13 @@ const series = defineType({
       group: 'content',
     }),
     defineField({
+      title: 'Series Cover',
+      name: 'cover',
+      type: 'cloudinary.asset',
+      options: {hotspot: true},
+      group: 'content',
+    }),
+    defineField({
       title: 'Collections',
       name: 'collections',
       type: 'array',

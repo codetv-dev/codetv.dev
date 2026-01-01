@@ -100,44 +100,6 @@ export type CloudinaryAsset = {
 	context?: CloudinaryAssetContext;
 };
 
-export type Person = {
-	_id: string;
-	_type: 'person';
-	_createdAt: string;
-	_updatedAt: string;
-	_rev: string;
-	name: string;
-	slug: Slug;
-	photo?: CloudinaryAsset;
-	bio?: Markdown;
-	links?: Array<{
-		label?: string;
-		url?: string;
-		_type: 'link';
-		_key: string;
-	}>;
-	subscription?: {
-		customer?: string;
-		level?:
-			| 'Silver Tier Supporter'
-			| 'Gold Tier Supporter'
-			| 'Platinum Tier Supporter';
-		status?:
-			| 'incomplete'
-			| 'incomplete_expired'
-			| 'trialing'
-			| 'active'
-			| 'past_due'
-			| 'canceled'
-			| 'unpaid'
-			| 'paused';
-		date?: string;
-	};
-	user_id?: string;
-};
-
-export type Markdown = string;
-
 export type Rules = {
 	_id: string;
 	_type: 'rules';
@@ -174,6 +136,82 @@ export type Faq = {
 	weight: number;
 	setAsDefault?: boolean;
 };
+
+export type HackathonSubmission = {
+	_id: string;
+	_type: 'hackathonSubmission';
+	_createdAt: string;
+	_updatedAt: string;
+	_rev: string;
+	hackathon: {
+		_ref: string;
+		_type: 'reference';
+		_weak?: boolean;
+		[internalGroqTypeReferenceTo]?: 'hackathon';
+	};
+	person?: {
+		_ref: string;
+		_type: 'reference';
+		_weak?: boolean;
+		[internalGroqTypeReferenceTo]?: 'person';
+	};
+	githubRepo: string;
+	deployedUrl?: string;
+	demoVideo?: string;
+	submittedAt?: string;
+};
+
+export type Person = {
+	_id: string;
+	_type: 'person';
+	_createdAt: string;
+	_updatedAt: string;
+	_rev: string;
+	name: string;
+	slug: Slug;
+	photo?: CloudinaryAsset;
+	bio?: Markdown;
+	links?: Array<{
+		label?: string;
+		url?: string;
+		_type: 'link';
+		_key: string;
+	}>;
+	subscription?: {
+		customer?: string;
+		level?:
+			| 'Silver Tier Supporter'
+			| 'Gold Tier Supporter'
+			| 'Platinum Tier Supporter';
+		status?:
+			| 'incomplete'
+			| 'incomplete_expired'
+			| 'trialing'
+			| 'active'
+			| 'past_due'
+			| 'canceled'
+			| 'unpaid'
+			| 'paused';
+		date?: string;
+	};
+	user_id?: string;
+	hackathons?: Array<{
+		_ref: string;
+		_type: 'reference';
+		_weak?: boolean;
+		_key: string;
+		[internalGroqTypeReferenceTo]?: 'hackathon';
+	}>;
+	hackathonSubmissions?: Array<{
+		_ref: string;
+		_type: 'reference';
+		_weak?: boolean;
+		_key: string;
+		[internalGroqTypeReferenceTo]?: 'hackathonSubmission';
+	}>;
+};
+
+export type Markdown = string;
 
 export type Hackathon = {
 	_id: string;
@@ -338,6 +376,7 @@ export type Series = {
 	slug: Slug;
 	description: string;
 	image?: CloudinaryAsset;
+	cover?: CloudinaryAsset;
 	collections?: Array<{
 		_ref: string;
 		_type: 'reference';
@@ -411,12 +450,18 @@ export type MuxStaticRenditions = {
 
 export type MuxStaticRenditionFile = {
 	_type: 'mux.staticRenditionFile';
-	ext?: string;
 	name?: string;
+	ext?: string;
+	height?: number;
 	width?: number;
 	bitrate?: number;
-	filesize?: number;
-	height?: number;
+	filesize?: string;
+	type?: string;
+	status?: string;
+	resolution_tier?: string;
+	resolution?: string;
+	id?: string;
+	passthrough?: string;
 };
 
 export type MuxPlaybackId = {
@@ -558,11 +603,12 @@ export type AllSanitySchemaTypes =
 	| Slug
 	| Sponsor
 	| CloudinaryAsset
-	| Person
-	| Markdown
 	| Rules
 	| Rewards
 	| Faq
+	| HackathonSubmission
+	| Person
+	| Markdown
 	| Hackathon
 	| Episode
 	| MuxVideo
@@ -588,12 +634,17 @@ export type AllSanitySchemaTypes =
 export declare const internalGroqTypeReferenceTo: unique symbol;
 // Source: ../../libs/sanity/src/index.ts
 // Variable: allSeriesQuery
-// Query: *[_type=="series"] {    title,    'slug': slug.current,    description,    image {      public_id,      height,      width,    },    "collections": collections[]->{      title,      'slug': slug.current,      release_year,      'episode_count': count(episodes[@->hidden != true && (defined(@->video.youtube_id) || defined(@->video.mux_video))])    } | order(release_year desc),    'total_episode_count': count(collections[]->episodes[@->hidden != true && (defined(@->video.youtube_id) || defined(@->video.mux_video))]),    'latestEpisodeDate': collections[]->episodes[@->hidden != true && (defined(@->video.youtube_id) || defined(@->video.mux_video))] | order(@->publish_date desc)[0]->publish_date,    featured  } | order(latestEpisodeDate desc)
+// Query: *[_type=="series"] {    title,    'slug': slug.current,    description,    image {      public_id,      height,      width,    },    cover {      public_id,      height,      width,    },    "collections": collections[]->{      title,      'slug': slug.current,      release_year,      'episode_count': count(episodes[@->hidden != true && (defined(@->video.youtube_id) || defined(@->video.mux_video))])    } | order(release_year desc),    'path': '/series/' + slug.current + '/' + collections[-1]->slug.current,    'total_episode_count': count(collections[]->episodes[@->hidden != true && (defined(@->video.youtube_id) || defined(@->video.mux_video))]),    'total_season_count': count(collections[]),    'latestEpisodeDate': collections[]->episodes[@->hidden != true && (defined(@->video.youtube_id) || defined(@->video.mux_video))] | order(@->publish_date desc)[0]->publish_date,    featured  } | order(latestEpisodeDate desc)
 export type AllSeriesQueryResult = Array<{
 	title: string;
 	slug: string;
 	description: string;
 	image: {
+		public_id: string | null;
+		height: number | null;
+		width: number | null;
+	} | null;
+	cover: {
 		public_id: string | null;
 		height: number | null;
 		width: number | null;
@@ -604,12 +655,14 @@ export type AllSeriesQueryResult = Array<{
 		release_year: string;
 		episode_count: number | null;
 	}> | null;
+	path: string | null;
 	total_episode_count: number | null;
+	total_season_count: number | null;
 	latestEpisodeDate: string | null;
 	featured: 'featured' | 'normal' | null;
 }>;
 // Variable: featuredSeriesQuery
-// Query: *[_type=="series" && featured == 'featured'] {    'slug': slug.current,    title,    description,    image {      public_id,      height,      width,    },    'path': '/series/' + slug.current + '/' + collections[-1]->slug.current,    'total_episode_count': count(collections[]->episodes[@->hidden != true && (defined(@->video.youtube_id) || defined(@->video.mux_video))]),    'total_season_count': count(collections[])  }
+// Query: *[_type=="series" && featured == 'featured'] {    'slug': slug.current,    title,    description,    image {      public_id,      height,      width,    },    cover {      public_id,      height,      width,    },    'path': '/series/' + slug.current + '/' + collections[-1]->slug.current,    'total_episode_count': count(collections[]->episodes[@->hidden != true && (defined(@->video.youtube_id) || defined(@->video.mux_video))]),    'total_season_count': count(collections[])  }
 export type FeaturedSeriesQueryResult = Array<{
 	slug: string;
 	title: string;
@@ -619,17 +672,27 @@ export type FeaturedSeriesQueryResult = Array<{
 		height: number | null;
 		width: number | null;
 	} | null;
+	cover: {
+		public_id: string | null;
+		height: number | null;
+		width: number | null;
+	} | null;
 	path: string | null;
 	total_episode_count: number | null;
 	total_season_count: number | null;
 }>;
 // Variable: seriesBySlugQuery
-// Query: *[_type=="series" && slug.current==$series][0] {    title,    'slug': slug.current,    description,    image {      public_id,      height,      width,    },    'sponsors': sponsors[]->{      'title': title,      logo {        public_id,        width,        height      },      link,    },    'collection': collections[@->slug.current==$collection && @->series._ref==^._id][0]->{      title,      'slug': slug.current,      release_year,      episodes[@->hidden != true]->{        title,        'slug': slug.current,        short_description,        publish_date,        'thumbnail': {          'public_id': video.thumbnail.public_id,          'alt': video.thumbnail_alt,          'width': video.thumbnail.width,          'height': video.thumbnail.height,        },        video {          youtube_id,          mux_video,          members_only        }      }    },    collections[]->{      title,      'slug': slug.current,      release_year,      'episode_count': count(episodes[@->hidden != true])    }  }
+// Query: *[_type=="series" && slug.current==$series][0] {    title,    'slug': slug.current,    description,    image {      public_id,      height,      width,    },    cover {      public_id,      height,      width,    },    'sponsors': sponsors[]->{      'title': title,      logo {        public_id,        width,        height      },      link,    },    'collection': collections[@->slug.current==$collection && @->series._ref==^._id][0]->{      title,      'slug': slug.current,      release_year,      episodes[@->hidden != true]->{        title,        'slug': slug.current,        short_description,        publish_date,        'thumbnail': {          'public_id': video.thumbnail.public_id,          'alt': video.thumbnail_alt,          'width': video.thumbnail.width,          'height': video.thumbnail.height,        },        video {          youtube_id,          mux_video,          members_only        }      }    },    collections[]->{      title,      'slug': slug.current,      release_year,      'episode_count': count(episodes[@->hidden != true])    }  }
 export type SeriesBySlugQueryResult = {
 	title: string;
 	slug: string;
 	description: string;
 	image: {
+		public_id: string | null;
+		height: number | null;
+		width: number | null;
+	} | null;
+	cover: {
 		public_id: string | null;
 		height: number | null;
 		width: number | null;
@@ -835,7 +898,7 @@ export type EarlyAccessEpisodesQueryResult = Array<{
 	episodes: Array<string> | null;
 }>;
 // Variable: recentEpisodesQuery
-// Query: *[_type=="episode" && dateTime(publish_date) < dateTime(now()) && (defined(video.youtube_id) || defined(video.mux_video)) && hidden != true] {    title,    'slug': slug.current,    short_description,    publish_date,    'thumbnail': {      'public_id': video.thumbnail.public_id,      'width': video.thumbnail.width,      'height': video.thumbnail.height,      'alt': video.thumbnail_alt,    },    'youtube_id': video.youtube_id,    'path': "/series/" + *[_type=="collection" && references(^._id)][0].series->slug.current + "/" + *[_type=="collection" && references(^._id)][0].slug.current + "/" + slug.current,    'series': *[_type=="collection" && references(^._id)][0].series->title,    'collection_number': upper(*[_type=="collection" && references(^._id)][0].slug.current),    'episodes': *[_type=="collection" && references(^._id)][0].episodes[]->slug.current,  } | order(publish_date desc)[0..2]
+// Query: *[_type=="episode" && dateTime(publish_date) < dateTime(now()) && (defined(video.youtube_id) || defined(video.mux_video)) && hidden != true] {    title,    'slug': slug.current,    short_description,    publish_date,    'thumbnail': {      'public_id': video.thumbnail.public_id,      'width': video.thumbnail.width,      'height': video.thumbnail.height,      'alt': video.thumbnail_alt,    },    'youtube_id': video.youtube_id,    'path': "/series/" + *[_type=="collection" && references(^._id)][0].series->slug.current + "/" + *[_type=="collection" && references(^._id)][0].slug.current + "/" + slug.current,    'series': *[_type=="collection" && references(^._id)][0].series->title,    'collection_number': upper(*[_type=="collection" && references(^._id)][0].slug.current),    'episodes': *[_type=="collection" && references(^._id)][0].episodes[]->slug.current,  } | order(publish_date desc)[0..7]
 export type RecentEpisodesQueryResult = Array<{
 	title: string;
 	slug: string;
@@ -1144,19 +1207,24 @@ export type HackathonBySlugQueryResult = {
 	};
 	hidden: 'hidden' | 'visible' | null;
 } | null;
+// Variable: activeHackathonQuery
+// Query: *[_type == "hackathon" && hidden != "hidden" && dateTime(pubDate) <= dateTime(now()) && dateTime(deadline) > dateTime(now())] | order(pubDate desc)[0] {    _id  }
+export type ActiveHackathonQueryResult = {
+	_id: string;
+} | null;
 
 // Query TypeMap
 import '@sanity/client';
 declare module '@sanity/client' {
 	interface SanityQueries {
-		"\n  *[_type==\"series\"] {\n    title,\n    'slug': slug.current,\n    description,\n    image {\n      public_id,\n      height,\n      width,\n    },\n    \"collections\": collections[]->{\n      title,\n      'slug': slug.current,\n      release_year,\n      'episode_count': count(episodes[@->hidden != true && (defined(@->video.youtube_id) || defined(@->video.mux_video))])\n    } | order(release_year desc),\n    'total_episode_count': count(collections[]->episodes[@->hidden != true && (defined(@->video.youtube_id) || defined(@->video.mux_video))]),\n    'latestEpisodeDate': collections[]->episodes[@->hidden != true && (defined(@->video.youtube_id) || defined(@->video.mux_video))] | order(@->publish_date desc)[0]->publish_date,\n    featured\n  } | order(latestEpisodeDate desc)\n": AllSeriesQueryResult;
-		"\n  *[_type==\"series\" && featured == 'featured'] {\n    'slug': slug.current,\n    title,\n    description,\n    image {\n      public_id,\n      height,\n      width,\n    },\n    'path': '/series/' + slug.current + '/' + collections[-1]->slug.current,\n    'total_episode_count': count(collections[]->episodes[@->hidden != true && (defined(@->video.youtube_id) || defined(@->video.mux_video))]),\n    'total_season_count': count(collections[])\n  }\n": FeaturedSeriesQueryResult;
-		"\n  *[_type==\"series\" && slug.current==$series][0] {\n    title,\n    'slug': slug.current,\n    description,\n    image {\n      public_id,\n      height,\n      width,\n    },\n    'sponsors': sponsors[]->{\n      'title': title,\n      logo {\n        public_id,\n        width,\n        height\n      },\n      link,\n    },\n    'collection': collections[@->slug.current==$collection && @->series._ref==^._id][0]->{\n      title,\n      'slug': slug.current,\n      release_year,\n      episodes[@->hidden != true]->{\n        title,\n        'slug': slug.current,\n        short_description,\n        publish_date,\n        'thumbnail': {\n          'public_id': video.thumbnail.public_id,\n          'alt': video.thumbnail_alt,\n          'width': video.thumbnail.width,\n          'height': video.thumbnail.height,\n        },\n        video {\n          youtube_id,\n          mux_video,\n          members_only\n        }\n      }\n    },\n    collections[]->{\n      title,\n      'slug': slug.current,\n      release_year,\n      'episode_count': count(episodes[@->hidden != true])\n    }\n  }\n": SeriesBySlugQueryResult;
+		"\n  *[_type==\"series\"] {\n    title,\n    'slug': slug.current,\n    description,\n    image {\n      public_id,\n      height,\n      width,\n    },\n    cover {\n      public_id,\n      height,\n      width,\n    },\n    \"collections\": collections[]->{\n      title,\n      'slug': slug.current,\n      release_year,\n      'episode_count': count(episodes[@->hidden != true && (defined(@->video.youtube_id) || defined(@->video.mux_video))])\n    } | order(release_year desc),\n    'path': '/series/' + slug.current + '/' + collections[-1]->slug.current,\n    'total_episode_count': count(collections[]->episodes[@->hidden != true && (defined(@->video.youtube_id) || defined(@->video.mux_video))]),\n    'total_season_count': count(collections[]),\n    'latestEpisodeDate': collections[]->episodes[@->hidden != true && (defined(@->video.youtube_id) || defined(@->video.mux_video))] | order(@->publish_date desc)[0]->publish_date,\n    featured\n  } | order(latestEpisodeDate desc)\n": AllSeriesQueryResult;
+		"\n  *[_type==\"series\" && featured == 'featured'] {\n    'slug': slug.current,\n    title,\n    description,\n    image {\n      public_id,\n      height,\n      width,\n    },\n    cover {\n      public_id,\n      height,\n      width,\n    },\n    'path': '/series/' + slug.current + '/' + collections[-1]->slug.current,\n    'total_episode_count': count(collections[]->episodes[@->hidden != true && (defined(@->video.youtube_id) || defined(@->video.mux_video))]),\n    'total_season_count': count(collections[])\n  }\n": FeaturedSeriesQueryResult;
+		"\n  *[_type==\"series\" && slug.current==$series][0] {\n    title,\n    'slug': slug.current,\n    description,\n    image {\n      public_id,\n      height,\n      width,\n    },\n    cover {\n      public_id,\n      height,\n      width,\n    },\n    'sponsors': sponsors[]->{\n      'title': title,\n      logo {\n        public_id,\n        width,\n        height\n      },\n      link,\n    },\n    'collection': collections[@->slug.current==$collection && @->series._ref==^._id][0]->{\n      title,\n      'slug': slug.current,\n      release_year,\n      episodes[@->hidden != true]->{\n        title,\n        'slug': slug.current,\n        short_description,\n        publish_date,\n        'thumbnail': {\n          'public_id': video.thumbnail.public_id,\n          'alt': video.thumbnail_alt,\n          'width': video.thumbnail.width,\n          'height': video.thumbnail.height,\n        },\n        video {\n          youtube_id,\n          mux_video,\n          members_only\n        }\n      }\n    },\n    collections[]->{\n      title,\n      'slug': slug.current,\n      release_year,\n      'episode_count': count(episodes[@->hidden != true])\n    }\n  }\n": SeriesBySlugQueryResult;
 		"\n  *[_type==\"episode\" && hidden != true] {\n    title,\n    'slug': slug.current,\n    description,\n    short_description,\n    publish_date,\n    'thumbnail': {\n      'public_id': video.thumbnail.public_id,\n      'width': video.thumbnail.width,\n      'height': video.thumbnail.height,\n      'alt': video.thumbnail_alt,\n    },\n    video {\n      youtube_id,\n      'mux': mux_video.asset->data.playback_ids,\n      'captions': captions.asset->url,\n      transcript,\n    },\n    people[]-> {\n      user_id,\n      name,\n      \"slug\": slug.current,\n      photo {\n        public_id\n      }\n    },\n    resources[] {\n      label,\n      url,\n    },\n    'sponsors': sponsors[]->{\n      title,\n      logo {\n        public_id,\n        width,\n        height\n      },\n      link,\n    },\n    'related_episodes': *[_type==\"collection\" && references(^._id)][0].episodes[@->hidden != true && (defined(@->video.youtube_id) || defined(@->video.mux_video))]-> {\n      title,\n      'slug': slug.current,\n      short_description,\n      publish_date,\n      'thumbnail': {\n        'public_id': video.thumbnail.public_id,\n        'width': video.thumbnail.width,\n        'height': video.thumbnail.height,\n        'alt': video.thumbnail_alt,\n      },\n      video {\n        youtube_id\n      }\n    },\n    'collection': *[_type==\"collection\" && references(^._id)][0] {\n      'slug': slug.current,\n      title,\n      'episodeSlugs': episodes[]->slug.current,\n    },\n    'series': *[_type==\"collection\" && references(^._id)][0].series->{\n      'slug': slug.current,\n      title,\n    },\n  }\n": AllEpisodesQueryResult;
 		"\n  *[_type==\"episode\" && slug.current==$episode][0] {\n    title,\n    'slug': slug.current,\n    description,\n    short_description,\n    publish_date,\n    'thumbnail': {\n      'public_id': video.thumbnail.public_id,\n      'width': video.thumbnail.width,\n      'height': video.thumbnail.height,\n      'alt': video.thumbnail_alt,\n    },\n    video {\n      youtube_id,\n      'mux': mux_video.asset->data.playback_ids,\n      'captions': captions.asset->url,\n      transcript,\n    },\n    people[]-> {\n      user_id,\n      name,\n      \"slug\": slug.current,\n      photo {\n        public_id\n      }\n    },\n    resources[] {\n      label,\n      url,\n    },\n    'sponsors': sponsors[]->{\n      title,\n      logo {\n        public_id,\n        width,\n        height\n      },\n      link,\n    },\n    'related_episodes': *[_type==\"collection\" && references(^._id)][0].episodes[@->hidden != true && (defined(@->video.youtube_id) || defined(@->video.mux_video))]-> {\n      title,\n      'slug': slug.current,\n      short_description,\n      publish_date,\n      'thumbnail': {\n        'public_id': video.thumbnail.public_id,\n        'width': video.thumbnail.width,\n        'height': video.thumbnail.height,\n        'alt': video.thumbnail_alt,\n      },\n      video {\n        youtube_id\n      }\n    },\n    'collection': *[_type==\"collection\" && references(^._id)][0] {\n      'slug': slug.current,\n      title,\n      'episodeSlugs': episodes[]->slug.current,\n    },\n    'series': *[_type==\"collection\" && references(^._id)][0].series->{\n      'slug': slug.current,\n      title,\n    },\n  }\n": EpisodeBySlugQueryResult;
 		'\n  *[_type=="episode" && slug.current==$episode][0].video.transcript\n': EpisodeTranscriptBySlugQueryResult;
 		"\n  *[_type==\"episode\" && dateTime(publish_date) > dateTime(now()) && defined(video.mux_video) && hidden != true] {\n    title,\n    'slug': slug.current,\n    short_description,\n    publish_date,\n    'thumbnail': {\n      'public_id': video.thumbnail.public_id,\n      'width': video.thumbnail.width,\n      'height': video.thumbnail.height,\n      'alt': video.thumbnail_alt,\n    },\n    'youtube_id': video.youtube_id,\n    'path': \"/series/\" + *[_type==\"collection\" && references(^._id)][0].series->slug.current + \"/\" + *[_type==\"collection\" && references(^._id)][0].slug.current + \"/\" + slug.current,\n    'series': *[_type==\"collection\" && references(^._id)][0].series->title,\n    'collection_number': upper(*[_type==\"collection\" && references(^._id)][0].slug.current),\n    'episodes': *[_type==\"collection\" && references(^._id)][0].episodes[]->slug.current,\n  }\n": EarlyAccessEpisodesQueryResult;
-		"\n  *[_type==\"episode\" && dateTime(publish_date) < dateTime(now()) && (defined(video.youtube_id) || defined(video.mux_video)) && hidden != true] {\n    title,\n    'slug': slug.current,\n    short_description,\n    publish_date,\n    'thumbnail': {\n      'public_id': video.thumbnail.public_id,\n      'width': video.thumbnail.width,\n      'height': video.thumbnail.height,\n      'alt': video.thumbnail_alt,\n    },\n    'youtube_id': video.youtube_id,\n    'path': \"/series/\" + *[_type==\"collection\" && references(^._id)][0].series->slug.current + \"/\" + *[_type==\"collection\" && references(^._id)][0].slug.current + \"/\" + slug.current,\n    'series': *[_type==\"collection\" && references(^._id)][0].series->title,\n    'collection_number': upper(*[_type==\"collection\" && references(^._id)][0].slug.current),\n    'episodes': *[_type==\"collection\" && references(^._id)][0].episodes[]->slug.current,\n  } | order(publish_date desc)[0..2]\n": RecentEpisodesQueryResult;
+		"\n  *[_type==\"episode\" && dateTime(publish_date) < dateTime(now()) && (defined(video.youtube_id) || defined(video.mux_video)) && hidden != true] {\n    title,\n    'slug': slug.current,\n    short_description,\n    publish_date,\n    'thumbnail': {\n      'public_id': video.thumbnail.public_id,\n      'width': video.thumbnail.width,\n      'height': video.thumbnail.height,\n      'alt': video.thumbnail_alt,\n    },\n    'youtube_id': video.youtube_id,\n    'path': \"/series/\" + *[_type==\"collection\" && references(^._id)][0].series->slug.current + \"/\" + *[_type==\"collection\" && references(^._id)][0].slug.current + \"/\" + slug.current,\n    'series': *[_type==\"collection\" && references(^._id)][0].series->title,\n    'collection_number': upper(*[_type==\"collection\" && references(^._id)][0].slug.current),\n    'episodes': *[_type==\"collection\" && references(^._id)][0].episodes[]->slug.current,\n  } | order(publish_date desc)[0..7]\n": RecentEpisodesQueryResult;
 		'\n  *[ _type == "collection" && series->slug.current == $seriesSlug] {\n    title,\n    "schedule": episodes[dateTime(@->publish_date) > dateTime(now()) && !defined(@->video.youtube_id) && !defined(@->video.mux_video) && @->hidden != true]-> {\n      title,\n      "slug": slug.current,\n      short_description,\n      publish_date,\n      "thumbnail": {\n        "src": video.thumbnail.public_id,\n        "alt": video.thumbnail_alt,\n      }\n    }\n  }\n': UpcomingEpisodeBySeriesQueryResult;
 		"\n  *[_type == \"person\" && user_id == $user_id][0] {\n    _id,\n    name,\n    photo {\n      public_id,\n      height,\n      width,\n    },\n    bio,\n    links[],\n    user_id,\n    \"episodes\": *[_type == \"episode\" && hidden!=true && references(^._id) && (defined(@->video.youtube_id) || defined(@->video.mux_video))] {\n      title,\n      'slug': slug.current,\n      short_description,\n      publish_date,\n      'thumbnail': {\n        'public_id': video.thumbnail.public_id,\n        'alt': video.thumbnail_alt,\n        'width': video.thumbnail.width,\n        'height': video.thumbnail.height,\n      },\n      video {\n        youtube_id,\n      },\n      'collection': *[_type==\"collection\" && references(^._id)][0] {\n        'slug': slug.current,\n        title,\n        'episodeSlugs': episodes[]->slug.current,\n      },\n      'series': *[_type==\"collection\" && references(^._id)][0].series->{\n        'slug': slug.current,\n        title,\n      },\n    } | order(publish_date desc)[0...4]\n  }\n": PersonByIdQueryResult;
 		"\n  *[_type==\"person\"] | order(name asc) | order(subscription.level asc) {\n    _id,\n    name,\n    \"slug\": slug.current,\n    bio,\n    photo {\n      public_id,\n      height,\n      width,\n    },\n    subscription {\n      \"cus_id\": customer,\n      level,\n      status,\n      date\n    },\n    user_id,\n    links[] {\n      label,\n      url\n    },\n    \"episodes\": *[_type == \"episode\" && references(^._id) && hidden != true && (defined(video.youtube_id) || defined(video.mux_video))] {\n      title,\n      'slug': slug.current,\n      short_description,\n      publish_date,\n      'thumbnail': {\n        'public_id': video.thumbnail.public_id,\n        'alt': video.thumbnail_alt,\n        'width': video.thumbnail.width,\n        'height': video.thumbnail.height,\n      },\n      video {\n        youtube_id,\n      },\n      'collection': *[_type==\"collection\" && references(^._id)][0] {\n        'slug': slug.current,\n        title,\n        'episodeSlugs': episodes[]->slug.current,\n      },\n      'series': *[_type==\"collection\" && references(^._id)][0].series->{\n        'slug': slug.current,\n        title,\n      },\n    } | order(publish_date desc)[0...6]\n  }\n": AllUsersQueryResult;
@@ -1165,5 +1233,6 @@ declare module '@sanity/client' {
 		'\n  *[_type == "person" && subscription.status == "active"] | order(subscription.date asc) {\n    _id,\n    name,\n    photo {\n      public_id,\n      height,\n      width,\n    },\n    \'username\': slug.current,\n    subscription {\n      level,\n      status\n    }\n  }\n': SupportersQueryResult;
 		"\n  *[_type == \"hackathon\" && hidden != \"hidden\"] | order(pubDate desc) {\n    _id,\n    title,\n    'slug': slug.current,\n    pubDate,\n    deadline,\n    description,\n    body,\n    hero_image {\n      public_id,\n      width,\n      height,\n    },\n    hero_title,\n    episodes[]-> {\n      _id,\n      title,\n      'slug': slug.current,\n      'path': \"/series/\" + *[_type==\"collection\" && references(^._id)][0].series->slug.current + \"/\" + *[_type==\"collection\" && references(^._id)][0].slug.current + \"/\" + slug.current,\n      short_description,\n      publish_date,\n      'thumbnail': {\n        'public_id': video.thumbnail.public_id,\n        'width': video.thumbnail.width,\n        'height': video.thumbnail.height,\n        'alt': video.thumbnail_alt,\n      }\n    },\n    share_image {\n      public_id,\n      width,\n      height,\n    },\n    hidden\n  }\n": AllHackathonsQueryResult;
 		"\n  *[_type == \"hackathon\" && slug.current == $slug][0] {\n    _id,\n    title,\n    'slug': slug.current,\n    description,\n    body,\n    pubDate,\n    deadline,\n    submissionForm,\n    hero_image {\n      public_id,\n      width,\n      height,\n    },\n    hero_title,\n    'episode': episodes[0]-> {\n      title,\n      'slug': slug.current,\n      'path': \"/series/\" + *[_type==\"collection\" && references(^._id)][0].series->slug.current + \"/\" + *[_type==\"collection\" && references(^._id)][0].slug.current + \"/\" + slug.current,\n      'thumbnail': {\n        'public_id': video.thumbnail.public_id,\n        'width': video.thumbnail.width,\n        'height': video.thumbnail.height,\n        'alt': video.thumbnail_alt,\n      },\n      video {\n        youtube_id,\n        'mux': mux_video.asset->data.playback_ids,\n      }\n    },\n    'sponsors': sponsors[]->{\n      title,\n      logo {\n        public_id,\n        width,\n        height\n      },\n      link,\n    },\n    'rewardsData': rewards[]-> {\n      title,\n      description,\n      image {\n        public_id,\n        width,\n        height,\n      },\n      weight\n    } | order(weight asc),\n    'faqData': faq[]-> {\n      question,\n      answer,\n      weight\n    } | order(weight asc),\n    rules[]-> {\n      title,\n      description,\n      weight\n    } | order(weight asc),\n    resources[] {\n      title,\n      description,\n      url,\n    },\n    share_image {\n      public_id,\n      width,\n      height,\n    },\n    hidden\n  }\n": HackathonBySlugQueryResult;
+		'\n  *[_type == "hackathon" && hidden != "hidden" && dateTime(pubDate) <= dateTime(now()) && dateTime(deadline) > dateTime(now())] | order(pubDate desc)[0] {\n    _id\n  }\n': ActiveHackathonQueryResult;
 	}
 }

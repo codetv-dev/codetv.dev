@@ -47,13 +47,20 @@ const allSeriesQuery = groq`
       height,
       width,
     },
+    cover {
+      public_id,
+      height,
+      width,
+    },
     "collections": collections[]->{
       title,
       'slug': slug.current,
       release_year,
       'episode_count': count(episodes[@->hidden != true && (defined(@->video.youtube_id) || defined(@->video.mux_video))])
     } | order(release_year desc),
+    'path': '/series/' + slug.current + '/' + collections[-1]->slug.current,
     'total_episode_count': count(collections[]->episodes[@->hidden != true && (defined(@->video.youtube_id) || defined(@->video.mux_video))]),
+    'total_season_count': count(collections[]),
     'latestEpisodeDate': collections[]->episodes[@->hidden != true && (defined(@->video.youtube_id) || defined(@->video.mux_video))] | order(@->publish_date desc)[0]->publish_date,
     featured
   } | order(latestEpisodeDate desc)
@@ -65,6 +72,11 @@ const featuredSeriesQuery = groq`
     title,
     description,
     image {
+      public_id,
+      height,
+      width,
+    },
+    cover {
       public_id,
       height,
       width,
@@ -81,6 +93,11 @@ const seriesBySlugQuery = groq`
     'slug': slug.current,
     description,
     image {
+      public_id,
+      height,
+      width,
+    },
+    cover {
       public_id,
       height,
       width,
@@ -300,7 +317,7 @@ const recentEpisodesQuery = groq`
     'series': *[_type=="collection" && references(^._id)][0].series->title,
     'collection_number': upper(*[_type=="collection" && references(^._id)][0].slug.current),
     'episodes': *[_type=="collection" && references(^._id)][0].episodes[]->slug.current,
-  } | order(publish_date desc)[0..2]
+  } | order(publish_date desc)[0..7]
 `;
 
 const upcomingEpisodeBySeriesQuery = groq`
