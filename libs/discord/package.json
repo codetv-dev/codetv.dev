@@ -15,6 +15,6 @@
 	},
 	"dependencies": {
 		"@codetv/types": "workspace:*",
-		"zod": "^3.25.76"
+		"zod": "^4.3.3"
 	}
 }

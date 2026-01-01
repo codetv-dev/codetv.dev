@@ -20,18 +20,18 @@
   ],
   "dependencies": {
     "@sanity/icons": "^3.7.4",
-    "@sanity/vision": "^4.15.0",
+    "@sanity/vision": "4.15.0",
     "easymde": "^2.20.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
-    "sanity": "^4.15.0",
+    "sanity": "4.15.0",
     "sanity-plugin-cloudinary": "^1.4.0",
-    "sanity-plugin-markdown": "^6.0.0",
+    "sanity-plugin-markdown": "6.0.0",
     "sanity-plugin-mux-input": "^2.11.2",
     "styled-components": "^6.1.19"
   },
   "devDependencies": {
-    "@sanity/eslint-config-studio": "^5.0.2",
+    "@sanity/eslint-config-studio": "6.0.0",
     "@types/react": "^19.2.6",
     "eslint": "^9.39.1",
     "prettier": "^3.6.2",
