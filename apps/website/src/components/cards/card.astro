@@ -73,7 +73,12 @@ if (image.src) {
 			<!-- prettier-ignore -->
 			<div class="tagline">{tagline ? <p>{tagline}</p> : <slot name="tagline" />}</div>
 
-			<h2><a href={link}>{title}</a></h2>
+			<div class="title">
+				<slot name="title">
+					<h2><a href={link}>{title}</a></h2>
+				</slot>
+			</div>
+
 			<div class="details">
 				<slot name="details" />
 			</div>
@@ -87,23 +92,28 @@ if (image.src) {
 
 <style>
 	.card-container {
+		align-self: start;
 		border-radius: 3px;
 		container: card / inline-size;
 		inline-size: 100%;
 		max-inline-size: 1280px;
-		outline: 1px solid transparent;
+		outline: 2px solid transparent;
 		outline-offset: 8px;
 		transition: 150ms outline-color linear;
 
 		&:has(:focus-within, :active, :hover) {
-			outline: 1px solid var(--gray-600);
+			outline: 2px solid var(--gray-600);
+
+			img {
+				scale: 1.03;
+			}
 		}
 	}
 
 	.card {
 		align-items: end;
 		display: grid;
-		gap: 20px;
+		gap: 8px;
 		grid-template-columns: 100%;
 		grid-template-rows: 1fr auto;
 		inline-size: 100cqi;
@@ -111,6 +121,7 @@ if (image.src) {
 
 		figure {
 			margin: 0;
+			overflow: hidden;
 			position: relative;
 			z-index: 1;
 
@@ -131,6 +142,7 @@ if (image.src) {
 			display: block;
 			inline-size: 100%;
 			position: relative;
+			transition: 200ms scale ease-in-out;
 			z-index: 10;
 		}
 
@@ -141,7 +153,7 @@ if (image.src) {
 			font-size: 1rem;
 			gap: 8px;
 			line-height: 1.45;
-			padding: 0 8px 8px;
+			padding: 0 2px 2px;
 			position: relative;
 			z-index: 10;
 		}
@@ -164,7 +176,7 @@ if (image.src) {
 			}
 		}
 
-		h2 {
+		:is(h2, h3) {
 			color: var(--text-emphasized);
 			font-family: var(--font-family);
 			font-size: clamp(1em, 4.5cqi, 1.75em);
@@ -176,6 +188,13 @@ if (image.src) {
 				color: currentColor;
 				text-decoration: none;
 			}
+		}
+
+		.title {
+			align-items: baseline;
+			display: grid;
+			gap: 16px;
+			grid-template-columns: minmax(0, max-content) 1fr;
 		}
 
 		.details {
@@ -191,6 +210,11 @@ if (image.src) {
 			}
 		}
 
+		.description {
+			color: var(--text-muted);
+			font-size: 0.875em;
+		}
+
 		.button {
 			background: transparent;
 			color: var(--white);
@@ -200,6 +224,7 @@ if (image.src) {
 			font-variation-settings: 'wdth' 100;
 			font-weight: 200;
 			line-height: 0.9;
+			margin-block-start: 0;
 			padding: 0;
 			text-decoration: none;
 

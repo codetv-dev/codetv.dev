@@ -1,32 +1,40 @@
 ---
-import Search from './search/search.astro';
+import { SignedIn, SignedOut } from '@clerk/astro/components';
+
+export const prerender = false;
 ---
 
 <footer>
 	<div class="mini-bio">
 		<p>
-			CodeTV is a place for developers to watch programming designed for them.
-			Watch original shows featuring professional developers across all skill
-			levels and career paths.
-		</p>
-		<p>
-			Our mission is to remind developers everywhere that learning, building,
-			and growing a technical skill set can be fun — and it's even more fun if
-			you're doing it with friends.
+			At CodeTV, we believe developers deserve to see themselves in the
+			entertainment they watch. We believe you deserve the best educational
+			materials and an excited, supportive community to learn with. And most of
+			all, we believe that <strong>you belong here.</strong>
 		</p>
 	</div>
 
 	<div class="middle">
-		<Search />
+		<nav class="links">
+			<a href="https://partners.codetv.dev">Become a partner / sponsor</a>
+			<a href="https://codetv.link/uses">Gear, software, & more we use</a>
+			<a href="mailto:info@codetv.dev">Send us an email</a>
+			<a href="/code-of-conduct">Code of conduct</a>
+			<a href="https://github.com/codetv-dev/codetv.dev">Source code</a>
+		</nav>
 	</div>
 
 	<nav class="links">
-		<a href="https://partners.codetv.dev">Become a partner / sponsor</a>
-		<a href="/newsletter">Get news & updates</a>
-		<a href="https://codetv.link/uses">Gear, software, & more we use</a>
-		<a href="/code-of-conduct">Code of conduct</a>
-		<a href="mailto:info@codetv.dev">info@codetv.dev</a>
-		<a href="https://github.com/codetv-dev/codetv.dev">Source code</a>
+		<SignedOut>
+			<a href="/dashboard/sign-in">Supporter Log In</a>
+			<a href="/dashboard/sign-up">Become a Supporter</a>
+		</SignedOut>
+		<SignedIn>
+			<a href="/dashboard">Dashboard</a>
+		</SignedIn>
+		<a href="https://store.codetv.dev/">CodeTV Store</a>
+		<a href="/newsletter">Newsletter</a>
+		<a href="/blog">CodeTV Blog</a>
 	</nav>
 </footer>
 
@@ -57,6 +65,12 @@ import Search from './search/search.astro';
 			display: flex;
 			flex-direction: column;
 			gap: 0.5rem;
+
+			.links {
+				@media (min-width: 800px) {
+					align-items: center;
+				}
+			}
 		}
 
 		.links {

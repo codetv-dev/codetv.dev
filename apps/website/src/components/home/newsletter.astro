@@ -8,10 +8,9 @@ import { actions } from 'astro:actions';
 		your inbox
 	</h2>
 	<p>
-		At CodeTV, we believe developers deserve to see themselves in the
-		entertainment they watch. We believe you deserve the best educational
-		materials and an excited, supportive community to learn with. And most of
-		all, we believe that <strong>you belong here.</strong>
+		Exclusive content, industry news, and more, all delivered directly to your
+		inbox. No spam, no sharing your personal info, and you can opt out in a
+		single click.
 	</p>
 
 	<form method="POST" action={actions.newsletter.subscribe}>
@@ -62,13 +61,16 @@ import { actions } from 'astro:actions';
 
 	h2 {
 		font-family: var(--font-family-heading);
-		font-size: clamp(1.75rem, 5.5cqi, 6.25rem);
+		font-size: clamp(1.75rem, 4.5cqi, 3.5rem);
+		font-weight: 900;
+		font-variation-settings: 'wdth' 80;
 		line-height: 0.9;
 		margin: 0;
+		text-transform: uppercase;
 
 		strong {
 			color: var(--orange);
-			font-weight: normal;
+			font-weight: inherit;
 		}
 
 		@media (min-width: 1280px) {
@@ -126,10 +128,10 @@ import { actions } from 'astro:actions';
 	}
 
 	.button {
-		border: 0;
+		align-self: end;
 		font-size: 20px;
 		line-height: 1;
 		margin: 0;
-		padding: 12px;
+		padding: 10px 12px;
 	}
 </style>

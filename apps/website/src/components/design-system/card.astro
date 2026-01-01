@@ -4,18 +4,22 @@ export interface Props {
 	variant?: 'primary' | 'secondary';
 	link?: string;
 	toggle?: boolean;
+	label?: string;
 }
 
-const { title, variant = 'primary', link, toggle = false } = Astro.props;
+const { title, variant = 'primary', link, toggle = false, label } = Astro.props;
 
 const Element = toggle ? 'details' : 'div';
 const TitleElement = toggle ? 'summary' : 'div';
 ---
 
-<div class:list={['card', { secondary: variant === 'secondary' }]}>
+<div
+	class:list={['card', { secondary: variant === 'secondary' }]}
+	data-label={label}
+>
 	{
 		link && (
-			<a href={link} class="card-image-link">
+			<a href={link} class="card-image-link" tabindex="-1">
 				<slot name="img" />
 			</a>
 		)
@@ -33,9 +37,10 @@ const TitleElement = toggle ? 'summary' : 'div';
 			{title && !link && <h3>{title}</h3>}
 			{!title && <slot name="title" />}
 		</TitleElement>
-		<div class="description">
-			<slot />
-		</div>
+
+		<div class="subtitle"><slot name="subtitle" /></div>
+
+		<div class="description"><slot /></div>
 	</Element>
 </div>
 
@@ -46,15 +51,21 @@ const TitleElement = toggle ? 'summary' : 'div';
 		background: var(--bg);
 		border: 0.5px solid color-mix(in oklch, var(--gray-600), transparent);
 		border-radius: 3px;
+		container: card / inline-size;
 		display: flex;
 		flex-direction: column;
+		font-size: clamp(12px, 1.125cqi, 1rem);
 		gap: var(--gap);
+		outline: 2px solid transparent;
+		outline-offset: 4px;
+		position: relative;
+		transition: 150ms outline-color linear;
 
 		.details {
 			display: flex;
 			flex-direction: column;
 			gap: var(--gap);
-			padding: 16px;
+			padding: 8px;
 		}
 
 		&.secondary {
@@ -62,12 +73,39 @@ const TitleElement = toggle ? 'summary' : 'div';
 			border: none;
 
 			.details {
-				padding-block: 8px;
+				padding: 2px;
 			}
 		}
 
+		&:is([data-label])::after {
+			background: color-mix(in oklch, var(--orange) 75%, transparent);
+			border-block-end: 0.5px solid
+				color-mix(in oklch, var(--text-muted) 75%, transparent);
+			border-inline-end: 0.5px solid
+				color-mix(in oklch, var(--text-muted) 75%, transparent);
+			border-end-end-radius: 3px;
+			border-start-start-radius: 3px;
+			color: var(--black);
+			content: attr(data-label);
+			display: block;
+			font-size: clamp(12px, 1cqi, 0.625em);
+			font-weight: 700;
+			inset-block-start: 0;
+			inset-inline-start: 0;
+			letter-spacing: 0.15em;
+			text-transform: uppercase;
+			text-box-trim: trim-both;
+			text-box-edge: cap alphabetic;
+			padding: 8px;
+			position: absolute;
+		}
+
 		&:has(> img, > .card-image-link) {
-			gap: 16px;
+			--gap: 8px;
+
+			&:has(:focus-within, :active, :hover) {
+				outline: 2px solid var(--gray-600);
+			}
 
 			img {
 				border-block-end: 0.5px solid
@@ -92,8 +130,11 @@ const TitleElement = toggle ? 'summary' : 'div';
 
 		.title {
 			color: var(--text-emphasized);
-			font-size: 1em;
+			display: flex;
+			font-size: clamp(12px, 1.25cqi, 1em);
 			font-weight: 400;
+			gap: 16px;
+			/* grid-template-columns: minmax(0, max-content) 1fr; */
 			line-height: 1.25;
 			margin: 0;
 
@@ -109,10 +150,11 @@ const TitleElement = toggle ? 'summary' : 'div';
 			}
 
 			:is(h1, h2, h3, h4, h5, h6) {
-				font-size: clamp(1em, 3.5cqi, 1.125em);
-				font-variation-settings: 'wdth' 100;
-				font-weight: 500;
+				font-size: clamp(12px, 1.25cqi, 1em);
+				font-variation-settings: 'wdth' 95;
+				font-weight: 550;
 				line-height: 1.1;
+				margin: 0;
 
 				summary & {
 					display: inline-block;
@@ -120,11 +162,44 @@ const TitleElement = toggle ? 'summary' : 'div';
 				}
 			}
 
+			.episode-number {
+				color: var(--text-muted);
+			}
+
 			a {
 				color: inherit;
 				text-decoration: none;
 
-				&:is(:hover, :active, :hover) {
+				&:is(:focusa, :active, :hover) {
+					outline: none;
+					text-decoration: underline;
+				}
+			}
+		}
+
+		.subtitle {
+			display: flex;
+			font-size: clamp(12px, 1.25cqi, 0.875em);
+			font-weight: 400;
+			gap: 8px;
+			line-height: 1.25;
+			text-wrap: balance;
+
+			&:empty {
+				display: none;
+			}
+
+			p:first-child {
+				color: var(--text-muted);
+				text-wrap: nowrap;
+			}
+
+			a {
+				color: inherit;
+				text-decoration: none;
+
+				&:is(:focus, :active, :hover) {
+					outline: none;
 					text-decoration: underline;
 				}
 			}
@@ -135,9 +210,15 @@ const TitleElement = toggle ? 'summary' : 'div';
 			display: flex;
 			flex-direction: column;
 			font-optical-sizing: auto;
+			font-size: clamp(12px, 1.25cqi, 0.875em);
 			font-weight: 300;
 			gap: var(--gap);
 			line-height: 1.35;
+			text-wrap: pretty;
+
+			&:empty {
+				display: none;
+			}
 
 			> * {
 				color: inherit;
@@ -145,6 +226,58 @@ const TitleElement = toggle ? 'summary' : 'div';
 				line-height: inherit;
 				margin: 0;
 			}
+		}
+
+		.tag {
+			background: var(--gray-200);
+			border-radius: 3px;
+			color: var(--text);
+			display: block;
+			font-family: var(--font-family-heading);
+			font-size: clamp(10px, 1cqi, 0.625em);
+			font-weight: 700;
+			letter-spacing: 0.15em;
+			line-height: 1;
+			padding: 4px;
+			text-transform: uppercase;
+			align-self: center;
+			text-box-trim: trim-both;
+			text-box-edge: cap alphabetic;
+		}
+
+		.button {
+			background: transparent;
+			color: var(--white);
+			display: inline-block;
+			font-family: var(--font-family);
+			font-size: clamp(12px, 1.25cqi, 0.875em);
+			font-variation-settings: 'wdth' 100;
+			font-weight: 200;
+			line-height: 0.9;
+			margin-block-start: 0;
+			padding: 0;
+			text-decoration: none;
+			text-transform: initial;
+			transition: 200ms all linear;
+
+			&:is(:active, :focus, :hover) {
+				background: transparent;
+				border-color: transparent;
+				color: var(--orange);
+				text-decoration: underline;
+			}
+
+			&::after {
+				content: ' →';
+			}
+		}
+
+		&:focus-within .button,
+		&:has(a:hover) .button {
+			background: transparent;
+			border-color: transparent;
+			color: var(--orange);
+			text-decoration: underline;
 		}
 	}
 </style>

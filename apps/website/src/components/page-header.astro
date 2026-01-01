@@ -35,7 +35,8 @@ const imgUrl = createImageUrl(image.public_id, {
 
 			h1 {
 				font-size: clamp(1rem, 11cqi, 11rem);
-				font-weight: 400;
+				font-weight: 900;
+				font-variation-settings: 'wdth' 80;
 				inline-size: min(90%, 1450px);
 				inset-block-end: 0;
 				line-height: 0.8;
@@ -44,6 +45,7 @@ const imgUrl = createImageUrl(image.public_id, {
 				text-box-trim: trim-both;
 				text-shadow: 0 1px 3px
 					color-mix(in oklch, var(--black) 50%, transparent);
+				text-transform: uppercase;
 				word-spacing: 0.1em;
 
 				.line-1,
