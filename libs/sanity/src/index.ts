@@ -206,6 +206,20 @@ const allEpisodesQuery = groq`
       'slug': slug.current,
       title,
     },
+    'hackathons': hackathons[]-> {
+      'slug': slug.current,
+      title,
+      deadline,
+      'sponsors': sponsors[]->{
+        title,
+        logo {
+          public_id,
+          width,
+          height
+        },
+        link,
+      },
+    },
   }
 `;
 
