@@ -70,3 +70,42 @@ export function generateDefaultImage({ text }: { text: string }) {
 
 	return url;
 }
+
+export function getImageURLWithFallback({
+	src,
+	public_id,
+	youtube_id,
+	text = '',
+	width = 675,
+	aspect_ratio = {
+		w: 340,
+		h: 190,
+	},
+}: {
+	src?: string | null;
+	public_id?: string | null;
+	youtube_id?: string | null;
+	text?: string;
+	width?: number;
+	aspect_ratio?: {
+		w: number;
+		h: number;
+	};
+}) {
+	let imageURL;
+	if (src) {
+		imageURL = src;
+	} else if (public_id) {
+		imageURL = createImageUrl(public_id, {
+			width,
+			aspect_ratio: `${aspect_ratio.w}:${aspect_ratio.h}`,
+			crop: 'fill',
+		});
+	} else if (youtube_id) {
+		imageURL = getYouTubeThumbnail(youtube_id);
+	} else {
+		imageURL = generateDefaultImage({ text });
+	}
+
+	return imageURL;
+}
