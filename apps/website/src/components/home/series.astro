@@ -75,7 +75,12 @@ const series = await getAllSeries();
 
 											<p>{earlyAccess.short_description}</p>
 											<p>
-												<a href={earlyAccess.path} class="button" tabindex="-1">
+												<a
+													href={earlyAccess.path}
+													class="button"
+													data-variant="more-link"
+													tabindex="-1"
+												>
 													See details and watch now
 												</a>
 											</p>
@@ -87,8 +92,7 @@ const series = await getAllSeries();
 						{recentEps.map((ep) => {
 							// magic numbers to determine if an episode was published within the last N days
 							const DAY_IN_MS = 86_400_000;
-							const NEW_CUTOFF_TIMESTAMP =
-								new Date().getTime() - DAY_IN_MS * 21;
+							const NEW_CUTOFF_TIMESTAMP = new Date().getTime() - DAY_IN_MS * 7;
 							const publishTimestamp = new Date(ep.publish_date).getTime();
 							const showNewTag = publishTimestamp > NEW_CUTOFF_TIMESTAMP;
 							const thumbnailURL = getImageURLWithFallback({
@@ -150,7 +154,12 @@ const series = await getAllSeries();
 
 										<p>{description}</p>
 										<p>
-											<a href={ep.path} class="button" tabindex="-1">
+											<a
+												href={ep.path}
+												class="button"
+												data-variant="more-link"
+												tabindex="-1"
+											>
 												See details and watch now
 											</a>
 										</p>
@@ -205,7 +214,12 @@ const series = await getAllSeries();
 
 								<p>{s.description}</p>
 								<p>
-									<a href={s.path} class="button" tabindex="-1">
+									<a
+										href={s.path}
+										class="button"
+										data-variant="more-link"
+										tabindex="-1"
+									>
 										See episodes
 									</a>
 								</p>

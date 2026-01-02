@@ -10,11 +10,11 @@ import {
 } from '@codetv/cloudinary';
 import Layout from '../../../../layouts/default.astro';
 import VideoPlayer from '../../../../components/video-player.astro';
-import ShareInput from '../../../../components/share-input.astro';
 import BecomeASupporter from '../../../../components/supporter-button.astro';
 import PeopleInEpisode from '../../../../components/people-in-episode.astro';
 import Supporters from '../../../../components/supporters.astro';
 import Card from '../../../../components/cards/card.astro';
+import HackathonStatusCard from '../../../../components/hackathon-status-card.astro';
 
 export const prerender = true;
 
@@ -218,13 +218,6 @@ if (episode.video && !episode.video.youtube_id && episode.video.mux) {
 				</div>
 
 				<nav class="episode-links">
-					<ShareInput
-						label="Share this episode"
-						title={title}
-						text={episode.short_description!}
-						url={url.toString()}
-					/>
-
 					<BecomeASupporter server:defer />
 
 					{
@@ -304,6 +297,35 @@ if (episode.video && !episode.video.youtube_id && episode.video.mux) {
 			</section>
 
 			<section class="additional-details">
+				{
+					episode.hackathons &&
+						episode.hackathons.filter((h) => new Date(h.deadline!) > new Date())
+							.length > 0 && (
+							<div class="hackathon-section">
+								{episode.hackathons
+									.filter((h) => new Date(h.deadline!) > new Date())
+									.map((hackathon) => {
+										const url = new URL(Astro.url);
+										url.pathname = `/hackathon/${hackathon.slug}`;
+
+										return (
+											<HackathonStatusCard
+												deadline={hackathon.deadline}
+												sponsors={hackathon.sponsors}
+												submissionForm={url.toString()}
+												buttonText="See Details & Join"
+											>
+												<div class="hackathon-header" slot="header">
+													<p>Try the challenge yourself: join the hackathon!</p>
+													<h3>{hackathon.title}</h3>
+												</div>
+											</HackathonStatusCard>
+										);
+									})}
+							</div>
+						)
+				}
+
 				{
 					episode.sponsors && episode.sponsors.length > 0 ? (
 						<div class="sponsors">
@@ -572,6 +594,22 @@ if (episode.video && !episode.video.youtube_id && episode.video.mux) {
 
 	.episode-date {
 		font-size: 0.875em;
+	}
+
+	.hackathon-section {
+		margin-block-end: 2rem;
+	}
+
+	.hackathon-header {
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
+		text-align: center;
+
+		h3 {
+			font-size: clamp(1.125em, 7cqi, 2.5em);
+			margin: 0;
+		}
 	}
 
 	.additional-details,
