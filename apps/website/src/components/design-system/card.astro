@@ -272,8 +272,8 @@ const TitleElement = toggle ? 'summary' : 'div';
 			}
 		}
 
-		&:focus-within .button,
-		&:has(a:hover) .button {
+		&:focus-within .button:is([data-variant='more-link']),
+		&:has(a:hover) .button:is([data-variant='more-link']) {
 			background: transparent;
 			border-color: transparent;
 			color: var(--orange);
