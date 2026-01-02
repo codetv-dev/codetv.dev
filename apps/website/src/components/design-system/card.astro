@@ -72,7 +72,7 @@ const TitleElement = toggle ? 'summary' : 'div';
 			background: unset;
 			border: none;
 
-			.details {
+			.details:not(details) {
 				padding: 2px;
 			}
 		}
@@ -129,12 +129,13 @@ const TitleElement = toggle ? 'summary' : 'div';
 		}
 
 		.title {
+			--font-size: clamp(12px, 4.5cqi, 1.125em);
+
 			color: var(--text-emphasized);
 			display: flex;
-			font-size: clamp(12px, 1.25cqi, 1em);
+			font-size: var(--font-size);
 			font-weight: 400;
 			gap: 16px;
-			/* grid-template-columns: minmax(0, max-content) 1fr; */
 			line-height: 1.25;
 			margin: 0;
 
@@ -150,7 +151,7 @@ const TitleElement = toggle ? 'summary' : 'div';
 			}
 
 			:is(h1, h2, h3, h4, h5, h6) {
-				font-size: clamp(12px, 1.25cqi, 1em);
+				font-size: var(--font-size);
 				font-variation-settings: 'wdth' 95;
 				font-weight: 550;
 				line-height: 1.1;
@@ -158,7 +159,15 @@ const TitleElement = toggle ? 'summary' : 'div';
 
 				summary & {
 					display: inline-block;
-					margin-inline-start: 4px;
+
+					&::before {
+						content: '\25B8';
+						margin-inline-end: 4px;
+					}
+
+					:open &::before {
+						content: '\25BE';
+					}
 				}
 			}
 
@@ -215,6 +224,10 @@ const TitleElement = toggle ? 'summary' : 'div';
 			gap: var(--gap);
 			line-height: 1.35;
 			text-wrap: pretty;
+
+			details & {
+				margin-inline-start: 12px;
+			}
 
 			&:empty {
 				display: none;
