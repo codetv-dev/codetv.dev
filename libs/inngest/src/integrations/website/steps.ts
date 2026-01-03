@@ -21,6 +21,7 @@ import {
 	updateUserRole,
 } from '../discord/steps.ts';
 import { userGetById } from '../clerk/steps.ts';
+import { tagSubscriber } from '../kit/steps.ts';
 
 export const handleUpdateUserProfile = inngest.createFunction(
 	{ id: 'codetv/user.profile.update' },
@@ -244,6 +245,20 @@ export const handleHackathonSubmission = inngest.createFunction(
 					demoVideo: event.data.demoVideo,
 					agreeTerms: event.data.agreeTerms,
 					optOutSponsorship: event.data.optOutSponsorship,
+				},
+			}),
+			// Tag subscriber in Kit
+			step.run('log-the-output', async () => {
+				return {
+					hackathonSlug: hackathon?.slug,
+					email: event.data.email,
+				};
+			}),
+			step.invoke('tag-subscriber', {
+				function: tagSubscriber,
+				data: {
+					email: event.data.email,
+					tagName: `wdc-hackathon-${hackathon?.slug}`,
 				},
 			}),
 		]);

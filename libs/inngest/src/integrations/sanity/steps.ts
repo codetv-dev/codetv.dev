@@ -15,7 +15,7 @@ import { inngest } from '../../client.js';
 export const getCurrentActiveHackathon = inngest.createFunction(
 	{ id: 'sanity/hackathon.get-current-active' },
 	{ event: 'sanity/hackathon.get-current-active' },
-	async function ({ event }): Promise<{ _id: string } | null> {
+	async function ({ event }): Promise<{ _id: string; slug: string } | null> {
 		return await getActiveHackathon();
 	},
 );
