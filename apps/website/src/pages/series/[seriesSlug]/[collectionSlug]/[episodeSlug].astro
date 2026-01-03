@@ -10,11 +10,11 @@ import {
 } from '@codetv/cloudinary';
 import Layout from '../../../../layouts/default.astro';
 import VideoPlayer from '../../../../components/video-player.astro';
-import ShareInput from '../../../../components/share-input.astro';
 import BecomeASupporter from '../../../../components/supporter-button.astro';
 import PeopleInEpisode from '../../../../components/people-in-episode.astro';
 import Supporters from '../../../../components/supporters.astro';
 import Card from '../../../../components/cards/card.astro';
+import HackathonStatusCard from '../../../../components/hackathon-status-card.astro';
 
 export const prerender = true;
 
@@ -218,13 +218,6 @@ if (episode.video && !episode.video.youtube_id && episode.video.mux) {
 				</div>
 
 				<nav class="episode-links">
-					<ShareInput
-						label="Share this episode"
-						title={title}
-						text={episode.short_description!}
-						url={url.toString()}
-					/>
-
 					<BecomeASupporter server:defer />
 
 					{
@@ -311,62 +304,24 @@ if (episode.video && !episode.video.youtube_id && episode.video.mux) {
 							<div class="hackathon-section">
 								{episode.hackathons
 									.filter((h) => new Date(h.deadline!) > new Date())
-									.map((hackathon) => (
-										<div class="hackathon-card">
-											<div class="hackathon-header">
-												<h3>{hackathon.title}</h3>
-												<span class="badge orange">Active</span>
-											</div>
+									.map((hackathon) => {
+										const url = new URL(Astro.url);
+										url.pathname = `/hackathon/${hackathon.slug}`;
 
-											{hackathon.sponsors && hackathon.sponsors.length > 0 && (
-												<div class="hackathon-sponsors">
-													<span class="label">Sponsored by</span>
-													<div class="hackathon-sponsor-logos">
-														{hackathon.sponsors.map((sponsor) => {
-															if (
-																!sponsor.logo?.public_id ||
-																!sponsor.logo?.width ||
-																!sponsor.logo?.height
-															) {
-																return null;
-															}
-
-															const src = createImageUrl(
-																sponsor.logo.public_id,
-																{
-																	height: sponsor.logo.height * 2,
-																	width: sponsor.logo.width * 2,
-																},
-															);
-
-															return (
-																<a href={sponsor.link}>
-																	<img
-																		src={src}
-																		alt={sponsor.title}
-																		height={sponsor.logo.height}
-																		width={sponsor.logo.width}
-																	/>
-																</a>
-															);
-														})}
-													</div>
+										return (
+											<HackathonStatusCard
+												deadline={hackathon.deadline}
+												sponsors={hackathon.sponsors}
+												submissionForm={url.toString()}
+												buttonText="See Details & Join"
+											>
+												<div class="hackathon-header" slot="header">
+													<p>Try the challenge yourself: join the hackathon!</p>
+													<h3>{hackathon.title}</h3>
 												</div>
-											)}
-
-											<div class="hackathon-deadline">
-												<span class="label">Deadline</span>
-												<span class="deadline-date">
-													{format(new Date(hackathon.deadline!), 'MMM d, yyyy')}{' '}
-													at {format(new Date(hackathon.deadline!), 'h:mm a')}
-												</span>
-											</div>
-
-											<a href={`/hackathon/${hackathon.slug}`} class="button">
-												Join Hackathon
-											</a>
-										</div>
-									))}
+											</HackathonStatusCard>
+										);
+									})}
 							</div>
 						)
 				}
@@ -645,79 +600,16 @@ if (episode.video && !episode.video.youtube_id && episode.video.mux) {
 		margin-block-end: 2rem;
 	}
 
-	.hackathon-card {
-		background: var(--gray-200);
-		border: 1px solid var(--gray-600);
-		border-radius: 12px;
+	.hackathon-header {
 		display: flex;
 		flex-direction: column;
-		gap: 1rem;
-		padding: 1.25rem;
-	}
-
-	.hackathon-header {
-		align-items: center;
-		display: flex;
-		gap: 0.75rem;
-		justify-content: space-between;
+		gap: 8px;
+		text-align: center;
 
 		h3 {
-			font-size: 1.125rem;
+			font-size: clamp(1.125em, 7cqi, 2.5em);
 			margin: 0;
 		}
-	}
-
-	.hackathon-sponsors {
-		display: flex;
-		flex-direction: column;
-		gap: 0.375rem;
-
-		.label {
-			color: var(--text-muted);
-			font-size: 0.75rem;
-			text-transform: uppercase;
-		}
-	}
-
-	.hackathon-sponsor-logos {
-		align-items: center;
-		display: flex;
-		flex-wrap: wrap;
-		gap: 1rem;
-
-		a {
-			display: block;
-		}
-
-		img {
-			block-size: 28px;
-			display: block;
-			inline-size: auto;
-			object-fit: contain;
-		}
-	}
-
-	.hackathon-deadline {
-		display: flex;
-		flex-direction: column;
-		gap: 0.25rem;
-
-		.label {
-			color: var(--text-muted);
-			font-size: 0.75rem;
-			text-transform: uppercase;
-		}
-
-		.deadline-date {
-			color: var(--text-emphasized);
-			font-size: 0.9375rem;
-			font-weight: 600;
-		}
-	}
-
-	.hackathon-card .button {
-		margin-block-start: 0.5rem;
-		text-align: center;
 	}
 
 	.additional-details,

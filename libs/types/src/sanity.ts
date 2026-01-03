@@ -35,6 +35,22 @@ export type EpisodeImage = {
 	caption?: string;
 };
 
+export type SanityImageCrop = {
+	_type: 'sanity.imageCrop';
+	top: number;
+	bottom: number;
+	left: number;
+	right: number;
+};
+
+export type SanityImageHotspot = {
+	_type: 'sanity.imageHotspot';
+	x: number;
+	y: number;
+	height: number;
+	width: number;
+};
+
 export type EpisodeTag = {
 	_id: string;
 	_type: 'episodeTag';
@@ -44,6 +60,12 @@ export type EpisodeTag = {
 	label: string;
 	slug: Slug;
 	description?: string;
+};
+
+export type Slug = {
+	_type: 'slug';
+	current: string;
+	source?: string;
 };
 
 export type Sponsor = {
@@ -56,6 +78,26 @@ export type Sponsor = {
 	slug: Slug;
 	logo: CloudinaryAsset;
 	link: string;
+};
+
+export type CloudinaryAsset = {
+	_type: 'cloudinary.asset';
+	public_id?: string;
+	resource_type?: string;
+	type?: string;
+	format?: string;
+	version?: number;
+	url?: string;
+	secure_url?: string;
+	width?: number;
+	height?: number;
+	bytes?: number;
+	duration?: number;
+	tags?: Array<string>;
+	created_at?: string;
+	derived?: Array<unknown>; // Unable to locate the referenced type "derived" in schema
+	access_mode?: string;
+	context?: CloudinaryAssetContext;
 };
 
 export type Rules = {
@@ -128,7 +170,7 @@ export type Person = {
 	name: string;
 	slug: Slug;
 	photo?: CloudinaryAsset;
-	bio?: string;
+	bio?: Markdown;
 	links?: Array<{
 		label?: string;
 		url?: string;
@@ -169,6 +211,8 @@ export type Person = {
 	}>;
 };
 
+export type Markdown = string;
+
 export type Hackathon = {
 	_id: string;
 	_type: 'hackathon';
@@ -182,7 +226,7 @@ export type Hackathon = {
 	description: string;
 	hero_image?: CloudinaryAsset;
 	hero_title?: string;
-	body: string;
+	body: Markdown;
 	episodes?: Array<{
 		_ref: string;
 		_type: 'reference';
@@ -238,7 +282,7 @@ export type Episode = {
 	slug: Slug;
 	publish_date: string;
 	short_description: string;
-	description: string;
+	description: Markdown;
 	people?: Array<{
 		_ref: string;
 		_type: 'reference';
@@ -282,10 +326,20 @@ export type Episode = {
 		};
 		thumbnail?: CloudinaryAsset;
 		thumbnail_alt?: string;
-		transcript?: string;
+		transcript?: Markdown;
 	};
 	hidden?: 'visible' | 'hidden';
 	featured?: 'normal' | 'featured';
+};
+
+export type MuxVideo = {
+	_type: 'mux.video';
+	asset?: {
+		_ref: string;
+		_type: 'reference';
+		_weak?: boolean;
+		[internalGroqTypeReferenceTo]?: 'mux.videoAsset';
+	};
 };
 
 export type Collection = {
@@ -340,16 +394,6 @@ export type Series = {
 	featured?: 'normal' | 'featured';
 };
 
-export type MuxVideo = {
-	_type: 'mux.video';
-	asset?: {
-		_ref: string;
-		_type: 'reference';
-		_weak?: boolean;
-		[internalGroqTypeReferenceTo]?: 'mux.videoAsset';
-	};
-};
-
 export type MuxVideoAsset = {
 	_id: string;
 	_type: 'mux.videoAsset';
@@ -374,6 +418,7 @@ export type MuxAssetData = {
 	max_stored_resolution?: string;
 	passthrough?: string;
 	encoding_tier?: string;
+	video_quality?: string;
 	master_access?: string;
 	aspect_ratio?: string;
 	duration?: number;
@@ -405,12 +450,18 @@ export type MuxStaticRenditions = {
 
 export type MuxStaticRenditionFile = {
 	_type: 'mux.staticRenditionFile';
-	ext?: string;
 	name?: string;
+	ext?: string;
+	height?: number;
 	width?: number;
 	bitrate?: number;
-	filesize?: number;
-	height?: number;
+	filesize?: string;
+	type?: string;
+	status?: string;
+	resolution_tier?: string;
+	resolution?: string;
+	id?: string;
+	passthrough?: string;
 };
 
 export type MuxPlaybackId = {
@@ -435,43 +486,17 @@ export type CloudinaryAssetContextCustom = {
 	caption?: string;
 };
 
+export type CloudinaryAssetContext = {
+	_type: 'cloudinary.assetContext';
+	custom?: CloudinaryAssetContextCustom;
+};
+
 export type CloudinaryAssetDerived = {
 	_type: 'cloudinary.assetDerived';
 	raw_transformation?: string;
 	url?: string;
 	secure_url?: string;
 };
-
-export type CloudinaryAsset = {
-	_type: 'cloudinary.asset';
-	public_id?: string;
-	resource_type?: string;
-	type?: string;
-	format?: string;
-	version?: number;
-	url?: string;
-	secure_url?: string;
-	width?: number;
-	height?: number;
-	bytes?: number;
-	duration?: number;
-	tags?: Array<string>;
-	created_at?: string;
-	derived?: Array<
-		{
-			_key: string;
-		} & CloudinaryAssetDerived
-	>;
-	access_mode?: string;
-	context?: CloudinaryAssetContext;
-};
-
-export type CloudinaryAssetContext = {
-	_type: 'cloudinary.assetContext';
-	custom?: CloudinaryAssetContextCustom;
-};
-
-export type Markdown = string;
 
 export type SanityImagePaletteSwatch = {
 	_type: 'sanity.imagePaletteSwatch';
@@ -499,20 +524,15 @@ export type SanityImageDimensions = {
 	aspectRatio: number;
 };
 
-export type SanityImageHotspot = {
-	_type: 'sanity.imageHotspot';
-	x: number;
-	y: number;
-	height: number;
-	width: number;
-};
-
-export type SanityImageCrop = {
-	_type: 'sanity.imageCrop';
-	top: number;
-	bottom: number;
-	left: number;
-	right: number;
+export type SanityImageMetadata = {
+	_type: 'sanity.imageMetadata';
+	location?: Geopoint;
+	dimensions?: SanityImageDimensions;
+	palette?: SanityImagePalette;
+	lqip?: string;
+	blurHash?: string;
+	hasAlpha?: boolean;
+	isOpaque?: boolean;
 };
 
 export type SanityFileAsset = {
@@ -535,6 +555,13 @@ export type SanityFileAsset = {
 	path?: string;
 	url?: string;
 	source?: SanityAssetSourceData;
+};
+
+export type SanityAssetSourceData = {
+	_type: 'sanity.assetSourceData';
+	name?: string;
+	id?: string;
+	url?: string;
 };
 
 export type SanityImageAsset = {
@@ -560,17 +587,6 @@ export type SanityImageAsset = {
 	source?: SanityAssetSourceData;
 };
 
-export type SanityImageMetadata = {
-	_type: 'sanity.imageMetadata';
-	location?: Geopoint;
-	dimensions?: SanityImageDimensions;
-	palette?: SanityImagePalette;
-	lqip?: string;
-	blurHash?: string;
-	hasAlpha?: boolean;
-	isOpaque?: boolean;
-};
-
 export type Geopoint = {
 	_type: 'geopoint';
 	lat?: number;
@@ -578,34 +594,26 @@ export type Geopoint = {
 	alt?: number;
 };
 
-export type Slug = {
-	_type: 'slug';
-	current: string;
-	source?: string;
-};
-
-export type SanityAssetSourceData = {
-	_type: 'sanity.assetSourceData';
-	name?: string;
-	id?: string;
-	url?: string;
-};
-
 export type AllSanitySchemaTypes =
 	| ResourceItem
 	| EpisodeImage
+	| SanityImageCrop
+	| SanityImageHotspot
 	| EpisodeTag
+	| Slug
 	| Sponsor
+	| CloudinaryAsset
 	| Rules
 	| Rewards
 	| Faq
 	| HackathonSubmission
 	| Person
+	| Markdown
 	| Hackathon
 	| Episode
+	| MuxVideo
 	| Collection
 	| Series
-	| MuxVideo
 	| MuxVideoAsset
 	| MuxAssetData
 	| MuxStaticRenditions
@@ -613,21 +621,16 @@ export type AllSanitySchemaTypes =
 	| MuxPlaybackId
 	| MuxTrack
 	| CloudinaryAssetContextCustom
-	| CloudinaryAssetDerived
-	| CloudinaryAsset
 	| CloudinaryAssetContext
-	| Markdown
+	| CloudinaryAssetDerived
 	| SanityImagePaletteSwatch
 	| SanityImagePalette
 	| SanityImageDimensions
-	| SanityImageHotspot
-	| SanityImageCrop
-	| SanityFileAsset
-	| SanityImageAsset
 	| SanityImageMetadata
-	| Geopoint
-	| Slug
-	| SanityAssetSourceData;
+	| SanityFileAsset
+	| SanityAssetSourceData
+	| SanityImageAsset
+	| Geopoint;
 export declare const internalGroqTypeReferenceTo: unique symbol;
 // Source: ../../libs/sanity/src/index.ts
 // Variable: allSeriesQuery
@@ -737,7 +740,7 @@ export type SeriesBySlugQueryResult = {
 export type AllEpisodesQueryResult = Array<{
 	title: string;
 	slug: string;
-	description: string;
+	description: Markdown;
 	short_description: string;
 	publish_date: string;
 	thumbnail: {
@@ -754,7 +757,7 @@ export type AllEpisodesQueryResult = Array<{
 			} & MuxPlaybackId
 		> | null;
 		captions: string | null;
-		transcript: string | null;
+		transcript: Markdown | null;
 	} | null;
 	people: Array<{
 		user_id: string | null;
@@ -821,7 +824,7 @@ export type AllEpisodesQueryResult = Array<{
 export type EpisodeBySlugQueryResult = {
 	title: string;
 	slug: string;
-	description: string;
+	description: Markdown;
 	short_description: string;
 	publish_date: string;
 	thumbnail: {
@@ -838,7 +841,7 @@ export type EpisodeBySlugQueryResult = {
 			} & MuxPlaybackId
 		> | null;
 		captions: string | null;
-		transcript: string | null;
+		transcript: Markdown | null;
 	} | null;
 	people: Array<{
 		user_id: string | null;
@@ -888,7 +891,7 @@ export type EpisodeBySlugQueryResult = {
 } | null;
 // Variable: episodeTranscriptBySlugQuery
 // Query: *[_type=="episode" && slug.current==$episode][0].video.transcript
-export type EpisodeTranscriptBySlugQueryResult = string | null;
+export type EpisodeTranscriptBySlugQueryResult = Markdown | null;
 // Variable: earlyAccessEpisodesQuery
 // Query: *[_type=="episode" && dateTime(publish_date) > dateTime(now()) && defined(video.mux_video) && hidden != true] {    title,    'slug': slug.current,    short_description,    publish_date,    'thumbnail': {      'public_id': video.thumbnail.public_id,      'width': video.thumbnail.width,      'height': video.thumbnail.height,      'alt': video.thumbnail_alt,    },    'youtube_id': video.youtube_id,    'path': "/series/" + *[_type=="collection" && references(^._id)][0].series->slug.current + "/" + *[_type=="collection" && references(^._id)][0].slug.current + "/" + slug.current,    'series': *[_type=="collection" && references(^._id)][0].series->title,    'collection_number': upper(*[_type=="collection" && references(^._id)][0].slug.current),    'episodes': *[_type=="collection" && references(^._id)][0].episodes[]->slug.current,  }
 export type EarlyAccessEpisodesQueryResult = Array<{
@@ -952,7 +955,7 @@ export type PersonByIdQueryResult = {
 		height: number | null;
 		width: number | null;
 	} | null;
-	bio: string | null;
+	bio: Markdown | null;
 	links: Array<{
 		label?: string;
 		url?: string;
@@ -968,7 +971,7 @@ export type AllUsersQueryResult = Array<{
 	_id: string;
 	name: string;
 	slug: string;
-	bio: string | null;
+	bio: Markdown | null;
 	photo: {
 		public_id: string | null;
 		height: number | null;
@@ -1034,7 +1037,7 @@ export type PersonBySlugQueryResult = {
 		height: number | null;
 		width: number | null;
 	} | null;
-	bio: string | null;
+	bio: Markdown | null;
 	links: Array<{
 		label?: string;
 		url?: string;
@@ -1113,7 +1116,7 @@ export type AllHackathonsQueryResult = Array<{
 	pubDate: string;
 	deadline: string;
 	description: string;
-	body: string;
+	body: Markdown;
 	hero_image: {
 		public_id: string | null;
 		width: number | null;
@@ -1148,7 +1151,7 @@ export type HackathonBySlugQueryResult = {
 	title: string;
 	slug: string;
 	description: string;
-	body: string;
+	body: Markdown;
 	pubDate: string;
 	deadline: string;
 	submissionForm: string;
