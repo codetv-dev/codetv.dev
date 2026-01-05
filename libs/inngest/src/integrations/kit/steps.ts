@@ -11,9 +11,8 @@ export const tagSubscriber = inngest.createFunction(
 		event: any;
 		step: any;
 	}): Promise<{ subscription: any }> {
-		console.log(event.data);
 		return await step.run('tag-subscriber', async () => {
-			return await tagSubscriberKit(event.data.email, event.data.tag);
+			return await tagSubscriberKit(event.data.email, event.data.tagName);
 		});
 	},
 );

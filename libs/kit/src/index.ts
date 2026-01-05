@@ -80,6 +80,10 @@ export async function getTags() {
 }
 
 export async function tagSubscriber(email: string, tagName: string) {
+	if (!tagName) {
+		throw new Error('tagName is required to tag a subscriber');
+	}
+
 	// Look up the tag ID by name
 	const tags = await getTags();
 	const tag = tags.find((t) => t.name?.toLowerCase() === tagName.toLowerCase());
