@@ -248,12 +248,6 @@ export const handleHackathonSubmission = inngest.createFunction(
 				},
 			}),
 			// Tag subscriber in Kit
-			step.run('log-the-output', async () => {
-				return {
-					hackathonSlug: hackathon?.slug,
-					email: event.data.email,
-				};
-			}),
 			step.invoke('tag-subscriber', {
 				function: tagSubscriber,
 				data: {
