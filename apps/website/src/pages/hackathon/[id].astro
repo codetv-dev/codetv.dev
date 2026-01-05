@@ -321,10 +321,6 @@ const primarySponsor = hasSponsors ? sponsors?.[0] : null;
 
 <style>
 	h2 {
-		font-family: var(--font-family-heading);
-		font-size: clamp(1.75rem, 3.75cqi, 4.25rem);
-		font-weight: normal;
-		line-height: 1;
 		margin: 0;
 	}
 
@@ -444,6 +440,14 @@ const primarySponsor = hasSponsors ? sponsors?.[0] : null;
 	@layer overrides {
 		.block[data-name='episode'] {
 			padding-inline: calc((100dvi - 960px) / 2);
+		}
+
+		.block[data-name='episode'],
+		.block[data-name='rewards'] {
+			h2 {
+				font-size: clamp(1.75rem, 3.75cqi, 4.25rem);
+				line-height: 1;
+			}
 		}
 
 		/* Force the submit block to be properly centered on all screens */
