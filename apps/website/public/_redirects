@@ -33,3 +33,5 @@
 /blog/serverless-functions/query-strings-serverless-functions /blog/query-strings-serverless-functions
 /blog/false                                                   /blog
 /false                                                        /
+
+/blog/rss.xml                                                 /blog/feed.xml
