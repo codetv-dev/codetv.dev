@@ -44,6 +44,10 @@ const loadAstroAsJsx = {
 					contents = `export default function OptInForm() { return <p><a href="https://lwj.dev/newsletter">Subscribe to my newsletter for more like this!</a></p>; }`;
 					break;
 
+				case 'mux-video-player.astro':
+					contents = `export default function MuxVideoPlayer() { return <></>; }`;
+					break;
+
 				default:
 					contents = `export default function Unknown() { return <></> }`;
 			}
@@ -63,13 +67,18 @@ export async function getHtmlFromContentCollectionEntry(
 		return '';
 	}
 
+	console.log({
+		path: resolve('./src/content/blog', dirname(post.id)),
+		dirname: dirname(post.id),
+		id: post.id,
+	});
+
 	const result = await bundleMDX({
 		source: post.body,
 		esbuildOptions(options) {
-			return {
-				...options,
-				plugins: [loadAstroAsJsx, ...(options.plugins as Plugin[])],
-			};
+			options.plugins = [loadAstroAsJsx, ...(options.plugins as Plugin[])];
+
+			return options;
 		},
 		cwd: resolve('./src/content/blog', dirname(post.id)),
 	});
