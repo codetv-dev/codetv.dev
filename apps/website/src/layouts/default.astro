@@ -33,7 +33,37 @@ const {
 			rel="alternate"
 			type="application/rss+xml"
 			title="CodeTV Blog RSS"
-			href={new URL('blog/rss.xml', Astro.site)}
+			href={new URL('blog/feed.xml', Astro.site)}
+		/>
+		<link
+			rel="alternate"
+			type="application/rss+xml"
+			title="Web Dev Challenge Episodes RSS"
+			href={new URL('series/web-dev-challenge/feed.xml', Astro.site)}
+		/>
+		<link
+			rel="alternate"
+			type="application/rss+xml"
+			title="Leet Heat Episodes RSS"
+			href={new URL('series/leet-heat/feed.xml', Astro.site)}
+		/>
+		<link
+			rel="alternate"
+			type="application/rss+xml"
+			title="Web Lunch Episodes RSS"
+			href={new URL('series/web-lunch/feed.xml', Astro.site)}
+		/>
+		<link
+			rel="alternate"
+			type="application/rss+xml"
+			title="Learn With Jason Episodes RSS"
+			href={new URL('series/learn-with-jason/feed.xml', Astro.site)}
+		/>
+		<link
+			rel="alternate"
+			type="application/rss+xml"
+			title="#DoItAnyways Episodes RSS"
+			href={new URL('series/do-it-anyways/feed.xml', Astro.site)}
 		/>
 
 		<slot name="head">
