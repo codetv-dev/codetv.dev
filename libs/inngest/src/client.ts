@@ -6,6 +6,7 @@ import { schema as googleSchema } from './integrations/google/index.js';
 import { schema as sanitySchema } from './integrations/sanity/index.js';
 import { schema as stripeSchema } from './integrations/stripe/index.js';
 import { schema as websiteSchema } from './integrations/website/index.js';
+import { schema as kitSchema } from './integrations/kit/index.js';
 
 // TODO pin Zod to 3 or figure out other workaround for
 // https://github.com/inngest/inngest-js/issues/1014
@@ -16,7 +17,8 @@ export const schemas = new EventSchemas()
 	.fromZod(googleSchema)
 	.fromZod(sanitySchema)
 	.fromZod(stripeSchema)
-	.fromZod(websiteSchema);
+	.fromZod(websiteSchema)
+	.fromZod(kitSchema);
 
 if (!process.env.INNGEST_EVENT_KEY) {
 	console.error('missing INNGEST_EVENT_KEY. Workflows will not run.');

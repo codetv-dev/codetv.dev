@@ -619,7 +619,8 @@ const hackathonBySlugQuery = groq`
 
 const activeHackathonQuery = groq`
   *[_type == "hackathon" && hidden != "hidden" && dateTime(pubDate) <= dateTime(now()) && dateTime(deadline) > dateTime(now())] | order(pubDate desc)[0] {
-    _id
+    _id,
+    'slug': slug.current,
   }
 `;
 
@@ -813,11 +814,10 @@ export async function getHackathonBySlug(params: { slug: string }) {
 }
 
 export async function getActiveHackathon() {
-	const hackathon = await client.fetch<{ _id: string } | null>(
-		activeHackathonQuery,
-		{},
-		{ useCdn: true },
-	);
+	const hackathon = await client.fetch<{
+		_id: string;
+		slug: string;
+	} | null>(activeHackathonQuery, {}, { useCdn: true });
 
 	if (!hackathon) {
 		return null;

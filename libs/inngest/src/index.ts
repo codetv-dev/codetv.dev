@@ -43,6 +43,7 @@ import {
 	handleUpdateUserProfile,
 	handleWDCIntakeSubmit,
 } from './integrations/website/steps.js';
+import { tagSubscriber } from './integrations/kit/steps.js';
 
 export { inngest } from './client.js';
 
@@ -94,4 +95,5 @@ export const functions: any[] = [
 	handleLWJIntake,
 	handleUpdateUserProfile,
 	handleWDCIntakeSubmit,
+	tagSubscriber,
 ];
