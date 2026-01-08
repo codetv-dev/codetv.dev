@@ -89,7 +89,7 @@ export async function tagSubscriber(email: string, tagName: string) {
 	const tag = tags.find((t) => t.name?.toLowerCase() === tagName.toLowerCase());
 
 	if (!tag) {
-		throw new Error(`Tag "${tagName}" not found in ConvertKit`);
+		throw new Error(`Tag "${tagName}" not found in Kit`);
 	}
 
 	const url = createApiUrl(`/v3/tags/${tag.id}/subscribe`);
