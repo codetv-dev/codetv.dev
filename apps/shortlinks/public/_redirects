@@ -51,6 +51,7 @@ https://codetv-links.netlify.app/*		https://codetv.dev/:splat					301!
 /wdc/s2e10									https://codetv.dev/series/web-dev-challenge/s2/e10-no-keyboards-allowed
 /wdc/s2e11									https://codetv.dev/series/web-dev-challenge/s2/e11-build-a-hotline
 /wdc/s2e12									https://codetv.dev/series/web-dev-challenge/s2/e12-better-ecommerce
+/wdc/s2e13									https://codetv.dev/series/web-dev-challenge/s2/e13-delightful-apps
 
 /wdc/hackathon							https://codetv.dev/blog/web-dev-challenge-hackathon-s2e11-code-powered-phone-hotline
 /wdc/hackathon/submit				https://x.com/twilio/status/1987971002643710442
