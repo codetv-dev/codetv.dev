@@ -124,13 +124,16 @@ const nav = [
 		z-index: 100;
 
 		@media (min-width: 1180px) {
+			block-size: auto;
 			border-radius: 8px;
 			box-shadow: 0 0 20px var(--black);
-			inset-block-start: 25px;
+			inset-block-start: 8px;
 			inline-size: min(90dvi + 20px, var(--max-width) + 20px);
 			margin-inline: calc(
 				(100% - min(90dvi + 20px, var(--max-width) + 20px)) / 2
 			);
+			padding: 4px;
+			padding-inline-start: 12px;
 			position: fixed;
 		}
 	}
@@ -174,12 +177,13 @@ const nav = [
 			color: var(--white);
 			display: block;
 			line-height: 1.1;
-			padding: 15px 10px;
+			padding: 4px 8px;
 			pointer-events: all;
 			text-decoration: none;
 			transition: opacity 150ms linear;
 
 			&.button {
+				align-self: center;
 				margin: 0;
 			}
 		}
@@ -250,7 +254,7 @@ const nav = [
 				block-size: 8cqi;
 				display: block;
 				inline-size: 100%;
-				max-block-size: 50px;
+				max-block-size: 24px;
 			}
 		}
 
