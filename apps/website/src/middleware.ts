@@ -5,18 +5,21 @@ import { PUBLIC_CLERK_PUBLISHABLE_KEY } from 'astro:env/client';
 // see the broken dashboard. Helpful for dev but not useful otherwise, I think.
 
 // TODO does this have any abuse vectors? I can't think of any, but...
-const key = PUBLIC_CLERK_PUBLISHABLE_KEY && PUBLIC_CLERK_PUBLISHABLE_KEY.length > 1 ? PUBLIC_CLERK_PUBLISHABLE_KEY : undefined;
+const key =
+	PUBLIC_CLERK_PUBLISHABLE_KEY && PUBLIC_CLERK_PUBLISHABLE_KEY.length > 1
+		? PUBLIC_CLERK_PUBLISHABLE_KEY
+		: undefined;
 
-const isProtectedPage = key ? createRouteMatcher([
-	/^(?!.*\/(?:sign-up|sign-in)\/?$)\/dashboard.*$/,
-]) : () => false;
+const isProtectedPage = key
+	? createRouteMatcher([/^(?!.*\/(?:sign-up|sign-in)\/?$)\/dashboard.*$/])
+	: () => false;
 
 export const onRequest = key
 	? clerkMiddleware((auth, context, next) => {
-		if (isProtectedPage(context.request) && !auth().userId) {
-			return auth().redirectToSignIn();
-		}
+			if (isProtectedPage(context.request) && !auth().userId) {
+				return auth().redirectToSignIn();
+			}
 
-		return next();
-	})
+			return next();
+		})
 	: (_: any, next: any) => next();

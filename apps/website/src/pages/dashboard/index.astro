@@ -115,7 +115,10 @@ if (!Astro.cookies.has('has_codetv_account')) {
 	import { PUBLIC_CLERK_PUBLISHABLE_KEY } from 'astro:env/client';
 	import { Clerk } from '@clerk/clerk-js';
 
-	const key = PUBLIC_CLERK_PUBLISHABLE_KEY && PUBLIC_CLERK_PUBLISHABLE_KEY.length > 1 ? PUBLIC_CLERK_PUBLISHABLE_KEY : undefined;
+	const key =
+		PUBLIC_CLERK_PUBLISHABLE_KEY && PUBLIC_CLERK_PUBLISHABLE_KEY.length > 1
+			? PUBLIC_CLERK_PUBLISHABLE_KEY
+			: undefined;
 
 	// @ts-expect-error we want to allow Clerk to run in keyless mode
 	const clerk = new Clerk(key);

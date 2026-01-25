@@ -64,14 +64,14 @@ export const server = {
 					return false;
 				}
 
-			await inngest.send({
-				name: 'discord/user.role.add',
-				data: {
-					type: 'alumni',
-					userId: user.id,
-					role: 'wdc_alumni',
-				},
-			});
+				await inngest.send({
+					name: 'discord/user.role.add',
+					data: {
+						type: 'alumni',
+						userId: user.id,
+						role: 'wdc_alumni',
+					},
+				});
 
 				return true;
 			},

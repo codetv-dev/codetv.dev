@@ -1,91 +1,91 @@
 .form-wrapper {
-  margin-inline: auto;
-  max-inline-size: 54ch;
+	margin-inline: auto;
+	max-inline-size: 54ch;
 
-  @media (min-width: 750px) {
-    padding-block: 120px;
-  }
+	@media (min-width: 750px) {
+		padding-block: 120px;
+	}
 }
 
 .form-section {
-  padding-block-start: 80px;
+	padding-block-start: 80px;
 }
 
 .error {
-  border: 0.5px solid color-mix(in oklch, red 60%, var(--text));
-  border-radius: 3px;
-  color: color-mix(in oklch, red 60%, var(--text));
-  font-size: 0.75em;
-  margin-block-start: 16px;
-  padding: 8px;
+	border: 0.5px solid color-mix(in oklch, red 60%, var(--text));
+	border-radius: 3px;
+	color: color-mix(in oklch, red 60%, var(--text));
+	font-size: 0.75em;
+	margin-block-start: 16px;
+	padding: 8px;
 }
 
 .field {
-  margin-block-start: 40px;
+	margin-block-start: 40px;
 
-  &:has(:required) label::after {
-    color: var(--orange);
-    content: '*';
-    font-size: 0.75em;
-    vertical-align: super;
-  }
+	&:has(:required) label::after {
+		color: var(--orange);
+		content: '*';
+		font-size: 0.75em;
+		vertical-align: super;
+	}
 }
 
 label {
-  margin-block: 24px 4px;
+	margin-block: 24px 4px;
 }
 
 .description {
-  color: var(--text-muted);
-  font-size: 0.75em;
-  margin-block: 4px 8px;
+	color: var(--text-muted);
+	font-size: 0.75em;
+	margin-block: 4px 8px;
 }
 
 label,
 input,
 textarea,
 button {
-  display: block;
-  font-size: 16px;
-  font-weight: 400;
-  line-height: 1.45;
+	display: block;
+	font-size: 16px;
+	font-weight: 400;
+	line-height: 1.45;
 }
 
 .input {
-  background: var(--bg);
-  border: 1px solid var(--text-muted);
-  border-radius: 3px;
-  color: var(--text);
-  padding: 8px;
-  inline-size: 100%;
+	background: var(--bg);
+	border: 1px solid var(--text-muted);
+	border-radius: 3px;
+	color: var(--text);
+	padding: 8px;
+	inline-size: 100%;
 
-  &.textarea {
-    field-sizing: content;
-  }
+	&.textarea {
+		field-sizing: content;
+	}
 }
 
 .checkbox-group {
-  display: flex;
-  gap: 16px;
-  margin-block-start: 16px;
+	display: flex;
+	gap: 16px;
+	margin-block-start: 16px;
 
-  .checkbox {
-    inline-size: 20px;
-  }
+	.checkbox {
+		inline-size: 20px;
+	}
 
-  label {
-    margin: 0;
-  }
+	label {
+		margin: 0;
+	}
 }
 
 .button {
-  border: none;
-  font-size: 1.25rem;
-  @media (min-width: 480px) {
-    grid-column-start: 2;
-  }
+	border: none;
+	font-size: 1.25rem;
+	@media (min-width: 480px) {
+		grid-column-start: 2;
+	}
 }
 
 .hidden {
-  display: none;
+	display: none;
 }

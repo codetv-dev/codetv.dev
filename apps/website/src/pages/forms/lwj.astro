@@ -10,13 +10,13 @@ url.pathname = '/forms/lwj';
 	<main>
 		<SignedIn>
 			<section class="wrapper">
-        <h2>Join Learn With Jason</h2>
+				<h2>Join Learn With Jason</h2>
 
-        <ul id="available-dates"></ul>
+				<ul id="available-dates"></ul>
 
-        <button type="button" class="button" id="get-dates">
-          Find Available Dates
-        </button>
+				<button type="button" class="button" id="get-dates">
+					Find Available Dates
+				</button>
 			</section>
 		</SignedIn>
 
@@ -27,7 +27,7 @@ url.pathname = '/forms/lwj';
 </Layout>
 
 <script>
-	import { actions } from "astro:actions";
+	import { actions } from 'astro:actions';
 
 	function updateUI(dates: string[]) {
 		const list = document.getElementById('available-dates');
@@ -41,13 +41,13 @@ url.pathname = '/forms/lwj';
 			li.textContent = date;
 
 			list.appendChild(li);
-		})
+		});
 	}
 
 	const btn = document.getElementById('get-dates');
-	
+
 	btn?.addEventListener('click', async () => {
-		const {data: ids, error} = await actions.forms.lwj();
+		const { data: ids, error } = await actions.forms.lwj();
 
 		if (error) {
 			console.error(error);
@@ -84,31 +84,31 @@ url.pathname = '/forms/lwj';
 </script>
 
 <script>
-  // import { subscribe } from "@inngest/realtime";
-  
-  // const token = await fetch("/api/get-token", {
-  //   method: "POST",
-  //   credentials: "include",
-  // }).then(res => res.json());
+	// import { subscribe } from "@inngest/realtime";
+
+	// const token = await fetch("/api/get-token", {
+	//   method: "POST",
+	//   credentials: "include",
+	// }).then(res => res.json());
 
 	// const stream = await subscribe(token);
 
-  // // const stream = await subscribe({
-  // //   channel: typeOnlyChannel('test'),
-  // //   topics: ["messages"],
-  // // });
+	// // const stream = await subscribe({
+	// //   channel: typeOnlyChannel('test'),
+	// //   topics: ["messages"],
+	// // });
 
 	// const log = document.getElementById('streaming-output');
 
-  // for await (const message of stream) {
-  //   console.log(message);
+	// for await (const message of stream) {
+	//   console.log(message);
 
 	// 	if (!log) {
 	// 		continue;
 	// 	}
 
 	// 	log.textContent += `\n${JSON.stringify(message, null, 2)}`;
-  // }
+	// }
 </script>
 
 <style>
