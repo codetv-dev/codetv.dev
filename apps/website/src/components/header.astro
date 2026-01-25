@@ -268,6 +268,40 @@ const nav = [
 		} */
 	}
 
+	.account {
+		align-items: center;
+		border: 1px solid color-mix(in oklch, var(--text-muted) 15%, transparent);
+		border-radius: 5px;
+		display: flex;
+		font-family: var(--font-family);
+		font-size: 0.75rem;
+		gap: 10px;
+		inline-size: max-content;
+		margin-inline: auto;
+		padding: 15px 5px 15px 10px;
+		transition: background-color 100ms linear;
+
+		@media (min-width: 1180px) {
+			justify-content: space-between;
+			min-inline-size: 150px;
+			padding: 4px;
+		}
+
+		&:is(:hover, :focus) {
+			background-color: color-mix(in oklch, var(--text-muted) 25%, transparent);
+		}
+
+		img {
+			aspect-ratio: 1;
+			block-size: auto;
+			border-radius: 2px;
+			display: block;
+			inline-size: 24px;
+			object-fit: cover;
+			outline: 1px solid var(--text-muted);
+		}
+	}
+
 	.menu-toggle {
 		background: transparent;
 		border: none;
