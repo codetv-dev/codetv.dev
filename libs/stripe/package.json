@@ -14,8 +14,8 @@
 		"./package.json": "./package.json"
 	},
 	"dependencies": {
-		"@clerk/astro": "^2.16.10",
+		"@clerk/astro": "^2.16.15",
 		"@codetv/clerk": "workspace:*",
-		"stripe": "^20.1.0"
+		"stripe": "^20.2.0"
 	}
 }

@@ -67,6 +67,22 @@ export const episode = defineType({
       group: 'details',
     }),
     defineField({
+      name: 'banner',
+      title: 'Banner Image',
+      description:
+        'This image will be shown at the top of the series page while this episode is featured and/or the most recently published.',
+      type: 'cloudinary.asset',
+      options: {hotspot: true},
+      group: 'details',
+    }),
+    defineField({
+      name: 'banner_alt',
+      title: 'Banner Alt Text',
+      type: 'string',
+      validation: (Rule) => Rule.warning('Alt text improves accessibility'),
+      group: 'details',
+    }),
+    defineField({
       name: 'hackathons',
       type: 'array',
       title: 'Related Hackathons',

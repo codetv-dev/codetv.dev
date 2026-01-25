@@ -12,9 +12,9 @@
 		"./package.json": "./package.json"
 	},
 	"dependencies": {
-		"@clerk/backend": "^2.29.0",
-		"@clerk/types": "^4.101.9",
-		"@sanity/client": "^7.13.2",
-		"stripe": "^20.1.0"
+		"@clerk/backend": "^2.29.5",
+		"@clerk/types": "^4.101.13",
+		"@sanity/client": "^7.14.1",
+		"stripe": "^20.2.0"
 	}
 }
