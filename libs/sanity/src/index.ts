@@ -17,6 +17,7 @@ import type {
 	AllUsersQueryResult,
 	AllHackathonsQueryResult,
 	HackathonBySlugQueryResult,
+	AllSponsorsForCollectionQueryResult,
 } from '@codetv/types';
 import type { UploadApiResponse } from '@codetv/cloudinary';
 
@@ -92,6 +93,12 @@ const seriesBySlugQuery = groq`
     title,
     'slug': slug.current,
     description,
+    details,
+    'banner': {
+      'public_id': banner.public_id,
+      'alt': banner_alt,
+    },
+    'logo': logo.public_id,
     image {
       public_id,
       height,
@@ -115,11 +122,16 @@ const seriesBySlugQuery = groq`
       title,
       'slug': slug.current,
       release_year,
+      'logo': logo.public_id,
       episodes[@->hidden != true]->{
         title,
         'slug': slug.current,
         short_description,
         publish_date,
+        'banner': {
+          'public_id': banner.public_id,
+          'alt': banner_alt,
+        },
         'thumbnail': {
           'public_id': video.thumbnail.public_id,
           'alt': video.thumbnail_alt,
@@ -130,7 +142,27 @@ const seriesBySlugQuery = groq`
           youtube_id,
           mux_video,
           members_only
-        }
+        },
+        'sponsors': sponsors[]->{
+          title,
+          logo {
+            public_id,
+            width,
+            height
+          },
+          link,
+        },
+      },
+      extras[]->{
+        title,
+        'slug': slug.current,
+        short_description,
+        publish_date,
+        video {
+          youtube_id,
+          mux_video,
+          members_only
+        },
       }
     },
     collections[]->{
@@ -154,6 +186,10 @@ const allEpisodesQuery = groq`
       'width': video.thumbnail.width,
       'height': video.thumbnail.height,
       'alt': video.thumbnail_alt,
+    },
+    'banner': {
+      'public_id': banner.public_id,
+      'alt': banner_alt,
     },
     video {
       youtube_id,
@@ -230,6 +266,10 @@ const episodeBySlugQuery = groq`
     description,
     short_description,
     publish_date,
+    'banner': {
+      'public_id': banner.public_id,
+      'alt': banner_alt,
+    },
     'thumbnail': {
       'public_id': video.thumbnail.public_id,
       'width': video.thumbnail.width,
@@ -624,6 +664,20 @@ const activeHackathonQuery = groq`
   }
 `;
 
+const allSponsorsForCollectionQuery = groq`
+  *[_type=="series" && slug.current==$series][0] {
+    'sponsors': collections[@->slug.current==$collection && @->series._ref==^._id][0]->episodes[@->hidden != true]->sponsors[]->{
+      title,
+      logo {
+        public_id,
+        width,
+        height
+      },
+      link,
+    }
+  }
+`;
+
 export async function getAllSeries() {
 	return client.fetch<AllSeriesQueryResult>(
 		allSeriesQuery,
@@ -824,6 +878,19 @@ export async function getActiveHackathon() {
 	}
 
 	return hackathon;
+}
+
+export async function getAllSponsorsForCollection(params: {
+	series: string;
+	collection: string;
+}) {
+	return client.fetch<AllSponsorsForCollectionQueryResult>(
+		allSponsorsForCollectionQuery,
+		params,
+		{
+			useCdn: true,
+		},
+	);
 }
 
 export async function createPerson(
