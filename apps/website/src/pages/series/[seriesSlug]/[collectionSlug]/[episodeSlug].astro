@@ -477,6 +477,7 @@ if (episode.video && !episode.video.youtube_id && episode.video.mux) {
 		margin-inline: auto;
 		max-inline-size: 1440px;
 		padding: 20px 5cqw 80px;
+		position: relative;
 
 		@media (min-width: 750px) {
 			display: grid;
@@ -495,10 +496,14 @@ if (episode.video && !episode.video.youtube_id && episode.video.mux) {
 	}
 
 	.thumbnail {
+		inset: 0;
+		position: absolute;
+
 		img {
-			aspect-ratio: 16 / 7;
+			block-size: 100%;
 			display: block;
-			object-fit: cover;
+			inline-size: 100%;
+			object-fit: contain !important;
 		}
 	}
 
