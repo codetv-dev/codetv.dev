@@ -140,7 +140,7 @@ const dateString = new Intl.DateTimeFormat('en-US', {
 	!isPrerelease && !isSubscriber && thumbnailSrc ? (
 		<div class="subscription-required" style={`--bg-img: url(${thumbnailSrc})`}>
 			<div class="notice">
-				<h2>This video is supporters-only</h2>
+				<h2>This video is available to CodeTV Supporters only</h2>
 				<p>
 					Certain videos are exclusive to CodeTV supporters. Become a supporter
 					to watch this video now and help us create more like it.
@@ -179,6 +179,7 @@ const dateString = new Intl.DateTimeFormat('en-US', {
 	}
 
 	.subscription-required {
+		align-items: end;
 		background-blend-mode: multiply, normal;
 		background-image:
 			linear-gradient(
@@ -189,7 +190,7 @@ const dateString = new Intl.DateTimeFormat('en-US', {
 		background-size: cover, cover;
 		block-size: 100%;
 		display: flex;
-		place-items: center;
+		inline-size: 100%;
 
 		.notice {
 			align-items: center;
@@ -202,13 +203,18 @@ const dateString = new Intl.DateTimeFormat('en-US', {
 			color: var(--text-emphasized);
 			display: flex;
 			flex-direction: column;
-			font-size: 0.875rem;
+			font-size: clamp(0.75rem, 3cqi, 0.875rem);
 			justify-content: center;
-			margin: auto;
-			max-inline-size: 45ch;
-			padding: 40px;
+			margin: 40px auto;
+			max-inline-size: min(60ch, 90cqi);
+			padding: 16px;
 			text-align: center;
+			text-wrap: balance;
 			z-index: 10;
+
+			h2 {
+				text-wrap: balance;
+			}
 
 			p {
 				margin-block-start: 8px;
@@ -225,6 +231,14 @@ const dateString = new Intl.DateTimeFormat('en-US', {
 				align-self: center;
 				font-size: 1rem;
 				margin-block-start: 12px;
+			}
+		}
+
+		@media (min-width: 960px) {
+			align-items: center;
+
+			.notice {
+				padding: 40px;
 			}
 		}
 	}

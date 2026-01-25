@@ -37,9 +37,10 @@ const imgUrl = createImageUrl(image.public_id, {
 	<Image src={imgUrl} alt={image.alt} aspectRatio={aspectRatio} />
 </section>
 
-<style>
+<style define:vars={{ aspectRatio }}>
 	@layer site-base {
 		.hero {
+			background: var(--black);
 			position: relative;
 
 			&[data-variant='gradient'] {
@@ -52,19 +53,32 @@ const imgUrl = createImageUrl(image.public_id, {
 				}
 
 				&::after {
+					--distance: 33%;
+					--transparency: 0%;
+
+					aspect-ratio: var(--aspectRatio);
+
 					background: linear-gradient(
 						to top,
-						var(--black),
-						color-mix(in oklch, var(--black), transparent 100%) 33%
+						color-mix(in oklch, var(--black), transparent var(--transparency)),
+						color-mix(in oklch, var(--black), transparent 100%) var(--distance)
 					);
 				}
 
 				&::before {
+					--transparency: 0%;
+					--distance: 35%;
+
 					background: linear-gradient(
 						to right,
-						var(--black),
-						color-mix(in oklch, var(--black), transparent 100%) 60%
+						color-mix(in oklch, var(--black), transparent var(--transparency)),
+						color-mix(in oklch, var(--black), transparent 100%) var(--distance)
 					);
+
+					@media (min-width: 1080px) {
+						--distance: 60%;
+						--transparency: 0%;
+					}
 				}
 			}
 

@@ -2,19 +2,23 @@
 import { format } from 'date-fns';
 import { marked } from 'marked';
 import { Image } from '@unpic/astro';
-import { getAllEpisodes, getEpisodeTranscriptBySlug } from '@codetv/sanity';
+import {
+	getAllEpisodes,
+	getEpisodeTranscriptBySlug,
+	getSeriesBySlug,
+} from '@codetv/sanity';
 import {
 	createImageUrl,
 	generateDefaultImage,
 	getYouTubeThumbnail,
 } from '@codetv/cloudinary';
 import Layout from '../../../../layouts/default.astro';
-import VideoPlayer from '../../../../components/video-player.astro';
-import BecomeASupporter from '../../../../components/supporter-button.astro';
 import PeopleInEpisode from '../../../../components/people-in-episode.astro';
 import Supporters from '../../../../components/supporters.astro';
 import Card from '../../../../components/cards/card.astro';
 import HackathonStatusCard from '../../../../components/hackathon-status-card.astro';
+import PageHeader from '../../../../components/page-header.astro';
+import { getRelativeAge } from '../../../../util/helpers';
 
 export const prerender = true;
 
@@ -88,14 +92,23 @@ const title =
 	' ' +
 	episode.collection?.title;
 
-let videoType;
+const { seriesSlug, collectionSlug } = Astro.params;
 
-if (episode.video && episode.video.youtube_id) {
-	videoType = 'youtube';
+if (!seriesSlug || !collectionSlug) {
+	throw new Error('Invalid series and/or collection provided.');
 }
 
-if (episode.video && !episode.video.youtube_id && episode.video.mux) {
-	videoType = 'mux';
+const series = await getSeriesBySlug({
+	series: seriesSlug,
+	collection: collectionSlug,
+});
+
+if (!series) {
+	throw new Error(`Invalid series for ${seriesSlug}`);
+}
+
+if (!series.image || !series.image.public_id) {
+	throw new Error('Missing series image');
 }
 ---
 
@@ -163,42 +176,22 @@ if (episode.video && !episode.video.youtube_id && episode.video.mux) {
 	</Fragment>
 
 	<main>
-		<div
-			class="video-wrapper"
-			style={`--bg-img: url(${image.replace(/,w_\d+\//, '/w_30/')})`}
+		<PageHeader
+			image={{
+				// @ts-expect-error
+				public_id: episode?.banner?.public_id ?? series?.banner?.public_id,
+				alt: episode?.banner?.alt ?? series.title,
+			}}
+			addGradient={true}
 		>
-			{
-				episode.video?.youtube_id || episode.video?.mux ? (
-					<VideoPlayer
-						video={{
-							youtube_id: episode.video.youtube_id,
-							mux: episode.video.mux?.map((v) => ({
-								id: v.id ?? '',
-								policy: v.policy as 'public' | 'signed',
-							})),
-							captions: episode.video.captions,
-							title: title,
-							publish_date: episode.publish_date,
-							thumbnail: episode.thumbnail,
-						}}
-						server:defer
-					>
-						<div class="video-player-placeholder" slot="fallback" />
-					</VideoPlayer>
-				) : image ? (
-					<div class="thumbnail">
-						<Image src={image} alt={episode.thumbnail.alt ?? title} />
-					</div>
-				) : null
-			}
-		</div>
+			<Fragment slot="content">
+				<div class="series-info">
+					<Image
+						src={createImageUrl(series.logo!)}
+						alt={series.title}
+						width={400}
+					/>
 
-		<div class="wrapper">
-			<section class="header">
-				<div class="episode-details">
-					<h1>
-						{episode.title}
-					</h1>
 					<div class="episode-meta">
 						<a
 							href={`/series/${episode.series?.slug}/${episode.collection?.slug}`}
@@ -215,45 +208,81 @@ if (episode.video && !episode.video.youtube_id && episode.video.mux) {
 							}
 						</span>
 					</div>
-				</div>
-
-				<nav class="episode-links">
-					<BecomeASupporter server:defer />
 
 					{
-						videoType === 'mux' ? (
-							<a href="https://codetv.link/mux">
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									width="148"
-									height="24"
-									fill="none"
-								>
-									<g clip-path="url(#a)">
-										<path
-											fill="#565E67"
-											d="M78.98 16.867v-3.614l-2.907-6.12h1.374l1.826 3.84q.16.346.254.627.105.267.133.4.04-.133.133-.4.107-.28.28-.627l1.787-3.84h1.36l-2.907 6.12v3.614zm-10.142 0V7.133h2.814q.907 0 1.546.307.654.293 1 .867.36.56.36 1.346 0 1-.626 1.587-.614.586-1.667.573v-.186q1.133-.015 1.827.68.693.68.693 1.84 0 .825-.36 1.44-.36.613-1.027.946-.652.334-1.56.334zm1.294-1.16h1.586q.815 0 1.28-.427.467-.44.467-1.187 0-.773-.467-1.253-.465-.48-1.28-.48h-1.586zm0-4.467h1.506q.748 0 1.174-.387.426-.399.426-1.08 0-.693-.426-1.08-.413-.4-1.16-.4h-1.52zm-13.897 5.627V7.133h2.614q.96 0 1.653.374.693.36 1.08 1.026.387.653.387 1.547v3.827q0 .893-.387 1.56a2.7 2.7 0 0 1-1.08 1.04q-.693.36-1.653.36zm1.32-1.174h1.294q.84 0 1.32-.48t.48-1.306V10.08q0-.826-.48-1.293-.48-.48-1.32-.48h-1.294zm-9.195 1.174V7.133h5.667V8.32h-4.36v2.893h3.894v1.16h-3.894v3.307h4.36v1.187zm-8.114 0V7.133h3.026q.894 0 1.56.36.68.346 1.04.987.375.627.374 1.48 0 .973-.507 1.693-.507.707-1.373.987l2.013 4.227h-1.533L43.032 12.8h-1.466v4.067zm1.32-5.24h1.706q.734 0 1.174-.454.44-.453.44-1.2 0-.759-.44-1.213-.44-.453-1.174-.453h-1.706zm-9.195 5.24V7.133h5.667V8.32h-4.36v2.893h3.893v1.16h-3.893v3.307h4.36v1.187zm-8.035 0-1.08-9.734h1.214l.706 7.094q.014.279.04.6t.04.613q.027.294.027.493a6 6 0 0 0 .04-.493q.027-.293.067-.613.039-.321.066-.6l.88-7.094h1.28l.814 7.094q.039.279.066.6.041.32.067.613.04.294.053.493a24 24 0 0 0 .027-.493q.027-.293.053-.613.04-.321.054-.6l.72-7.094h1.173l-1.12 9.734h-1.587l-.8-7.2q-.027-.294-.066-.6l-.054-.574a20 20 0 0 1-.04-.466q-.013.187-.053.466-.027.267-.053.574-.027.306-.067.6l-.867 7.2zM18.821 17q-.892 0-1.546-.333a2.4 2.4 0 0 1-.987-.974q-.347-.64-.347-1.52V9.827q0-.881.347-1.507.347-.64.987-.973Q17.927 7 18.82 7t1.534.347a2.3 2.3 0 0 1 1 .973q.345.627.346 1.493v4.36q0 .88-.346 1.52a2.4 2.4 0 0 1-1 .974q-.64.333-1.534.333m0-1.173q.76 0 1.16-.427.4-.426.4-1.227V9.827q0-.801-.4-1.227t-1.16-.427q-.747 0-1.16.427-.4.426-.4 1.227v4.346q0 .801.4 1.227.413.427 1.16.427M8 16.867V7.133h3.16q.933 0 1.613.36t1.054 1.014q.373.639.373 1.533 0 .867-.373 1.52-.374.653-1.054 1.013-.679.36-1.613.36H9.32v3.934zm1.32-5.107h1.84q.76 0 1.213-.467.467-.48.467-1.253 0-.8-.467-1.267-.453-.466-1.213-.466H9.32z"
-										/>
-										<path stroke="#565E67" d="M.5.5h147v23H.5z" />
-										<path
-											fill="#565E67"
-											fill-rule="evenodd"
-											d="M148 0H90v24h58zm-19.678 16.013 4.07-4.013-4.07-4.013a1.73 1.73 0 0 1 0-2.475 1.79 1.79 0 0 1 2.509 0l4.07 4.014 4.07-4.014a1.79 1.79 0 0 1 2.509 0 1.73 1.73 0 0 1 0 2.475L137.411 12l4.069 4.013a1.73 1.73 0 0 1 0 2.474 1.79 1.79 0 0 1-2.509 0l-4.07-4.013-4.07 4.014a1.79 1.79 0 0 1-2.509 0 1.73 1.73 0 0 1 0-2.475m-5.579-9.263c0-.967.794-1.75 1.774-1.75s1.775.783 1.775 1.75V12c0 3.86-3.185 7-7.099 7s-7.099-3.14-7.099-7V6.75c0-.967.794-1.75 1.774-1.75s1.774.783 1.774 1.75V12c0 1.93 1.593 3.5 3.55 3.5 1.958 0 3.551-1.57 3.551-3.5zm-13.641-1.617a1.79 1.79 0 0 0-1.933.38l-4.07 4.013-4.07-4.013c-.507-.5-1.27-.65-1.934-.38A1.75 1.75 0 0 0 96 6.75v10.5c0 .967.794 1.75 1.774 1.75s1.775-.783 1.775-1.75v-6.276l2.295 2.263a1.793 1.793 0 0 0 2.51 0l2.295-2.263v6.276c0 .967.795 1.75 1.774 1.75.98 0 1.775-.783 1.775-1.75V6.75a1.75 1.75 0 0 0-1.095-1.617z"
-											clip-rule="evenodd"
-										/>
-									</g>
-									<defs>
-										<clipPath id="a">
-											<path fill="#fff" d="M0 0h148v24H0z" />
-										</clipPath>
-									</defs>
-								</svg>
-							</a>
-						) : null
-					}
-				</nav>
-			</section>
+						episode
+							? () => {
+									const description = episode.short_description;
+									const path = `/series/${series.slug}/${series.collection?.slug}/${episode.slug}/play`;
+									const age = getRelativeAge(episode.publish_date);
+									const date = new Date(
+										episode.publish_date,
+									).toLocaleDateString('en-US', {
+										month: 'short',
+										day: 'numeric',
+									});
 
+									let tag;
+									if (age === 'FUTURE') {
+										tag = `Coming ${date}`;
+									}
+
+									if (age === 'NEW') {
+										tag = 'NEW';
+									}
+
+									return (
+										<div class="latest-episode">
+											<div class="title">
+												{tag ? <p class="tag">{tag}</p> : null}
+												<h3>
+													<a href={path}>{episode.title}</a>
+												</h3>
+											</div>
+
+											<p class="description">{description}</p>
+											<div class="options">
+												<a href={path} class="button" tabindex="-1">
+													<svg
+														xmlns="http://www.w3.org/2000/svg"
+														fill="none"
+														viewBox="0 0 15 18"
+													>
+														<path
+															fill="#080217"
+															d="M14.5 7.641a1 1 0 0 1 0 1.732l-13 7.506a1 1 0 0 1-1.5-.866V1A1 1 0 0 1 1.5.135l13 7.506Z"
+															style="fill:#080217;fill:color(display-p3 .0314 .0078 .0902);fill-opacity:1"
+														/>
+													</svg>
+													Watch
+												</a>
+
+												{episode.sponsors && episode.sponsors.length > 0 ? (
+													<>
+														<span>sponsored by</span>
+														{episode.sponsors?.map((sponsor) => {
+															return (
+																<Image
+																	src={createImageUrl(sponsor.logo.public_id!)}
+																	width={sponsor.logo.width!}
+																	height={sponsor.logo.height!}
+																	alt={sponsor.title}
+																/>
+															);
+														})}
+													</>
+												) : null}
+											</div>
+										</div>
+									);
+								}
+							: null
+					}
+				</div>
+			</Fragment>
+		</PageHeader>
+
+		<div class="wrapper">
 			<section class="description">
 				<div set:html={description} />
 
@@ -326,46 +355,6 @@ if (episode.video && !episode.video.youtube_id && episode.video.mux) {
 						)
 				}
 
-				{
-					episode.sponsors && episode.sponsors.length > 0 ? (
-						<div class="sponsors">
-							<h3>Presented by</h3>
-
-							<div class="sponsor-logos">
-								{episode.sponsors.map((sponsor) => {
-									if (
-										!sponsor.logo ||
-										!sponsor.logo.public_id ||
-										!sponsor.logo.width ||
-										!sponsor.logo.height
-									) {
-										return;
-									}
-
-									const src = createImageUrl(sponsor.logo.public_id, {
-										height: sponsor.logo.height * 2,
-										width: sponsor.logo.width * 2,
-									});
-
-									return (
-										<a
-											href={sponsor.link}
-											style={`--ar: ${sponsor.logo.width / sponsor.logo.height}`}
-										>
-											<img
-												src={src}
-												alt={sponsor.title}
-												height={sponsor.logo.height * 2}
-												width={sponsor.logo.width * 2}
-											/>
-										</a>
-									);
-								})}
-							</div>
-						</div>
-					) : null
-				}
-
 				<PeopleInEpisode people={episode.people ?? []} server:defer />
 
 				<div class="supporters">
@@ -430,59 +419,180 @@ if (episode.video && !episode.video.youtube_id && episode.video.mux) {
 	</main>
 </Layout>
 
+<style is:global>
+	.hero {
+		min-block-size: 360px;
+	}
+</style>
+
 <style>
-	.video-wrapper {
-		aspect-ratio: 16 / 9;
-		background: var(--black);
-		border-bottom: 1px solid var(--gray-600);
-		container: video-wrapper / size;
-		inline-size: 100%;
-		margin: 0;
-		max-block-size: calc(100dvh - 280px);
-		position: relative;
-		z-index: 1;
+	.series-info {
+		font-size: clamp(14px, 1.25cqi, 1.125rem);
+		inset-block-end: 0;
+		inset-inline-start: 5cqi;
+		max-inline-size: 90%;
+		position: absolute;
+		z-index: 10;
 
-		@media (min-width: 1080px) {
-			margin-block-start: 64px;
+		img {
+			inline-size: min(400px, 40dvi) !important;
 		}
 
-		&::after {
-			background: var(--bg-img);
-			background-size: cover;
-			content: '';
-			filter: blur(40px);
-			inset: 20px;
-			opacity: 0.4;
-			position: absolute;
-			z-index: 1;
+		.episode-meta {
+			display: flex;
+			font-size: 1.125em;
+			gap: 4px 16px;
+			margin-block: 16px 8px;
 		}
 
-		> * {
-			position: relative;
-			z-index: 10;
+		.title {
+			--font-size: clamp(14px, 4.5cqi, 1.125em);
+
+			color: var(--text-emphasized);
+			display: flex;
+			flex-wrap: wrap;
+			font-size: var(--font-size);
+			font-weight: 400;
+			gap: 8px 16px;
+			line-height: 1.25;
+			margin: 8px;
+			margin-inline-start: 0;
+
+			&:empty {
+				display: none;
+			}
+
+			* {
+				color: inherit;
+				font-size: inherit;
+				font-weight: inherit;
+				line-height: inherit;
+			}
+
+			:is(h1, h2, h3, h4, h5, h6) {
+				font-size: var(--font-size);
+				font-variation-settings: 'wdth' 95;
+				font-weight: 550;
+				line-height: 1.1;
+				margin: 0;
+
+				summary & {
+					display: inline-block;
+
+					&::before {
+						content: '\25B8';
+						margin-inline-end: 4px;
+					}
+
+					:open &::before {
+						content: '\25BE';
+					}
+				}
+			}
+
+			.tag {
+				background: var(--gray-200);
+				border-radius: 3px;
+				color: var(--text);
+				display: block;
+				font-family: var(--font-family-heading);
+				font-size: clamp(10px, 1cqi, 0.625em);
+				font-weight: 700;
+				letter-spacing: 0.15em;
+				line-height: 1;
+				padding: 4px;
+				text-transform: uppercase;
+				align-self: center;
+				text-box-trim: trim-both;
+				text-box-edge: cap alphabetic;
+			}
+
+			.episode-number {
+				color: var(--text-muted);
+			}
+
+			a {
+				color: inherit;
+				text-decoration: none;
+
+				&:is(:focusa, :active, :hover) {
+					outline: none;
+					text-decoration: underline;
+				}
+			}
 		}
 
-		&:has(.subscription-required) {
-			aspect-ratio: unset;
-			container: video-wrapper / inline-size;
+		.description {
+			color: var(--text-muted);
+			display: flex;
+			flex-direction: column;
+			font-optical-sizing: auto;
+			font-size: clamp(14px, 1.375cqi, 1.125em);
+			font-weight: 300;
+			gap: var(--gap);
+			line-height: 1.35;
+			margin-block-end: 32px;
+			max-inline-size: 45ch;
+			padding-inline: 0;
+			text-wrap: pretty;
 
-			@media (min-width: 500px) {
-				aspect-ratio: 16 / 9;
-				container: video-wrapper / size;
+			details & {
+				margin-inline-start: 12px;
+			}
+
+			&:empty {
+				display: none;
+			}
+
+			> * {
+				color: inherit;
+				font-size: inherit;
+				line-height: inherit;
+				margin: 0;
+			}
+		}
+
+		.options {
+			align-items: center;
+			display: flex;
+			gap: 16px;
+
+			span {
+				color: var(--text-muted);
+				font-size: 0.625em;
+				letter-spacing: 0.1em;
+				text-transform: uppercase;
+			}
+		}
+
+		.button {
+			align-items: center;
+			display: flex;
+			font-size: 1em;
+			font-weight: 600;
+			gap: 8px;
+			justify-self: start;
+			margin-block: 0;
+			margin-inline-end: 32px;
+			padding-inline: 24px;
+
+			svg {
+				block-size: 16px;
 			}
 		}
 	}
-
 	.wrapper {
+		background: var(--black);
 		margin-inline: auto;
 		max-inline-size: 1440px;
-		padding: 20px 5cqw 80px;
+		padding: 40px 5cqw 80px;
 		position: relative;
 
 		@media (min-width: 750px) {
 			display: grid;
 			gap: 30px;
 			grid-template-columns: calc(62% - 15px) minmax(0, 1fr);
+			/* padding-block-start: 20px; */
 		}
 	}
 
@@ -571,7 +681,8 @@ if (episode.video && !episode.video.youtube_id && episode.video.mux) {
 	.episode-meta {
 		align-items: baseline;
 		display: flex;
-		flex-direction: column;
+		flex-wrap: wrap;
+		/* flex-direction: column; */
 		font-size: 0.875rem;
 		font-weight: 200;
 		margin-block: 0.25rem;
@@ -644,7 +755,7 @@ if (episode.video && !episode.video.youtube_id && episode.video.mux) {
 	}
 
 	.description {
-		margin-block: 3rem;
+		/* margin-block: 3rem; */
 		max-inline-size: 54ch;
 
 		@media (min-width: 1000px) {
