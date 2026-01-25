@@ -294,6 +294,9 @@ importers:
       '@codetv/discord':
         specifier: workspace:*
         version: link:../discord
+      '@codetv/kit':
+        specifier: workspace:*
+        version: link:../kit
       '@codetv/sanity':
         specifier: workspace:*
         version: link:../sanity
@@ -16720,7 +16723,7 @@ snapshots:
 
   '@types/ws@7.4.7':
     dependencies:
-      '@types/node': 12.20.55
+      '@types/node': 25.0.10
 
   '@types/ws@8.18.1':
     dependencies:
