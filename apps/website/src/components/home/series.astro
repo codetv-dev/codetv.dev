@@ -6,15 +6,7 @@ import {
 } from '@codetv/sanity';
 import Card from '../design-system/card.astro';
 import { getImageURLWithFallback } from '@codetv/cloudinary';
-
-function getTagline(date: string) {
-	const dateString = new Date(date).toLocaleDateString('en-US', {
-		month: 'short',
-		day: 'numeric',
-	});
-
-	return `Supporters only until ${dateString}`;
-}
+import { isNew } from '../../util/helpers';
 
 const earlyAccess = await getNextEarlyAccessEpisode();
 const recentEps = await getRecentEpisodes();
@@ -90,11 +82,7 @@ const series = await getAllSeries();
 							: null}
 
 						{recentEps.map((ep) => {
-							// magic numbers to determine if an episode was published within the last N days
-							const DAY_IN_MS = 86_400_000;
-							const NEW_CUTOFF_TIMESTAMP = new Date().getTime() - DAY_IN_MS * 7;
-							const publishTimestamp = new Date(ep.publish_date).getTime();
-							const showNewTag = publishTimestamp > NEW_CUTOFF_TIMESTAMP;
+							const showNewTag = isNew(ep.publish_date);
 							const thumbnailURL = getImageURLWithFallback({
 								public_id: ep.thumbnail.public_id,
 								youtube_id: ep.youtube_id,
@@ -107,64 +95,48 @@ const series = await getAllSeries();
 								label = 'New Episode';
 							}
 
-							const letters = ep.short_description
-								.split('')
-								.slice(0, 60)
-								.join('');
-							const words =
-								ep.short_description.length > letters.length
-									? letters.split(' ').slice(0, -1)
-									: letters.split(' ');
-							const description =
-								ep.short_description.length > words.join(' ').length
-									? words.slice(0, 10).join(' ') + '...'
-									: words.join(' ');
+							const description = ep.short_description;
 
 							return (
-								<>
-									<Card
-										link={ep.path ?? undefined}
-										variant="secondary"
-										label={label}
-									>
-										{thumbnailURL ? (
-											<img slot="img" src={thumbnailURL} alt={ep.title} />
-										) : null}
+								<Card
+									link={ep.path ?? undefined}
+									variant="secondary"
+									label={label}
+								>
+									{thumbnailURL ? (
+										<img slot="img" src={thumbnailURL} alt={ep.title} />
+									) : null}
 
-										<Fragment slot="title">
-											{showNewTag ? <p class="tag">NEW</p> : null}
-											<h3>{ep.series}</h3>
-											<p class="episode-number">{ep.episodeNumber}</p>
-										</Fragment>
+									<Fragment slot="title">
+										{showNewTag ? <p class="tag">NEW</p> : null}
+										<h3>{ep.series}</h3>
+										<p class="episode-number">{ep.episodeNumber}</p>
+									</Fragment>
 
-										<Fragment slot="subtitle">
-											<p class="episode-date">
-												{new Date(ep.publish_date!).toLocaleDateString(
-													'en-US',
-													{
-														month: 'short',
-														day: 'numeric',
-													},
-												)}
-											</p>
-											<p class="episode-title">
-												<a href={ep.path}>{ep.title}</a>
-											</p>
-										</Fragment>
-
-										<p>{description}</p>
-										<p>
-											<a
-												href={ep.path}
-												class="button"
-												data-variant="more-link"
-												tabindex="-1"
-											>
-												See details and watch now
-											</a>
+									<Fragment slot="subtitle">
+										<p class="episode-date">
+											{new Date(ep.publish_date!).toLocaleDateString('en-US', {
+												month: 'short',
+												day: 'numeric',
+											})}
 										</p>
-									</Card>
-								</>
+										<p class="episode-title">
+											<a href={ep.path}>{ep.title}</a>
+										</p>
+									</Fragment>
+
+									<p class="episode-description">{description}</p>
+									<p>
+										<a
+											href={ep.path}
+											class="button"
+											data-variant="more-link"
+											tabindex="-1"
+										>
+											See details and watch now
+										</a>
+									</p>
+								</Card>
 							);
 						})}
 					</div>
@@ -212,7 +184,7 @@ const series = await getAllSeries();
 									<p class="episode-count">{episodes}</p>
 								</Fragment>
 
-								<p>{s.description}</p>
+								<p class="series-description">{s.description}</p>
 								<p>
 									<a
 										href={s.path}
@@ -285,5 +257,13 @@ const series = await getAllSeries();
 		font-weight: 600;
 		margin-block-start: 40px;
 		padding-inline: max((100% - var(--max-width)) / 2, 5%);
+	}
+
+	.episode-description,
+	.series-description {
+		display: -webkit-box;
+		-webkit-box-orient: vertical;
+		-webkit-line-clamp: 3;
+		overflow: hidden;
 	}
 </style>

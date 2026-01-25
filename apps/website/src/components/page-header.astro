@@ -3,16 +3,23 @@ import { createImageUrl } from '@codetv/cloudinary';
 import { Image } from '@unpic/astro';
 
 export interface Props {
-	line1: string;
-	line2: string;
+	line1?: string;
+	line2?: string;
 	image: {
 		public_id: string;
 		alt: string;
 	};
 	aspectRatio?: number;
+	addGradient?: boolean;
 }
 
-const { line1, line2, image, aspectRatio = 1728 / 795 } = Astro.props;
+const {
+	line1,
+	line2,
+	image,
+	aspectRatio = 1728 / 795,
+	addGradient = false,
+} = Astro.props;
 
 const imgUrl = createImageUrl(image.public_id, {
 	aspect_ratio: aspectRatio,
@@ -20,11 +27,13 @@ const imgUrl = createImageUrl(image.public_id, {
 });
 ---
 
-<section class="hero">
-	<h1>
-		<span class="line-1">{line1}</span>
-		<span class="line-2">{line2}</span>
-	</h1>
+<section class="hero" data-variant={addGradient ? 'gradient' : undefined}>
+	<slot name="content">
+		<h1>
+			<span class="line-1">{line1}</span>
+			<span class="line-2">{line2}</span>
+		</h1>
+	</slot>
 	<Image src={imgUrl} alt={image.alt} aspectRatio={aspectRatio} />
 </section>
 
@@ -32,6 +41,32 @@ const imgUrl = createImageUrl(image.public_id, {
 	@layer site-base {
 		.hero {
 			position: relative;
+
+			&[data-variant='gradient'] {
+				&::before,
+				&::after {
+					content: '';
+					inset: 0;
+					position: absolute;
+					z-index: 5;
+				}
+
+				&::after {
+					background: linear-gradient(
+						to top,
+						var(--black),
+						color-mix(in oklch, var(--black), transparent 100%) 33%
+					);
+				}
+
+				&::before {
+					background: linear-gradient(
+						to right,
+						var(--black),
+						color-mix(in oklch, var(--black), transparent 100%) 60%
+					);
+				}
+			}
 
 			h1 {
 				font-size: clamp(1rem, 11cqi, 11rem);
@@ -47,6 +82,7 @@ const imgUrl = createImageUrl(image.public_id, {
 					color-mix(in oklch, var(--black) 50%, transparent);
 				text-transform: uppercase;
 				word-spacing: 0.1em;
+				z-index: 10;
 
 				.line-1,
 				.line-2 {
@@ -62,6 +98,7 @@ const imgUrl = createImageUrl(image.public_id, {
 
 			img {
 				display: block;
+				z-index: 1;
 			}
 		}
 	}
