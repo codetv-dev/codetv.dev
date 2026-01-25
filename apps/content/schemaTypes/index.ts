@@ -1,7 +1,8 @@
 import {defineField, defineType} from 'sanity'
-import {PlayIcon, UserIcon, TagIcon, ImageIcon, FolderIcon, StarIcon} from '@sanity/icons'
+import {FolderIcon} from '@sanity/icons'
 import {person} from './documents/person'
 import {episode} from './documents/episode'
+import {extra} from './documents/extra'
 import {hackathon} from './documents/hackathon'
 import {hackathonSubmission} from './documents/hackathon-submission'
 import {faq} from './documents/faqs'
@@ -62,10 +63,40 @@ const series = defineType({
       group: 'content',
     }),
     defineField({
+      name: 'details',
+      type: 'markdown',
+      description: 'Detailed description of the series',
+      validation: (Rule) => Rule.required().error('Full description is required'),
+      group: 'content',
+    }),
+    defineField({
+      name: 'logo',
+      title: 'Series Logo',
+      type: 'cloudinary.asset',
+      options: {hotspot: true},
+      group: 'content',
+      validation: (Rule) => Rule.required().error('Series logo is required'),
+    }),
+    defineField({
       title: 'Series Image',
+      description: 'Used for social sharing',
       name: 'image',
       type: 'cloudinary.asset',
       options: {hotspot: true},
+      group: 'content',
+    }),
+    defineField({
+      title: 'Series Banner',
+      description: 'Used as the fallback for the series page top image',
+      name: 'banner',
+      type: 'cloudinary.asset',
+      options: {hotspot: true},
+      group: 'content',
+    }),
+    defineField({
+      title: 'Banner Alt Text',
+      name: 'banner_alt',
+      type: 'string',
       group: 'content',
     }),
     defineField({
@@ -120,11 +151,10 @@ const series = defineType({
   preview: {
     select: {
       title: 'title',
-      description: 'description',
       collections: 'collections',
       featured: 'featured',
     },
-    prepare({title, description, collections, featured}) {
+    prepare({title, collections, featured}) {
       const collectionCount = collections?.length || 0
       const status = featured === 'featured' ? ' (Featured)' : ''
 
@@ -187,6 +217,19 @@ const collection = defineType({
       ],
       group: 'content',
     }),
+    defineField({
+      title: 'Extras',
+      name: 'extras',
+      type: 'array',
+      description: 'Extras that belong to this collection',
+      of: [
+        {
+          type: 'reference',
+          to: [{type: 'extra'}],
+        },
+      ],
+      group: 'content',
+    }),
   ],
   preview: {
     select: {
@@ -242,7 +285,6 @@ const sponsor = defineType({
     prepare({title, logo}) {
       let url
       if (logo && logo.public_id) {
-        console.log(logo.public_id)
         url = new URL('https://res.cloudinary.com')
         url.pathname = [
           'jlengstorf',
@@ -270,6 +312,7 @@ export const schemaTypes = [
   series,
   collection,
   episode,
+  extra,
   hackathon,
   hackathonSubmission,
   faq,
