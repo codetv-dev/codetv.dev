@@ -1,5 +1,6 @@
 ---
 import { SignedIn, SignedOut } from '@clerk/astro/components';
+import Search from './search/search.astro';
 
 export const prerender = false;
 ---
@@ -25,6 +26,7 @@ export const prerender = false;
 	</div>
 
 	<nav class="links">
+		<Search />
 		<SignedOut>
 			<a href="/dashboard/sign-in">Supporter Log In</a>
 			<a href="/dashboard/sign-up">Become a Supporter</a>
