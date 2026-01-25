@@ -137,6 +137,24 @@ const dateString = new Intl.DateTimeFormat('en-US', {
 }
 
 {
+	!isPrerelease && !isSubscriber && thumbnailSrc ? (
+		<div class="subscription-required" style={`--bg-img: url(${thumbnailSrc})`}>
+			<div class="notice">
+				<h2>This video is supporters-only</h2>
+				<p>
+					Certain videos are exclusive to CodeTV supporters. Become a supporter
+					to watch this video now and help us create more like it.
+				</p>
+				<a href="/dashboard" class="button">
+					<Heart />
+					Become a Supporter
+				</a>
+			</div>
+		</div>
+	) : null
+}
+
+{
 	!isPrerelease && publicPlayback ? (
 		<mux-player
 			theme="classic"
@@ -177,7 +195,7 @@ const dateString = new Intl.DateTimeFormat('en-US', {
 			align-items: center;
 			backdrop-filter: blur(2rem) saturate(150%);
 			-webkit-backdrop-filter: blur(2rem) saturate(150%);
-			background: color-mix(in oklch, var(--white) 60%, transparent);
+			background: color-mix(in oklch, var(--bg) 60%, transparent);
 			border-radius: 0.25rem;
 			box-shadow: 0 1px 2px
 				color-mix(in oklch, var(--text-muted) 80%, transparent);
@@ -187,15 +205,26 @@ const dateString = new Intl.DateTimeFormat('en-US', {
 			font-size: 0.875rem;
 			justify-content: center;
 			margin: auto;
-			padding: 3rem;
+			max-inline-size: 45ch;
+			padding: 40px;
 			text-align: center;
 			z-index: 10;
+
+			p {
+				margin-block-start: 8px;
+			}
 
 			time {
 				display: block;
 				font-size: 1.125rem;
 				font-weight: 600;
 				margin-block: 0.25rem 1.5rem;
+			}
+
+			.button {
+				align-self: center;
+				font-size: 1rem;
+				margin-block-start: 12px;
 			}
 		}
 	}
