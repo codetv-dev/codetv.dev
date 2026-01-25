@@ -21,6 +21,7 @@
 		"@codetv/clerk": "workspace:*",
 		"@codetv/cloudinary": "workspace:*",
 		"@codetv/discord": "workspace:*",
+		"@codetv/kit": "workspace:*",
 		"@codetv/sanity": "workspace:*",
 		"@codetv/stripe": "workspace:*",
 		"@codetv/types": "workspace:*",
