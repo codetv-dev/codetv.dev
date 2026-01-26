@@ -8,38 +8,17 @@ export interface Props {
 const { youtube_id, title, autoplay = false } = Astro.props;
 ---
 
-<lite-youtube
-	videoid={youtube_id}
-	playlabel={title ? `Play: ${title}` : undefined}
-	js-api></lite-youtube>
-
-<script>
-	import 'lite-youtube-embed';
-	import 'lite-youtube-embed/src/lite-yt-embed.css';
-</script>
-
-<script define:vars={{ autoplay }}>
-	const init = async () => {
-		const el = document.querySelector('lite-youtube');
-
-		if (!autoplay || !el) {
-			return;
-		}
-		// @ts-expect-error
-		const player = await el.getYTPlayer();
-
-		if (!player) {
-			return;
-		}
-
-		player.playVideo();
-	};
-
-	document.addEventListener('astro:after-swap', init);
-</script>
+<iframe
+	title={title}
+	width="1440"
+	height="762"
+	src={`https://www.youtube-nocookie.com/embed/${youtube_id}?origin=${Astro.url}&autoplay=${autoplay ? '1' : '0'}&rel=0`}
+	frameborder="0"
+	allow="autoplay; encrypted-media"
+	allowfullscreen></iframe>
 
 <style>
-	lite-youtube {
+	iframe {
 		aspect-ratio: 16 / 9;
 		block-size: 100cqb;
 		margin-inline: auto;

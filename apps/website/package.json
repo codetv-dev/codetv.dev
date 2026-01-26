@@ -51,7 +51,6 @@
 		"groq": "^5.6.0",
 		"inngest": "^3.49.3",
 		"jsonwebtoken": "^9.0.3",
-		"lite-youtube-embed": "^0.3.4",
 		"marked": "^17.0.1",
 		"mdx-bundler": "^10.1.1",
 		"react": "^19.2.3",
