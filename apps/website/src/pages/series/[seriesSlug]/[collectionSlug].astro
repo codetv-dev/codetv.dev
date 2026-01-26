@@ -185,7 +185,7 @@ const latest_episode = getLatestEpisode(series);
 
 										<p class="description">{description}</p>
 										<div class="options">
-											<a href={path} class="button" tabindex="-1">
+											<a href={`${path}/play`} class="button" tabindex="-1">
 												<svg
 													xmlns="http://www.w3.org/2000/svg"
 													fill="none"
@@ -197,7 +197,7 @@ const latest_episode = getLatestEpisode(series);
 														style="fill:#080217;fill:color(display-p3 .0314 .0078 .0902);fill-opacity:1"
 													/>
 												</svg>
-												Play
+												Watch
 											</a>
 
 											{latest_episode.sponsors &&
@@ -303,7 +303,7 @@ const latest_episode = getLatestEpisode(series);
 					Release year: {format(date, 'yyyy')}
 				</p>
 			</div>
-			<div class="row three-up">
+			<div class="row five-up">
 				{
 					series.collection?.episodes?.map((episode, index) => {
 						if (!episode || !episode.slug) {
@@ -382,7 +382,7 @@ const latest_episode = getLatestEpisode(series);
 		{
 			(series.collection?.extras?.length ?? 0 > 0) ? (
 				<section id="extras" class="extras">
-					<div class="row three-up">
+					<div class="row five-up">
 						{series.collection?.extras?.map((extra, index) => {
 							if (!extra || !extra.slug) {
 								return null;
@@ -396,7 +396,7 @@ const latest_episode = getLatestEpisode(series);
 
 							const description = extra.short_description;
 							const date = new Date(extra.publish_date ?? '');
-							const path = `/series/${series.slug}/${series.collection?.slug}/${extra.slug}`;
+							const path = `/series/${series.slug}/${series.collection?.slug}/${extra.slug}/play`;
 
 							return (
 								<Card link={path} variant="secondary">
@@ -517,7 +517,7 @@ const latest_episode = getLatestEpisode(series);
 		z-index: 10;
 
 		img {
-			inline-size: min(400px, 60dvi) !important;
+			inline-size: min(400px, 40dvi) !important;
 		}
 
 		.series-details {
@@ -533,9 +533,10 @@ const latest_episode = getLatestEpisode(series);
 
 			color: var(--text-emphasized);
 			display: flex;
+			flex-wrap: wrap;
 			font-size: var(--font-size);
 			font-weight: 400;
-			gap: 16px;
+			gap: 8px 16px;
 			line-height: 1.25;
 			margin: 0 8px 8px;
 
@@ -641,13 +642,9 @@ const latest_episode = getLatestEpisode(series);
 
 			span {
 				color: var(--text-muted);
-				font-size: 0.75em;
+				font-size: 0.625em;
 				letter-spacing: 0.1em;
 				text-transform: uppercase;
-			}
-
-			img {
-				margin-block-end: 4px;
 			}
 		}
 

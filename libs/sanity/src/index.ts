@@ -18,6 +18,7 @@ import type {
 	AllHackathonsQueryResult,
 	HackathonBySlugQueryResult,
 	AllSponsorsForCollectionQueryResult,
+	AllExtrasQueryResult,
 } from '@codetv/types';
 import type { UploadApiResponse } from '@codetv/cloudinary';
 
@@ -256,6 +257,43 @@ const allEpisodesQuery = groq`
         link,
       },
     },
+  }
+`;
+
+const allExtrasQuery = groq`
+  *[_type=="extra" && hidden != true] {
+    title,
+    'slug': slug.current,
+    short_description,
+    publish_date,
+    'thumbnail': {
+      'public_id': video.thumbnail.public_id,
+      'width': video.thumbnail.width,
+      'height': video.thumbnail.height,
+      'alt': video.thumbnail_alt,
+    },
+    video {
+      youtube_id,
+      'mux': mux_video.asset->data.playback_ids,
+      'captions': captions.asset->url,
+      transcript,
+    },
+    people[]-> {
+      user_id,
+      name,
+      "slug": slug.current,
+      photo {
+        public_id
+      }
+    },
+    'collection': *[_type=="collection" && references(^._id)][0] {
+      'slug': slug.current,
+      title,
+    },
+    'series': *[_type=="collection" && references(^._id)][0].series->{
+      'slug': slug.current,
+      title,
+    }
   }
 `;
 
@@ -698,6 +736,14 @@ export async function getSeriesBySlug(params: {
 export async function getAllEpisodes() {
 	return client.fetch<AllEpisodesQueryResult>(
 		allEpisodesQuery,
+		{},
+		{ useCdn: true },
+	);
+}
+
+export async function getAllExtras() {
+	return client.fetch<AllExtrasQueryResult>(
+		allExtrasQuery,
 		{},
 		{ useCdn: true },
 	);

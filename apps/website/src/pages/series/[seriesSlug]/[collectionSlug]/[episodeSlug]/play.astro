@@ -1,0 +1,127 @@
+---
+import { getAllEpisodes, getAllExtras } from '@codetv/sanity';
+import { ClientRouter } from 'astro:transitions';
+import VideoModal from '../../../../../components/video-modal.astro';
+
+import '../../../../../styles/global.css';
+
+export const prerender = true;
+
+export async function getStaticPaths() {
+	const [allEpisodes, allExtras] = await Promise.all([
+		getAllEpisodes(),
+		getAllExtras(),
+	]);
+
+	const episodePaths = await Promise.all(
+		allEpisodes.map(async (e) => {
+			if (!e.series || !e.collection || !e.slug) {
+				console.error('[/play] => invalid episode');
+				console.error(e.slug);
+				return false;
+			}
+
+			const episode = e;
+
+			return {
+				params: {
+					seriesSlug: e.series.slug,
+					collectionSlug: e.collection.slug,
+					episodeSlug: e.slug,
+				},
+				props: { type: 'episode', extra: null, episode },
+			};
+		}),
+	);
+
+	const extraPaths = allExtras.map((e) => {
+		if (!e.series || !e.collection || !e.slug) {
+			console.error('[/play] => invalid extra:');
+			console.error(e.slug);
+			return false;
+		}
+
+		return {
+			params: {
+				seriesSlug: e.series.slug,
+				collectionSlug: e.collection.slug,
+				episodeSlug: e.slug,
+			},
+			props: { type: 'extra', extra: e, episode: null },
+		};
+	});
+
+	return [...episodePaths, ...extraPaths].filter(Boolean);
+}
+
+const { type, episode, extra } = Astro.props;
+
+const url = Astro.url;
+const pathParts = url.pathname.split('/');
+const canonicalPathParts = pathParts.filter((p) => {
+	let toRemove = ['play'];
+	if (type === 'extra' && extra && extra.slug) {
+		toRemove.push(extra.slug);
+	}
+
+	return !toRemove.includes(p);
+});
+
+url.pathname = canonicalPathParts.join('/');
+
+const content = type === 'episode' ? episode : extra;
+
+if (
+	!content ||
+	!content.video ||
+	(!content.video.youtube_id && !content.video.mux)
+) {
+	console.log(content);
+	return Astro.redirect(url.pathname);
+}
+
+let title = content.title + ' | ' + content.series?.title;
+let episodeNumber;
+
+if (type === 'episode') {
+	const episodeIndex =
+		// @ts-expect-error too lazy to set up the union type to make this work properly
+		content.related_episodes?.findIndex((e) => e.slug === episode.slug) ?? 0;
+
+	episodeNumber = (
+		content.collection?.slug + `.E${episodeIndex + 1}`
+	).toUpperCase();
+
+	title += ' | ' + episodeNumber;
+}
+---
+
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="shortcut icon" href="/favicon.ico" />
+		<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+		<link rel="manifest" href="/site.webmanifest" />
+		<meta name="viewport" content="width=device-width" />
+		<meta name="generator" content={Astro.generator} />
+
+		<link rel="canonical" href={url.toString()} />
+
+		<title>{title}</title>
+
+		<script src="https://cdn.usefathom.com/script.js" data-site="FEWJBQRA" defer
+		></script>
+
+		<ClientRouter />
+	</head>
+	<body>
+		<VideoModal
+			episode={content}
+			title={title}
+			url={url.toString()}
+			episodeNumber={episodeNumber ?? 'EXTRA'}
+		/>
+	</body>
+</html>
