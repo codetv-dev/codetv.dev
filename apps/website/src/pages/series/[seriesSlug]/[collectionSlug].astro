@@ -303,7 +303,7 @@ const latest_episode = getLatestEpisode(series);
 					Release year: {format(date, 'yyyy')}
 				</p>
 			</div>
-			<div class="row three-up">
+			<div class="row five-up">
 				{
 					series.collection?.episodes?.map((episode, index) => {
 						if (!episode || !episode.slug) {
@@ -382,7 +382,7 @@ const latest_episode = getLatestEpisode(series);
 		{
 			(series.collection?.extras?.length ?? 0 > 0) ? (
 				<section id="extras" class="extras">
-					<div class="row three-up">
+					<div class="row five-up">
 						{series.collection?.extras?.map((extra, index) => {
 							if (!extra || !extra.slug) {
 								return null;
@@ -396,7 +396,7 @@ const latest_episode = getLatestEpisode(series);
 
 							const description = extra.short_description;
 							const date = new Date(extra.publish_date ?? '');
-							const path = `/series/${series.slug}/${series.collection?.slug}/${extra.slug}`;
+							const path = `/series/${series.slug}/${series.collection?.slug}/${extra.slug}/play`;
 
 							return (
 								<Card link={path} variant="secondary">

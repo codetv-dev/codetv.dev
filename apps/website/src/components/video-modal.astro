@@ -1,17 +1,19 @@
 ---
-import type { Episode, EpisodeBySlugQueryResult } from '@codetv/types';
+import type {
+	AllExtrasQueryResult,
+	EpisodeBySlugQueryResult,
+	UnwrapArray,
+} from '@codetv/types';
 import VideoPlayer from './video-player.astro';
 
 export interface Props {
-	episode: EpisodeBySlugQueryResult;
+	episode: EpisodeBySlugQueryResult | UnwrapArray<AllExtrasQueryResult>;
+	title?: string;
+	url?: string;
+	episodeNumber?: string;
 }
 
-const { episode } = Astro.props;
-
-const url = Astro.url;
-const pathParts = url.pathname.split('/');
-const canonicalPathParts = pathParts.filter((p) => p !== 'play');
-url.pathname = canonicalPathParts.join('/');
+const { episode, title, url, episodeNumber } = Astro.props;
 
 if (
 	!episode ||
@@ -20,26 +22,16 @@ if (
 ) {
 	return null;
 }
-
-const episodeIndex =
-	episode.related_episodes?.findIndex((e) => e.slug === episode.slug) ?? 0;
-
-const episodeNumber = (
-	episode.collection?.slug + `.E${episodeIndex + 1}`
-).toUpperCase();
-
-const title =
-	episode.title + ' | ' + episode.series?.title + ' ' + episodeNumber;
 ---
 
 <header>
-	<a href={url.toString()}>&larr;</a>
+	<a href={url}>&larr;</a>
 	<div class="episode-info">
 		<h1>{episode.title}</h1>
 		<div class="details">
 			<p>
 				{episode.series?.title}
-				{episodeNumber}
+				{episodeNumber ?? 'EXTRA'}
 			</p>
 
 			{
@@ -84,7 +76,7 @@ const title =
 				policy: v.policy as 'public' | 'signed',
 			})),
 			captions: episode.video.captions,
-			title: title,
+			title: title ?? '',
 			publish_date: episode.publish_date,
 			thumbnail: episode.thumbnail,
 		}}

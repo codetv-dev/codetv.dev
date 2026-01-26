@@ -136,6 +136,29 @@
 		}
 	}
 
+	.five-up {
+		display: grid;
+		gap: 80px;
+		grid-template-columns: 100%;
+
+		@media (min-width: 500px) {
+			gap: 20px;
+			grid-template-columns: repeat(2, 1fr);
+		}
+
+		@media (min-width: 750px) {
+			grid-template-columns: repeat(3, 1fr);
+		}
+
+		@media (min-width: 950px) {
+			grid-template-columns: repeat(4, 1fr);
+		}
+
+		@media (min-width: 1280px) {
+			grid-template-columns: repeat(5, 1fr);
+		}
+	}
+
 	.portrait-cards {
 		.card {
 			max-inline-size: 240px;
