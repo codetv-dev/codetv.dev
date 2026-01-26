@@ -1,4 +1,4 @@
-const ck_api = new URL('https://api.convertkit.com');
+const kit_api_url = new URL('https://api.convertkit.com');
 const api_key = process.env.KIT_SECRET_KEY;
 
 if (!api_key) {
@@ -8,7 +8,7 @@ if (!api_key) {
 }
 
 function createApiUrl(pathname: string) {
-	const url = new URL(pathname, CK_BASE_URL);
+	const url = new URL(pathname, kit_api_url);
 	url.searchParams.set('api_secret', api_key!);
 	return url;
 }
