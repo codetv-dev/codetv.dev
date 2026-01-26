@@ -83,26 +83,34 @@ const nav = [
 </header>
 
 <script>
-	const nav = document.querySelector('nav');
-	const menuToggleBtn = document.querySelector('.menu-toggle');
-	const navSearchBtn = document.querySelector('[data-name="nav-search"]');
+	function setupNav() {
+		const nav = document.querySelector('nav');
+		const menuToggleBtn = document.querySelector('.menu-toggle');
+		const navSearchBtn = document.querySelector('[data-name="nav-search"]');
 
-	menuToggleBtn?.addEventListener('click', () => {
-		nav?.classList.toggle('open');
+		menuToggleBtn?.addEventListener('click', () => {
+			nav?.classList.toggle('open');
+		});
+
+		navSearchBtn?.addEventListener('click', (event) => {
+			event.preventDefault();
+
+			const search = document.querySelector(
+				'[data-name="main-search"]',
+			) as HTMLButtonElement;
+
+			(
+				document.querySelector('#menu:popover-open') as HTMLElement
+			)?.hidePopover();
+			search.click();
+		});
+	}
+
+	document.addEventListener('astro:before-swap', () => {
+		document.removeEventListener('astro:page-load', setupNav);
 	});
 
-	navSearchBtn?.addEventListener('click', (event) => {
-		event.preventDefault();
-
-		const search = document.querySelector(
-			'[data-name="main-search"]',
-		) as HTMLButtonElement;
-
-		(
-			document.querySelector('#menu:popover-open') as HTMLElement
-		)?.hidePopover();
-		search.click();
-	});
+	document.addEventListener('astro:page-load', setupNav);
 </script>
 
 <style>

@@ -491,13 +491,21 @@ const latest_episode = getLatestEpisode(series);
 <script>
 	import { navigate } from 'astro:transitions/client';
 
-	const select = document.querySelector(
-		'#collection-selector',
-	) as HTMLSelectElement;
-
-	select.addEventListener('change', (event) => {
+	let handleCollectionChange = (event: Event) => {
 		const option = event.target as HTMLOptionElement;
 		navigate(option.value);
+	};
+
+	document.addEventListener('astro:before-swap', () => {
+		document.removeEventListener('change', handleCollectionChange);
+	});
+
+	document.addEventListener('astro:page-load', () => {
+		const select = document.querySelector(
+			'#collection-selector',
+		) as HTMLSelectElement;
+
+		select.addEventListener('change', handleCollectionChange);
 	});
 </script>
 

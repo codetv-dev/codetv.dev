@@ -32,22 +32,30 @@ import { actions } from 'astro:actions';
 	import { actions } from 'astro:actions';
 	import { navigate } from 'astro:transitions/client';
 
-	const form = document.querySelector('form');
-	form?.addEventListener('submit', async (event) => {
-		event.preventDefault();
+	function setupSubmit() {
+		const form = document.querySelector('form');
+		form?.addEventListener('submit', async (event) => {
+			event.preventDefault();
 
-		const formData = new FormData(form);
-		const input = {
-			firstName: formData.get('firstName')?.toString() ?? '',
-			email: formData.get('email')?.toString() ?? '',
-		};
+			const formData = new FormData(form);
+			const input = {
+				firstName: formData.get('firstName')?.toString() ?? '',
+				email: formData.get('email')?.toString() ?? '',
+			};
 
-		const { error } = await actions.newsletter.subscribe(input);
+			const { error } = await actions.newsletter.subscribe(input);
 
-		if (!error) {
-			navigate('/confirm');
-		}
+			if (!error) {
+				navigate('/confirm');
+			}
+		});
+	}
+
+	document.addEventListener('astro:before-swap', () => {
+		document.removeEventListener('astro:page-load', setupSubmit);
 	});
+
+	document.addEventListener('astro:page-load', setupSubmit);
 </script>
 
 <style>
