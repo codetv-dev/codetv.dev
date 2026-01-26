@@ -1,4 +1,5 @@
 ---
+import { ClientRouter } from 'astro:transitions';
 // import Eyebrow from '../components/eyebrow.astro';
 import Header from '../components/header.astro';
 import Footer from '../components/footer.astro';
@@ -87,6 +88,8 @@ const {
 			<meta name="twitter:image" content={image} />
 			<meta name="twitter:creator" content="@codetv_dev" />
 		</slot>
+
+		<ClientRouter />
 
 		<script src="https://cdn.usefathom.com/script.js" data-site="FEWJBQRA" defer
 		></script>

@@ -21,6 +21,7 @@ export interface Props {
 	} | null;
 	title: string;
 	publish_date: string | null;
+	autoplay: boolean;
 }
 
 const mux = new Mux({
@@ -43,7 +44,13 @@ try {
 // @ts-ignore
 const isSubscriber = user && user?.publicMetadata?.stripe?.status === 'active';
 
-const { playback_ids, thumbnail, title, publish_date } = Astro.props;
+const {
+	playback_ids,
+	thumbnail,
+	title,
+	publish_date,
+	autoplay = false,
+} = Astro.props;
 
 const signedPlayback = playback_ids.find((pid) => pid.policy === 'signed');
 const publicPlayback = playback_ids.find((pid) => pid.policy === 'public');
@@ -115,6 +122,7 @@ const dateString = new Intl.DateTimeFormat('en-US', {
 			storyboard-token={storyboardPlaybackToken}
 			metadata-video-title={title}
 			title={title}
+			autoplay={autoplay}
 		/>
 	) : null
 }
