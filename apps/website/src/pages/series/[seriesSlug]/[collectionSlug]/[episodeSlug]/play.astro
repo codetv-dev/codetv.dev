@@ -138,6 +138,10 @@ const title =
 <style>
 	:root {
 		--header-height: 70px;
+
+		@media screen and (orientation: landscape) {
+			--header-height: 40px;
+		}
 	}
 
 	header {
@@ -160,6 +164,12 @@ const title =
 		}
 
 		.episode-info {
+			align-items: baseline;
+			display: flex;
+			flex-wrap: wrap;
+			gap: 4px 16px;
+			inline-size: 100%;
+			justify-content: space-between;
 			overflow: hidden;
 		}
 
@@ -172,6 +182,7 @@ const title =
 
 		h1 {
 			font-size: 1.125em;
+			line-height: 1.1;
 		}
 
 		p {
@@ -180,7 +191,8 @@ const title =
 			font-weight: 400;
 			inline-size: auto;
 			letter-spacing: 0.15em;
-			margin: 4px 0 0;
+			margin: 0;
+			text-box: trim-both cap alphabetic;
 			text-transform: uppercase;
 			text-wrap: nowrap;
 		}
@@ -193,10 +205,9 @@ const title =
 		}
 
 		svg {
-			block-size: 16px;
-			display: inline-block;
+			block-size: 0.5em;
+			display: block;
 			inline-size: auto;
-			inset-block-start: 2px;
 			position: relative;
 		}
 	}
@@ -208,6 +219,10 @@ const title =
 		lite-youtube {
 			background-repeat: no-repeat;
 			background-size: contain;
+
+			@media screen and (orientation: landscape) {
+				background-size: cover;
+			}
 		}
 	}
 </style>
