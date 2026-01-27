@@ -43,8 +43,9 @@ const { heading = 'tv for developers in your inbox', disclaimer } = Astro.props;
 	import { navigate } from 'astro:transitions/client';
 
 	function setupForm() {
-		const form = document.querySelector('form');
-		form?.addEventListener('submit', async (event) => {
+		const form = document.querySelector('form') as HTMLFormElement;
+
+		async function handleFormSubmit(event: SubmitEvent) {
 			event.preventDefault();
 
 			const formData = new FormData(form);
@@ -58,12 +59,13 @@ const { heading = 'tv for developers in your inbox', disclaimer } = Astro.props;
 			if (!error) {
 				navigate('/confirm');
 			}
-		});
-	}
+		}
 
-	document.addEventListener('astro:before-swap', () => {
-		document.removeEventListener('astro:page-load', setupForm);
-	});
+		// View Transitions + astro:page-load cause this code to re-execute
+		// remove the listener first to avoid duplicate listeners
+		form?.removeEventListener('submit', handleFormSubmit);
+		form?.addEventListener('submit', handleFormSubmit);
+	}
 
 	document.addEventListener('astro:page-load', setupForm);
 </script>

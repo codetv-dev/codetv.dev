@@ -33,8 +33,9 @@ import { actions } from 'astro:actions';
 	import { navigate } from 'astro:transitions/client';
 
 	function setupSubmit() {
-		const form = document.querySelector('form');
-		form?.addEventListener('submit', async (event) => {
+		const form = document.querySelector('form') as HTMLFormElement;
+
+		async function handleSubmit(event: SubmitEvent) {
 			event.preventDefault();
 
 			const formData = new FormData(form);
@@ -48,12 +49,13 @@ import { actions } from 'astro:actions';
 			if (!error) {
 				navigate('/confirm');
 			}
-		});
-	}
+		}
 
-	document.addEventListener('astro:before-swap', () => {
-		document.removeEventListener('astro:page-load', setupSubmit);
-	});
+		// View Transitions + astro:page-load cause this code to re-execute
+		// remove the listener first to avoid duplicate listeners
+		form?.removeEventListener('submit', handleSubmit);
+		form?.addEventListener('submit', handleSubmit);
+	}
 
 	document.addEventListener('astro:page-load', setupSubmit);
 </script>

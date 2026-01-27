@@ -88,11 +88,11 @@ const nav = [
 		const menuToggleBtn = document.querySelector('.menu-toggle');
 		const navSearchBtn = document.querySelector('[data-name="nav-search"]');
 
-		menuToggleBtn?.addEventListener('click', () => {
+		function handleToggle() {
 			nav?.classList.toggle('open');
-		});
+		}
 
-		navSearchBtn?.addEventListener('click', (event) => {
+		function handleSearchClick(event: Event) {
 			event.preventDefault();
 
 			const search = document.querySelector(
@@ -103,12 +103,16 @@ const nav = [
 				document.querySelector('#menu:popover-open') as HTMLElement
 			)?.hidePopover();
 			search.click();
-		});
-	}
+		}
 
-	document.addEventListener('astro:before-swap', () => {
-		document.removeEventListener('astro:page-load', setupNav);
-	});
+		// View Transitions + astro:page-load cause this code to re-execute
+		// remove the listener first to avoid duplicate listeners
+		menuToggleBtn?.removeEventListener('click', handleToggle);
+		navSearchBtn?.removeEventListener('click', handleSearchClick);
+
+		menuToggleBtn?.addEventListener('click', handleToggle);
+		navSearchBtn?.addEventListener('click', handleSearchClick);
+	}
 
 	document.addEventListener('astro:page-load', setupNav);
 </script>

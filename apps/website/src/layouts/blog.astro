@@ -151,14 +151,14 @@ og.image = frontmatter.share?.image ?? generateDefaultImage({ text: og.title });
 				};
 			});
 
-		return () => {
+		document.addEventListener('astro:before-swap', () => {
 			Array.from(headingElements).map((h2) => {
 				observer.unobserve(h2);
 			});
-		};
+		});
 	}
 
-	setActiveHeading();
+	document.addEventListener('astro:page-load', setActiveHeading);
 </script>
 
 <style>
