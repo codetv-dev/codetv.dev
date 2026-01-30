@@ -10,7 +10,7 @@ import { format } from 'date-fns';
 import { marked } from 'marked';
 import Layout from '../../../layouts/default.astro';
 import Card from '../../../components/design-system/card.astro';
-import { getRelativeAge, isNew, truncate } from '../../../util/helpers';
+import { getRelativeAge } from '../../../util/helpers';
 import PageHeader from '../../../components/page-header.astro';
 import type { SeriesBySlugQueryResult } from '@codetv/types';
 
@@ -93,6 +93,11 @@ function getLatestEpisode(s: SeriesBySlugQueryResult) {
 }
 
 const latest_episode = getLatestEpisode(series);
+const banner = latest_episode?.banner?.public_id ?? series?.banner?.public_id;
+
+if (!banner) {
+	console.error(`missing banner for ${url.toString()}`);
+}
 ---
 
 <Layout title={`${series.title} ${series.collection?.title}`}>
@@ -123,9 +128,7 @@ const latest_episode = getLatestEpisode(series);
 	<main>
 		<PageHeader
 			image={{
-				// @ts-expect-error
-				public_id:
-					latest_episode?.banner?.public_id ?? series?.banner?.public_id,
+				public_id: banner ?? 'wdc-header',
 				alt: latest_episode?.banner?.alt ?? series.title,
 			}}
 			addGradient={true}
@@ -383,7 +386,7 @@ const latest_episode = getLatestEpisode(series);
 			(series.collection?.extras?.length ?? 0 > 0) ? (
 				<section id="extras" class="extras">
 					<div class="row five-up">
-						{series.collection?.extras?.map((extra, index) => {
+						{series.collection?.extras?.map((extra) => {
 							if (!extra || !extra.slug) {
 								return null;
 							}
@@ -491,21 +494,15 @@ const latest_episode = getLatestEpisode(series);
 <script>
 	import { navigate } from 'astro:transitions/client';
 
-	let handleCollectionChange = (event: Event) => {
-		const option = event.target as HTMLOptionElement;
-		navigate(option.value);
-	};
-
-	document.addEventListener('astro:before-swap', () => {
-		document.removeEventListener('change', handleCollectionChange);
-	});
-
 	document.addEventListener('astro:page-load', () => {
 		const select = document.querySelector(
 			'#collection-selector',
 		) as HTMLSelectElement;
 
-		select.addEventListener('change', handleCollectionChange);
+		select.addEventListener('change', (event) => {
+			const option = event.target as HTMLOptionElement;
+			navigate(option.value);
+		});
 	});
 </script>
 
