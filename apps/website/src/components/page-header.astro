@@ -1,13 +1,19 @@
 ---
 import { createImageUrl } from '@codetv/cloudinary';
 import { Image } from '@unpic/astro';
+import MuxVideoPlayer from './mux-video-player.astro';
 
 export interface Props {
 	line1?: string;
 	line2?: string;
-	image: {
+	image?: {
 		public_id: string;
 		alt: string;
+	};
+	video?: {
+		public_id: string;
+		title: string;
+		publish_date: string;
 	};
 	aspectRatio?: number;
 	addGradient?: boolean;
@@ -17,14 +23,18 @@ const {
 	line1,
 	line2,
 	image,
+	video,
 	aspectRatio = 1728 / 795,
 	addGradient = false,
 } = Astro.props;
 
-const imgUrl = createImageUrl(image.public_id, {
-	aspect_ratio: aspectRatio,
-	crop: 'fill',
-});
+let imgUrl;
+if (image) {
+	imgUrl = createImageUrl(image.public_id, {
+		aspect_ratio: aspectRatio,
+		crop: 'fill',
+	});
+}
 ---
 
 <section class="hero" data-variant={addGradient ? 'gradient' : undefined}>
@@ -34,13 +44,32 @@ const imgUrl = createImageUrl(image.public_id, {
 			<span class="line-2">{line2}</span>
 		</h1>
 	</slot>
-	<Image src={imgUrl} alt={image.alt} aspectRatio={aspectRatio} />
+	{
+		imgUrl ? (
+			<Image src={imgUrl} alt={image?.alt} aspectRatio={aspectRatio} />
+		) : null
+	}
+
+	{
+		video && video.public_id ? (
+			<MuxVideoPlayer
+				playback_ids={[{ id: video.public_id, policy: 'public' }]}
+				publish_date={video.publish_date}
+				title={video.title}
+				autoplay
+				muted
+				loop
+				controls={false}
+			/>
+		) : null
+	}
 </section>
 
 <style define:vars={{ aspectRatio }}>
 	@layer site-base {
 		.hero {
 			background: var(--black);
+			container: hero / inline-size;
 			position: relative;
 
 			&[data-variant='gradient'] {
@@ -110,9 +139,27 @@ const imgUrl = createImageUrl(image.public_id, {
 				}
 			}
 
-			img {
+			img,
+			mux-player {
 				display: block;
 				z-index: 1;
+			}
+
+			mux-player {
+				block-size: 100cqb;
+				inline-size: 100cqi;
+				max-block-size: 80dvb;
+			}
+
+			&:has(mux-player)::after {
+				background: linear-gradient(
+					to top,
+					var(--black),
+					color-mix(in oklch, var(--black), transparent 100%) 80%
+				);
+				content: '';
+				inset: 0;
+				position: absolute;
 			}
 		}
 	}

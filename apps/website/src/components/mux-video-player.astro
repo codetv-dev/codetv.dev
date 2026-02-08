@@ -22,6 +22,9 @@ export interface Props {
 	title: string;
 	publish_date: string | null;
 	autoplay: boolean;
+	muted?: boolean;
+	loop?: boolean;
+	controls?: boolean;
 }
 
 const mux = new Mux({
@@ -50,6 +53,9 @@ const {
 	title,
 	publish_date,
 	autoplay = false,
+	muted = false,
+	loop = false,
+	controls = true,
 } = Astro.props;
 
 const signedPlayback = playback_ids.find((pid) => pid.policy === 'signed');
@@ -164,12 +170,25 @@ const dateString = new Intl.DateTimeFormat('en-US', {
 
 {
 	!isPrerelease && publicPlayback ? (
+		<>
 		<mux-player
 			theme="classic"
 			playback-id={publicPlayback.id}
 			metadata-video-title={title}
 			title={title}
+			autoplay={autoplay}
+			muted={muted}
+			loop={loop}
 		/>
+		 	{!controls ? (
+				<style>
+					mux-player {
+						--controls: none;
+						--media-object-fit: cover;
+					}
+				</style>
+		 	) : null}
+		</>
 	) : null
 }
 
