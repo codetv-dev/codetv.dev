@@ -74,7 +74,7 @@ https://codetv-links.netlify.app/*		https://codetv.dev/:splat					301!
 /wdc-hackathon-s2e10-submit	https://docs.google.com/forms/d/e/1FAIpQLSevu6FJQFlKCUQOiIDYymD8QhtmfQMo3ua-SqaYRT62ym7aFQ/viewform
 /wdc-hackathon-s2e11-submit	https://twitter.com/twilio/status/1987928456030560568
 
-/wdc-slc										https://ti.to/epicweb/epicweb-conf-2025/with/web-dev-challenge#tickets
+/wdc-slc								https://ti.to/epicweb/epicweb-conf-2025/with/web-dev-challenge#tickets
 
 # Google hackathon
 /google-hackathon				https://shortclick.link/amf3t5
@@ -180,7 +180,9 @@ https://codetv-links.netlify.app/*		https://codetv.dev/:splat					301!
 /goose									https://block.github.io/goose/?utm_source=codetv&utm_medium=video&utm_campaign=web-dev-challenge
 /twilio									https://twil.io/wdc-signup
 /openrouter							https://openrouter.ai/?utm_source=codetv&utm_medium=video&utm_campaign=web-dev-challenge
-/github							    https://github.com/?utm_source=codetv
+/github									https://github.com/?utm_source=codetv
+/appwrite								https://appwrite.io/?utm_source=codetv
+/auth0									https://auth0.com/?utm_source=codetv
 
 /benq										https://www.benq.com/en-us/campaign/best-coding-monitor-for-programmers.html?utm_source=influencer_codetv&utm_medium=affiliate&utm_campaign=lcd_programming_rd280u_na_2025_us_awareness
 /uplift									https://www.upliftdesk.com/?utm_source=codetv&utm_medium=video&utm_campaign=web-dev-challenge
@@ -211,4 +213,4 @@ https://codetv-links.netlify.app/*		https://codetv.dev/:splat					301!
 /live										https://youtube.com/@codetv-dev/live
 
 # if we get here, redirect to the main site where a 404 can be reported
-/*								      https://codetv.dev/:splat	 301!
+/*											https://codetv.dev/:splat	 301!
