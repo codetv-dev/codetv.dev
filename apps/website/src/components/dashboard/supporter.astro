@@ -54,7 +54,7 @@ const isSubscriber = subscription?.status === 'active';
 
 				<div class="panel-field">
 					<div class="field">
-						<form action="/api/stripe/portal" method="POST">
+						<form action="/api/stripe/portal" method="POST" data-astro-reload>
 							<input
 								type="hidden"
 								name="customerId"
@@ -74,7 +74,7 @@ const isSubscriber = subscription?.status === 'active';
 				<div class="panel-field">
 					<div class="field">
 						<p class="field-label">Newsletter</p>
-						<form action="/api/stripe/portal" method="POST">
+						<form action="/api/stripe/portal" method="POST" data-astro-reload>
 							<input
 								type="hidden"
 								name="customerId"
@@ -130,7 +130,11 @@ const isSubscriber = subscription?.status === 'active';
 									}).format(price.price / 100);
 
 									return (
-										<form action="/api/stripe/checkout" method="POST">
+										<form
+											action="/api/stripe/checkout"
+											method="POST"
+											data-astro-reload
+										>
 											{user?.publicMetadata?.stripe?.customer ? (
 												<input
 													type="hidden"
