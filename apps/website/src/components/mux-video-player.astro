@@ -44,6 +44,8 @@ try {
 	user = undefined;
 }
 
+console.log(user);
+
 // @ts-ignore
 const isSubscriber = user && user?.publicMetadata?.stripe?.status === 'active';
 
