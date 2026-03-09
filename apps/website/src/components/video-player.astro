@@ -18,6 +18,7 @@ export interface Props {
 		} | null;
 		title: string | null;
 		publish_date: string | null;
+		autoplay?: boolean;
 	};
 }
 
@@ -42,7 +43,7 @@ if (video?.youtube_id) {
 		<YouTubeVideoPlayer
 			youtube_id={video.youtube_id!}
 			title={video.title ?? ''}
-			autoplay
+			autoplay={video?.autoplay ?? false}
 		/>
 	) : null
 }
@@ -54,7 +55,7 @@ if (video?.youtube_id) {
 			title={video.title ?? ''}
 			publish_date={video.publish_date}
 			thumbnail={video.thumbnail}
-			autoplay
+			autoplay={video?.autoplay ?? false}
 			server:defer
 		/>
 	) : null

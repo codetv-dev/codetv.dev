@@ -11,9 +11,10 @@ export interface Props {
 	title?: string;
 	url?: string;
 	episodeNumber?: string;
+	autoplay?: boolean;
 }
 
-const { episode, title, url, episodeNumber } = Astro.props;
+const { episode, title, url, episodeNumber, autoplay = false } = Astro.props;
 
 if (
 	!episode ||
@@ -79,6 +80,7 @@ if (
 			title: title ?? '',
 			publish_date: episode.publish_date,
 			thumbnail: episode.thumbnail,
+			autoplay,
 		}}
 	/>
 </div>
