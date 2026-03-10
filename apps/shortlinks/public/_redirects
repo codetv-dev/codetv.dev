@@ -54,8 +54,8 @@ https://codetv-links.netlify.app/*		https://codetv.dev/:splat					301!
 /wdc/s2e13									https://codetv.dev/series/web-dev-challenge/s2/e13-delightful-apps
 /wdc/s3e1										https://codetv.dev/series/web-dev-challenge/s3/e1-playful-apps
 
-/wdc/hackathon							https://codetv.dev/blog/web-dev-challenge-hackathon-s2e11-code-powered-phone-hotline
-/wdc/hackathon/submit				https://x.com/twilio/status/1987971002643710442
+/wdc/hackathon							https://codetv.dev/hackathon/wdc-s3e1-playful-apps
+/wdc/hackathon/submit				/wdc/hackathon
 
 /wdc-giveaway								/wdc/hackathon
 /wdc-hackathon							/wdc/hackathon
