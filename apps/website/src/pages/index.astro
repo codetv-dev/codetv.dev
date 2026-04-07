@@ -6,10 +6,14 @@ import Support from '../components/home/support.astro';
 import Newsletter from '../components/home/newsletter.astro';
 import PageHeader from '../components/page-header.astro';
 
+const title = 'tv for developers — CodeTV';
+const description =
+	'Original series featuring real developers. Learn something new. Build with the latest tools. Grow your career, together with the best community in tech.';
+
 export const prerender = true;
 ---
 
-<Layout title="tv for developers — CodeTV">
+<Layout title={title} description={description}>
 	<main>
 		<PageHeader
 			video={{
