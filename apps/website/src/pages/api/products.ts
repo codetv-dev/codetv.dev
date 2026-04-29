@@ -36,7 +36,14 @@ function productServiceErrorResponse(error: unknown) {
 		);
 	}
 
-	throw error;
+	console.error('product.route.unexpected-error', { error });
+	return json(
+		{
+			error: 'Internal server error',
+			code: 'INTERNAL_SERVER_ERROR',
+		},
+		{ status: 500 },
+	);
 }
 
 const productWithFullStructure = {
@@ -117,8 +124,7 @@ export const GET: APIRoute = async ({ request }) =>
 export const POST: APIRoute = async ({ request }) =>
 	withSkill(async (request) => {
 		const { user, ability } = await getUserAbilityForRequest(request);
-		if (!user)
-			return json({ error: 'Authentication required' }, { status: 401 });
+		if (!user) return json({ error: 'Unauthorized' }, { status: 401 });
 		if (!ability.can('create', 'Content')) {
 			return json({ error: 'Forbidden' }, { status: 403 });
 		}
@@ -144,8 +150,7 @@ export const POST: APIRoute = async ({ request }) =>
 export const PUT: APIRoute = async ({ request }) =>
 	withSkill(async (request) => {
 		const { user, ability } = await getUserAbilityForRequest(request);
-		if (!user)
-			return json({ error: 'Authentication required' }, { status: 401 });
+		if (!user) return json({ error: 'Unauthorized' }, { status: 401 });
 		if (!ability.can('update', 'Content')) {
 			return json({ error: 'Forbidden' }, { status: 403 });
 		}

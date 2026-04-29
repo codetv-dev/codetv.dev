@@ -301,11 +301,10 @@ After opening the PR, continue with follow-up work in this order:
 8. Port/team-verify **Team Seat** / **Team Claim Link** / self-redeem flow.
 9. Add upload/media routes if Workshop import/upload workflow needs CLI support.
 10. Update agent-readiness artifacts as public surfaces stabilize:
-
-- `robots.txt`
-- sitemap audit
-- `llms.txt`
-- OAuth Protected Resource metadata
+    - `robots.txt`
+    - sitemap audit
+    - `llms.txt`
+    - OAuth Protected Resource metadata
 
 ### Agent-readiness SOP
 
