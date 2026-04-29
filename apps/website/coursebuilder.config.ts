@@ -3,7 +3,7 @@ import { userSchema } from '@coursebuilder/core/schemas';
 
 import { getStripeProvider } from './src/coursebuilder/stripe-provider';
 import { getCourseBuilderUserForClerkUser } from './src/coursebuilder/users';
-import { courseBuilderAdapter } from './src/db';
+import { getCourseBuilderAdapter } from './src/db';
 
 export default defineConfig(async (context) => {
 	const stripeProvider = getStripeProvider();
@@ -23,7 +23,7 @@ export default defineConfig(async (context) => {
 			process.env.URL ??
 			'http://localhost:4321',
 		basePath: '/api/coursebuilder',
-		adapter: courseBuilderAdapter,
+		adapter: getCourseBuilderAdapter(),
 		providers: stripeProvider ? [stripeProvider] : [],
 		getCurrentUser,
 		callbacks: {
