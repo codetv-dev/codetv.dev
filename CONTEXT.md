@@ -33,12 +33,24 @@ Recordings, Q&A, office hours, and resources produced for a specific Cohort rath
 _Avoid_: replay, assets, bonus content
 
 **Team Seat**:
-A claimed seat from a team Workshop Ticket purchase that grants Workshop Access to an additional Viewer.
+A claimable seat from a team Workshop Ticket purchase that becomes an individual Workshop Ticket for the Viewer who claims it.
 _Avoid_: license, invite, transfer
 
 **Team Claim Link**:
 A URL from a team Workshop Ticket purchase that lets another Viewer claim a Team Seat.
 _Avoid_: coupon link, invite link, transfer link
+
+**Ticket Transfer**:
+A buyer-initiated reassignment of a purchased Workshop Ticket to a different email address or Viewer.
+_Avoid_: email change, seat distribution, claim
+
+**Purchase Processing**:
+The asynchronous period after Stripe checkout succeeds while CodeTV records the purchase, sends emails, and prepares access.
+_Avoid_: checkout success, fulfillment, sync
+
+**Invoice**:
+A CodeTV-hosted public purchase document for a specific paid purchase that the buyer can customize and print or save.
+_Avoid_: Stripe invoice, receipt, bill, payment confirmation
 
 **Workshop Archive**:
 The collection of past Workshops available through supporter membership rather than an individual Workshop Ticket.
@@ -53,8 +65,31 @@ _Avoid_: self-paced workshop, previous event, replay product
 - A **Workshop Ticket** belongs to exactly one **Cohort** and creates lifetime **Workshop Access** for that Cohort's **Workshop**.
 - A **Workshop Ticket** may create additional lifetime **Workshop Access** to Cohort-specific materials for the attended **Cohort**.
 - A **Workshop Ticket** may include live-period benefits that expire after the **Cohort** ends.
-- A team **Workshop Ticket** purchase creates claimable **Team Seats** using a **Team Claim Link** associated with a coupon code.
+- A claimed **Team Seat** grants the same **Workshop Ticket** access scope as an individual purchase for that **Cohort**, including Workshop Access and Cohort Materials.
+- A team purchase does not automatically assign a seat to the buyer; the buyer may claim one for themself using the canonical CourseBuilder self-redeem button.
+- A team **Workshop Ticket** purchase creates claimable **Team Seats** using a **Team Claim Link** associated with a bulk coupon.
+- A **Team Claim Link** is manually distributed by the buyer; CodeTV does not need first-pass email invite UI for teammate distribution.
 - A **Team Claim Link** should land on the relevant **Cohort** or **Workshop** page with the existing claim confirmation modal pattern before the seat is claimed.
+- A single **Workshop Ticket** may be reassigned through a **Ticket Transfer** immediately after purchase.
+- **Ticket Transfer** is distinct from **Team Seat** distribution: transfer changes who owns a purchased ticket, while distribution lets teammates claim seats from a multi-seat purchase.
+- The Viewer who claims a **Team Seat** may use whatever email/account they choose at claim time; once claimed, the seat belongs to that Viewer.
+- Stripe checkout returns the buyer to a **Purchase Processing** screen while webhook-driven fulfillment is cataloged in the CodeTV database.
+- **Purchase Processing** may take several seconds and can take up to about a minute while webhooks, Inngest workflows, database writes, emails, ticket transfer setup, team seat setup, and invoice availability complete.
+- The **Purchase Processing** screen should mirror the AI Hero / Code with Antonio thanks-page pattern: poll for a completed purchase, show a loading/validation state while waiting, then show the post-purchase welcome/thanks experience once the purchase is verified.
+- The post-purchase welcome/thanks experience should optimistically reassure the buyer that checkout succeeded, show welcome/orientation content, and then unlock invoice, transfer, and team distribution actions only after the purchase is verified in the database.
+- The verified post-purchase state should include the information and actions the buyer needs immediately: invoice access, ticket transfer, team seat distribution when relevant, email/login status, and Workshop next steps.
+- If payment succeeded but purchase processing cannot be verified, the fallback state should mirror the shared AI Hero / Code with Antonio `PaymentSuccessButProcessingFailed` message: reassure the buyer that payment succeeded, explain setup is temporarily delayed, ask them to wait for confirmation email, and then contact support if email does not arrive after 20–30 minutes.
+- Purchase processing fallback should emit enough logs for support/debugging.
+- The **Purchase Processing** experience should use all technically available checkout/session evidence to reassure the buyer before database fulfillment is complete, while making the verified purchase state the final source of truth.
+- CodeTV should keep the buyer in an optimistic processing/welcome state for about 60 seconds before escalating concern, and may continue polling up to about 2 minutes before showing a support-oriented fallback.
+- Transfer, team distribution, and invoice actions should not be usable until the purchase is verified; if fulfillment is delayed, email-driven follow-up should close the loop once processing succeeds.
+- Every paid **Workshop Ticket** purchase should produce an **Invoice** suitable for buyer self-service and support avoidance.
+- An **Invoice** is hosted by CodeTV/CourseBuilder rather than relying on Stripe-hosted invoice pages.
+- An **Invoice** has a public route keyed by the purchase/merchant charge identifier so it can be shared with accounting without requiring support intervention.
+- An **Invoice** may need to be sent or forwarded to someone other than the Viewer who receives Workshop Access.
+- An **Invoice** must support customizable billing details and free-form notes because buyers frequently need company/accounting-specific invoice information.
+- **Invoice** customization should be shareable without server persistence: custom fields travel in query parameters managed with nuqs on the invoice URL and may also be remembered locally on the buyer's machine.
+- CodeTV should mirror the AI Hero / Code with Antonio invoice pattern where possible, but improve customization sharing with URL-level state rather than server-side invoice customization storage.
 - A supporter membership may create **Workshop Access** to the **Workshop Archive** after a **Workshop** is no longer in its live ticketed access period.
 - **Workshop Archive** availability may lag behind the live run to preserve **Workshop Ticket** value.
 - Existing supporter memberships and archive access are separate from **Workshop Ticket** sales until the membership model is intentionally migrated.
@@ -65,7 +100,7 @@ _Avoid_: self-paced workshop, previous event, replay product
 - A CourseBuilder user row is created lazily when a **Viewer** first performs an authenticated commerce interaction.
 - **Viewer** auth uses Clerk for the first commerce integration.
 - **Operator** auth may use Auth.js for CourseBuilder CLI/device-flow authentication while CodeTV evaluates a longer-term Clerk migration.
-- The first CodeTV commerce path may require sign-in before checkout, even though other CourseBuilder apps can create a user from the Stripe checkout email and offer post-purchase transfer.
+- The first CodeTV commerce path should require sign-in before checkout because Workshop Tickets are relatively high-ticket purchases and CodeTV needs to check existing purchase/access state and purchase intent before sending the buyer to Stripe.
 - CodeTV owns its own CourseBuilder database and does not share Workshop, product, purchase, access, or Workshop content records with other CourseBuilder apps.
 - Workshop and Cohort commerce content lives in the CodeTV CourseBuilder database, not Sanity.
 - Initial Workshop, Cohort, and Ticket records should be created and maintained with the existing CourseBuilder CLI or scripts rather than a new admin UI.
@@ -78,8 +113,10 @@ _Avoid_: self-paced workshop, previous event, replay product
 - CodeTV should port the existing `getUserAbilityForRequest` and `withSkill` patterns, adapting internals only where Clerk forces it.
 - Clerk is a transitional complication, not a design driver.
 - Routes should resolve the acting principal once per request through shared helpers rather than directly mixing Clerk, Auth.js, device token, and CourseBuilder user lookup logic.
-- The first CourseBuilder integration sells individual **Workshop Tickets** and grants lifetime **Workshop Access** for purchased **Workshops**.
+- The first CourseBuilder integration must prove the full **Workshop Ticket** commerce journey: build a **Workshop**, sell tickets through Stripe checkout, land the buyer on a welcome/thanks screen, send purchase emails, support immediate ticket distribution or transfer, and provide end-to-end commerce logging.
 - Code with Antonio and AI Hero are reference implementations; CodeTV should keep the first Astro integration simple while reusing or adapting the existing React pricing component and pricing data loader because they present PPP, coupons, discounts, team pricing, and scaled discounts.
+- CodeTV should reuse CourseBuilder React commerce components as much as possible, likely through Astro React islands, and avoid building parallel Astro-native commerce UI unless a component cannot reasonably be adapted.
+- The `@coursebuilder/commerce-next` package may need refactoring so reusable React commerce widgets are not tightly coupled to Next.js server actions/router conventions; prefer package export boundaries and adapter props that keep existing Next apps compatible while allowing Astro usage.
 
 ## Example dialogue
 
@@ -94,11 +131,26 @@ _Avoid_: self-paced workshop, previous event, replay product
 - The exact lag before a **Workshop** enters the **Workshop Archive** is intentionally unresolved; likely around 15 days, but supporter tier rules are not yet decided.
 - Supporter membership and archive access rules are deferred; the first implementation focuses on selling live **Workshop Tickets**.
 - CodeTV may offer products similar to other CourseBuilder apps, but those products are modeled as standalone CodeTV **Workshops**; for example, **Building Cool Apps with AI** is a CodeTV **Workshop**, while AI Hero is a separate product.
-- Guest checkout and post-purchase transfer exist in other CourseBuilder apps but are not required for the first CodeTV commerce path.
-- Team ticket purchases are in scope for CodeTV because team seats are claimed through a **Team Claim Link** associated with a coupon code.
-- Existing CourseBuilder team seat patterns should be reused rather than inventing new team purchase mechanics.
+- Guest checkout and post-purchase transfer exist in other CourseBuilder apps, but CodeTV's first high-ticket Workshop Ticket path favors pre-checkout sign-in to reduce identity ambiguity and support existing-purchase checks.
+- Team ticket purchases are in scope for CodeTV because team seats are claimed through a **Team Claim Link** associated with a bulk coupon.
+- CourseBuilder's canonical team purchase model is a bulk purchase backed by a `bulkCoupon`; CodeTV should reuse the existing `NEW_BULK_COUPON`, `EXISTING_BULK_COUPON`, `INDIVIDUAL_TO_BULK_UPGRADE`, and `NEW_INDIVIDUAL_PURCHASE` purchase-type branching.
+- If a signed-in Viewer already has Workshop Access, the checkout flow should capture intent rather than blindly selling another individual ticket: block/redirect for accidental duplicate individual purchases, but allow or guide purchase of additional **Team Seats**.
+- Existing-purchase intent capture should preserve CourseBuilder bulk coupon quantity discount behavior, such as discounts for buying five or more seats.
+- Existing CourseBuilder bulk coupon and team invite patterns should be reused rather than inventing new team purchase mechanics.
+- First-pass team distribution only needs the canonical CourseBuilder team UI: available-seat count, copyable **Team Claim Link**, copy-link button, and “Claim 1 seat for yourself” self-redeem button; teammate email invite UI is not required.
 - Do not overbuild unlikely account-mismatch safeguards for team seat claims; follow the proven existing claim flow.
+- "Distribute tickets" means **Team Seat** distribution for multi-seat purchases, not **Ticket Transfer**.
+- "Change email" after purchase means **Ticket Transfer** when it changes who receives Workshop Access.
+- Invoice customization is in scope for the first serious commerce journey because missing invoice self-service creates predictable support load.
+- The post-checkout UX goal is for the buyer to feel whole: acknowledge payment/session success quickly, keep them informed while fulfillment completes, avoid implying their money was taken without access, and avoid premature support-contact states.
+- Stripe-hosted invoices are explicitly not the desired buyer-facing invoice experience for CodeTV commerce.
+- Server-side invoice customization persistence is out of scope unless URL/local persistence proves insufficient.
+- Invoice customization query parameters are an intentional trade-off for shareability and buyer self-service; logging and analytics should avoid capturing invoice customization values where practical.
+- Invoice customization should use one encoded, versioned query parameter rather than several readable accounting fields in the URL.
+- The first **Invoice** customization model is two free-form fields: a multiline invoice recipient/name block and a multiline additional details block.
+- CodeTV does not model country-specific tax invoice requirements; buyers can place company names, VAT IDs, addresses, purchase-order notes, or accounting instructions into the free-form invoice fields themselves.
 - The React pricing component and pricing data loader are part of the first serious commerce path because they present PPP, coupons, discounts, team pricing, and scaled discounts that should not be casually reimplemented.
+- Transfer, invoice, team invite/self-redeem, post-purchase summary, and pricing UI should prefer CourseBuilder React component reuse over Astro-specific reimplementation.
 - CodeTV should expose tRPC from Astro at `/api/trpc` using `@trpc/server/adapters/fetch` so the existing pricing data loader path can be brought over with minimal transport changes.
 - CodeTV must reserve `/api/coursebuilder/*` for CourseBuilder commerce endpoints and `/api/trpc/*` for app pricing/data procedures.
 
@@ -211,7 +263,7 @@ Temporary smoke rows were cleaned from the DB after tests.
 - Upload/media routes are not implemented yet.
 - Search/memory/support/shortlink/survey parity routes are deferred.
 - `cb app current` for unknown `codetv` profile may not hydrate capability flags from discovery; auth and endpoint calls still work.
-- `workshop create --create-product` creates CourseBuilder `self-paced` products today. Workshop Ticket / Cohort semantics may need a `cohort` or `live` product flow later.
+- `workshop create --create-product` creates CourseBuilder `self-paced` products today. This is only acceptable as checkout plumbing if it is followed by a real **Workshop Ticket** flow that supports ticket distribution, ticket transfer, purchase emails, welcome/thanks UX, and end-to-end logging.
 
 ### Next steps
 
@@ -219,11 +271,15 @@ Recommended PR framing now: **CourseBuilder foundation + CLI/operator API surfac
 
 After opening the PR, continue with follow-up work in this order:
 
-1. Verify CourseBuilder core commerce endpoints locally/prod:
+1. Build and verify the checkout/status spine first because invoice, transfer, and team-seat flows need a verified purchase to hang off:
+   - sign-in-gated checkout start
    - `POST /api/coursebuilder/prices-formatted`
    - `POST /api/coursebuilder/checkout/stripe`
-   - `GET /api/coursebuilder/purchases?userId=...`
-   - `POST /api/coursebuilder/redeem` or exact coupon redeem path used by CourseBuilder core
+   - Stripe return URL with checkout session evidence
+   - optimistic **Purchase Processing** / thanks shell
+   - purchase status polling
+   - verified purchase state
+   - delayed-processing fallback using the shared CourseBuilder message
 2. Run a real Stripe checkout in prod using the CourseBuilder Stripe account.
 3. Confirm Stripe webhook delivery to `/api/coursebuilder/webhook/stripe`.
 4. Confirm rows land in:
@@ -232,9 +288,11 @@ After opening the PR, continue with follow-up work in this order:
    - `ctv_MerchantCharge`
    - `ctv_Purchase`
 5. Verify access lookup for the purchasing Clerk viewer bridged to `ctv_User.externalId`.
-6. Port/team-verify Team Seat / Team Claim Link flow.
-7. Add upload/media routes if Workshop import/upload workflow needs CLI support.
-8. Update agent-readiness artifacts as public surfaces stabilize:
+6. Port the CodeTV-hosted **Invoice** route with nuqs URL customization.
+7. Port **Ticket Transfer** for verified individual purchases.
+8. Port/team-verify **Team Seat** / **Team Claim Link** / self-redeem flow.
+9. Add upload/media routes if Workshop import/upload workflow needs CLI support.
+10. Update agent-readiness artifacts as public surfaces stabilize:
    - `robots.txt`
    - sitemap audit
    - `llms.txt`
