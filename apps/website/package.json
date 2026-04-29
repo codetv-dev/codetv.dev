@@ -61,7 +61,7 @@
 		"esbuild": "^0.27.2",
 		"groq": "^5.6.0",
 		"human-readable-ids": "^1.0.4",
-		"inngest": "^3.49.3",
+		"inngest": "^3.54.0",
 		"jsonwebtoken": "^9.0.3",
 		"marked": "^17.0.1",
 		"mdx-bundler": "^10.1.1",

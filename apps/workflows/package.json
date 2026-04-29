@@ -13,7 +13,7 @@
 		"@astrojs/netlify": "^6.6.4",
 		"@codetv/inngest": "workspace:*",
 		"astro": "^5.16.15",
-		"inngest": "^3.49.3",
+		"inngest": "^3.54.0",
 		"netlify-plugin-inngest": "^1.0.1"
 	}
 }
