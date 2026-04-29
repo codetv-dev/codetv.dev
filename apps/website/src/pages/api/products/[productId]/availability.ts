@@ -1,28 +1,19 @@
 import type { APIRoute } from 'astro';
-import { and, eq, ne } from 'drizzle-orm';
+import { and, count, eq, ne } from 'drizzle-orm';
 
 import { courseBuilderAdapter, db } from '../../../../db';
 import { purchases } from '../../../../db/schema';
 import { withSkill } from '../../../../server/with-skill';
 
-const corsHeaders = {
-	'Access-Control-Allow-Origin': '*',
-	'Access-Control-Allow-Methods': 'GET, OPTIONS',
-	'Access-Control-Allow-Headers': 'Content-Type',
-	'Cache-Control': 'no-store, max-age=0',
-};
-
 function json(body: unknown, init: ResponseInit = {}) {
 	return Response.json(body, {
 		...init,
 		headers: {
-			...corsHeaders,
+			'Cache-Control': 'no-store, max-age=0',
 			...(init.headers ?? {}),
 		},
 	});
 }
-
-export const OPTIONS: APIRoute = async () => json({});
 
 export const GET: APIRoute = async ({ request, params }) =>
 	withSkill(async () => {
@@ -42,15 +33,18 @@ export const GET: APIRoute = async ({ request, params }) =>
 			return json({ quantityAvailable: -1, unlimited: true });
 		}
 
-		const activePurchases = await db.query.purchases.findMany({
-			where: and(
-				eq(purchases.productId, productId),
-				ne(purchases.status, 'Refunded'),
-			),
-		});
+		const [activePurchaseCount] = await db
+			.select({ count: count() })
+			.from(purchases)
+			.where(
+				and(
+					eq(purchases.productId, productId),
+					ne(purchases.status, 'Refunded'),
+				),
+			);
 
 		const quantityAvailable =
-			(product.quantityAvailable || 0) - activePurchases.length;
+			(product.quantityAvailable || 0) - (activePurchaseCount?.count ?? 0);
 
 		return json({
 			quantityAvailable: Math.max(0, quantityAvailable),

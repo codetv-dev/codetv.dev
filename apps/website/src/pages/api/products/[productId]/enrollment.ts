@@ -6,24 +6,15 @@ import { coupon, purchases } from '../../../../db/schema';
 import { getUserAbilityForRequest } from '../../../../server/ability';
 import { withSkill } from '../../../../server/with-skill';
 
-const corsHeaders = {
-	'Access-Control-Allow-Origin': '*',
-	'Access-Control-Allow-Methods': 'GET, OPTIONS',
-	'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-	'Cache-Control': 'no-store, max-age=0',
-};
-
 function json(body: unknown, init: ResponseInit = {}) {
 	return Response.json(body, {
 		...init,
 		headers: {
-			...corsHeaders,
+			'Cache-Control': 'no-store, max-age=0',
 			...(init.headers ?? {}),
 		},
 	});
 }
-
-export const OPTIONS: APIRoute = async () => json({});
 
 export const GET: APIRoute = async ({ request, params }) =>
 	withSkill(async (request) => {

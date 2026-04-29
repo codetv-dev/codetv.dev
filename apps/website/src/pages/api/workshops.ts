@@ -6,12 +6,7 @@ import { ensureStripeMerchantAccount } from '../../coursebuilder/merchant-accoun
 import { courseBuilderAdapter, db } from '../../db';
 import { contentResource, contentResourceResource } from '../../db/schema';
 import { getUserAbilityForRequest } from '../../server/ability';
-
-const corsHeaders = {
-	'Access-Control-Allow-Origin': '*',
-	'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-	'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-};
+import { withSkill } from '../../server/with-skill';
 
 const WorkshopCreateSchema = z.object({
 	workshop: z.object({
@@ -55,13 +50,7 @@ const WorkshopCreateSchema = z.object({
 });
 
 function json(body: unknown, init: ResponseInit = {}) {
-	return Response.json(body, {
-		...init,
-		headers: {
-			...corsHeaders,
-			...(init.headers ?? {}),
-		},
-	});
+	return Response.json(body, init);
 }
 
 function isVisibleWorkshop(
@@ -73,101 +62,118 @@ function isVisibleWorkshop(
 	return fields.state === 'published' && fields.visibility === 'public';
 }
 
-export const OPTIONS: APIRoute = async () => json({});
+type CourseBuilderWorkshopAdapter = {
+	createWorkshop(
+		input: z.infer<typeof WorkshopCreateSchema>,
+		userId: string,
+	): Promise<{
+		workshop: typeof contentResource.$inferSelect;
+		sections: Array<typeof contentResource.$inferSelect>;
+		lessons: Array<typeof contentResource.$inferSelect>;
+		product?: unknown;
+	}>;
+};
 
-export const GET: APIRoute = async ({ request }) => {
-	const { searchParams } = new URL(request.url);
-	const slugOrId = searchParams.get('slugOrId');
-	const { ability } = await getUserAbilityForRequest(request);
-	const canSeeDrafts = ability.can('update', 'Content');
+const workshopAdapter = courseBuilderAdapter as CourseBuilderWorkshopAdapter;
 
-	if (slugOrId) {
-		const workshop = await db.query.contentResource.findFirst({
-			where: and(
-				eq(contentResource.type, 'workshop'),
-				or(eq(contentResource.id, slugOrId), eq(contentResource.slug, slugOrId)),
-			),
-			with: {
-				resources: {
-					with: {
-						resource: {
-							with: {
-								resources: {
-									with: { resource: true },
-									orderBy: asc(contentResourceResource.position),
+export const GET: APIRoute = async ({ request }) =>
+	withSkill(async (request) => {
+		const { searchParams } = new URL(request.url);
+		const slugOrId = searchParams.get('slugOrId');
+		const { ability } = await getUserAbilityForRequest(request);
+		const canSeeDrafts = ability.can('update', 'Content');
+
+		if (slugOrId) {
+			const workshop = await db.query.contentResource.findFirst({
+				where: and(
+					eq(contentResource.type, 'workshop'),
+					or(
+						eq(contentResource.id, slugOrId),
+						eq(contentResource.slug, slugOrId),
+					),
+				),
+				with: {
+					resources: {
+						with: {
+							resource: {
+								with: {
+									resources: {
+										with: { resource: true },
+										orderBy: asc(contentResourceResource.position),
+									},
 								},
 							},
 						},
+						orderBy: asc(contentResourceResource.position),
 					},
-					orderBy: asc(contentResourceResource.position),
-				},
-				resourceProducts: {
-					with: {
-						product: {
-							with: { price: true },
+					resourceProducts: {
+						with: {
+							product: {
+								with: { price: true },
+							},
 						},
 					},
 				},
-			},
-		});
+			});
 
-		if (!workshop || !isVisibleWorkshop(workshop, canSeeDrafts)) {
-			return json({ error: 'Workshop not found' }, { status: 404 });
+			if (!workshop || !isVisibleWorkshop(workshop, canSeeDrafts)) {
+				return json({ error: 'Workshop not found' }, { status: 404 });
+			}
+
+			return json(workshop);
 		}
 
-		return json(workshop);
-	}
-
-	const workshops = await db.query.contentResource.findMany({
-		where: eq(contentResource.type, 'workshop'),
-		with: {
-			resources: {
-				with: { resource: true },
-				orderBy: asc(contentResourceResource.position),
+		const workshops = await db.query.contentResource.findMany({
+			where: eq(contentResource.type, 'workshop'),
+			with: {
+				resources: {
+					with: { resource: true },
+					orderBy: asc(contentResourceResource.position),
+				},
 			},
-		},
-		orderBy: desc(contentResource.createdAt),
-		limit: 100,
-	});
+			orderBy: desc(contentResource.createdAt),
+			limit: 100,
+		});
 
-	return json(
-		canSeeDrafts
-			? workshops
-			: workshops.filter((workshop) =>
-					isVisibleWorkshop(workshop, canSeeDrafts),
-				),
-	);
-};
-
-export const POST: APIRoute = async ({ request }) => {
-	const { user, ability } = await getUserAbilityForRequest(request);
-
-	if (!user) return json({ error: 'Unauthorized' }, { status: 401 });
-	if (ability.cannot('create', 'Content')) {
-		return json({ error: 'Forbidden' }, { status: 403 });
-	}
-
-	const body = await request.json();
-	const parsed = WorkshopCreateSchema.safeParse(body);
-
-	if (!parsed.success) {
 		return json(
-			{ error: 'Invalid input', details: z.treeifyError(parsed.error) },
-			{ status: 400 },
+			canSeeDrafts
+				? workshops
+				: workshops.filter((workshop) =>
+						isVisibleWorkshop(workshop, canSeeDrafts),
+					),
 		);
-	}
+	})(request);
 
-	if (parsed.data.createProduct) {
-		await ensureStripeMerchantAccount();
-	}
+export const POST: APIRoute = async ({ request }) =>
+	withSkill(async (request) => {
+		const { user, ability } = await getUserAbilityForRequest(request);
 
-	const result = await (courseBuilderAdapter as any).createWorkshop(
-		{
-			...parsed.data,
-			pricing: parsed.data.pricing ?? {},
-		},
-		user.id,
-	);
+		if (!user) return json({ error: 'Unauthorized' }, { status: 401 });
+		if (ability.cannot('create', 'Content')) {
+			return json({ error: 'Forbidden' }, { status: 403 });
+		}
 
-	return json({ success: true, ...result }, { status: 201 });
-};
+		const body = await request.json();
+		const parsed = WorkshopCreateSchema.safeParse(body);
+
+		if (!parsed.success) {
+			return json(
+				{ error: 'Invalid input', details: z.treeifyError(parsed.error) },
+				{ status: 400 },
+			);
+		}
+
+		if (parsed.data.createProduct) {
+			await ensureStripeMerchantAccount();
+		}
+
+		const result = await workshopAdapter.createWorkshop(
+			{
+				...parsed.data,
+				pricing: parsed.data.pricing ?? {},
+			},
+			user.id,
+		);
+
+		return json({ success: true, ...result }, { status: 201 });
+	})(request);

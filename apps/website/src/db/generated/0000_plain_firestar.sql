@@ -1,4 +1,4 @@
-CREATE TABLE `CodeTV_Account` (
+CREATE TABLE `ctv_Account` (
 	`userId` varchar(255) NOT NULL,
 	`type` varchar(255) NOT NULL,
 	`provider` varchar(255) NOT NULL,
@@ -13,10 +13,10 @@ CREATE TABLE `CodeTV_Account` (
 	`id_token` text,
 	`session_state` varchar(255),
 	`refresh_token_expires_in` int,
-	CONSTRAINT `CodeTV_Account_provider_providerAccountId_pk` PRIMARY KEY(`provider`,`providerAccountId`)
+	CONSTRAINT `ctv_Account_provider_providerAccountId_pk` PRIMARY KEY(`provider`,`providerAccountId`)
 );
 --> statement-breakpoint
-CREATE TABLE `CodeTV_Comment` (
+CREATE TABLE `ctv_Comment` (
 	`id` varchar(191) NOT NULL,
 	`userId` varchar(255) NOT NULL,
 	`organizationMembershipId` varchar(255),
@@ -25,10 +25,10 @@ CREATE TABLE `CodeTV_Comment` (
 	`createdAt` timestamp(3) DEFAULT CURRENT_TIMESTAMP(3),
 	`updatedAt` timestamp(3) DEFAULT CURRENT_TIMESTAMP(3),
 	`deletedAt` timestamp(3),
-	CONSTRAINT `CodeTV_Comment_id_pk` PRIMARY KEY(`id`)
+	CONSTRAINT `ctv_Comment_id_pk` PRIMARY KEY(`id`)
 );
 --> statement-breakpoint
-CREATE TABLE `CodeTV_CommunicationChannel` (
+CREATE TABLE `ctv_CommunicationChannel` (
 	`id` varchar(255) NOT NULL,
 	`organizationId` varchar(191),
 	`name` varchar(255) NOT NULL,
@@ -37,10 +37,10 @@ CREATE TABLE `CodeTV_CommunicationChannel` (
 	`createdAt` timestamp(3) DEFAULT (now()),
 	`updatedAt` timestamp(3) DEFAULT (now()),
 	`deletedAt` timestamp(3),
-	CONSTRAINT `CodeTV_CommunicationChannel_id` PRIMARY KEY(`id`)
+	CONSTRAINT `ctv_CommunicationChannel_id` PRIMARY KEY(`id`)
 );
 --> statement-breakpoint
-CREATE TABLE `CodeTV_CommunicationPreferenceType` (
+CREATE TABLE `ctv_CommunicationPreferenceType` (
 	`id` varchar(255) NOT NULL,
 	`organizationId` varchar(191),
 	`name` varchar(255) NOT NULL,
@@ -49,10 +49,10 @@ CREATE TABLE `CodeTV_CommunicationPreferenceType` (
 	`createdAt` timestamp(3) DEFAULT (now()),
 	`updatedAt` timestamp(3),
 	`deletedAt` timestamp(3),
-	CONSTRAINT `CodeTV_CommunicationPreferenceType_id` PRIMARY KEY(`id`)
+	CONSTRAINT `ctv_CommunicationPreferenceType_id` PRIMARY KEY(`id`)
 );
 --> statement-breakpoint
-CREATE TABLE `CodeTV_CommunicationPreference` (
+CREATE TABLE `ctv_CommunicationPreference` (
 	`id` varchar(255) NOT NULL,
 	`organizationId` varchar(191),
 	`userId` varchar(255) NOT NULL,
@@ -66,10 +66,10 @@ CREATE TABLE `CodeTV_CommunicationPreference` (
 	`optOutAt` timestamp(3),
 	`updatedAt` timestamp(3) DEFAULT (now()),
 	`deletedAt` timestamp(3),
-	CONSTRAINT `CodeTV_CommunicationPreference_id` PRIMARY KEY(`id`)
+	CONSTRAINT `ctv_CommunicationPreference_id` PRIMARY KEY(`id`)
 );
 --> statement-breakpoint
-CREATE TABLE `CodeTV_ContentContribution` (
+CREATE TABLE `ctv_ContentContribution` (
 	`id` varchar(255) NOT NULL,
 	`userId` varchar(255) NOT NULL,
 	`organizationId` varchar(191),
@@ -80,10 +80,10 @@ CREATE TABLE `CodeTV_ContentContribution` (
 	`createdAt` timestamp(3) DEFAULT (now()),
 	`updatedAt` timestamp(3) DEFAULT (now()),
 	`deletedAt` timestamp(3),
-	CONSTRAINT `CodeTV_ContentContribution_id` PRIMARY KEY(`id`)
+	CONSTRAINT `ctv_ContentContribution_id` PRIMARY KEY(`id`)
 );
 --> statement-breakpoint
-CREATE TABLE `CodeTV_ContentResource` (
+CREATE TABLE `ctv_ContentResource` (
 	`id` varchar(255) NOT NULL,
 	`organizationId` varchar(191),
 	`createdByOrganizationMembershipId` varchar(191),
@@ -95,10 +95,10 @@ CREATE TABLE `CodeTV_ContentResource` (
 	`createdAt` timestamp(3) DEFAULT CURRENT_TIMESTAMP(3),
 	`updatedAt` timestamp(3) DEFAULT CURRENT_TIMESTAMP(3),
 	`deletedAt` timestamp(3),
-	CONSTRAINT `CodeTV_ContentResource_id` PRIMARY KEY(`id`)
+	CONSTRAINT `ctv_ContentResource_id` PRIMARY KEY(`id`)
 );
 --> statement-breakpoint
-CREATE TABLE `CodeTV_ContentResourceProduct` (
+CREATE TABLE `ctv_ContentResourceProduct` (
 	`productId` varchar(255) NOT NULL,
 	`resourceId` varchar(255) NOT NULL,
 	`organizationId` varchar(191),
@@ -107,10 +107,10 @@ CREATE TABLE `CodeTV_ContentResourceProduct` (
 	`createdAt` timestamp(3) DEFAULT CURRENT_TIMESTAMP(3),
 	`updatedAt` timestamp(3) DEFAULT CURRENT_TIMESTAMP(3),
 	`deletedAt` timestamp(3),
-	CONSTRAINT `CodeTV_ContentResourceProduct_productId_resourceId_pk` PRIMARY KEY(`productId`,`resourceId`)
+	CONSTRAINT `ctv_ContentResourceProduct_productId_resourceId_pk` PRIMARY KEY(`productId`,`resourceId`)
 );
 --> statement-breakpoint
-CREATE TABLE `CodeTV_ContentResourceResource` (
+CREATE TABLE `ctv_ContentResourceResource` (
 	`resourceOfId` varchar(255) NOT NULL,
 	`resourceId` varchar(255) NOT NULL,
 	`position` double NOT NULL DEFAULT 0,
@@ -119,20 +119,20 @@ CREATE TABLE `CodeTV_ContentResourceResource` (
 	`createdAt` timestamp(3) DEFAULT CURRENT_TIMESTAMP(3),
 	`updatedAt` timestamp(3) DEFAULT CURRENT_TIMESTAMP(3),
 	`deletedAt` timestamp(3),
-	CONSTRAINT `CodeTV_ContentResourceResource_resourceOfId_resourceId_pk` PRIMARY KEY(`resourceOfId`,`resourceId`)
+	CONSTRAINT `ctv_ContentResourceResource_resourceOfId_resourceId_pk` PRIMARY KEY(`resourceOfId`,`resourceId`)
 );
 --> statement-breakpoint
-CREATE TABLE `CodeTV_ContentResourceTag` (
+CREATE TABLE `ctv_ContentResourceTag` (
 	`contentResourceId` varchar(255) NOT NULL,
 	`organizationId` varchar(191),
 	`tagId` varchar(255) NOT NULL,
 	`position` double NOT NULL DEFAULT 0,
 	`createdAt` timestamp(3) DEFAULT CURRENT_TIMESTAMP(3),
 	`updatedAt` timestamp(3) DEFAULT CURRENT_TIMESTAMP(3),
-	CONSTRAINT `CodeTV_ContentResourceTag_contentResourceId_tagId_pk` PRIMARY KEY(`contentResourceId`,`tagId`)
+	CONSTRAINT `ctv_ContentResourceTag_contentResourceId_tagId_pk` PRIMARY KEY(`contentResourceId`,`tagId`)
 );
 --> statement-breakpoint
-CREATE TABLE `CodeTV_ContentResourceVersion` (
+CREATE TABLE `ctv_ContentResourceVersion` (
 	`id` varchar(255) NOT NULL,
 	`organizationId` varchar(191),
 	`resourceId` varchar(255) NOT NULL,
@@ -141,11 +141,11 @@ CREATE TABLE `CodeTV_ContentResourceVersion` (
 	`fields` json DEFAULT ('{}'),
 	`createdAt` timestamp(3) DEFAULT CURRENT_TIMESTAMP(3),
 	`createdById` varchar(255) NOT NULL,
-	CONSTRAINT `CodeTV_ContentResourceVersion_id` PRIMARY KEY(`id`),
+	CONSTRAINT `ctv_ContentResourceVersion_id` PRIMARY KEY(`id`),
 	CONSTRAINT `uq_resource_version_number` UNIQUE(`resourceId`,`versionNumber`)
 );
 --> statement-breakpoint
-CREATE TABLE `CodeTV_ContributionType` (
+CREATE TABLE `ctv_ContributionType` (
 	`id` varchar(255) NOT NULL,
 	`organizationId` varchar(191),
 	`slug` varchar(255) NOT NULL,
@@ -155,11 +155,11 @@ CREATE TABLE `CodeTV_ContributionType` (
 	`createdAt` timestamp(3) DEFAULT (now()),
 	`updatedAt` timestamp(3) DEFAULT (now()),
 	`deletedAt` timestamp(3),
-	CONSTRAINT `CodeTV_ContributionType_id` PRIMARY KEY(`id`),
-	CONSTRAINT `CodeTV_ContributionType_slug_unique` UNIQUE(`slug`)
+	CONSTRAINT `ctv_ContributionType_id` PRIMARY KEY(`id`),
+	CONSTRAINT `ctv_ContributionType_slug_unique` UNIQUE(`slug`)
 );
 --> statement-breakpoint
-CREATE TABLE `CodeTV_Coupon` (
+CREATE TABLE `ctv_Coupon` (
 	`id` varchar(191) NOT NULL,
 	`organizationId` varchar(191),
 	`code` varchar(191),
@@ -178,33 +178,33 @@ CREATE TABLE `CodeTV_Coupon` (
 	CONSTRAINT `Coupon_code_key` UNIQUE(`code`)
 );
 --> statement-breakpoint
-CREATE TABLE `CodeTV_DeviceAccessToken` (
+CREATE TABLE `ctv_DeviceAccessToken` (
 	`token` varchar(191) NOT NULL,
 	`userId` varchar(191) NOT NULL,
 	`organizationMembershipId` varchar(191),
 	`createdAt` timestamp(3) DEFAULT CURRENT_TIMESTAMP(3),
-	CONSTRAINT `CodeTV_DeviceAccessToken_token_pk` PRIMARY KEY(`token`)
+	CONSTRAINT `ctv_DeviceAccessToken_token_pk` PRIMARY KEY(`token`)
 );
 --> statement-breakpoint
-CREATE TABLE `CodeTV_DeviceVerification` (
+CREATE TABLE `ctv_DeviceVerification` (
 	`verifiedByUserId` varchar(255),
 	`deviceCode` varchar(191) NOT NULL,
 	`userCode` text NOT NULL,
 	`expires` timestamp(3) NOT NULL,
 	`createdAt` timestamp(3) DEFAULT CURRENT_TIMESTAMP(3),
 	`verifiedAt` timestamp(3),
-	CONSTRAINT `CodeTV_DeviceVerification_deviceCode_pk` PRIMARY KEY(`deviceCode`)
+	CONSTRAINT `ctv_DeviceVerification_deviceCode_pk` PRIMARY KEY(`deviceCode`)
 );
 --> statement-breakpoint
-CREATE TABLE `CodeTV_EntitlementType` (
+CREATE TABLE `ctv_EntitlementType` (
 	`id` varchar(191) NOT NULL,
 	`name` varchar(255) NOT NULL,
 	`description` text,
-	CONSTRAINT `CodeTV_EntitlementType_id` PRIMARY KEY(`id`),
+	CONSTRAINT `ctv_EntitlementType_id` PRIMARY KEY(`id`),
 	CONSTRAINT `unique_name_idx` UNIQUE(`name`)
 );
 --> statement-breakpoint
-CREATE TABLE `CodeTV_Entitlement` (
+CREATE TABLE `ctv_Entitlement` (
 	`id` varchar(191) NOT NULL,
 	`entitlementType` varchar(255) NOT NULL,
 	`userId` varchar(191),
@@ -217,10 +217,10 @@ CREATE TABLE `CodeTV_Entitlement` (
 	`createdAt` timestamp(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 	`updatedAt` timestamp(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 	`deletedAt` timestamp(3),
-	CONSTRAINT `CodeTV_Entitlement_id` PRIMARY KEY(`id`)
+	CONSTRAINT `ctv_Entitlement_id` PRIMARY KEY(`id`)
 );
 --> statement-breakpoint
-CREATE TABLE `CodeTV_LessonProgress` (
+CREATE TABLE `ctv_LessonProgress` (
 	`id` varchar(191) NOT NULL,
 	`userId` varchar(191) NOT NULL,
 	`organizationId` varchar(191),
@@ -233,10 +233,10 @@ CREATE TABLE `CodeTV_LessonProgress` (
 	`completedAt` datetime(3),
 	`updatedAt` datetime(3),
 	`createdAt` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-	CONSTRAINT `CodeTV_LessonProgress_id` PRIMARY KEY(`id`)
+	CONSTRAINT `ctv_LessonProgress_id` PRIMARY KEY(`id`)
 );
 --> statement-breakpoint
-CREATE TABLE `CodeTV_MerchantAccount` (
+CREATE TABLE `ctv_MerchantAccount` (
 	`id` varchar(191) NOT NULL,
 	`organizationId` varchar(191),
 	`status` int NOT NULL DEFAULT 0,
@@ -246,7 +246,7 @@ CREATE TABLE `CodeTV_MerchantAccount` (
 	CONSTRAINT `MerchantAccount_id` PRIMARY KEY(`id`)
 );
 --> statement-breakpoint
-CREATE TABLE `CodeTV_MerchantCharge` (
+CREATE TABLE `ctv_MerchantCharge` (
 	`id` varchar(191) NOT NULL,
 	`organizationId` varchar(191),
 	`status` int NOT NULL DEFAULT 0,
@@ -261,7 +261,7 @@ CREATE TABLE `CodeTV_MerchantCharge` (
 	CONSTRAINT `MerchantCharge_identifier_key` UNIQUE(`identifier`)
 );
 --> statement-breakpoint
-CREATE TABLE `CodeTV_MerchantCoupon` (
+CREATE TABLE `ctv_MerchantCoupon` (
 	`id` varchar(191) NOT NULL,
 	`identifier` varchar(191),
 	`organizationId` varchar(191),
@@ -274,7 +274,7 @@ CREATE TABLE `CodeTV_MerchantCoupon` (
 	CONSTRAINT `MerchantCoupon_identifier_key` UNIQUE(`identifier`)
 );
 --> statement-breakpoint
-CREATE TABLE `CodeTV_MerchantCustomer` (
+CREATE TABLE `ctv_MerchantCustomer` (
 	`id` varchar(191) NOT NULL,
 	`organizationId` varchar(191),
 	`userId` varchar(191) NOT NULL,
@@ -286,7 +286,7 @@ CREATE TABLE `CodeTV_MerchantCustomer` (
 	CONSTRAINT `MerchantCustomer_identifier_key` UNIQUE(`identifier`)
 );
 --> statement-breakpoint
-CREATE TABLE `CodeTV_MerchantEvents` (
+CREATE TABLE `ctv_MerchantEvents` (
 	`id` varchar(191) NOT NULL,
 	`merchantAccountId` varchar(191) NOT NULL,
 	`identifier` varchar(191) NOT NULL,
@@ -296,7 +296,7 @@ CREATE TABLE `CodeTV_MerchantEvents` (
 	CONSTRAINT `MerchantEvents_identifier_key` UNIQUE(`identifier`)
 );
 --> statement-breakpoint
-CREATE TABLE `CodeTV_MerchantPrice` (
+CREATE TABLE `ctv_MerchantPrice` (
 	`id` varchar(191) NOT NULL,
 	`organizationId` varchar(191),
 	`merchantAccountId` varchar(191) NOT NULL,
@@ -309,7 +309,7 @@ CREATE TABLE `CodeTV_MerchantPrice` (
 	CONSTRAINT `MerchantPrice_identifier_key` UNIQUE(`identifier`)
 );
 --> statement-breakpoint
-CREATE TABLE `CodeTV_MerchantProduct` (
+CREATE TABLE `ctv_MerchantProduct` (
 	`id` varchar(191) NOT NULL,
 	`organizationId` varchar(191),
 	`merchantAccountId` varchar(191) NOT NULL,
@@ -321,7 +321,7 @@ CREATE TABLE `CodeTV_MerchantProduct` (
 	CONSTRAINT `MerchantProduct_identifier_key` UNIQUE(`identifier`)
 );
 --> statement-breakpoint
-CREATE TABLE `CodeTV_MerchantSession` (
+CREATE TABLE `ctv_MerchantSession` (
 	`id` varchar(191) NOT NULL,
 	`organizationId` varchar(191),
 	`identifier` varchar(191) NOT NULL,
@@ -329,7 +329,7 @@ CREATE TABLE `CodeTV_MerchantSession` (
 	CONSTRAINT `MerchantSession_id` PRIMARY KEY(`id`)
 );
 --> statement-breakpoint
-CREATE TABLE `CodeTV_MerchantSubscription` (
+CREATE TABLE `ctv_MerchantSubscription` (
 	`id` varchar(191) NOT NULL,
 	`organizationId` varchar(191),
 	`merchantAccountId` varchar(191) NOT NULL,
@@ -342,16 +342,16 @@ CREATE TABLE `CodeTV_MerchantSubscription` (
 	CONSTRAINT `MerchantSubscription_id` PRIMARY KEY(`id`)
 );
 --> statement-breakpoint
-CREATE TABLE `CodeTV_Organization` (
+CREATE TABLE `ctv_Organization` (
 	`id` varchar(255) NOT NULL,
 	`name` varchar(255),
 	`fields` json DEFAULT ('{}'),
 	`image` varchar(255),
 	`createdAt` timestamp(3) DEFAULT CURRENT_TIMESTAMP(3),
-	CONSTRAINT `CodeTV_Organization_id` PRIMARY KEY(`id`)
+	CONSTRAINT `ctv_Organization_id` PRIMARY KEY(`id`)
 );
 --> statement-breakpoint
-CREATE TABLE `CodeTV_OrganizationMembershipRole` (
+CREATE TABLE `ctv_OrganizationMembershipRole` (
 	`organizationMembershipId` varchar(255) NOT NULL,
 	`roleId` varchar(255) NOT NULL,
 	`active` boolean NOT NULL DEFAULT true,
@@ -362,7 +362,7 @@ CREATE TABLE `CodeTV_OrganizationMembershipRole` (
 	CONSTRAINT `pk` PRIMARY KEY(`organizationMembershipId`,`roleId`)
 );
 --> statement-breakpoint
-CREATE TABLE `CodeTV_OrganizationMembership` (
+CREATE TABLE `ctv_OrganizationMembership` (
 	`id` varchar(255) NOT NULL,
 	`organizationId` varchar(191),
 	`role` varchar(191) NOT NULL DEFAULT 'user',
@@ -370,10 +370,10 @@ CREATE TABLE `CodeTV_OrganizationMembership` (
 	`userId` varchar(255) NOT NULL,
 	`fields` json DEFAULT ('{}'),
 	`createdAt` timestamp(3) DEFAULT CURRENT_TIMESTAMP(3),
-	CONSTRAINT `CodeTV_OrganizationMembership_id` PRIMARY KEY(`id`)
+	CONSTRAINT `ctv_OrganizationMembership_id` PRIMARY KEY(`id`)
 );
 --> statement-breakpoint
-CREATE TABLE `CodeTV_Permission` (
+CREATE TABLE `ctv_Permission` (
 	`id` varchar(255) NOT NULL,
 	`name` varchar(255) NOT NULL,
 	`description` text,
@@ -381,11 +381,11 @@ CREATE TABLE `CodeTV_Permission` (
 	`createdAt` timestamp(3) DEFAULT (now()),
 	`updatedAt` timestamp(3) DEFAULT (now()),
 	`deletedAt` timestamp(3),
-	CONSTRAINT `CodeTV_Permission_id` PRIMARY KEY(`id`),
-	CONSTRAINT `CodeTV_Permission_name_unique` UNIQUE(`name`)
+	CONSTRAINT `ctv_Permission_id` PRIMARY KEY(`id`),
+	CONSTRAINT `ctv_Permission_name_unique` UNIQUE(`name`)
 );
 --> statement-breakpoint
-CREATE TABLE `CodeTV_Price` (
+CREATE TABLE `ctv_Price` (
 	`id` varchar(191) NOT NULL,
 	`productId` varchar(191),
 	`organizationId` varchar(191),
@@ -397,7 +397,7 @@ CREATE TABLE `CodeTV_Price` (
 	CONSTRAINT `Price_id` PRIMARY KEY(`id`)
 );
 --> statement-breakpoint
-CREATE TABLE `CodeTV_Product` (
+CREATE TABLE `ctv_Product` (
 	`id` varchar(191) NOT NULL,
 	`organizationId` varchar(191),
 	`name` varchar(191) NOT NULL,
@@ -410,18 +410,18 @@ CREATE TABLE `CodeTV_Product` (
 	CONSTRAINT `Product_id` PRIMARY KEY(`id`)
 );
 --> statement-breakpoint
-CREATE TABLE `CodeTV_Profile` (
+CREATE TABLE `ctv_Profile` (
 	`id` varchar(255) NOT NULL,
 	`userId` varchar(255) NOT NULL,
 	`type` varchar(255) NOT NULL,
 	`fields` json DEFAULT ('{}'),
 	`createdAt` timestamp(3) DEFAULT CURRENT_TIMESTAMP(3),
 	`updatedAt` timestamp(3) DEFAULT CURRENT_TIMESTAMP(3),
-	CONSTRAINT `CodeTV_Profile_id` PRIMARY KEY(`id`),
+	CONSTRAINT `ctv_Profile_id` PRIMARY KEY(`id`),
 	CONSTRAINT `unique_user_type_idx` UNIQUE(`userId`,`type`)
 );
 --> statement-breakpoint
-CREATE TABLE `CodeTV_PurchaseUserTransfer` (
+CREATE TABLE `ctv_PurchaseUserTransfer` (
 	`id` varchar(191) NOT NULL,
 	`transferState` enum('AVAILABLE','INITIATED','VERIFIED','CANCELED','EXPIRED','CONFIRMED','COMPLETED') NOT NULL DEFAULT 'AVAILABLE',
 	`purchaseId` varchar(191) NOT NULL,
@@ -436,7 +436,7 @@ CREATE TABLE `CodeTV_PurchaseUserTransfer` (
 	CONSTRAINT `PurchaseUserTransfer_id` PRIMARY KEY(`id`)
 );
 --> statement-breakpoint
-CREATE TABLE `CodeTV_Purchase` (
+CREATE TABLE `ctv_Purchase` (
 	`id` varchar(191) NOT NULL,
 	`userId` varchar(191),
 	`organizationMembershipId` varchar(191),
@@ -460,7 +460,7 @@ CREATE TABLE `CodeTV_Purchase` (
 	CONSTRAINT `Purchase_upgradedFromId_key` UNIQUE(`upgradedFromId`)
 );
 --> statement-breakpoint
-CREATE TABLE `CodeTV_QuestionResponse` (
+CREATE TABLE `ctv_QuestionResponse` (
 	`id` varchar(255) NOT NULL,
 	`surveyId` varchar(255) NOT NULL,
 	`questionId` varchar(255) NOT NULL,
@@ -472,11 +472,11 @@ CREATE TABLE `CodeTV_QuestionResponse` (
 	`createdAt` timestamp(3) DEFAULT CURRENT_TIMESTAMP(3),
 	`updatedAt` timestamp(3) DEFAULT CURRENT_TIMESTAMP(3),
 	`deletedAt` timestamp(3),
-	CONSTRAINT `CodeTV_QuestionResponse_id` PRIMARY KEY(`id`),
+	CONSTRAINT `ctv_QuestionResponse_id` PRIMARY KEY(`id`),
 	CONSTRAINT `survey_question_respondent_unique` UNIQUE(`surveyId`,`questionId`,`respondentKey`)
 );
 --> statement-breakpoint
-CREATE TABLE `CodeTV_ResourceProgress` (
+CREATE TABLE `ctv_ResourceProgress` (
 	`userId` varchar(255) NOT NULL,
 	`organizationId` varchar(191),
 	`organizationMembershipId` varchar(191),
@@ -485,20 +485,20 @@ CREATE TABLE `CodeTV_ResourceProgress` (
 	`completedAt` datetime(3),
 	`updatedAt` datetime(3),
 	`createdAt` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-	CONSTRAINT `CodeTV_ResourceProgress_userId_resourceId_pk` PRIMARY KEY(`userId`,`resourceId`)
+	CONSTRAINT `ctv_ResourceProgress_userId_resourceId_pk` PRIMARY KEY(`userId`,`resourceId`)
 );
 --> statement-breakpoint
-CREATE TABLE `CodeTV_RolePermission` (
+CREATE TABLE `ctv_RolePermission` (
 	`roleId` varchar(255) NOT NULL,
 	`permissionId` varchar(255) NOT NULL,
 	`active` boolean NOT NULL DEFAULT true,
 	`createdAt` timestamp(3) DEFAULT (now()),
 	`updatedAt` timestamp(3) DEFAULT (now()),
 	`deletedAt` timestamp(3),
-	CONSTRAINT `CodeTV_RolePermission_roleId_permissionId_pk` PRIMARY KEY(`roleId`,`permissionId`)
+	CONSTRAINT `ctv_RolePermission_roleId_permissionId_pk` PRIMARY KEY(`roleId`,`permissionId`)
 );
 --> statement-breakpoint
-CREATE TABLE `CodeTV_Role` (
+CREATE TABLE `ctv_Role` (
 	`id` varchar(255) NOT NULL,
 	`organizationId` varchar(191),
 	`name` varchar(255) NOT NULL,
@@ -507,18 +507,18 @@ CREATE TABLE `CodeTV_Role` (
 	`createdAt` timestamp(3) DEFAULT (now()),
 	`updatedAt` timestamp(3) DEFAULT (now()),
 	`deletedAt` timestamp(3),
-	CONSTRAINT `CodeTV_Role_id` PRIMARY KEY(`id`),
+	CONSTRAINT `ctv_Role_id` PRIMARY KEY(`id`),
 	CONSTRAINT `unique_name_per_org` UNIQUE(`organizationId`,`name`)
 );
 --> statement-breakpoint
-CREATE TABLE `CodeTV_Session` (
+CREATE TABLE `ctv_Session` (
 	`sessionToken` varchar(255) NOT NULL,
 	`userId` varchar(255) NOT NULL,
 	`expires` timestamp NOT NULL,
-	CONSTRAINT `CodeTV_Session_sessionToken` PRIMARY KEY(`sessionToken`)
+	CONSTRAINT `ctv_Session_sessionToken` PRIMARY KEY(`sessionToken`)
 );
 --> statement-breakpoint
-CREATE TABLE `CodeTV_Subscription` (
+CREATE TABLE `ctv_Subscription` (
 	`id` varchar(191) NOT NULL,
 	`organizationId` varchar(191),
 	`productId` varchar(191) NOT NULL,
@@ -529,7 +529,7 @@ CREATE TABLE `CodeTV_Subscription` (
 	CONSTRAINT `Subscription_id` PRIMARY KEY(`id`)
 );
 --> statement-breakpoint
-CREATE TABLE `CodeTV_Tag` (
+CREATE TABLE `ctv_Tag` (
 	`id` varchar(255) NOT NULL,
 	`organizationId` varchar(191),
 	`type` varchar(255) NOT NULL,
@@ -537,10 +537,10 @@ CREATE TABLE `CodeTV_Tag` (
 	`createdAt` timestamp(3) DEFAULT CURRENT_TIMESTAMP(3),
 	`updatedAt` timestamp(3) DEFAULT CURRENT_TIMESTAMP(3),
 	`deletedAt` timestamp(3),
-	CONSTRAINT `CodeTV_Tag_id` PRIMARY KEY(`id`)
+	CONSTRAINT `ctv_Tag_id` PRIMARY KEY(`id`)
 );
 --> statement-breakpoint
-CREATE TABLE `CodeTV_TagTag` (
+CREATE TABLE `ctv_TagTag` (
 	`parentTagId` varchar(255) NOT NULL,
 	`childTagId` varchar(255) NOT NULL,
 	`position` double NOT NULL DEFAULT 0,
@@ -549,10 +549,10 @@ CREATE TABLE `CodeTV_TagTag` (
 	`createdAt` timestamp(3) DEFAULT CURRENT_TIMESTAMP(3),
 	`updatedAt` timestamp(3) DEFAULT CURRENT_TIMESTAMP(3),
 	`deletedAt` timestamp(3),
-	CONSTRAINT `CodeTV_TagTag_parentTagId_childTagId_pk` PRIMARY KEY(`parentTagId`,`childTagId`)
+	CONSTRAINT `ctv_TagTag_parentTagId_childTagId_pk` PRIMARY KEY(`parentTagId`,`childTagId`)
 );
 --> statement-breakpoint
-CREATE TABLE `CodeTV_UpgradableProducts` (
+CREATE TABLE `ctv_UpgradableProducts` (
 	`upgradableToId` varchar(255) NOT NULL,
 	`upgradableFrom` varchar(255) NOT NULL,
 	`organizationId` varchar(191),
@@ -561,10 +561,10 @@ CREATE TABLE `CodeTV_UpgradableProducts` (
 	`createdAt` timestamp(3) DEFAULT CURRENT_TIMESTAMP(3),
 	`updatedAt` timestamp(3) DEFAULT CURRENT_TIMESTAMP(3),
 	`deletedAt` timestamp(3),
-	CONSTRAINT `CodeTV_UpgradableProducts_upgradableToId_upgradableFrom_pk` PRIMARY KEY(`upgradableToId`,`upgradableFrom`)
+	CONSTRAINT `ctv_UpgradableProducts_upgradableToId_upgradableFrom_pk` PRIMARY KEY(`upgradableToId`,`upgradableFrom`)
 );
 --> statement-breakpoint
-CREATE TABLE `CodeTV_UserPermission` (
+CREATE TABLE `ctv_UserPermission` (
 	`userId` varchar(255) NOT NULL,
 	`organizationId` varchar(191),
 	`permissionId` varchar(255) NOT NULL,
@@ -572,10 +572,10 @@ CREATE TABLE `CodeTV_UserPermission` (
 	`createdAt` timestamp(3) DEFAULT (now()),
 	`updatedAt` timestamp(3) DEFAULT (now()),
 	`deletedAt` timestamp(3),
-	CONSTRAINT `CodeTV_UserPermission_userId_permissionId_pk` PRIMARY KEY(`userId`,`permissionId`)
+	CONSTRAINT `ctv_UserPermission_userId_permissionId_pk` PRIMARY KEY(`userId`,`permissionId`)
 );
 --> statement-breakpoint
-CREATE TABLE `CodeTV_UserPrefs` (
+CREATE TABLE `ctv_UserPrefs` (
 	`id` varchar(191) NOT NULL,
 	`organizationId` varchar(191),
 	`type` varchar(191) NOT NULL DEFAULT 'Global',
@@ -584,10 +584,10 @@ CREATE TABLE `CodeTV_UserPrefs` (
 	`createdAt` timestamp(3) DEFAULT CURRENT_TIMESTAMP(3),
 	`updatedAt` timestamp(3) DEFAULT CURRENT_TIMESTAMP(3),
 	`deletedAt` timestamp(3),
-	CONSTRAINT `CodeTV_UserPrefs_id_pk` PRIMARY KEY(`id`)
+	CONSTRAINT `ctv_UserPrefs_id_pk` PRIMARY KEY(`id`)
 );
 --> statement-breakpoint
-CREATE TABLE `CodeTV_UserRole` (
+CREATE TABLE `ctv_UserRole` (
 	`userId` varchar(255) NOT NULL,
 	`roleId` varchar(255) NOT NULL,
 	`active` boolean NOT NULL DEFAULT true,
@@ -595,10 +595,10 @@ CREATE TABLE `CodeTV_UserRole` (
 	`createdAt` timestamp(3) DEFAULT (now()),
 	`updatedAt` timestamp(3) DEFAULT (now()),
 	`deletedAt` timestamp(3),
-	CONSTRAINT `CodeTV_UserRole_userId_roleId_pk` PRIMARY KEY(`userId`,`roleId`)
+	CONSTRAINT `ctv_UserRole_userId_roleId_pk` PRIMARY KEY(`userId`,`roleId`)
 );
 --> statement-breakpoint
-CREATE TABLE `CodeTV_User` (
+CREATE TABLE `ctv_User` (
 	`id` varchar(255) NOT NULL,
 	`name` varchar(255),
 	`role` varchar(191) NOT NULL DEFAULT 'user',
@@ -608,127 +608,127 @@ CREATE TABLE `CodeTV_User` (
 	`emailVerified` timestamp(3),
 	`image` varchar(255),
 	`createdAt` timestamp(3) DEFAULT CURRENT_TIMESTAMP(3),
-	CONSTRAINT `CodeTV_User_id` PRIMARY KEY(`id`),
-	CONSTRAINT `CodeTV_User_email_unique` UNIQUE(`email`),
+	CONSTRAINT `ctv_User_id` PRIMARY KEY(`id`),
+	CONSTRAINT `ctv_User_email_unique` UNIQUE(`email`),
 	CONSTRAINT `external_id_idx` UNIQUE(`externalId`)
 );
 --> statement-breakpoint
-CREATE TABLE `CodeTV_VerificationToken` (
+CREATE TABLE `ctv_VerificationToken` (
 	`identifier` varchar(255) NOT NULL,
 	`token` varchar(255) NOT NULL,
 	`expires` timestamp NOT NULL,
 	`createdAt` timestamp(3) DEFAULT (now()),
-	CONSTRAINT `CodeTV_VerificationToken_identifier_token_pk` PRIMARY KEY(`identifier`,`token`)
+	CONSTRAINT `ctv_VerificationToken_identifier_token_pk` PRIMARY KEY(`identifier`,`token`)
 );
 --> statement-breakpoint
-CREATE INDEX `userId_idx` ON `CodeTV_Account` (`userId`);--> statement-breakpoint
-CREATE INDEX `crr_userIdId_idx` ON `CodeTV_Comment` (`userId`);--> statement-breakpoint
-CREATE INDEX `organizationMembershipId_idx` ON `CodeTV_Comment` (`organizationMembershipId`);--> statement-breakpoint
-CREATE INDEX `name_idx` ON `CodeTV_CommunicationChannel` (`name`);--> statement-breakpoint
-CREATE INDEX `organizationId_idx` ON `CodeTV_CommunicationChannel` (`organizationId`);--> statement-breakpoint
-CREATE INDEX `userId_idx` ON `CodeTV_CommunicationPreference` (`userId`);--> statement-breakpoint
-CREATE INDEX `preferenceTypeId_idx` ON `CodeTV_CommunicationPreference` (`preferenceTypeId`);--> statement-breakpoint
-CREATE INDEX `channelId_idx` ON `CodeTV_CommunicationPreference` (`channelId`);--> statement-breakpoint
-CREATE INDEX `organizationMembershipId_idx` ON `CodeTV_CommunicationPreference` (`organizationMembershipId`);--> statement-breakpoint
-CREATE INDEX `userId_idx` ON `CodeTV_ContentContribution` (`userId`);--> statement-breakpoint
-CREATE INDEX `contentId_idx` ON `CodeTV_ContentContribution` (`contentId`);--> statement-breakpoint
-CREATE INDEX `contributionTypeId_idx` ON `CodeTV_ContentContribution` (`contributionTypeId`);--> statement-breakpoint
-CREATE INDEX `organizationMembershipId_idx` ON `CodeTV_ContentContribution` (`organizationMembershipId`);--> statement-breakpoint
-CREATE INDEX `type_idx` ON `CodeTV_ContentResource` (`type`);--> statement-breakpoint
-CREATE INDEX `createdById_idx` ON `CodeTV_ContentResource` (`createdById`);--> statement-breakpoint
-CREATE INDEX `createdAt_idx` ON `CodeTV_ContentResource` (`createdAt`);--> statement-breakpoint
-CREATE INDEX `currentVersionId_idx` ON `CodeTV_ContentResource` (`currentVersionId`);--> statement-breakpoint
-CREATE INDEX `createdByOrganizationMembershipId_idx` ON `CodeTV_ContentResource` (`createdByOrganizationMembershipId`);--> statement-breakpoint
-CREATE INDEX `slug_idx` ON `CodeTV_ContentResource` (`slug`);--> statement-breakpoint
-CREATE INDEX `contentResourceId_idx` ON `CodeTV_ContentResourceProduct` (`productId`);--> statement-breakpoint
-CREATE INDEX `resourceId_idx` ON `CodeTV_ContentResourceProduct` (`resourceId`);--> statement-breakpoint
-CREATE INDEX `organizationId_idx` ON `CodeTV_ContentResourceProduct` (`organizationId`);--> statement-breakpoint
-CREATE INDEX `contentResourceId_idx` ON `CodeTV_ContentResourceResource` (`resourceOfId`);--> statement-breakpoint
-CREATE INDEX `resourceId_idx` ON `CodeTV_ContentResourceResource` (`resourceId`);--> statement-breakpoint
-CREATE INDEX `organizationId_idx` ON `CodeTV_ContentResourceResource` (`organizationId`);--> statement-breakpoint
-CREATE INDEX `contentResourceId_idx` ON `CodeTV_ContentResourceTag` (`contentResourceId`);--> statement-breakpoint
-CREATE INDEX `tagId_idx` ON `CodeTV_ContentResourceTag` (`tagId`);--> statement-breakpoint
-CREATE INDEX `position_idx` ON `CodeTV_ContentResourceTag` (`position`);--> statement-breakpoint
-CREATE INDEX `organizationId_idx` ON `CodeTV_ContentResourceTag` (`organizationId`);--> statement-breakpoint
-CREATE INDEX `resourceId_idx` ON `CodeTV_ContentResourceVersion` (`resourceId`);--> statement-breakpoint
-CREATE INDEX `parentVersionId_idx` ON `CodeTV_ContentResourceVersion` (`parentVersionId`);--> statement-breakpoint
-CREATE INDEX `resourceId_versionNumber_idx` ON `CodeTV_ContentResourceVersion` (`resourceId`,`versionNumber`);--> statement-breakpoint
-CREATE INDEX `organizationId_idx` ON `CodeTV_ContentResourceVersion` (`organizationId`);--> statement-breakpoint
-CREATE INDEX `name_idx` ON `CodeTV_ContributionType` (`name`);--> statement-breakpoint
-CREATE INDEX `slug_idx` ON `CodeTV_ContributionType` (`slug`);--> statement-breakpoint
-CREATE INDEX `organizationId_idx` ON `CodeTV_ContributionType` (`organizationId`);--> statement-breakpoint
-CREATE INDEX `Coupon_id_code_index` ON `CodeTV_Coupon` (`id`,`code`);--> statement-breakpoint
-CREATE INDEX `organizationId_idx` ON `CodeTV_Coupon` (`organizationId`);--> statement-breakpoint
-CREATE INDEX `userId_idx` ON `CodeTV_DeviceAccessToken` (`userId`);--> statement-breakpoint
-CREATE INDEX `userId_idx` ON `CodeTV_Entitlement` (`userId`);--> statement-breakpoint
-CREATE INDEX `orgId_idx` ON `CodeTV_Entitlement` (`organizationId`);--> statement-breakpoint
-CREATE INDEX `source_idx` ON `CodeTV_Entitlement` (`sourceType`,`sourceId`);--> statement-breakpoint
-CREATE INDEX `type_idx` ON `CodeTV_Entitlement` (`entitlementType`);--> statement-breakpoint
-CREATE INDEX `crp_userId_contentResourceId_idx` ON `CodeTV_LessonProgress` (`userId`,`lessonId`);--> statement-breakpoint
-CREATE INDEX `userId_idx` ON `CodeTV_LessonProgress` (`userId`);--> statement-breakpoint
-CREATE INDEX `lessonId_idx` ON `CodeTV_LessonProgress` (`lessonId`);--> statement-breakpoint
-CREATE INDEX `organizationMembershipId_idx` ON `CodeTV_LessonProgress` (`organizationMembershipId`);--> statement-breakpoint
-CREATE INDEX `organizationId_idx` ON `CodeTV_MerchantAccount` (`organizationId`);--> statement-breakpoint
-CREATE INDEX `merchantSubscriptionId_idx` ON `CodeTV_MerchantCharge` (`merchantSubscriptionId`);--> statement-breakpoint
-CREATE INDEX `organizationId_idx` ON `CodeTV_MerchantCharge` (`organizationId`);--> statement-breakpoint
-CREATE INDEX `organizationId_idx` ON `CodeTV_MerchantCoupon` (`organizationId`);--> statement-breakpoint
-CREATE INDEX `idx_MerchantCustomer_on_userId` ON `CodeTV_MerchantCustomer` (`userId`);--> statement-breakpoint
-CREATE INDEX `organizationId_idx` ON `CodeTV_MerchantCustomer` (`organizationId`);--> statement-breakpoint
-CREATE INDEX `merchantAccountId_idx` ON `CodeTV_MerchantEvents` (`merchantAccountId`);--> statement-breakpoint
-CREATE INDEX `createdAt_idx` ON `CodeTV_MerchantEvents` (`createdAt`);--> statement-breakpoint
-CREATE INDEX `organizationId_idx` ON `CodeTV_MerchantPrice` (`organizationId`);--> statement-breakpoint
-CREATE INDEX `organizationId_idx` ON `CodeTV_MerchantProduct` (`organizationId`);--> statement-breakpoint
-CREATE INDEX `organizationId_idx` ON `CodeTV_MerchantSession` (`organizationId`);--> statement-breakpoint
-CREATE INDEX `organizationId_idx` ON `CodeTV_MerchantSubscription` (`organizationId`);--> statement-breakpoint
-CREATE INDEX `created_at_idx` ON `CodeTV_Organization` (`createdAt`);--> statement-breakpoint
-CREATE INDEX `orgMemberId_idx` ON `CodeTV_OrganizationMembershipRole` (`organizationMembershipId`);--> statement-breakpoint
-CREATE INDEX `roleId_idx` ON `CodeTV_OrganizationMembershipRole` (`roleId`);--> statement-breakpoint
-CREATE INDEX `organizationId_idx` ON `CodeTV_OrganizationMembershipRole` (`organizationId`);--> statement-breakpoint
-CREATE INDEX `role_idx` ON `CodeTV_OrganizationMembership` (`role`);--> statement-breakpoint
-CREATE INDEX `created_at_idx` ON `CodeTV_OrganizationMembership` (`createdAt`);--> statement-breakpoint
-CREATE INDEX `organizationId_idx` ON `CodeTV_OrganizationMembership` (`organizationId`);--> statement-breakpoint
-CREATE INDEX `name_idx` ON `CodeTV_Permission` (`name`);--> statement-breakpoint
-CREATE INDEX `organizationId_idx` ON `CodeTV_Price` (`organizationId`);--> statement-breakpoint
-CREATE INDEX `organizationId_idx` ON `CodeTV_Product` (`organizationId`);--> statement-breakpoint
-CREATE INDEX `userId_idx` ON `CodeTV_Profile` (`userId`);--> statement-breakpoint
-CREATE INDEX `organizationId_idx` ON `CodeTV_PurchaseUserTransfer` (`organizationId`);--> statement-breakpoint
-CREATE INDEX `idx_Purchase_on_merchantChargeId` ON `CodeTV_Purchase` (`merchantChargeId`);--> statement-breakpoint
-CREATE INDEX `organizationId_idx` ON `CodeTV_Purchase` (`organizationId`);--> statement-breakpoint
-CREATE INDEX `organizationMembershipId_idx` ON `CodeTV_Purchase` (`organizationMembershipId`);--> statement-breakpoint
-CREATE INDEX `surveyId_idx` ON `CodeTV_QuestionResponse` (`surveyId`);--> statement-breakpoint
-CREATE INDEX `questionId_idx` ON `CodeTV_QuestionResponse` (`questionId`);--> statement-breakpoint
-CREATE INDEX `respondent_key_idx` ON `CodeTV_QuestionResponse` (`respondentKey`);--> statement-breakpoint
-CREATE INDEX `survey_session_id_idx` ON `CodeTV_QuestionResponse` (`surveySessionId`);--> statement-breakpoint
-CREATE INDEX `userId_idx` ON `CodeTV_QuestionResponse` (`userId`);--> statement-breakpoint
-CREATE INDEX `emailListSubscriberId_idx` ON `CodeTV_QuestionResponse` (`emailListSubscriberId`);--> statement-breakpoint
-CREATE INDEX `survey_subscriber_idx` ON `CodeTV_QuestionResponse` (`surveyId`,`emailListSubscriberId`);--> statement-breakpoint
-CREATE INDEX `crp_userId_contentResourceId_idx` ON `CodeTV_ResourceProgress` (`userId`,`resourceId`);--> statement-breakpoint
-CREATE INDEX `contentResourceId_idx` ON `CodeTV_ResourceProgress` (`resourceId`);--> statement-breakpoint
-CREATE INDEX `resourceId_idx` ON `CodeTV_ResourceProgress` (`userId`);--> statement-breakpoint
-CREATE INDEX `organizationMembershipId_idx` ON `CodeTV_ResourceProgress` (`organizationMembershipId`);--> statement-breakpoint
-CREATE INDEX `roleId_idx` ON `CodeTV_RolePermission` (`roleId`);--> statement-breakpoint
-CREATE INDEX `permissionId_idx` ON `CodeTV_RolePermission` (`permissionId`);--> statement-breakpoint
-CREATE INDEX `name_idx` ON `CodeTV_Role` (`name`);--> statement-breakpoint
-CREATE INDEX `organizationId_idx` ON `CodeTV_Role` (`organizationId`);--> statement-breakpoint
-CREATE INDEX `userId_idx` ON `CodeTV_Session` (`userId`);--> statement-breakpoint
-CREATE INDEX `organizationId_idx` ON `CodeTV_Subscription` (`organizationId`);--> statement-breakpoint
-CREATE INDEX `type_idx` ON `CodeTV_Tag` (`type`);--> statement-breakpoint
-CREATE INDEX `organizationId_idx` ON `CodeTV_Tag` (`organizationId`);--> statement-breakpoint
-CREATE INDEX `parentTagId_idx` ON `CodeTV_TagTag` (`parentTagId`);--> statement-breakpoint
-CREATE INDEX `childTagId_idx` ON `CodeTV_TagTag` (`childTagId`);--> statement-breakpoint
-CREATE INDEX `position_idx` ON `CodeTV_TagTag` (`position`);--> statement-breakpoint
-CREATE INDEX `organizationId_idx` ON `CodeTV_TagTag` (`organizationId`);--> statement-breakpoint
-CREATE INDEX `upgradableFromId_idx` ON `CodeTV_UpgradableProducts` (`upgradableToId`);--> statement-breakpoint
-CREATE INDEX `upgradableToId_idx` ON `CodeTV_UpgradableProducts` (`upgradableFrom`);--> statement-breakpoint
-CREATE INDEX `organizationId_idx` ON `CodeTV_UpgradableProducts` (`organizationId`);--> statement-breakpoint
-CREATE INDEX `userId_idx` ON `CodeTV_UserPermission` (`userId`);--> statement-breakpoint
-CREATE INDEX `permissionId_idx` ON `CodeTV_UserPermission` (`permissionId`);--> statement-breakpoint
-CREATE INDEX `organizationId_idx` ON `CodeTV_UserPermission` (`organizationId`);--> statement-breakpoint
-CREATE INDEX `crr_userIdId_idx` ON `CodeTV_UserPrefs` (`userId`);--> statement-breakpoint
-CREATE INDEX `organizationId_idx` ON `CodeTV_UserPrefs` (`organizationId`);--> statement-breakpoint
-CREATE INDEX `userId_idx` ON `CodeTV_UserRole` (`userId`);--> statement-breakpoint
-CREATE INDEX `roleId_idx` ON `CodeTV_UserRole` (`roleId`);--> statement-breakpoint
-CREATE INDEX `organizationId_idx` ON `CodeTV_UserRole` (`organizationId`);--> statement-breakpoint
-CREATE INDEX `email_idx` ON `CodeTV_User` (`email`);--> statement-breakpoint
-CREATE INDEX `role_idx` ON `CodeTV_User` (`role`);--> statement-breakpoint
-CREATE INDEX `created_at_idx` ON `CodeTV_User` (`createdAt`);
+CREATE INDEX `userId_idx` ON `ctv_Account` (`userId`);--> statement-breakpoint
+CREATE INDEX `crr_userIdId_idx` ON `ctv_Comment` (`userId`);--> statement-breakpoint
+CREATE INDEX `organizationMembershipId_idx` ON `ctv_Comment` (`organizationMembershipId`);--> statement-breakpoint
+CREATE INDEX `name_idx` ON `ctv_CommunicationChannel` (`name`);--> statement-breakpoint
+CREATE INDEX `organizationId_idx` ON `ctv_CommunicationChannel` (`organizationId`);--> statement-breakpoint
+CREATE INDEX `userId_idx` ON `ctv_CommunicationPreference` (`userId`);--> statement-breakpoint
+CREATE INDEX `preferenceTypeId_idx` ON `ctv_CommunicationPreference` (`preferenceTypeId`);--> statement-breakpoint
+CREATE INDEX `channelId_idx` ON `ctv_CommunicationPreference` (`channelId`);--> statement-breakpoint
+CREATE INDEX `organizationMembershipId_idx` ON `ctv_CommunicationPreference` (`organizationMembershipId`);--> statement-breakpoint
+CREATE INDEX `userId_idx` ON `ctv_ContentContribution` (`userId`);--> statement-breakpoint
+CREATE INDEX `contentId_idx` ON `ctv_ContentContribution` (`contentId`);--> statement-breakpoint
+CREATE INDEX `contributionTypeId_idx` ON `ctv_ContentContribution` (`contributionTypeId`);--> statement-breakpoint
+CREATE INDEX `organizationMembershipId_idx` ON `ctv_ContentContribution` (`organizationMembershipId`);--> statement-breakpoint
+CREATE INDEX `type_idx` ON `ctv_ContentResource` (`type`);--> statement-breakpoint
+CREATE INDEX `createdById_idx` ON `ctv_ContentResource` (`createdById`);--> statement-breakpoint
+CREATE INDEX `createdAt_idx` ON `ctv_ContentResource` (`createdAt`);--> statement-breakpoint
+CREATE INDEX `currentVersionId_idx` ON `ctv_ContentResource` (`currentVersionId`);--> statement-breakpoint
+CREATE INDEX `createdByOrganizationMembershipId_idx` ON `ctv_ContentResource` (`createdByOrganizationMembershipId`);--> statement-breakpoint
+CREATE INDEX `slug_idx` ON `ctv_ContentResource` (`slug`);--> statement-breakpoint
+CREATE INDEX `contentResourceId_idx` ON `ctv_ContentResourceProduct` (`productId`);--> statement-breakpoint
+CREATE INDEX `resourceId_idx` ON `ctv_ContentResourceProduct` (`resourceId`);--> statement-breakpoint
+CREATE INDEX `organizationId_idx` ON `ctv_ContentResourceProduct` (`organizationId`);--> statement-breakpoint
+CREATE INDEX `contentResourceId_idx` ON `ctv_ContentResourceResource` (`resourceOfId`);--> statement-breakpoint
+CREATE INDEX `resourceId_idx` ON `ctv_ContentResourceResource` (`resourceId`);--> statement-breakpoint
+CREATE INDEX `organizationId_idx` ON `ctv_ContentResourceResource` (`organizationId`);--> statement-breakpoint
+CREATE INDEX `contentResourceId_idx` ON `ctv_ContentResourceTag` (`contentResourceId`);--> statement-breakpoint
+CREATE INDEX `tagId_idx` ON `ctv_ContentResourceTag` (`tagId`);--> statement-breakpoint
+CREATE INDEX `position_idx` ON `ctv_ContentResourceTag` (`position`);--> statement-breakpoint
+CREATE INDEX `organizationId_idx` ON `ctv_ContentResourceTag` (`organizationId`);--> statement-breakpoint
+CREATE INDEX `resourceId_idx` ON `ctv_ContentResourceVersion` (`resourceId`);--> statement-breakpoint
+CREATE INDEX `parentVersionId_idx` ON `ctv_ContentResourceVersion` (`parentVersionId`);--> statement-breakpoint
+CREATE INDEX `resourceId_versionNumber_idx` ON `ctv_ContentResourceVersion` (`resourceId`,`versionNumber`);--> statement-breakpoint
+CREATE INDEX `organizationId_idx` ON `ctv_ContentResourceVersion` (`organizationId`);--> statement-breakpoint
+CREATE INDEX `name_idx` ON `ctv_ContributionType` (`name`);--> statement-breakpoint
+CREATE INDEX `slug_idx` ON `ctv_ContributionType` (`slug`);--> statement-breakpoint
+CREATE INDEX `organizationId_idx` ON `ctv_ContributionType` (`organizationId`);--> statement-breakpoint
+CREATE INDEX `Coupon_id_code_index` ON `ctv_Coupon` (`id`,`code`);--> statement-breakpoint
+CREATE INDEX `organizationId_idx` ON `ctv_Coupon` (`organizationId`);--> statement-breakpoint
+CREATE INDEX `userId_idx` ON `ctv_DeviceAccessToken` (`userId`);--> statement-breakpoint
+CREATE INDEX `userId_idx` ON `ctv_Entitlement` (`userId`);--> statement-breakpoint
+CREATE INDEX `orgId_idx` ON `ctv_Entitlement` (`organizationId`);--> statement-breakpoint
+CREATE INDEX `source_idx` ON `ctv_Entitlement` (`sourceType`,`sourceId`);--> statement-breakpoint
+CREATE INDEX `type_idx` ON `ctv_Entitlement` (`entitlementType`);--> statement-breakpoint
+CREATE INDEX `crp_userId_contentResourceId_idx` ON `ctv_LessonProgress` (`userId`,`lessonId`);--> statement-breakpoint
+CREATE INDEX `userId_idx` ON `ctv_LessonProgress` (`userId`);--> statement-breakpoint
+CREATE INDEX `lessonId_idx` ON `ctv_LessonProgress` (`lessonId`);--> statement-breakpoint
+CREATE INDEX `organizationMembershipId_idx` ON `ctv_LessonProgress` (`organizationMembershipId`);--> statement-breakpoint
+CREATE INDEX `organizationId_idx` ON `ctv_MerchantAccount` (`organizationId`);--> statement-breakpoint
+CREATE INDEX `merchantSubscriptionId_idx` ON `ctv_MerchantCharge` (`merchantSubscriptionId`);--> statement-breakpoint
+CREATE INDEX `organizationId_idx` ON `ctv_MerchantCharge` (`organizationId`);--> statement-breakpoint
+CREATE INDEX `organizationId_idx` ON `ctv_MerchantCoupon` (`organizationId`);--> statement-breakpoint
+CREATE INDEX `idx_MerchantCustomer_on_userId` ON `ctv_MerchantCustomer` (`userId`);--> statement-breakpoint
+CREATE INDEX `organizationId_idx` ON `ctv_MerchantCustomer` (`organizationId`);--> statement-breakpoint
+CREATE INDEX `merchantAccountId_idx` ON `ctv_MerchantEvents` (`merchantAccountId`);--> statement-breakpoint
+CREATE INDEX `createdAt_idx` ON `ctv_MerchantEvents` (`createdAt`);--> statement-breakpoint
+CREATE INDEX `organizationId_idx` ON `ctv_MerchantPrice` (`organizationId`);--> statement-breakpoint
+CREATE INDEX `organizationId_idx` ON `ctv_MerchantProduct` (`organizationId`);--> statement-breakpoint
+CREATE INDEX `organizationId_idx` ON `ctv_MerchantSession` (`organizationId`);--> statement-breakpoint
+CREATE INDEX `organizationId_idx` ON `ctv_MerchantSubscription` (`organizationId`);--> statement-breakpoint
+CREATE INDEX `created_at_idx` ON `ctv_Organization` (`createdAt`);--> statement-breakpoint
+CREATE INDEX `orgMemberId_idx` ON `ctv_OrganizationMembershipRole` (`organizationMembershipId`);--> statement-breakpoint
+CREATE INDEX `roleId_idx` ON `ctv_OrganizationMembershipRole` (`roleId`);--> statement-breakpoint
+CREATE INDEX `organizationId_idx` ON `ctv_OrganizationMembershipRole` (`organizationId`);--> statement-breakpoint
+CREATE INDEX `role_idx` ON `ctv_OrganizationMembership` (`role`);--> statement-breakpoint
+CREATE INDEX `created_at_idx` ON `ctv_OrganizationMembership` (`createdAt`);--> statement-breakpoint
+CREATE INDEX `organizationId_idx` ON `ctv_OrganizationMembership` (`organizationId`);--> statement-breakpoint
+CREATE INDEX `name_idx` ON `ctv_Permission` (`name`);--> statement-breakpoint
+CREATE INDEX `organizationId_idx` ON `ctv_Price` (`organizationId`);--> statement-breakpoint
+CREATE INDEX `organizationId_idx` ON `ctv_Product` (`organizationId`);--> statement-breakpoint
+CREATE INDEX `userId_idx` ON `ctv_Profile` (`userId`);--> statement-breakpoint
+CREATE INDEX `organizationId_idx` ON `ctv_PurchaseUserTransfer` (`organizationId`);--> statement-breakpoint
+CREATE INDEX `idx_Purchase_on_merchantChargeId` ON `ctv_Purchase` (`merchantChargeId`);--> statement-breakpoint
+CREATE INDEX `organizationId_idx` ON `ctv_Purchase` (`organizationId`);--> statement-breakpoint
+CREATE INDEX `organizationMembershipId_idx` ON `ctv_Purchase` (`organizationMembershipId`);--> statement-breakpoint
+CREATE INDEX `surveyId_idx` ON `ctv_QuestionResponse` (`surveyId`);--> statement-breakpoint
+CREATE INDEX `questionId_idx` ON `ctv_QuestionResponse` (`questionId`);--> statement-breakpoint
+CREATE INDEX `respondent_key_idx` ON `ctv_QuestionResponse` (`respondentKey`);--> statement-breakpoint
+CREATE INDEX `survey_session_id_idx` ON `ctv_QuestionResponse` (`surveySessionId`);--> statement-breakpoint
+CREATE INDEX `userId_idx` ON `ctv_QuestionResponse` (`userId`);--> statement-breakpoint
+CREATE INDEX `emailListSubscriberId_idx` ON `ctv_QuestionResponse` (`emailListSubscriberId`);--> statement-breakpoint
+CREATE INDEX `survey_subscriber_idx` ON `ctv_QuestionResponse` (`surveyId`,`emailListSubscriberId`);--> statement-breakpoint
+CREATE INDEX `crp_userId_contentResourceId_idx` ON `ctv_ResourceProgress` (`userId`,`resourceId`);--> statement-breakpoint
+CREATE INDEX `contentResourceId_idx` ON `ctv_ResourceProgress` (`resourceId`);--> statement-breakpoint
+CREATE INDEX `resourceId_idx` ON `ctv_ResourceProgress` (`userId`);--> statement-breakpoint
+CREATE INDEX `organizationMembershipId_idx` ON `ctv_ResourceProgress` (`organizationMembershipId`);--> statement-breakpoint
+CREATE INDEX `roleId_idx` ON `ctv_RolePermission` (`roleId`);--> statement-breakpoint
+CREATE INDEX `permissionId_idx` ON `ctv_RolePermission` (`permissionId`);--> statement-breakpoint
+CREATE INDEX `name_idx` ON `ctv_Role` (`name`);--> statement-breakpoint
+CREATE INDEX `organizationId_idx` ON `ctv_Role` (`organizationId`);--> statement-breakpoint
+CREATE INDEX `userId_idx` ON `ctv_Session` (`userId`);--> statement-breakpoint
+CREATE INDEX `organizationId_idx` ON `ctv_Subscription` (`organizationId`);--> statement-breakpoint
+CREATE INDEX `type_idx` ON `ctv_Tag` (`type`);--> statement-breakpoint
+CREATE INDEX `organizationId_idx` ON `ctv_Tag` (`organizationId`);--> statement-breakpoint
+CREATE INDEX `parentTagId_idx` ON `ctv_TagTag` (`parentTagId`);--> statement-breakpoint
+CREATE INDEX `childTagId_idx` ON `ctv_TagTag` (`childTagId`);--> statement-breakpoint
+CREATE INDEX `position_idx` ON `ctv_TagTag` (`position`);--> statement-breakpoint
+CREATE INDEX `organizationId_idx` ON `ctv_TagTag` (`organizationId`);--> statement-breakpoint
+CREATE INDEX `upgradableFromId_idx` ON `ctv_UpgradableProducts` (`upgradableToId`);--> statement-breakpoint
+CREATE INDEX `upgradableToId_idx` ON `ctv_UpgradableProducts` (`upgradableFrom`);--> statement-breakpoint
+CREATE INDEX `organizationId_idx` ON `ctv_UpgradableProducts` (`organizationId`);--> statement-breakpoint
+CREATE INDEX `userId_idx` ON `ctv_UserPermission` (`userId`);--> statement-breakpoint
+CREATE INDEX `permissionId_idx` ON `ctv_UserPermission` (`permissionId`);--> statement-breakpoint
+CREATE INDEX `organizationId_idx` ON `ctv_UserPermission` (`organizationId`);--> statement-breakpoint
+CREATE INDEX `crr_userIdId_idx` ON `ctv_UserPrefs` (`userId`);--> statement-breakpoint
+CREATE INDEX `organizationId_idx` ON `ctv_UserPrefs` (`organizationId`);--> statement-breakpoint
+CREATE INDEX `userId_idx` ON `ctv_UserRole` (`userId`);--> statement-breakpoint
+CREATE INDEX `roleId_idx` ON `ctv_UserRole` (`roleId`);--> statement-breakpoint
+CREATE INDEX `organizationId_idx` ON `ctv_UserRole` (`organizationId`);--> statement-breakpoint
+CREATE INDEX `email_idx` ON `ctv_User` (`email`);--> statement-breakpoint
+CREATE INDEX `role_idx` ON `ctv_User` (`role`);--> statement-breakpoint
+CREATE INDEX `created_at_idx` ON `ctv_User` (`createdAt`);

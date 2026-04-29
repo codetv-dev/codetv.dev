@@ -6,27 +6,13 @@ import { contentResource, contentResourceResource } from '../../../db/schema';
 import { getUserAbilityForRequest } from '../../../server/ability';
 import { withSkill } from '../../../server/with-skill';
 
-const corsHeaders = {
-	'Access-Control-Allow-Origin': '*',
-	'Access-Control-Allow-Methods': 'GET, POST, PATCH, DELETE, OPTIONS',
-	'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-};
-
 function json(body: unknown, init: ResponseInit = {}) {
-	return Response.json(body, {
-		...init,
-		headers: {
-			...corsHeaders,
-			...(init.headers ?? {}),
-		},
-	});
+	return Response.json(body, init);
 }
 
 function isObject(value: unknown): value is Record<string, unknown> {
 	return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
-
-export const OPTIONS: APIRoute = async () => json({});
 
 export const GET: APIRoute = async ({ request }) =>
 	withSkill(async (request) => {
@@ -100,7 +86,10 @@ export const POST: APIRoute = async ({ request }) =>
 		});
 
 		if (existing) {
-			return json({ error: 'Edge already exists', edge: existing }, { status: 409 });
+			return json(
+				{ error: 'Edge already exists', edge: existing },
+				{ status: 409 },
+			);
 		}
 
 		let resolvedPosition = position;
@@ -174,7 +163,10 @@ export const PATCH: APIRoute = async ({ request }) =>
 			metadata:
 				metadata === undefined
 					? existing.metadata
-					: { ...((existing.metadata ?? {}) as Record<string, unknown>), ...metadata },
+					: {
+							...((existing.metadata ?? {}) as Record<string, unknown>),
+							...metadata,
+						},
 			updatedAt: new Date(),
 		};
 		if (position !== undefined) update.position = position;

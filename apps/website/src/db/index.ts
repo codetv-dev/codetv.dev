@@ -7,9 +7,17 @@ import { getStripeProvider } from '../coursebuilder/stripe-provider';
 import { mysqlTable } from './mysql-table';
 import * as schema from './schema';
 
+const databaseUrl = process.env.DATABASE_URL;
+
+if (!databaseUrl) {
+	throw new Error(
+		'DATABASE_URL is required to initialize the CourseBuilder database',
+	);
+}
+
 export const db = drizzle(
 	new Client({
-		url: process.env.DATABASE_URL ?? '',
+		url: databaseUrl,
 	}),
 	{ schema },
 );

@@ -6,28 +6,14 @@ import { contentResource } from '../../db/schema';
 import { getUserAbilityForRequest } from '../../server/ability';
 import { withSkill } from '../../server/with-skill';
 
-const corsHeaders = {
-	'Access-Control-Allow-Origin': '*',
-	'Access-Control-Allow-Methods': 'GET, PUT, OPTIONS',
-	'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-};
-
 function json(body: unknown, init: ResponseInit = {}) {
-	return Response.json(body, {
-		...init,
-		headers: {
-			...corsHeaders,
-			...(init.headers ?? {}),
-		},
-	});
+	return Response.json(body, init);
 }
 
 function isPublicLesson(lesson: typeof contentResource.$inferSelect) {
 	const fields = (lesson.fields ?? {}) as Record<string, unknown>;
 	return fields.state === 'published' && fields.visibility === 'public';
 }
-
-export const OPTIONS: APIRoute = async () => json({});
 
 export const GET: APIRoute = async ({ request }) =>
 	withSkill(async (request) => {

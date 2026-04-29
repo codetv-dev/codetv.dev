@@ -6,23 +6,9 @@ import { contentResourceResource, products } from '../../db/schema';
 import { getUserAbilityForRequest } from '../../server/ability';
 import { withSkill } from '../../server/with-skill';
 
-const corsHeaders = {
-	'Access-Control-Allow-Origin': '*',
-	'Access-Control-Allow-Methods': 'GET, OPTIONS',
-	'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-};
-
 function json(body: unknown, init: ResponseInit = {}) {
-	return Response.json(body, {
-		...init,
-		headers: {
-			...corsHeaders,
-			...(init.headers ?? {}),
-		},
-	});
+	return Response.json(body, init);
 }
-
-export const OPTIONS: APIRoute = async () => json({});
 
 const productWithFullStructure = {
 	price: true,
@@ -72,12 +58,16 @@ export const GET: APIRoute = async ({ request }) =>
 			const product = await db.query.products.findFirst({
 				where: or(
 					eq(products.id, slugOrId),
-					eq(sql`JSON_EXTRACT(${products.fields}, "$.slug")`, slugOrId),
+					eq(
+						sql`JSON_UNQUOTE(JSON_EXTRACT(${products.fields}, "$.slug"))`,
+						slugOrId,
+					),
 				),
 				with: productWithFullStructure,
 			});
 
-			if (!product) return json({ error: 'Product not found' }, { status: 404 });
+			if (!product)
+				return json({ error: 'Product not found' }, { status: 404 });
 
 			return json(product);
 		}

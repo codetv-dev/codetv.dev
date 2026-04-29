@@ -10,7 +10,7 @@ import { withSkill } from '../../../server/with-skill';
 export const POST: APIRoute = async ({ request }) =>
 	withSkill(async () => {
 		const TEN_MINUTES_IN_MILLISECONDS = 60 * 10 * 1000;
-		const expires = new Date(Date.now() + TEN_MINUTES_IN_MILLISECONDS + 10000);
+		const expires = new Date(Date.now() + TEN_MINUTES_IN_MILLISECONDS);
 		const userCode = hri.random();
 		const deviceCode = crypto.randomUUID();
 

@@ -185,7 +185,7 @@ Recommended Stripe webhook event set for CourseBuilder prod: use the full suppor
 
 ### Validated smoke tests
 
-Validated with the actual CourseBuilder CLI from `/Users/joel/Code/badass-courses/course-builder/packages/aihero-cli/src/cli.ts` using `npx pnpm@10.26.1 --filter @coursebuilder/cli dev -- ...`.
+Validated with the actual CourseBuilder CLI from [`packages/aihero-cli/src/cli.ts`](https://github.com/badass-courses/course-builder/blob/main/packages/aihero-cli/src/cli.ts) in a local checkout of `github.com/badass-courses/course-builder`, using `npx pnpm@10.26.1 --filter @coursebuilder/cli dev -- ...`.
 
 Smoke-tested successfully:
 

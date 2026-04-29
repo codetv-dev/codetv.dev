@@ -1,11 +1,11 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "e4a41341-db8b-4969-8408-af65e0d1ff83",
+  "id": "78be9c98-6073-4744-8482-705bf0f6d6fa",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
-    "CodeTV_Account": {
-      "name": "CodeTV_Account",
+    "ctv_Account": {
+      "name": "ctv_Account",
       "columns": {
         "userId": {
           "name": "userId",
@@ -117,8 +117,8 @@
       },
       "foreignKeys": {},
       "compositePrimaryKeys": {
-        "CodeTV_Account_provider_providerAccountId_pk": {
-          "name": "CodeTV_Account_provider_providerAccountId_pk",
+        "ctv_Account_provider_providerAccountId_pk": {
+          "name": "ctv_Account_provider_providerAccountId_pk",
           "columns": [
             "provider",
             "providerAccountId"
@@ -128,8 +128,8 @@
       "uniqueConstraints": {},
       "checkConstraint": {}
     },
-    "CodeTV_Comment": {
-      "name": "CodeTV_Comment",
+    "ctv_Comment": {
+      "name": "ctv_Comment",
       "columns": {
         "id": {
           "name": "id",
@@ -209,8 +209,8 @@
       },
       "foreignKeys": {},
       "compositePrimaryKeys": {
-        "CodeTV_Comment_id_pk": {
-          "name": "CodeTV_Comment_id_pk",
+        "ctv_Comment_id_pk": {
+          "name": "ctv_Comment_id_pk",
           "columns": [
             "id"
           ]
@@ -219,8 +219,8 @@
       "uniqueConstraints": {},
       "checkConstraint": {}
     },
-    "CodeTV_CommunicationChannel": {
-      "name": "CodeTV_CommunicationChannel",
+    "ctv_CommunicationChannel": {
+      "name": "ctv_CommunicationChannel",
       "columns": {
         "id": {
           "name": "id",
@@ -300,8 +300,8 @@
       },
       "foreignKeys": {},
       "compositePrimaryKeys": {
-        "CodeTV_CommunicationChannel_id": {
-          "name": "CodeTV_CommunicationChannel_id",
+        "ctv_CommunicationChannel_id": {
+          "name": "ctv_CommunicationChannel_id",
           "columns": [
             "id"
           ]
@@ -310,8 +310,8 @@
       "uniqueConstraints": {},
       "checkConstraint": {}
     },
-    "CodeTV_CommunicationPreferenceType": {
-      "name": "CodeTV_CommunicationPreferenceType",
+    "ctv_CommunicationPreferenceType": {
+      "name": "ctv_CommunicationPreferenceType",
       "columns": {
         "id": {
           "name": "id",
@@ -375,8 +375,8 @@
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {
-        "CodeTV_CommunicationPreferenceType_id": {
-          "name": "CodeTV_CommunicationPreferenceType_id",
+        "ctv_CommunicationPreferenceType_id": {
+          "name": "ctv_CommunicationPreferenceType_id",
           "columns": [
             "id"
           ]
@@ -385,8 +385,8 @@
       "uniqueConstraints": {},
       "checkConstraint": {}
     },
-    "CodeTV_CommunicationPreference": {
-      "name": "CodeTV_CommunicationPreference",
+    "ctv_CommunicationPreference": {
+      "name": "ctv_CommunicationPreference",
       "columns": {
         "id": {
           "name": "id",
@@ -516,8 +516,8 @@
       },
       "foreignKeys": {},
       "compositePrimaryKeys": {
-        "CodeTV_CommunicationPreference_id": {
-          "name": "CodeTV_CommunicationPreference_id",
+        "ctv_CommunicationPreference_id": {
+          "name": "ctv_CommunicationPreference_id",
           "columns": [
             "id"
           ]
@@ -526,8 +526,8 @@
       "uniqueConstraints": {},
       "checkConstraint": {}
     },
-    "CodeTV_ContentContribution": {
-      "name": "CodeTV_ContentContribution",
+    "ctv_ContentContribution": {
+      "name": "ctv_ContentContribution",
       "columns": {
         "id": {
           "name": "id",
@@ -635,8 +635,8 @@
       },
       "foreignKeys": {},
       "compositePrimaryKeys": {
-        "CodeTV_ContentContribution_id": {
-          "name": "CodeTV_ContentContribution_id",
+        "ctv_ContentContribution_id": {
+          "name": "ctv_ContentContribution_id",
           "columns": [
             "id"
           ]
@@ -645,8 +645,8 @@
       "uniqueConstraints": {},
       "checkConstraint": {}
     },
-    "CodeTV_ContentResource": {
-      "name": "CodeTV_ContentResource",
+    "ctv_ContentResource": {
+      "name": "ctv_ContentResource",
       "columns": {
         "id": {
           "name": "id",
@@ -779,8 +779,8 @@
       },
       "foreignKeys": {},
       "compositePrimaryKeys": {
-        "CodeTV_ContentResource_id": {
-          "name": "CodeTV_ContentResource_id",
+        "ctv_ContentResource_id": {
+          "name": "ctv_ContentResource_id",
           "columns": [
             "id"
           ]
@@ -789,8 +789,8 @@
       "uniqueConstraints": {},
       "checkConstraint": {}
     },
-    "CodeTV_ContentResourceProduct": {
-      "name": "CodeTV_ContentResourceProduct",
+    "ctv_ContentResourceProduct": {
+      "name": "ctv_ContentResourceProduct",
       "columns": {
         "productId": {
           "name": "productId",
@@ -878,8 +878,8 @@
       },
       "foreignKeys": {},
       "compositePrimaryKeys": {
-        "CodeTV_ContentResourceProduct_productId_resourceId_pk": {
-          "name": "CodeTV_ContentResourceProduct_productId_resourceId_pk",
+        "ctv_ContentResourceProduct_productId_resourceId_pk": {
+          "name": "ctv_ContentResourceProduct_productId_resourceId_pk",
           "columns": [
             "productId",
             "resourceId"
@@ -889,8 +889,8 @@
       "uniqueConstraints": {},
       "checkConstraint": {}
     },
-    "CodeTV_ContentResourceResource": {
-      "name": "CodeTV_ContentResourceResource",
+    "ctv_ContentResourceResource": {
+      "name": "ctv_ContentResourceResource",
       "columns": {
         "resourceOfId": {
           "name": "resourceOfId",
@@ -978,8 +978,8 @@
       },
       "foreignKeys": {},
       "compositePrimaryKeys": {
-        "CodeTV_ContentResourceResource_resourceOfId_resourceId_pk": {
-          "name": "CodeTV_ContentResourceResource_resourceOfId_resourceId_pk",
+        "ctv_ContentResourceResource_resourceOfId_resourceId_pk": {
+          "name": "ctv_ContentResourceResource_resourceOfId_resourceId_pk",
           "columns": [
             "resourceOfId",
             "resourceId"
@@ -989,8 +989,8 @@
       "uniqueConstraints": {},
       "checkConstraint": {}
     },
-    "CodeTV_ContentResourceTag": {
-      "name": "CodeTV_ContentResourceTag",
+    "ctv_ContentResourceTag": {
+      "name": "ctv_ContentResourceTag",
       "columns": {
         "contentResourceId": {
           "name": "contentResourceId",
@@ -1070,8 +1070,8 @@
       },
       "foreignKeys": {},
       "compositePrimaryKeys": {
-        "CodeTV_ContentResourceTag_contentResourceId_tagId_pk": {
-          "name": "CodeTV_ContentResourceTag_contentResourceId_tagId_pk",
+        "ctv_ContentResourceTag_contentResourceId_tagId_pk": {
+          "name": "ctv_ContentResourceTag_contentResourceId_tagId_pk",
           "columns": [
             "contentResourceId",
             "tagId"
@@ -1081,8 +1081,8 @@
       "uniqueConstraints": {},
       "checkConstraint": {}
     },
-    "CodeTV_ContentResourceVersion": {
-      "name": "CodeTV_ContentResourceVersion",
+    "ctv_ContentResourceVersion": {
+      "name": "ctv_ContentResourceVersion",
       "columns": {
         "id": {
           "name": "id",
@@ -1176,8 +1176,8 @@
       },
       "foreignKeys": {},
       "compositePrimaryKeys": {
-        "CodeTV_ContentResourceVersion_id": {
-          "name": "CodeTV_ContentResourceVersion_id",
+        "ctv_ContentResourceVersion_id": {
+          "name": "ctv_ContentResourceVersion_id",
           "columns": [
             "id"
           ]
@@ -1194,8 +1194,8 @@
       },
       "checkConstraint": {}
     },
-    "CodeTV_ContributionType": {
-      "name": "CodeTV_ContributionType",
+    "ctv_ContributionType": {
+      "name": "ctv_ContributionType",
       "columns": {
         "id": {
           "name": "id",
@@ -1289,16 +1289,16 @@
       },
       "foreignKeys": {},
       "compositePrimaryKeys": {
-        "CodeTV_ContributionType_id": {
-          "name": "CodeTV_ContributionType_id",
+        "ctv_ContributionType_id": {
+          "name": "ctv_ContributionType_id",
           "columns": [
             "id"
           ]
         }
       },
       "uniqueConstraints": {
-        "CodeTV_ContributionType_slug_unique": {
-          "name": "CodeTV_ContributionType_slug_unique",
+        "ctv_ContributionType_slug_unique": {
+          "name": "ctv_ContributionType_slug_unique",
           "columns": [
             "slug"
           ]
@@ -1306,8 +1306,8 @@
       },
       "checkConstraint": {}
     },
-    "CodeTV_Coupon": {
-      "name": "CodeTV_Coupon",
+    "ctv_Coupon": {
+      "name": "ctv_Coupon",
       "columns": {
         "id": {
           "name": "id",
@@ -1450,8 +1450,8 @@
       },
       "checkConstraint": {}
     },
-    "CodeTV_DeviceAccessToken": {
-      "name": "CodeTV_DeviceAccessToken",
+    "ctv_DeviceAccessToken": {
+      "name": "ctv_DeviceAccessToken",
       "columns": {
         "token": {
           "name": "token",
@@ -1494,8 +1494,8 @@
       },
       "foreignKeys": {},
       "compositePrimaryKeys": {
-        "CodeTV_DeviceAccessToken_token_pk": {
-          "name": "CodeTV_DeviceAccessToken_token_pk",
+        "ctv_DeviceAccessToken_token_pk": {
+          "name": "ctv_DeviceAccessToken_token_pk",
           "columns": [
             "token"
           ]
@@ -1504,8 +1504,8 @@
       "uniqueConstraints": {},
       "checkConstraint": {}
     },
-    "CodeTV_DeviceVerification": {
-      "name": "CodeTV_DeviceVerification",
+    "ctv_DeviceVerification": {
+      "name": "ctv_DeviceVerification",
       "columns": {
         "verifiedByUserId": {
           "name": "verifiedByUserId",
@@ -1554,8 +1554,8 @@
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {
-        "CodeTV_DeviceVerification_deviceCode_pk": {
-          "name": "CodeTV_DeviceVerification_deviceCode_pk",
+        "ctv_DeviceVerification_deviceCode_pk": {
+          "name": "ctv_DeviceVerification_deviceCode_pk",
           "columns": [
             "deviceCode"
           ]
@@ -1564,8 +1564,8 @@
       "uniqueConstraints": {},
       "checkConstraint": {}
     },
-    "CodeTV_EntitlementType": {
-      "name": "CodeTV_EntitlementType",
+    "ctv_EntitlementType": {
+      "name": "ctv_EntitlementType",
       "columns": {
         "id": {
           "name": "id",
@@ -1600,8 +1600,8 @@
       },
       "foreignKeys": {},
       "compositePrimaryKeys": {
-        "CodeTV_EntitlementType_id": {
-          "name": "CodeTV_EntitlementType_id",
+        "ctv_EntitlementType_id": {
+          "name": "ctv_EntitlementType_id",
           "columns": [
             "id"
           ]
@@ -1610,8 +1610,8 @@
       "uniqueConstraints": {},
       "checkConstraint": {}
     },
-    "CodeTV_Entitlement": {
-      "name": "CodeTV_Entitlement",
+    "ctv_Entitlement": {
+      "name": "ctv_Entitlement",
       "columns": {
         "id": {
           "name": "id",
@@ -1734,8 +1734,8 @@
       },
       "foreignKeys": {},
       "compositePrimaryKeys": {
-        "CodeTV_Entitlement_id": {
-          "name": "CodeTV_Entitlement_id",
+        "ctv_Entitlement_id": {
+          "name": "ctv_Entitlement_id",
           "columns": [
             "id"
           ]
@@ -1744,8 +1744,8 @@
       "uniqueConstraints": {},
       "checkConstraint": {}
     },
-    "CodeTV_LessonProgress": {
-      "name": "CodeTV_LessonProgress",
+    "ctv_LessonProgress": {
+      "name": "ctv_LessonProgress",
       "columns": {
         "id": {
           "name": "id",
@@ -1866,8 +1866,8 @@
       },
       "foreignKeys": {},
       "compositePrimaryKeys": {
-        "CodeTV_LessonProgress_id": {
-          "name": "CodeTV_LessonProgress_id",
+        "ctv_LessonProgress_id": {
+          "name": "ctv_LessonProgress_id",
           "columns": [
             "id"
           ]
@@ -1876,8 +1876,8 @@
       "uniqueConstraints": {},
       "checkConstraint": {}
     },
-    "CodeTV_MerchantAccount": {
-      "name": "CodeTV_MerchantAccount",
+    "ctv_MerchantAccount": {
+      "name": "ctv_MerchantAccount",
       "columns": {
         "id": {
           "name": "id",
@@ -1945,8 +1945,8 @@
       "uniqueConstraints": {},
       "checkConstraint": {}
     },
-    "CodeTV_MerchantCharge": {
-      "name": "CodeTV_MerchantCharge",
+    "ctv_MerchantCharge": {
+      "name": "ctv_MerchantCharge",
       "columns": {
         "id": {
           "name": "id",
@@ -2056,8 +2056,8 @@
       },
       "checkConstraint": {}
     },
-    "CodeTV_MerchantCoupon": {
-      "name": "CodeTV_MerchantCoupon",
+    "ctv_MerchantCoupon": {
+      "name": "ctv_MerchantCoupon",
       "columns": {
         "id": {
           "name": "id",
@@ -2145,8 +2145,8 @@
       },
       "checkConstraint": {}
     },
-    "CodeTV_MerchantCustomer": {
-      "name": "CodeTV_MerchantCustomer",
+    "ctv_MerchantCustomer": {
+      "name": "ctv_MerchantCustomer",
       "columns": {
         "id": {
           "name": "id",
@@ -2235,8 +2235,8 @@
       },
       "checkConstraint": {}
     },
-    "CodeTV_MerchantEvents": {
-      "name": "CodeTV_MerchantEvents",
+    "ctv_MerchantEvents": {
+      "name": "ctv_MerchantEvents",
       "columns": {
         "id": {
           "name": "id",
@@ -2310,8 +2310,8 @@
       },
       "checkConstraint": {}
     },
-    "CodeTV_MerchantPrice": {
-      "name": "CodeTV_MerchantPrice",
+    "ctv_MerchantPrice": {
+      "name": "ctv_MerchantPrice",
       "columns": {
         "id": {
           "name": "id",
@@ -2400,8 +2400,8 @@
       },
       "checkConstraint": {}
     },
-    "CodeTV_MerchantProduct": {
-      "name": "CodeTV_MerchantProduct",
+    "ctv_MerchantProduct": {
+      "name": "ctv_MerchantProduct",
       "columns": {
         "id": {
           "name": "id",
@@ -2483,8 +2483,8 @@
       },
       "checkConstraint": {}
     },
-    "CodeTV_MerchantSession": {
-      "name": "CodeTV_MerchantSession",
+    "ctv_MerchantSession": {
+      "name": "ctv_MerchantSession",
       "columns": {
         "id": {
           "name": "id",
@@ -2536,8 +2536,8 @@
       "uniqueConstraints": {},
       "checkConstraint": {}
     },
-    "CodeTV_MerchantSubscription": {
-      "name": "CodeTV_MerchantSubscription",
+    "ctv_MerchantSubscription": {
+      "name": "ctv_MerchantSubscription",
       "columns": {
         "id": {
           "name": "id",
@@ -2626,8 +2626,8 @@
       "uniqueConstraints": {},
       "checkConstraint": {}
     },
-    "CodeTV_Organization": {
-      "name": "CodeTV_Organization",
+    "ctv_Organization": {
+      "name": "ctv_Organization",
       "columns": {
         "id": {
           "name": "id",
@@ -2678,8 +2678,8 @@
       },
       "foreignKeys": {},
       "compositePrimaryKeys": {
-        "CodeTV_Organization_id": {
-          "name": "CodeTV_Organization_id",
+        "ctv_Organization_id": {
+          "name": "ctv_Organization_id",
           "columns": [
             "id"
           ]
@@ -2688,8 +2688,8 @@
       "uniqueConstraints": {},
       "checkConstraint": {}
     },
-    "CodeTV_OrganizationMembershipRole": {
-      "name": "CodeTV_OrganizationMembershipRole",
+    "ctv_OrganizationMembershipRole": {
+      "name": "ctv_OrganizationMembershipRole",
       "columns": {
         "organizationMembershipId": {
           "name": "organizationMembershipId",
@@ -2780,8 +2780,8 @@
       "uniqueConstraints": {},
       "checkConstraint": {}
     },
-    "CodeTV_OrganizationMembership": {
-      "name": "CodeTV_OrganizationMembership",
+    "ctv_OrganizationMembership": {
+      "name": "ctv_OrganizationMembership",
       "columns": {
         "id": {
           "name": "id",
@@ -2861,8 +2861,8 @@
       },
       "foreignKeys": {},
       "compositePrimaryKeys": {
-        "CodeTV_OrganizationMembership_id": {
-          "name": "CodeTV_OrganizationMembership_id",
+        "ctv_OrganizationMembership_id": {
+          "name": "ctv_OrganizationMembership_id",
           "columns": [
             "id"
           ]
@@ -2871,8 +2871,8 @@
       "uniqueConstraints": {},
       "checkConstraint": {}
     },
-    "CodeTV_Permission": {
-      "name": "CodeTV_Permission",
+    "ctv_Permission": {
+      "name": "ctv_Permission",
       "columns": {
         "id": {
           "name": "id",
@@ -2938,16 +2938,16 @@
       },
       "foreignKeys": {},
       "compositePrimaryKeys": {
-        "CodeTV_Permission_id": {
-          "name": "CodeTV_Permission_id",
+        "ctv_Permission_id": {
+          "name": "ctv_Permission_id",
           "columns": [
             "id"
           ]
         }
       },
       "uniqueConstraints": {
-        "CodeTV_Permission_name_unique": {
-          "name": "CodeTV_Permission_name_unique",
+        "ctv_Permission_name_unique": {
+          "name": "ctv_Permission_name_unique",
           "columns": [
             "name"
           ]
@@ -2955,8 +2955,8 @@
       },
       "checkConstraint": {}
     },
-    "CodeTV_Price": {
-      "name": "CodeTV_Price",
+    "ctv_Price": {
+      "name": "ctv_Price",
       "columns": {
         "id": {
           "name": "id",
@@ -3039,8 +3039,8 @@
       "uniqueConstraints": {},
       "checkConstraint": {}
     },
-    "CodeTV_Product": {
-      "name": "CodeTV_Product",
+    "ctv_Product": {
+      "name": "ctv_Product",
       "columns": {
         "id": {
           "name": "id",
@@ -3131,8 +3131,8 @@
       "uniqueConstraints": {},
       "checkConstraint": {}
     },
-    "CodeTV_Profile": {
-      "name": "CodeTV_Profile",
+    "ctv_Profile": {
+      "name": "ctv_Profile",
       "columns": {
         "id": {
           "name": "id",
@@ -3199,8 +3199,8 @@
       },
       "foreignKeys": {},
       "compositePrimaryKeys": {
-        "CodeTV_Profile_id": {
-          "name": "CodeTV_Profile_id",
+        "ctv_Profile_id": {
+          "name": "ctv_Profile_id",
           "columns": [
             "id"
           ]
@@ -3209,8 +3209,8 @@
       "uniqueConstraints": {},
       "checkConstraint": {}
     },
-    "CodeTV_PurchaseUserTransfer": {
-      "name": "CodeTV_PurchaseUserTransfer",
+    "ctv_PurchaseUserTransfer": {
+      "name": "ctv_PurchaseUserTransfer",
       "columns": {
         "id": {
           "name": "id",
@@ -3313,8 +3313,8 @@
       "uniqueConstraints": {},
       "checkConstraint": {}
     },
-    "CodeTV_Purchase": {
-      "name": "CodeTV_Purchase",
+    "ctv_Purchase": {
+      "name": "ctv_Purchase",
       "columns": {
         "id": {
           "name": "id",
@@ -3495,8 +3495,8 @@
       },
       "checkConstraint": {}
     },
-    "CodeTV_QuestionResponse": {
-      "name": "CodeTV_QuestionResponse",
+    "ctv_QuestionResponse": {
+      "name": "ctv_QuestionResponse",
       "columns": {
         "id": {
           "name": "id",
@@ -3642,8 +3642,8 @@
       },
       "foreignKeys": {},
       "compositePrimaryKeys": {
-        "CodeTV_QuestionResponse_id": {
-          "name": "CodeTV_QuestionResponse_id",
+        "ctv_QuestionResponse_id": {
+          "name": "ctv_QuestionResponse_id",
           "columns": [
             "id"
           ]
@@ -3652,8 +3652,8 @@
       "uniqueConstraints": {},
       "checkConstraint": {}
     },
-    "CodeTV_ResourceProgress": {
-      "name": "CodeTV_ResourceProgress",
+    "ctv_ResourceProgress": {
+      "name": "ctv_ResourceProgress",
       "columns": {
         "userId": {
           "name": "userId",
@@ -3747,8 +3747,8 @@
       },
       "foreignKeys": {},
       "compositePrimaryKeys": {
-        "CodeTV_ResourceProgress_userId_resourceId_pk": {
-          "name": "CodeTV_ResourceProgress_userId_resourceId_pk",
+        "ctv_ResourceProgress_userId_resourceId_pk": {
+          "name": "ctv_ResourceProgress_userId_resourceId_pk",
           "columns": [
             "userId",
             "resourceId"
@@ -3758,8 +3758,8 @@
       "uniqueConstraints": {},
       "checkConstraint": {}
     },
-    "CodeTV_RolePermission": {
-      "name": "CodeTV_RolePermission",
+    "ctv_RolePermission": {
+      "name": "ctv_RolePermission",
       "columns": {
         "roleId": {
           "name": "roleId",
@@ -3825,8 +3825,8 @@
       },
       "foreignKeys": {},
       "compositePrimaryKeys": {
-        "CodeTV_RolePermission_roleId_permissionId_pk": {
-          "name": "CodeTV_RolePermission_roleId_permissionId_pk",
+        "ctv_RolePermission_roleId_permissionId_pk": {
+          "name": "ctv_RolePermission_roleId_permissionId_pk",
           "columns": [
             "roleId",
             "permissionId"
@@ -3836,8 +3836,8 @@
       "uniqueConstraints": {},
       "checkConstraint": {}
     },
-    "CodeTV_Role": {
-      "name": "CodeTV_Role",
+    "ctv_Role": {
+      "name": "ctv_Role",
       "columns": {
         "id": {
           "name": "id",
@@ -3925,8 +3925,8 @@
       },
       "foreignKeys": {},
       "compositePrimaryKeys": {
-        "CodeTV_Role_id": {
-          "name": "CodeTV_Role_id",
+        "ctv_Role_id": {
+          "name": "ctv_Role_id",
           "columns": [
             "id"
           ]
@@ -3935,8 +3935,8 @@
       "uniqueConstraints": {},
       "checkConstraint": {}
     },
-    "CodeTV_Session": {
-      "name": "CodeTV_Session",
+    "ctv_Session": {
+      "name": "ctv_Session",
       "columns": {
         "sessionToken": {
           "name": "sessionToken",
@@ -3971,8 +3971,8 @@
       },
       "foreignKeys": {},
       "compositePrimaryKeys": {
-        "CodeTV_Session_sessionToken": {
-          "name": "CodeTV_Session_sessionToken",
+        "ctv_Session_sessionToken": {
+          "name": "ctv_Session_sessionToken",
           "columns": [
             "sessionToken"
           ]
@@ -3981,8 +3981,8 @@
       "uniqueConstraints": {},
       "checkConstraint": {}
     },
-    "CodeTV_Subscription": {
-      "name": "CodeTV_Subscription",
+    "ctv_Subscription": {
+      "name": "ctv_Subscription",
       "columns": {
         "id": {
           "name": "id",
@@ -4058,8 +4058,8 @@
       "uniqueConstraints": {},
       "checkConstraint": {}
     },
-    "CodeTV_Tag": {
-      "name": "CodeTV_Tag",
+    "ctv_Tag": {
+      "name": "ctv_Tag",
       "columns": {
         "id": {
           "name": "id",
@@ -4132,8 +4132,8 @@
       },
       "foreignKeys": {},
       "compositePrimaryKeys": {
-        "CodeTV_Tag_id": {
-          "name": "CodeTV_Tag_id",
+        "ctv_Tag_id": {
+          "name": "ctv_Tag_id",
           "columns": [
             "id"
           ]
@@ -4142,8 +4142,8 @@
       "uniqueConstraints": {},
       "checkConstraint": {}
     },
-    "CodeTV_TagTag": {
-      "name": "CodeTV_TagTag",
+    "ctv_TagTag": {
+      "name": "ctv_TagTag",
       "columns": {
         "parentTagId": {
           "name": "parentTagId",
@@ -4238,8 +4238,8 @@
       },
       "foreignKeys": {},
       "compositePrimaryKeys": {
-        "CodeTV_TagTag_parentTagId_childTagId_pk": {
-          "name": "CodeTV_TagTag_parentTagId_childTagId_pk",
+        "ctv_TagTag_parentTagId_childTagId_pk": {
+          "name": "ctv_TagTag_parentTagId_childTagId_pk",
           "columns": [
             "parentTagId",
             "childTagId"
@@ -4249,8 +4249,8 @@
       "uniqueConstraints": {},
       "checkConstraint": {}
     },
-    "CodeTV_UpgradableProducts": {
-      "name": "CodeTV_UpgradableProducts",
+    "ctv_UpgradableProducts": {
+      "name": "ctv_UpgradableProducts",
       "columns": {
         "upgradableToId": {
           "name": "upgradableToId",
@@ -4338,8 +4338,8 @@
       },
       "foreignKeys": {},
       "compositePrimaryKeys": {
-        "CodeTV_UpgradableProducts_upgradableToId_upgradableFrom_pk": {
-          "name": "CodeTV_UpgradableProducts_upgradableToId_upgradableFrom_pk",
+        "ctv_UpgradableProducts_upgradableToId_upgradableFrom_pk": {
+          "name": "ctv_UpgradableProducts_upgradableToId_upgradableFrom_pk",
           "columns": [
             "upgradableToId",
             "upgradableFrom"
@@ -4349,8 +4349,8 @@
       "uniqueConstraints": {},
       "checkConstraint": {}
     },
-    "CodeTV_UserPermission": {
-      "name": "CodeTV_UserPermission",
+    "ctv_UserPermission": {
+      "name": "ctv_UserPermission",
       "columns": {
         "userId": {
           "name": "userId",
@@ -4430,8 +4430,8 @@
       },
       "foreignKeys": {},
       "compositePrimaryKeys": {
-        "CodeTV_UserPermission_userId_permissionId_pk": {
-          "name": "CodeTV_UserPermission_userId_permissionId_pk",
+        "ctv_UserPermission_userId_permissionId_pk": {
+          "name": "ctv_UserPermission_userId_permissionId_pk",
           "columns": [
             "userId",
             "permissionId"
@@ -4441,8 +4441,8 @@
       "uniqueConstraints": {},
       "checkConstraint": {}
     },
-    "CodeTV_UserPrefs": {
-      "name": "CodeTV_UserPrefs",
+    "ctv_UserPrefs": {
+      "name": "ctv_UserPrefs",
       "columns": {
         "id": {
           "name": "id",
@@ -4523,8 +4523,8 @@
       },
       "foreignKeys": {},
       "compositePrimaryKeys": {
-        "CodeTV_UserPrefs_id_pk": {
-          "name": "CodeTV_UserPrefs_id_pk",
+        "ctv_UserPrefs_id_pk": {
+          "name": "ctv_UserPrefs_id_pk",
           "columns": [
             "id"
           ]
@@ -4533,8 +4533,8 @@
       "uniqueConstraints": {},
       "checkConstraint": {}
     },
-    "CodeTV_UserRole": {
-      "name": "CodeTV_UserRole",
+    "ctv_UserRole": {
+      "name": "ctv_UserRole",
       "columns": {
         "userId": {
           "name": "userId",
@@ -4614,8 +4614,8 @@
       },
       "foreignKeys": {},
       "compositePrimaryKeys": {
-        "CodeTV_UserRole_userId_roleId_pk": {
-          "name": "CodeTV_UserRole_userId_roleId_pk",
+        "ctv_UserRole_userId_roleId_pk": {
+          "name": "ctv_UserRole_userId_roleId_pk",
           "columns": [
             "userId",
             "roleId"
@@ -4625,8 +4625,8 @@
       "uniqueConstraints": {},
       "checkConstraint": {}
     },
-    "CodeTV_User": {
-      "name": "CodeTV_User",
+    "ctv_User": {
+      "name": "ctv_User",
       "columns": {
         "id": {
           "name": "id",
@@ -4731,16 +4731,16 @@
       },
       "foreignKeys": {},
       "compositePrimaryKeys": {
-        "CodeTV_User_id": {
-          "name": "CodeTV_User_id",
+        "ctv_User_id": {
+          "name": "ctv_User_id",
           "columns": [
             "id"
           ]
         }
       },
       "uniqueConstraints": {
-        "CodeTV_User_email_unique": {
-          "name": "CodeTV_User_email_unique",
+        "ctv_User_email_unique": {
+          "name": "ctv_User_email_unique",
           "columns": [
             "email"
           ]
@@ -4748,8 +4748,8 @@
       },
       "checkConstraint": {}
     },
-    "CodeTV_VerificationToken": {
-      "name": "CodeTV_VerificationToken",
+    "ctv_VerificationToken": {
+      "name": "ctv_VerificationToken",
       "columns": {
         "identifier": {
           "name": "identifier",
@@ -4784,8 +4784,8 @@
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {
-        "CodeTV_VerificationToken_identifier_token_pk": {
-          "name": "CodeTV_VerificationToken_identifier_token_pk",
+        "ctv_VerificationToken_identifier_token_pk": {
+          "name": "ctv_VerificationToken_identifier_token_pk",
           "columns": [
             "identifier",
             "token"

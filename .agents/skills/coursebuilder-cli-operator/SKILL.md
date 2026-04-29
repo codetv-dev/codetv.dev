@@ -10,20 +10,19 @@ Use the CourseBuilder CLI as the contract. Do not invent app API behavior when t
 ## Source order
 
 1. `@coursebuilder/core` for `/api/coursebuilder/*` commerce behavior.
-2. `/Users/joel/Code/badass-courses/course-builder/packages/aihero-cli/src/cli.ts` for CLI route/shape contract.
+2. [`packages/aihero-cli/src/cli.ts`](https://github.com/badass-courses/course-builder/blob/main/packages/aihero-cli/src/cli.ts) in the CourseBuilder repo for CLI route/shape contract.
 3. AI Hero and Code with Antonio route implementations for proven app patterns:
-   - `/Users/joel/Code/badass-courses/course-builder/apps/ai-hero/src/app/api`
-   - `/Users/joel/Code/badass-courses/course-builder/apps/code-with-antonio/src/app/api`
-   - `/Users/joel/Code/badass-courses/course-builder/apps/*/src/app/oauth`
+   - [`apps/ai-hero/src/app/api`](https://github.com/badass-courses/course-builder/tree/main/apps/ai-hero/src/app/api)
+   - [`apps/code-with-antonio/src/app/api`](https://github.com/badass-courses/course-builder/tree/main/apps/code-with-antonio/src/app/api)
+   - `apps/*/src/app/oauth` in the CourseBuilder repo
 
 If sources conflict, support what the CLI calls and prefer the working app implementation unless core has a newer verified-compatible behavior.
 
 ## Common CLI smoke commands
 
-Run from the CourseBuilder repo:
+Run from a local checkout of `github.com/badass-courses/course-builder`:
 
 ```bash
-cd /Users/joel/Code/badass-courses/course-builder
 npx pnpm@10.26.1 --filter @coursebuilder/cli dev -- auth whoami --app codetv
 npx pnpm@10.26.1 --filter @coursebuilder/cli dev -- resource get <slug-or-id> --app codetv
 npx pnpm@10.26.1 --filter @coursebuilder/cli dev -- crud lesson list --app codetv --slug-or-id <id>

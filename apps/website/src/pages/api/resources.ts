@@ -6,20 +6,8 @@ import { contentResource } from '../../db/schema';
 import { getUserAbilityForRequest } from '../../server/ability';
 import { withSkill } from '../../server/with-skill';
 
-const corsHeaders = {
-	'Access-Control-Allow-Origin': '*',
-	'Access-Control-Allow-Methods': 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
-	'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-};
-
 function json(body: unknown, init: ResponseInit = {}) {
-	return Response.json(body, {
-		...init,
-		headers: {
-			...corsHeaders,
-			...(init.headers ?? {}),
-		},
-	});
+	return Response.json(body, init);
 }
 
 function slugify(value: string) {
@@ -30,8 +18,6 @@ function slugify(value: string) {
 		.replace(/^-+|-+$/g, '')
 		.slice(0, 220);
 }
-
-export const OPTIONS: APIRoute = async () => json({});
 
 export const GET: APIRoute = async ({ request }) =>
 	withSkill(async (request) => {
@@ -46,7 +32,10 @@ export const GET: APIRoute = async ({ request }) =>
 		const { ability } = await getUserAbilityForRequest(request);
 		const resource = await db.query.contentResource.findFirst({
 			where: and(
-				or(eq(contentResource.id, slugOrId), eq(contentResource.slug, slugOrId)),
+				or(
+					eq(contentResource.id, slugOrId),
+					eq(contentResource.slug, slugOrId),
+				),
 				...(type ? [eq(contentResource.type, type)] : []),
 			),
 		});
@@ -81,7 +70,10 @@ export const POST: APIRoute = async ({ request }) =>
 		const inputFields = body?.fields ?? {};
 
 		if (!type || typeof type !== 'string') {
-			return json({ error: 'Missing or invalid "type" field' }, { status: 400 });
+			return json(
+				{ error: 'Missing or invalid "type" field' },
+				{ status: 400 },
+			);
 		}
 
 		if (!title || typeof title !== 'string' || title.trim().length < 2) {
