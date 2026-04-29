@@ -24,6 +24,10 @@ _Avoid_: event, workshop run
 A purchasable pass to a specific Cohort that grants live-period benefits and lifetime access to that Cohort's Workshop recordings and materials.
 _Avoid_: event purchase, product
 
+**CourseBuilder Product**:
+An internal commerce item that can be sold through CourseBuilder and may later be linked to Workshop or Cohort resources.
+_Avoid_: standalone product, offer, SKU
+
 **Workshop Access**:
 A person's ability to view a Workshop or Cohort-specific materials through a Workshop Ticket, team seat claim, or supporter membership.
 _Avoid_: entitlement, permission, grant
@@ -103,9 +107,12 @@ _Avoid_: self-paced workshop, previous event, replay product
 - The first CodeTV commerce path should require sign-in before checkout because Workshop Tickets are relatively high-ticket purchases and CodeTV needs to check existing purchase/access state and purchase intent before sending the buyer to Stripe.
 - CodeTV owns its own CourseBuilder database and does not share Workshop, product, purchase, access, or Workshop content records with other CourseBuilder apps.
 - Workshop and Cohort commerce content lives in the CodeTV CourseBuilder database, not Sanity.
+- A **CourseBuilder Product** may exist without linked resources so CodeTV can verify Stripe product, price, checkout, and webhook plumbing before attaching it to Workshop or Cohort content.
+- A **CourseBuilder Product** may later be linked to one or more resources when the product should create resource-specific access.
 - Initial Workshop, Cohort, and Ticket records should be created and maintained with the existing CourseBuilder CLI or scripts rather than a new admin UI.
 - CodeTV should validate CLI workflows for creating, listing, and updating commerce content so CRUD UI is not required for the first implementation.
 - CodeTV should target full CLI/API parity for the CourseBuilder CLI; the CLI effectively defines the content and support operations contract.
+- CodeTV should expose CourseBuilder Product create/update through `/api/products` first, while treating upstream canonical CourseBuilder product mutation APIs as a likely future extraction because multiple CourseBuilder apps need the same operator workflow.
 - Primary sources for the CodeTV integration are `@coursebuilder/core` for the `/api/coursebuilder/*` routes, `aihero-cli` for the CLI contract, and AI Hero / Code with Antonio for implemented real-world route patterns.
 - When sources conflict, support what `aihero-cli` calls and prefer AI Hero / Code with Antonio working patterns over abstract package intent, unless `@coursebuilder/core` has a newer verified-compatible API.
 - CodeTV should mirror the Code with Antonio and AI Hero device-flow OAuth/token patterns so agents and operators can perform authenticated content CRUD and support operations.
@@ -130,7 +137,8 @@ _Avoid_: self-paced workshop, previous event, replay product
 - "Entitlement" names a CourseBuilder schema concept, not a CodeTV domain term — resolved: use **Workshop Access** in domain language.
 - The exact lag before a **Workshop** enters the **Workshop Archive** is intentionally unresolved; likely around 15 days, but supporter tier rules are not yet decided.
 - Supporter membership and archive access rules are deferred; the first implementation focuses on selling live **Workshop Tickets**.
-- CodeTV may offer products similar to other CourseBuilder apps, but those products are modeled as standalone CodeTV **Workshops**; for example, **Building Cool Apps with AI** is a CodeTV **Workshop**, while AI Hero is a separate product.
+- CodeTV may offer products similar to other CourseBuilder apps, but customer-facing paid learning products are modeled as CodeTV **Workshops**; for example, **Building Cool Apps with AI** is a CodeTV **Workshop**, while AI Hero is a separate product.
+- "Standalone product" is ambiguous — resolved: use **CourseBuilder Product** for the internal commerce primitive, not for a new customer-facing CodeTV product category.
 - Guest checkout and post-purchase transfer exist in other CourseBuilder apps, but CodeTV's first high-ticket Workshop Ticket path favors pre-checkout sign-in to reduce identity ambiguity and support existing-purchase checks.
 - Team ticket purchases are in scope for CodeTV because team seats are claimed through a **Team Claim Link** associated with a bulk coupon.
 - CourseBuilder's canonical team purchase model is a bulk purchase backed by a `bulkCoupon`; CodeTV should reuse the existing `NEW_BULK_COUPON`, `EXISTING_BULK_COUPON`, `INDIVIDUAL_TO_BULK_UPGRADE`, and `NEW_INDIVIDUAL_PURCHASE` purchase-type branching.
@@ -293,10 +301,11 @@ After opening the PR, continue with follow-up work in this order:
 8. Port/team-verify **Team Seat** / **Team Claim Link** / self-redeem flow.
 9. Add upload/media routes if Workshop import/upload workflow needs CLI support.
 10. Update agent-readiness artifacts as public surfaces stabilize:
-   - `robots.txt`
-   - sitemap audit
-   - `llms.txt`
-   - OAuth Protected Resource metadata
+
+- `robots.txt`
+- sitemap audit
+- `llms.txt`
+- OAuth Protected Resource metadata
 
 ### Agent-readiness SOP
 
