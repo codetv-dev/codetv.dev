@@ -114,3 +114,4 @@ CLI effectively defines this contract. CodeTV should expose the full surface nee
 - Pricing component + data loader are part of the serious commerce path because they encode PPP, coupons, discounts, team pricing, and scaled discounts.
 - Validate whether `createCohort` CLI support exists; adapter supports it, but CLI inventory surfaced `workshop create` more clearly than `cohort create`.
 - Watch product type: `createWorkshop` creates `self-paced`; Cohort product creation creates `cohort`; events create `live`. Workshop Ticket semantics likely need Cohort product behavior.
+- `workshop create --create-product` requires a `stripe` row in `ctv_MerchantAccount`; CodeTV now ensures that row before calling the CourseBuilder adapter so product creation does not silently return `product: null`.

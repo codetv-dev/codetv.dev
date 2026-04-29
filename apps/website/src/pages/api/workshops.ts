@@ -2,6 +2,7 @@ import type { APIRoute } from 'astro';
 import { asc, desc, eq, or, and } from 'drizzle-orm';
 import { z } from 'zod';
 
+import { ensureStripeMerchantAccount } from '../../coursebuilder/merchant-account';
 import { courseBuilderAdapter, db } from '../../db';
 import { contentResource, contentResourceResource } from '../../db/schema';
 import { getUserAbilityForRequest } from '../../server/ability';
@@ -154,6 +155,10 @@ export const POST: APIRoute = async ({ request }) => {
 			{ error: 'Invalid input', details: z.treeifyError(parsed.error) },
 			{ status: 400 },
 		);
+	}
+
+	if (parsed.data.createProduct) {
+		await ensureStripeMerchantAccount();
 	}
 
 	const result = await (courseBuilderAdapter as any).createWorkshop(
