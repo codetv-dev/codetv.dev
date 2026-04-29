@@ -1,4 +1,5 @@
 import { defineConfig, envField } from 'astro/config';
+import coursebuilder from '@coursebuilder/astro';
 import clerk from '@clerk/astro';
 import { dark } from '@clerk/themes';
 import netlify from '@astrojs/netlify';
@@ -24,6 +25,7 @@ export default defineConfig({
 				},
 			},
 		}),
+		coursebuilder({ configFile: './coursebuilder.config.ts' }),
 		expressiveCode({ themes: ['night-owl'] }),
 		mdx(),
 		react(),
@@ -50,6 +52,46 @@ export default defineConfig({
 				default: '',
 			}),
 			MUX_TOKEN_SECRET: envField.string({
+				access: 'secret',
+				context: 'server',
+				default: '',
+			}),
+			DATABASE_URL: envField.string({
+				access: 'secret',
+				context: 'server',
+				default: '',
+			}),
+			COURSEBUILDER_URL: envField.string({
+				access: 'secret',
+				context: 'server',
+				default: '',
+			}),
+			STRIPE_SECRET_TOKEN: envField.string({
+				access: 'secret',
+				context: 'server',
+				default: '',
+			}),
+			STRIPE_WEBHOOK_SECRET: envField.string({
+				access: 'secret',
+				context: 'server',
+				default: '',
+			}),
+			COURSEBUILDER_STRIPE_SECRET_TOKEN: envField.string({
+				access: 'secret',
+				context: 'server',
+				default: '',
+			}),
+			COURSEBUILDER_STRIPE_SECRET_KEY: envField.string({
+				access: 'secret',
+				context: 'server',
+				default: '',
+			}),
+			COURSEBUILDER_STRIPE_WEBHOOK_SECRET: envField.string({
+				access: 'secret',
+				context: 'server',
+				default: '',
+			}),
+			COURSEBUILDER_STRIPE_ACCOUNT_ID: envField.string({
 				access: 'secret',
 				context: 'server',
 				default: '',

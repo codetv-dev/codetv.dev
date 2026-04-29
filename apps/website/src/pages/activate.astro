@@ -1,0 +1,91 @@
+---
+import Layout from '../layouts/default.astro';
+
+const userCode = Astro.url.searchParams.get('user_code') ?? '';
+const clerkUser = await Astro.locals.currentUser?.();
+---
+
+<Layout title="Activate CourseBuilder CLI">
+	<main class="activate">
+		<h1>Activate CourseBuilder CLI</h1>
+		{
+			!userCode ? (
+				<p>No device code was provided. Run <code>cb auth login</code> again.</p>
+			) : !clerkUser ? (
+				<>
+					<p>Sign in to CodeTV, then return to this activation link.</p>
+					<a href="/dashboard/sign-in">Sign in</a>
+				</>
+			) : (
+				<>
+					<p>
+						Authorize the CourseBuilder CLI for <strong>{clerkUser.primaryEmailAddress?.emailAddress ?? clerkUser.emailAddresses?.[0]?.emailAddress ?? clerkUser.id}</strong>?
+					</p>
+					<p>
+						Device code: <code>{userCode}</code>
+					</p>
+					<button id="verify-device" data-user-code={userCode}>Authorize device</button>
+					<p id="verify-status" aria-live="polite"></p>
+				</>
+			)
+		}
+	</main>
+</Layout>
+
+<script>
+	const button = document.querySelector<HTMLButtonElement>('#verify-device');
+	const status = document.querySelector<HTMLElement>('#verify-status');
+
+	button?.addEventListener('click', async () => {
+		button.disabled = true;
+		if (status) status.textContent = 'Authorizing…';
+
+		const userCode = button.dataset.userCode;
+		const response = await fetch('/api/trpc/deviceVerification.verify', {
+			method: 'POST',
+			headers: { 'content-type': 'application/json' },
+			body: JSON.stringify({ json: { userCode } }),
+		});
+		const payload = await response.json();
+		const result = payload?.result?.data?.json ?? payload?.result?.data;
+		const nextStatus = result?.status ?? 'unknown';
+
+		if (status) {
+			status.textContent =
+				nextStatus === 'device-verified' || nextStatus === 'already-verified'
+					? 'Device authorized. You can return to the CLI.'
+					: `Authorization failed: ${nextStatus}`;
+		}
+
+		if (nextStatus !== 'device-verified' && nextStatus !== 'already-verified') {
+			button.disabled = false;
+		}
+	});
+</script>
+
+<style>
+	.activate {
+		max-width: 720px;
+		margin: 0 auto;
+		padding: 80px 24px;
+	}
+
+	button,
+	a {
+		display: inline-block;
+		margin-top: 16px;
+		padding: 12px 16px;
+		border: 0;
+		border-radius: 8px;
+		background: #111;
+		color: #fff;
+		font: inherit;
+		text-decoration: none;
+		cursor: pointer;
+	}
+
+	button:disabled {
+		opacity: 0.6;
+		cursor: wait;
+	}
+</style>

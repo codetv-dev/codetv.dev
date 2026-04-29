@@ -15,6 +15,10 @@ import type { Plugin } from 'esbuild';
 import { basename, dirname, resolve } from 'node:path';
 import { renderToString } from 'react-dom/server';
 import { createElement } from 'react';
+// Force mdx-bundler to use the app's React runtime. CourseBuilder pulls in
+// older React peer trees, and mdx-bundler can otherwise emit React 18 elements
+// that React 19 server rendering rejects while building RSS feeds.
+import * as jsxRuntime from 'react/jsx-runtime';
 import { getMDXComponent } from 'mdx-bundler/client';
 import { bundleMDX } from 'mdx-bundler';
 
@@ -90,7 +94,9 @@ async function getHtmlFromContentCollectionEntry(
 		cwd: resolve('./src/content/blog'),
 	});
 
-	const Component = await getMDXComponent(result.code);
+	const Component = await getMDXComponent(result.code, {
+		_jsx_runtime: jsxRuntime,
+	});
 
 	return renderToString(createElement(Component));
 }
@@ -133,7 +139,9 @@ export async function GET(context: AstroConfig) {
 						cwd: resolve('./src/content/blog', dirname(post.id)),
 					});
 
-					const Component = await getMDXComponent(result.code);
+					const Component = await getMDXComponent(result.code, {
+						_jsx_runtime: jsxRuntime,
+					});
 
 					let html = '';
 

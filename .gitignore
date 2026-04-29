@@ -10,3 +10,9 @@
 .github/instructions/nx.instructions.md
 node_modules
 .opencode/
+# local secrets
+.env
+.env.*
+!.env.TEMPLATE
+!.env.example
+!.env.EXAMPLE
