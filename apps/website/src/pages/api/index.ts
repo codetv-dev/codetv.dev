@@ -13,6 +13,7 @@ export const GET: APIRoute = async () =>
 				resourceEdges: '/api/resources/edges',
 				lessons: '/api/lessons',
 				workshops: '/api/workshops',
+				products: '/api/products',
 				coursebuilder: '/api/coursebuilder',
 				trpc: '/api/trpc',
 			},
@@ -23,6 +24,7 @@ export const GET: APIRoute = async () =>
 					resourceEdges: '/api/resources/edges',
 					lessons: '/api/lessons',
 					workshops: '/api/workshops',
+					products: '/api/products',
 				},
 			},
 			next_actions: [

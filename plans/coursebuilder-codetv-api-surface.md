@@ -12,7 +12,7 @@
 1. CourseBuilder schema/config/catchall route. — started: packages installed, Astro integration wired, schema/db/config scaffolded.
 2. Device auth, CASL ability helpers, `getUserAbilityForRequest`, and `withSkill`. — started: OAuth device-flow routes, discovery metadata, activation page, tRPC verification procedure, minimal ability helper, and `withSkill` wrapper added.
 3. CLI discovery and tRPC fetch-adapter route. — started: `/.well-known/coursebuilder-app`, `/api/trpc/*` fetch adapter route, health procedure, and `deviceVerification.verify` scaffolded.
-4. Core content CRUD: resources, edges, workshops, lessons, products. — started: public `/api` entrypoint, CLI-compatible `/api/resources` GET/POST/PUT, `/api/resources/edges` GET/POST/PATCH/DELETE, `/api/lessons` GET/PUT, and `/api/workshops` GET/POST smoke-tested.
+4. Core content CRUD: resources, edges, workshops, lessons, products. — started: public `/api` entrypoint, CLI-compatible `/api/resources` GET/POST/PUT, `/api/resources/edges` GET/POST/PATCH/DELETE, `/api/lessons` GET/PUT, `/api/workshops` GET/POST, and `/api/products` GET plus availability/enrollment smoke-tested.
 5. Pricing, checkout, Workshop Ticket purchase, and team claim flows.
 6. Upload/media routes needed by creator/import workflows.
 7. Support, search, memory, shortlinks, surveys, and remaining operator surfaces.
@@ -67,9 +67,9 @@ CLI effectively defines this contract. CodeTV should expose the full surface nee
 | `GET/POST /api/workshops`                             | CWA                   | started                       | Workshop create/list/get implemented and CLI-smoke-tested without product creation.       |
 | `GET/PUT /api/lessons`                                | CWA/AIH               | started                       | Lesson list/get/update implemented and CLI-smoke-tested.                                 |
 | `GET/POST/PUT/DELETE /api/lessons/:lessonId/solution` | CWA/AIH               | defer unless CLI launch needs | Lesson solution CRUD.                                                                    |
-| `GET /api/products`                                   | AIH                   | required                      | Product list/get with nested structure.                                                  |
-| `GET /api/products/:productId/availability`           | CWA better            | required for team/quantity    | Use CWA version because it excludes refunded purchases.                                  |
-| `GET /api/products/:productId/enrollment`             | AIH                   | required for team reporting   | Bulk seat/enrollment stats.                                                              |
+| `GET /api/products`                                   | AIH                   | started                       | Product list/get with nested structure.                                                  |
+| `GET /api/products/:productId/availability`           | CWA better            | started                       | Uses CWA behavior: excludes refunded purchases.                                          |
+| `GET /api/products/:productId/enrollment`             | AIH                   | started                       | Bulk seat/enrollment stats.                                                              |
 | `GET/POST/PUT/DELETE /api/posts`                      | CWA/AIH               | defer                         | Not needed for first Workshop sale unless CLI requires broad content parity immediately. |
 | `GET/POST/PATCH/DELETE /api/surveys`                  | CWA/AIH               | defer                         | Support later CLI parity.                                                                |
 | `GET/POST/DELETE /api/shortlinks`                     | CLI                   | defer                         | Support/marketing ops later.                                                             |
