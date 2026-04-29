@@ -10,6 +10,7 @@ export const GET: APIRoute = async () =>
 				self: '/api',
 				discovery: '/.well-known/coursebuilder-app',
 				resources: '/api/resources',
+				resourceEdges: '/api/resources/edges',
 				lessons: '/api/lessons',
 				coursebuilder: '/api/coursebuilder',
 				trpc: '/api/trpc',
@@ -18,6 +19,7 @@ export const GET: APIRoute = async () =>
 				content: {
 					api: '/api',
 					resources: '/api/resources',
+					resourceEdges: '/api/resources/edges',
 					lessons: '/api/lessons',
 				},
 			},

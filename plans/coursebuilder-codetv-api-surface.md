@@ -12,7 +12,7 @@
 1. CourseBuilder schema/config/catchall route. — started: packages installed, Astro integration wired, schema/db/config scaffolded.
 2. Device auth, CASL ability helpers, `getUserAbilityForRequest`, and `withSkill`. — started: OAuth device-flow routes, discovery metadata, activation page, tRPC verification procedure, minimal ability helper, and `withSkill` wrapper added.
 3. CLI discovery and tRPC fetch-adapter route. — started: `/.well-known/coursebuilder-app`, `/api/trpc/*` fetch adapter route, health procedure, and `deviceVerification.verify` scaffolded.
-4. Core content CRUD: resources, edges, workshops, lessons, products. — started: public `/api` entrypoint and CLI-compatible `/api/resources` GET/POST/PUT smoke-tested through `cb resource`.
+4. Core content CRUD: resources, edges, workshops, lessons, products. — started: public `/api` entrypoint, CLI-compatible `/api/resources` GET/POST/PUT, and `/api/resources/edges` GET/POST/PATCH/DELETE smoke-tested.
 5. Pricing, checkout, Workshop Ticket purchase, and team claim flows.
 6. Upload/media routes needed by creator/import workflows.
 7. Support, search, memory, shortlinks, surveys, and remaining operator surfaces.
@@ -62,7 +62,7 @@ CLI effectively defines this contract. CodeTV should expose the full surface nee
 | Target                                                | Source implementation | Status                        | Notes                                                                                    |
 | ----------------------------------------------------- | --------------------- | ----------------------------- | ---------------------------------------------------------------------------------------- |
 | `GET/POST/PUT/DELETE /api/resources`                  | CWA strongest         | started                       | GET/POST/PUT implemented and smoke-tested through CLI; DELETE still pending.              |
-| `GET/POST/PATCH/DELETE /api/resources/edges`          | CWA                   | required                      | Parent/child resource linking.                                                           |
+| `GET/POST/PATCH/DELETE /api/resources/edges`          | CWA                   | started                       | Parent/child resource linking implemented and curl-smoke-tested.                         |
 | `POST /api/resources/revalidate`                      | CWA                   | useful                        | Explicit cache/revalidation route.                                                       |
 | `GET/POST /api/workshops`                             | CWA                   | required                      | Workshop create/list/get. Supports structure and pricing fields.                         |
 | `GET/PUT /api/lessons`                                | CWA/AIH               | required                      | Lesson list/get/update.                                                                  |
