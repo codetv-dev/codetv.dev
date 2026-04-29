@@ -10,8 +10,13 @@ const baseUrl =
 
 export function getStripeProvider() {
 	const stripeToken =
-		process.env.STRIPE_SECRET_TOKEN ?? process.env.STRIPE_SECRET_KEY;
-	const stripeWebhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+		process.env.COURSEBUILDER_STRIPE_SECRET_TOKEN ??
+		process.env.COURSEBUILDER_STRIPE_SECRET_KEY ??
+		process.env.STRIPE_SECRET_TOKEN ??
+		process.env.STRIPE_SECRET_KEY;
+	const stripeWebhookSecret =
+		process.env.COURSEBUILDER_STRIPE_WEBHOOK_SECRET ??
+		process.env.STRIPE_WEBHOOK_SECRET;
 
 	if (!stripeToken || !stripeWebhookSecret) return null;
 

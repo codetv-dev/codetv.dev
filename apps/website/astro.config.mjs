@@ -76,6 +76,26 @@ export default defineConfig({
 				context: 'server',
 				default: '',
 			}),
+			COURSEBUILDER_STRIPE_SECRET_TOKEN: envField.string({
+				access: 'secret',
+				context: 'server',
+				default: '',
+			}),
+			COURSEBUILDER_STRIPE_SECRET_KEY: envField.string({
+				access: 'secret',
+				context: 'server',
+				default: '',
+			}),
+			COURSEBUILDER_STRIPE_WEBHOOK_SECRET: envField.string({
+				access: 'secret',
+				context: 'server',
+				default: '',
+			}),
+			COURSEBUILDER_STRIPE_ACCOUNT_ID: envField.string({
+				access: 'secret',
+				context: 'server',
+				default: '',
+			}),
 			ALGOLIA_API_KEY: envField.string({
 				access: 'public',
 				context: 'client',

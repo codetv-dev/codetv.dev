@@ -16,6 +16,8 @@ export async function ensureStripeMerchantAccount() {
 		id: STRIPE_MERCHANT_ACCOUNT_ID,
 		label: 'stripe',
 		identifier:
+			process.env.COURSEBUILDER_STRIPE_ACCOUNT_ID ??
+			process.env.COURSEBUILDER_STRIPE_MERCHANT_ACCOUNT_ID ??
 			process.env.STRIPE_ACCOUNT_ID ??
 			process.env.STRIPE_MERCHANT_ACCOUNT_ID ??
 			STRIPE_MERCHANT_ACCOUNT_ID,
