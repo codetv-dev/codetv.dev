@@ -1,0 +1,3 @@
+# Use CourseBuilder CLI as the content and support operations contract
+
+CodeTV will mirror the CourseBuilder CLI/API surface used by Code with Antonio and AI Hero, including device-flow authentication and token-backed API access, so agents and operators can create, inspect, update, and support CourseBuilder commerce/content records without a custom CRUD admin UI. This deliberately favors a CLI-first operations model over building bespoke admin screens because the existing CLI already defines the practical contract for content CRUD, team-seat workflows, pricing inspection, and support operations across CourseBuilder apps.

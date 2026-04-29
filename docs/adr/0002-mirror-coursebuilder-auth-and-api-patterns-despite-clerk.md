@@ -1,0 +1,3 @@
+# Mirror CourseBuilder auth and API patterns despite Clerk
+
+CodeTV will keep Clerk as the current viewer authentication provider, but CourseBuilder operations will mirror the established Code with Antonio and AI Hero API authorization patterns: CASL abilities, device-token authenticated CLI/API requests, `getUserAbilityForRequest`, and `withSkill`. Clerk is a transitional complication rather than a design driver, so Clerk-specific lookup and user-bridging logic should be isolated behind helpers while CodeTV preserves compatibility with the CourseBuilder CLI, agent, content CRUD, and support workflows.
