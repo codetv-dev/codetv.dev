@@ -138,8 +138,8 @@ importers:
         specifier: workspace:*
         version: link:../../libs/types
       '@coursebuilder/adapter-drizzle':
-        specifier: 1.0.6
-        version: 1.0.6(drizzle-orm@0.36.0(@opentelemetry/api@1.9.0)(@planetscale/database@1.19.0)(@types/pg@8.15.6)(@types/react@19.2.9)(mysql2@3.22.3(@types/node@25.0.10))(react@19.2.3))
+        specifier: 1.0.7
+        version: 1.0.7(drizzle-orm@0.36.0(@opentelemetry/api@1.9.0)(@planetscale/database@1.19.0)(@types/pg@8.15.6)(@types/react@19.2.9)(mysql2@3.22.3(@types/node@25.0.10))(react@19.2.3))
       '@coursebuilder/astro':
         specifier: 2.0.2
         version: 2.0.2(@coursebuilder/core@1.2.1(@babel/core@7.28.6)(@opentelemetry/api@1.9.0)(@opentelemetry/core@2.5.0(@opentelemetry/api@1.9.0))(@swc/core@1.15.10(@swc/helpers@0.5.18))(@swc/helpers@0.5.18)(babel-plugin-macros@3.1.0)(bufferutil@4.1.0)(drizzle-orm@0.36.0(@opentelemetry/api@1.9.0)(@planetscale/database@1.19.0)(@types/pg@8.15.6)(@types/react@19.2.9)(mysql2@3.22.3(@types/node@25.0.10))(react@19.2.3))(eslint@9.39.2(jiti@2.6.1))(h3@1.15.5)(next@14.1.0(@babel/core@7.28.6)(@opentelemetry/api@1.9.0)(babel-plugin-macros@3.1.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(postcss@8.5.6)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(rollup@4.56.0)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@4.3.6))(astro@5.16.15(@netlify/blobs@10.5.0)(@planetscale/database@1.19.0)(@types/node@25.0.10)(idb-keyval@6.2.1)(jiti@2.6.1)(rollup@4.56.0)(terser@5.46.0)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))
@@ -1400,8 +1400,8 @@ packages:
     resolution: {integrity: sha512-Ir+AOibqzrIsL6ajt3Rz3LskB7OiMVHqltZmspbW/TJuTVuyOMirVqAkjfY6JISiLHgyNqicAC8AyHHGzNd/dA==}
     engines: {node: '>=0.1.90'}
 
-  '@coursebuilder/adapter-drizzle@1.0.6':
-    resolution: {integrity: sha512-JQbxY4QYMahH4iwndZatTxBlef/Mbm2sZS+rfJlzSrTjQa6oQHtFZPR8kVo8SiOhRDWI1TZ7ORZdfhxtBytRuQ==}
+  '@coursebuilder/adapter-drizzle@1.0.7':
+    resolution: {integrity: sha512-WZf7X1H1WsJ3zV2Tjg4MaDBfJ7gnkoPCg84dq66IYJH1n9fVx47tKb8V2GJWrLGLjJggj+cY2aFrgukHZnDIyg==}
     peerDependencies:
       drizzle-orm: 0.36.x
 
@@ -15011,7 +15011,7 @@ snapshots:
 
   '@colors/colors@1.6.0': {}
 
-  '@coursebuilder/adapter-drizzle@1.0.6(drizzle-orm@0.36.0(@opentelemetry/api@1.9.0)(@planetscale/database@1.19.0)(@types/pg@8.15.6)(@types/react@19.2.9)(mysql2@3.22.3(@types/node@25.0.10))(react@19.2.3))':
+  '@coursebuilder/adapter-drizzle@1.0.7(drizzle-orm@0.36.0(@opentelemetry/api@1.9.0)(@planetscale/database@1.19.0)(@types/pg@8.15.6)(@types/react@19.2.9)(mysql2@3.22.3(@types/node@25.0.10))(react@19.2.3))':
     dependencies:
       '@coursebuilder/nodash': 0.0.3
       '@sindresorhus/slugify': 2.2.1

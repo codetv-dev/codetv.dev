@@ -35,7 +35,7 @@
 		"@codetv/sanity": "workspace:*",
 		"@codetv/stripe": "workspace:*",
 		"@codetv/types": "workspace:*",
-		"@coursebuilder/adapter-drizzle": "1.0.6",
+		"@coursebuilder/adapter-drizzle": "1.0.7",
 		"@coursebuilder/astro": "2.0.2",
 		"@coursebuilder/core": "1.2.1",
 		"@coursebuilder/nodash": "0.0.3",
