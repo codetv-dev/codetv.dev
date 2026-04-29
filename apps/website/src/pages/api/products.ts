@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { asc, eq, or, sql } from 'drizzle-orm';
+import { and, asc, eq, or, sql } from 'drizzle-orm';
 
 import { db } from '../../db';
 import { contentResourceResource, products } from '../../db/schema';
@@ -48,21 +48,21 @@ export const GET: APIRoute = async ({ request }) =>
 	withSkill(async (request) => {
 		const { searchParams } = new URL(request.url);
 		const slugOrId = searchParams.get('slugOrId');
-		const { ability, user } = await getUserAbilityForRequest(request);
-
-		if (ability.cannot('read', 'Content')) {
-			return json({ error: 'Unauthorized' }, { status: user ? 403 : 401 });
-		}
+		const { ability } = await getUserAbilityForRequest(request);
+		const canSeeInactiveProducts = ability.can('update', 'Content');
 
 		if (slugOrId) {
-			const product = await db.query.products.findFirst({
-				where: or(
-					eq(products.id, slugOrId),
-					eq(
-						sql`JSON_UNQUOTE(JSON_EXTRACT(${products.fields}, "$.slug"))`,
-						slugOrId,
-					),
+			const slugOrIdCondition = or(
+				eq(products.id, slugOrId),
+				eq(
+					sql`JSON_UNQUOTE(JSON_EXTRACT(${products.fields}, "$.slug"))`,
+					slugOrId,
 				),
+			);
+			const product = await db.query.products.findFirst({
+				where: canSeeInactiveProducts
+					? slugOrIdCondition
+					: and(slugOrIdCondition, eq(products.status, 1)),
 				with: productWithFullStructure,
 			});
 

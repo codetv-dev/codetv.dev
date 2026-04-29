@@ -12,7 +12,7 @@ export function getAbility(options: { user?: AbilityUser | null } = {}) {
 	return {
 		can(action: string, _subject?: string) {
 			if (role === 'admin') return true;
-			if (action === 'read') return true;
+			if (action === 'read') return Boolean(options.user);
 			return false;
 		},
 		cannot(action: string, subject?: string) {
@@ -50,7 +50,8 @@ export async function getUserAbilityForRequest(request: Request) {
 	}
 
 	const user =
-		(await db.query.users.findFirst({ where: eq(users.id, token.userId) })) ?? null;
+		(await db.query.users.findFirst({ where: eq(users.id, token.userId) })) ??
+		null;
 
 	return { user, ability: getAbility({ user }) };
 }

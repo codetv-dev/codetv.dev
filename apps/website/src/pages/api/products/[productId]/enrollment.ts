@@ -26,8 +26,11 @@ export const GET: APIRoute = async ({ request, params }) =>
 
 		const { user, ability } = await getUserAbilityForRequest(request);
 
-		if (!user || ability.cannot('update', 'Content')) {
+		if (!user) {
 			return json({ error: 'Unauthorized' }, { status: 401 });
+		}
+		if (ability.cannot('update', 'Content')) {
+			return json({ error: 'Forbidden' }, { status: 403 });
 		}
 
 		const statusCounts = await db
@@ -69,8 +72,7 @@ export const GET: APIRoute = async ({ request, params }) =>
 		};
 		const unredeemedSeats =
 			Number(bulk.totalMaxUses) - Number(bulk.totalUsedCount);
-		const activePurchases =
-			(byStatus.Valid ?? 0) + (byStatus.Restricted ?? 0);
+		const activePurchases = (byStatus.Valid ?? 0) + (byStatus.Restricted ?? 0);
 
 		return json({
 			productId,
