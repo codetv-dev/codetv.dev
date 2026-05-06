@@ -24,3 +24,5 @@ pnpm-debug.log*
 
 # macOS-specific files
 .DS_Store
+
+.sequoia-state.json

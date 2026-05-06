@@ -17,7 +17,7 @@
 		"build": "envsubst < ./src/integrations/google/config.ts > ./src/integrations/google/config.updated.ts && mv ./src/integrations/google/config.updated.ts ./src/integrations/google/config.ts"
 	},
 	"dependencies": {
-		"@clerk/backend": "^2.29.5",
+		"@clerk/backend": "^2.33.1",
 		"@codetv/clerk": "workspace:*",
 		"@codetv/cloudinary": "workspace:*",
 		"@codetv/discord": "workspace:*",
@@ -28,7 +28,7 @@
 		"date-fns": "^4.1.0",
 		"inngest": "^3.54.0",
 		"jsonwebtoken": "^9.0.3",
-		"stripe": "^20.2.0",
+		"stripe": "^20.4.1",
 		"zod": "^4.3.6"
 	},
 	"devDependencies": {

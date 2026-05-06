@@ -11,14 +11,14 @@ import { schema as kitSchema } from './integrations/kit/index.js';
 // TODO pin Zod to 3 or figure out other workaround for
 // https://github.com/inngest/inngest-js/issues/1014
 export const schemas = new EventSchemas()
-	.fromZod(clerkSchema)
-	.fromZod(cloudinarySchema)
-	.fromZod(discordSchema)
-	.fromZod(googleSchema)
-	.fromZod(sanitySchema)
-	.fromZod(stripeSchema)
-	.fromZod(websiteSchema)
-	.fromZod(kitSchema);
+	.fromSchema(clerkSchema)
+	.fromSchema(cloudinarySchema)
+	.fromSchema(discordSchema)
+	.fromSchema(googleSchema)
+	.fromSchema(sanitySchema)
+	.fromSchema(stripeSchema)
+	.fromSchema(websiteSchema)
+	.fromSchema(kitSchema);
 
 if (!process.env.INNGEST_EVENT_KEY) {
 	console.error('missing INNGEST_EVENT_KEY. Workflows will not run.');

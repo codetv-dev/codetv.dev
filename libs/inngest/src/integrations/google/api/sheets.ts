@@ -1,5 +1,6 @@
 import { getGoogleAccessToken } from './auth.ts';
 import { config } from '../config.ts';
+import { type WebDevChallengeFormAWSSubmit } from '../../website/types.ts';
 
 /**
  * Generic helper to append a row to a Google Sheet
@@ -76,6 +77,19 @@ export async function appendValue({
 		dietaryRequirements,
 		foodAdventurousness,
 		coffee,
+	]);
+}
+
+export async function appendAwsWdcValue(data: WebDevChallengeFormAWSSubmit) {
+	return appendToSheet(config.wdcAwsSheet.id, config.wdcAwsSheet.range, [
+		data.name,
+		data.email,
+		data.location,
+		data.strengths,
+		data.teammates,
+		data.inregion,
+		data.inperson,
+		data.dates,
 	]);
 }
 

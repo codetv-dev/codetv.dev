@@ -13,8 +13,8 @@
 		"./package.json": "./package.json"
 	},
 	"dependencies": {
-		"@clerk/astro": "^2.16.15",
-		"@clerk/backend": "^2.29.5",
+		"@clerk/astro": "^2.17.9",
+		"@clerk/backend": "^2.33.1",
 		"@codetv/types": "workspace:*",
 		"zod": "^4.3.6"
 	}

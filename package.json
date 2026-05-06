@@ -8,9 +8,9 @@
 	"private": true,
 	"devDependencies": {
 		"@nx/js": "22.4.1",
-		"@types/node": "^25.0.10",
+		"@types/node": "^25.6.0",
 		"nx": "22.4.1",
-		"prettier": "^3.8.1",
+		"prettier": "^3.8.2",
 		"prettier-plugin-astro": "^0.14.1"
 	}
 }

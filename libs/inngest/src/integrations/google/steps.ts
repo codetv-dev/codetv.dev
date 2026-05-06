@@ -9,8 +9,17 @@ import {
 import { inngest } from '../../client.js';
 import { getGoogleAccessToken } from './api/auth.ts';
 import { getCalendarEvents, getHostFreeBusy } from './api/calendar.ts';
-import { appendValue, appendHackathonValue } from './api/sheets.ts';
+import {
+	appendValue,
+	appendHackathonValue,
+	appendAwsWdcValue,
+} from './api/sheets.ts';
 import { CalendarEvent } from './types.ts';
+import {
+	HackathonSubmission,
+	WebDevChallengeFormAWSSubmit,
+	WebDevChallengeFormSubmit,
+} from '../website/types.ts';
 
 type CalendarEvent = z.infer<typeof CalendarEvent>;
 
@@ -26,60 +35,53 @@ export const sheetRowAppend = inngest.createFunction(
 	{ id: 'google/sheet.row.append' },
 	{ event: 'google/sheet.row.append' },
 	async ({ event, step }) => {
-		const isHackathon =
-			'formType' in event.data && event.data.formType === 'hackathon';
-		const stepName = isHackathon
-			? 'google/hackathon.sheet.row.append'
-			: 'google/sheet.row.append';
+		const type = event.data?.formType ?? 'wdc';
+		let stepName;
+		let stepData;
+		let stepFn;
+
+		if (!event.data) {
+			return;
+		}
+
+		switch (type) {
+			case 'hackathon':
+				stepName = 'google/hackathon.sheet.row.append';
+				stepFn = appendHackathonValue;
+				stepData = HackathonSubmission.parse(event.data);
+				break;
+
+			case 'wdc-aws':
+				stepName = 'google/sheet.row.append';
+				stepFn = appendAwsWdcValue;
+				stepData = WebDevChallengeFormAWSSubmit.parse(event.data);
+				break;
+
+			case 'wdc':
+				stepName = 'google/sheet.row.append';
+				stepFn = appendValue;
+
+				const wdcData = WebDevChallengeFormSubmit.parse(event.data);
+				stepData = {
+					signature: wdcData.signature,
+					role: wdcData.role,
+					reimbursement: wdcData.reimbursement,
+					email: wdcData.email,
+					phone: wdcData.phone,
+					groupchat: wdcData.groupchat,
+					dietaryRequirements: wdcData.dietaryRequirements,
+					foodAdventurousness: wdcData.foodAdventurousness,
+					coffee: wdcData.coffee,
+				};
+				break;
+
+			default:
+				console.error(`unhandled form type: ${type}`);
+				return;
+		}
 
 		return step.run(stepName, async () => {
-			if (isHackathon) {
-				const {
-					userId,
-					fullName,
-					email,
-					githubRepo,
-					deployedUrl,
-					demoVideo,
-					agreeTerms,
-					optOutSponsorship,
-				} = event.data as any;
-
-				return await appendHackathonValue({
-					userId,
-					fullName,
-					email,
-					githubRepo,
-					deployedUrl,
-					demoVideo,
-					agreeTerms,
-					optOutSponsorship,
-				});
-			} else {
-				const {
-					signature,
-					role,
-					reimbursement,
-					email,
-					phone,
-					groupchat,
-					dietaryRequirements,
-					foodAdventurousness,
-					coffee,
-				} = event.data as any;
-
-				return await appendValue({
-					signature,
-					role,
-					reimbursement,
-					email,
-					phone,
-					groupchat,
-					dietaryRequirements,
-					foodAdventurousness,
-					coffee,
-				});
-			}
+			return await stepFn(stepData as any);
 		});
 	},
 );

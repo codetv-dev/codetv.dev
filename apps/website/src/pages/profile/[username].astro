@@ -1,11 +1,12 @@
 ---
-import { createImageUrl } from '@codetv/cloudinary';
+import { createImageUrl, getImageURLWithFallback } from '@codetv/cloudinary';
 import { Image } from '@unpic/astro';
 import { getCollection } from 'astro:content';
 import { marked } from 'marked';
 import Layout from '../../layouts/default.astro';
-import Card from '../../components/cards/card.astro';
+import Card from '../../components/design-system/card.astro';
 import { getEntry } from 'astro:content';
+import { getRelativeAge, socialLinkExtraction } from '../../util/helpers';
 
 export const prerender = true;
 
@@ -63,22 +64,46 @@ const bio = marked.parse(user.bio ?? '');
 			/>
 
 			<h1>
-				{user.name} (@{username})
+				{user.name}
 			</h1>
+			<p class="username">@{username}</p>
 			{isSubscriber ? <p class="level">{subscription.level}</p> : null}
-		</div>
-		<div class="details">
+
 			{
-				user.links && user.links?.length > 0 ? (
-					<nav class="links">
-						<span>Links:</span>
-						{user.links.map((link) => (
-							<a href={link.url}>{link.label}</a>
+				user.badges && user.badges?.length > 0 ? (
+					<ul class="badges">
+						{user.badges.map((badge) => (
+							<li>
+								<img
+									src={createImageUrl(badge.image.public_id, {
+										width: 100,
+										aspect_ratio: '1',
+									})}
+									alt={badge.title}
+									title={badge.description}
+								/>
+							</li>
 						))}
-					</nav>
+					</ul>
 				) : null
 			}
 
+			{
+				user.links && user.links?.length > 0 ? (
+					<nav class="links">
+						{user.links.map((link) => {
+							const { Icon, url, label } = socialLinkExtraction(link);
+							return (
+								<a href={url.toString()}>
+									<Icon /> {label}
+								</a>
+							);
+						})}
+					</nav>
+				) : null
+			}
+		</div>
+		<div class="details">
 			<div class="bio" set:html={bio} />
 
 			{
@@ -88,31 +113,85 @@ const bio = marked.parse(user.bio ?? '');
 
 						<div class="row three-up">
 							{user.episodes.map((related) => {
+								if (!related || !related.slug) {
+									return null;
+								}
+
 								const epIndex =
 									related.collection?.episodeSlugs?.findIndex(
 										(slug) => slug === related.slug,
 									) ?? 0;
 								const epNumber = epIndex + 1;
 
+								const thumbnailURL = getImageURLWithFallback({
+									public_id: related.thumbnail?.public_id,
+									youtube_id: related.video?.youtube_id,
+									text: related.title,
+									width: 400,
+								});
+
+								const description = related.short_description;
+								const date = new Date(related.publish_date ?? '');
+								const path = `/series/${related.series.slug}/${related.collection?.slug}/${related.slug}`;
+								const age = getRelativeAge(related.publish_date.toString());
+
+								let label;
+								if (age === 'FUTURE') {
+									label = `Available ${date.toLocaleDateString('en-US', {
+										month: 'short',
+										day: 'numeric',
+										year: 'numeric',
+									})}`;
+								}
+
+								if (age === 'NEW') {
+									label = 'New Episode';
+								}
+
 								return (
-									<Card
-										image={{
-											public_id: related.thumbnail?.public_id,
-											alt: related.thumbnail?.alt ?? '',
-										}}
-										title={related.title}
-										description={related.short_description}
-										link={`/series/${related.series?.slug}/${related.collection?.slug}/${related.slug}`}
-										linkText="Watch episode"
-										youtube_id={related.video?.youtube_id}
-									>
-										<Fragment slot="tagline">
-											<p class="series">{related.series?.title}</p>
-											<p class="episode-number">
-												{`${related.collection?.slug}E${epNumber}`.toUpperCase()}
+									<>
+										<Card link={path} variant="secondary" label={label}>
+											{thumbnailURL ? (
+												<img
+													slot="img"
+													src={thumbnailURL}
+													alt={related.title}
+												/>
+											) : null}
+
+											<Fragment slot="title">
+												{label ? <p class="tag">NEW</p> : null}
+												<h3>
+													<a href={path}>{related.title}</a>
+												</h3>
+											</Fragment>
+
+											<Fragment slot="subtitle">
+												<p class="episode-number">
+													{`${related.collection?.slug}.E${epNumber}`.toUpperCase()}
+												</p>
+												<p class="episode-date">
+													{date.toLocaleDateString('en-US', {
+														month: 'short',
+														day: 'numeric',
+														year: 'numeric',
+													})}
+												</p>
+											</Fragment>
+
+											<p class="episode-description">{description}</p>
+											<p>
+												<a
+													href={path}
+													class="button"
+													data-variant="more-link"
+													tabindex="-1"
+												>
+													See details and watch now
+												</a>
 											</p>
-										</Fragment>
-									</Card>
+										</Card>
+									</>
 								);
 							})}
 						</div>
@@ -130,7 +209,7 @@ const bio = marked.parse(user.bio ?? '');
 		@media (min-width: 750px) {
 			display: grid;
 			gap: 40px;
-			grid-template-columns: 320px auto;
+			grid-template-columns: 240px auto;
 			padding-block-start: 120px;
 		}
 	}
@@ -146,25 +225,88 @@ const bio = marked.parse(user.bio ?? '');
 		}
 
 		h1 {
-			margin-block: 20px;
+			font-size: 1.75em;
+			margin-block: 16px 8px;
 		}
 	}
 
 	.links {
 		align-items: center;
 		display: flex;
+		flex-direction: column;
 		flex-wrap: wrap;
-		gap: 1rem;
-		margin-block-start: 1rem;
+		gap: 4px;
+		margin-block-start: 24px;
+
+		a {
+			align-items: center;
+			background: color-mix(in oklch, var(--white), transparent 98%);
+			border: 1px solid color-mix(in oklch, var(--white), transparent 90%);
+			border-radius: 3px;
+			color: var(--text-muted);
+			display: flex;
+			font-size: 0.875rem;
+			gap: 8px;
+			inline-size: 100%;
+			padding: 4px 8px;
+			text-decoration-color: transparent;
+			transition: 150ms all linear;
+
+			&:is(:hover, :active, :focus) {
+				background: color-mix(in oklch, var(--white), transparent 95%);
+				border: 1px solid color-mix(in oklch, var(--white), transparent 85%);
+				color: var(--text-emphasized);
+				text-decoration-color: var(--text-muted);
+			}
+		}
+
+		svg {
+			aspect-ratio: 1;
+			block-size: auto;
+			display: block;
+			inline-size: 16px;
+
+			path {
+				fill: var(--text);
+			}
+		}
+	}
+
+	.badges {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 4px;
+		list-style: none;
+		margin: 24px 0;
+		padding: 0;
+
+		li {
+			margin: 0;
+		}
+
+		img {
+			aspect-ratio: 1;
+			block-size: auto;
+			display: block;
+			inline-size: 44px;
+			border-radius: 3px;
+			display: block;
+			opacity: 0.85;
+			transition-duration: 150ms;
+			transition-timing-function: linear;
+			transition-property: opacity;
+
+			&:is(:hover, :active, :focus) {
+				opacity: 1;
+			}
+		}
 	}
 
 	.bio {
-		margin-block: 40px;
+		margin-block: 24px 40px;
 		max-inline-size: 54ch;
 
 		p {
-			font-size: 1.25em;
-
 			+ p {
 				margin-block-start: 12px;
 			}
@@ -173,22 +315,35 @@ const bio = marked.parse(user.bio ?? '');
 
 	h2 {
 		font-size: 1.25em;
-		font-weight: 400;
 		line-height: 1.1;
 		margin-block: 64px 20px;
 	}
 
+	.username,
 	.level {
-		background: color-mix(in oklch, var(--orange) 15%, transparent);
-		border: 0.5px solid var(--orange);
+		--color: var(--text-muted);
+
+		background: color-mix(in oklch, var(--color) 15%, transparent);
+		border: 0.5px solid var(--color);
 		border-radius: 3px;
-		color: color-mix(in oklch, var(--orange) 40%, var(--white));
+		color: color-mix(in oklch, var(--color) 40%, var(--white));
 		font-size: 0.75em;
 		inline-size: max-content;
 		padding-inline: 4px;
 	}
 
+	.level {
+		--color: var(--orange);
+	}
+
 	.row {
 		padding-inline: 0;
+	}
+
+	.episode-description {
+		display: -webkit-box;
+		-webkit-box-orient: vertical;
+		-webkit-line-clamp: 3;
+		overflow: hidden;
 	}
 </style>

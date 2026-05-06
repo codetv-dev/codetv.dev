@@ -148,6 +148,24 @@ export const person = defineType({
       ],
       group: 'hackathons',
     }),
+    defineField({
+      name: 'badges',
+      type: 'array',
+      title: 'Badges',
+      description: 'Membership badges earned by this user.',
+      of: [
+        defineArrayMember({
+          type: 'reference',
+          to: [{type: 'badge'}],
+        }),
+      ],
+    }),
+    defineField({
+      title: 'atproto DID',
+      name: 'atprotoDid',
+      type: 'string',
+      description: 'TODO: this should be set via OAuth',
+    }),
   ],
   __experimental_formPreviewTitle: false,
   preview: {

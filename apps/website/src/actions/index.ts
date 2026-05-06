@@ -150,6 +150,57 @@ export const server = {
 				}
 			},
 		}),
+		wdc_aws: defineAction({
+			accept: 'form',
+			handler: async (formData) => {
+				const rawInput = {
+					inregion: formData.get('inregion'),
+					inperson: formData.get('inperson'),
+					dates: formData.get('dates'),
+					name: formData.get('name'),
+					email: formData.get('email'),
+					location: formData.get('location'),
+					strengths: formData.get('strengths') ?? '',
+					teammates: formData.get('teammates') ?? '',
+					id: formData.get('id'),
+					username: formData.get('username'),
+				};
+
+				console.log(JSON.stringify(rawInput));
+
+				const InputSchema = z.object({
+					inregion: z.coerce.boolean(),
+					inperson: z.coerce.boolean(),
+					dates: z.coerce.boolean(),
+					name: z.string(),
+					email: z.string(),
+					location: z.string(),
+					strengths: z.string().optional(),
+					teammates: z.string().optional(),
+					id: z.string(),
+					username: z.string(),
+				});
+
+				const data = InputSchema.parse(rawInput);
+
+				console.log(JSON.stringify(data));
+
+				try {
+					// TODO update Inngest actions
+					await inngest.send({
+						name: 'codetv/forms.wdc-aws.submit',
+						data,
+					});
+
+					return data;
+				} catch (err) {
+					console.log({ err });
+					return {
+						error: err,
+					};
+				}
+			},
+		}),
 		lwj: defineAction({
 			async handler(_, context) {
 				const user = await context.locals.currentUser();

@@ -59,6 +59,19 @@ const profiles = defineCollection({
 				}),
 			)
 			.nullish(),
+		badges: z
+			.array(
+				z.object({
+					title: z.string(),
+					description: z.string(),
+					image: z.object({
+						public_id: z.string(),
+						width: z.number(),
+						height: z.number(),
+					}),
+				}),
+			)
+			.nullish(),
 		episodes: z
 			.array(
 				z.object({

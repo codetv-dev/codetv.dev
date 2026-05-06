@@ -489,6 +489,15 @@ const allUsersQuery = groq`
       label,
       url
     },
+    badges[]->{
+      title,
+      description,
+      image {
+        public_id,
+        width,
+        height
+      }
+    },
     "episodes": *[_type == "episode" && references(^._id) && hidden != true && (defined(video.youtube_id) || defined(video.mux_video))] {
       title,
       'slug': slug.current,

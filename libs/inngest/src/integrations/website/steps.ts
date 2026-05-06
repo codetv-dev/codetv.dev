@@ -72,6 +72,30 @@ export const handleWDCIntakeSubmit = inngest.createFunction(
 	},
 );
 
+export const handleWDCAWSIntakeSubmit = inngest.createFunction(
+	{ id: 'codetv/forms.wdc-aws.submit' },
+	{ event: 'codetv/forms.wdc-aws.submit' },
+	async function ({ event, step }) {
+		const { name } = event.data;
+
+		// these details are only relevant to the production, so don’t store in Sanity/Clerk
+		const sheetUrl = await step.invoke('append-row-to-google-sheet', {
+			function: sheetRowAppend,
+			data: {
+				formType: 'wdc-aws',
+				...event.data,
+			},
+		});
+
+		await step.invoke('send-discord-message', {
+			function: messageSend,
+			data: {
+				message: `${name} filled out the WDC onboarding form ([view submission](${sheetUrl}))`,
+			},
+		});
+	},
+);
+
 export const handleLWJIntake = inngest.createFunction(
 	{ id: 'codetv/forms.lwj.book' },
 	{ event: 'codetv/forms.lwj.book' },

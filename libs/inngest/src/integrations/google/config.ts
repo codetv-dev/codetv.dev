@@ -24,4 +24,8 @@ export const config = {
 		id: '1VD4HwrKnChg_eIPg8aMjYCxFQJqMZPIwCMbY9qltgUs',
 		range: 'Sheet1!A2',
 	},
+	wdcAwsSheet: {
+		id: '1GdwLr2cqzxLXHy-qKAVGpyZv0epTXEajpOhUxpJVYxo',
+		range: 'Responses!A2',
+	},
 };
