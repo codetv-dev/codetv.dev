@@ -2253,6 +2253,13 @@
           ]
         },
         "optional": true
+      },
+      "at_uri": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        },
+        "optional": true
       }
     }
   },

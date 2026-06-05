@@ -187,6 +187,12 @@ export const episode = defineType({
       initialValue: 'normal',
       group: 'seo',
     }),
+    defineField({
+      name: 'at_uri',
+      type: 'string',
+      title: 'AT URI',
+      description: 'Get this by publishing a site.standard.document record at atproto.at',
+    }),
   ],
   preview: {
     select: {

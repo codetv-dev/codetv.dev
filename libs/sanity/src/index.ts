@@ -198,6 +198,7 @@ const allEpisodesQuery = groq`
       'captions': captions.asset->url,
       transcript,
     },
+    at_uri,
     people[]-> {
       user_id,
       name,
@@ -365,6 +366,7 @@ const episodeBySlugQuery = groq`
       'slug': slug.current,
       title,
     },
+    at_uri,
   }
 `;
 
