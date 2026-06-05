@@ -56,6 +56,8 @@ https://codetv-links.netlify.app/*		https://codetv.dev/:splat					301!
 /wdc/s2e13									https://codetv.dev/series/web-dev-challenge/s2/e13-delightful-apps
 /wdc/s3e1										https://codetv.dev/series/web-dev-challenge/s3/e1-playful-apps
 /wdc/s3e2										https://codetv.dev/series/web-dev-challenge/s3/e2-apps-for-building
+/wdc/s3e3										https://codetv.dev/series/web-dev-challenge/s3/e3-bring-people-together
+/wdc/s3e4										https://codetv.dev/series/web-dev-challenge/s3/e4-rebuild-your-website-again
 
 /wdc/hackathon							https://codetv.dev/hackathon/rebuild-your-website-again
 /wdc/hackathon/submit				/wdc/hackathon
