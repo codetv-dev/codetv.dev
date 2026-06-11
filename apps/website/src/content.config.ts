@@ -10,6 +10,7 @@ const blog = defineCollection({
 		updated: z.date().optional(),
 		title: z.string(),
 		description: z.string(),
+		aturi: z.string().optional(),
 		share: z
 			.object({
 				title: z.string().optional(),

@@ -6,7 +6,7 @@ import Layout from './default.astro';
 const { frontmatter, headings } = Astro.props;
 const url = Astro.url.toString();
 
-const { title, description } = frontmatter;
+const { title, description, aturi } = frontmatter;
 
 const og: { title: string; description: string; image?: string } = {
 	title: frontmatter.share?.title ?? title,
@@ -61,6 +61,8 @@ og.image = frontmatter.share?.image ?? generateDefaultImage({ text: og.title });
 				}
 			`}
 		/>
+
+		{aturi ? <link rel="site.standard.document" href={aturi} /> : null}
 
 		<script async src="https://cpwebassets.codepen.io/assets/embed/ei.js"
 		></script>
