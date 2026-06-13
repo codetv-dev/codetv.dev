@@ -279,7 +279,14 @@ og.image = frontmatter.share?.image ?? generateDefaultImage({ text: og.title });
 
 <style is:global>
 	.post-content {
+		p:not(:first-child),
+		ul,
+		ol {
+			margin-block-start: 16px;
+		}
+
 		h2 {
+			font-size: clamp(1.25em, 3.5cqi, 1.5em);
 			scroll-padding-top: 30px;
 
 			&:not(:first-child) {
@@ -288,15 +295,20 @@ og.image = frontmatter.share?.image ?? generateDefaultImage({ text: og.title });
 		}
 
 		h3 {
+			color: color-mix(in oklab, var(--text) 20%, var(--text-emphasized));
+			font-size: clamp(0.75em, 2.5cqi, 1em);
+			font-weight: 500;
+			font-variation-settings: 'wdth' 115;
+			letter-spacing: 0.15em;
+			text-transform: uppercase;
+
+			+ p:not(:first-child) {
+				margin-block-start: 8px;
+			}
+
 			&:not(:first-child) {
 				margin-block-start: 32px;
 			}
-		}
-
-		p:not(:first-child),
-		ul,
-		ol {
-			margin-block-start: 20px;
 		}
 
 		li {
