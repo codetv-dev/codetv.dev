@@ -1,0 +1,137 @@
+---
+slug: upload-image-blobs-atproto
+pubDate: 2026-06-13
+
+title: >
+  How to upload images from URL as blobs to AT Protocol using Node
+description: >
+  If you want to add a custom image to your AT Protocol records, here’s a handy script to help.
+
+aturi: at://did:plc:rwwdbpl76rghy7d5z4sd2ozp/site.standard.document/3mo7gel6wem2y
+
+share:
+  image: https://res.cloudinary.com/jlengstorf/image/upload/f_auto/q_auto/v1781393745/image-blobs-atproto-node.jpg
+---
+
+import YouTube from '../../components/youtube.astro';
+import Figure from '../../components/figure.astro';
+import Aside from '../../components/aside.astro';
+import Heart from '../../components/heart.astro';
+
+I've been working on [adding multiple Standard Site publications to CodeTV][multi-pub], and I wanted each one to have its own custom icon.
+
+In [AT Protocol][atproto], images must be stored as [blob][blob] types and referenced in the record, which requires a few extra steps to accomplish.
+
+I wrote a small helper script in Node. I run it manually and just dump the blob info to the console for copy-pasting. You might do something much more sophisticated with your own images; I hope you tag me if you do so I can steal your ideas.
+
+### Step 1: Turn an image URL into an atproto blob
+
+I already put all my images up on [Cloudinary][cloudinary], so it made sense for me to grab images off a CDN instead of loading them from disk. I believe it would be relatively straightforward to change this script to read from disk if you prefer.
+
+<Aside>
+  **NOTE:** This script requires auth. If you're using your Bluesky username and password, go to your Bluesky settings and [create an app password][password] for this.
+</Aside>
+
+```ts title="Blob upload script"
+import 'dotenv/config';
+import { AtpAgent } from '@atproto/api';
+
+if (!process.env.BLUESKY_USERNAME) {
+  console.error('No Bluesky username provided. Add BLUESKY_USERNAME in .env');
+}
+
+if (!process.env.BLUESKY_PASSWORD) {
+  console.error('No Bluesky password provided. Add BLUESKY_PASSWORD in .env');
+}
+
+if (!process.env.BLUESKY_USERNAME || !process.env.BLUESKY_PASSWORD) {
+  throw new Error('Missing Bluesky credentials');
+}
+
+const agent = new AtpAgent({
+  service: 'https://bsky.social',
+});
+
+await agent.login({
+  identifier: process.env.BLUESKY_USERNAME,
+  password: process.env.BLUESKY_PASSWORD,
+});
+
+async function imgUrlToBlob(url: string) {
+  const res = await fetch(url);
+
+  if (!res.ok) {
+    console.error(res.statusText);
+    throw new Error('unable to load image');
+  }
+
+  const arrayBuffer = await res.arrayBuffer();
+  const uint8Array = new Uint8Array(arrayBuffer);
+  const encoding = res.headers.get('content-type') ?? undefined;
+
+  const { data } = await agent.uploadBlob(uint8Array, { encoding });
+
+  return data;
+}
+
+const icon = await imgUrlToBlob(
+  'https://res.cloudinary.com/jlengstorf/image/upload/f_auto/q_auto/v1781037770/the-build-log-cover.jpg',
+);
+
+// dump the output for use in the new record
+console.log(JSON.stringify(icon, null, 2));
+```
+
+### Step 2: Copy the blob data from the output
+
+After the blob is created, you get back a JSON response that looks like this:
+
+```json title="Example output of uploading a blob"
+{
+  "blob": {
+    "$type": "blob",
+    "ref": {
+      "$link": "bafkreifjgtzald6j2ebhfkvuddrnle746eczxweogyrbln6aj3stv4yi2m"
+    },
+    "mimeType": "image/jpeg",
+    "size": 369212
+  }
+}
+```
+
+### Step 3: Use the object value of `blob` to populate the record
+
+Grab just the object inside `blob` and put it in your record to use your own custom image in your records:
+
+```json title="Example Standard Site publication using the uploaded blob" mark={6-13}
+{
+  "$type": "site.standard.publication",
+  "url": "https://codetv.dev/series/build-log",
+  "name": "The Build Log (a CodeTV production)",
+  "description": "Join host Jason Lengstorf as he travels to hear real stories about real companies, told by the people who built them.",
+  "icon": {
+    "$type": "blob",
+    "ref": {
+      "$link": "bafkreifjgtzald6j2ebhfkvuddrnle746eczxweogyrbln6aj3stv4yi2m"
+    },
+    "mimeType": "image/jpeg",
+    "size": 369212
+  },
+  "createdAt": "2026-06-09T22:00:00.000Z",
+  "preferences": {
+    "showInDiscover": true
+  }
+}
+```
+
+## Don't forget to reference the blob!
+
+When a blob is first uploaded, it's stored in a temporary location. It's only after a record references the blob that it becomes publicly accessible and permanent! [Unreferenced blobs will get garbage collected "after an appropriate amount of time".](https://atproto.com/guides/blob-lifecycle#garbage-collecting)
+
+Make sure to create the records that reference the blob pretty soon after uploading to make sure you don't run into issues.
+
+[multi-pub]: /blog/multiple-standard-site-publications-on-one-website
+[atproto]: https://atproto.com/
+[blob]: https://atproto.com/guides/images-and-video
+[cloudinary]: https://cloudinary.com/
+[password]: https://bsky.app/settings/app-passwords

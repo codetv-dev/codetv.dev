@@ -1,0 +1,168 @@
+---
+slug: multiple-standard-site-publications-on-one-website
+pubDate: 2026-06-13
+
+title: >
+  How to publish multiple Standard Site publications on one domain
+description: >
+  How CodeTV is publishing each of our series on atproto as its own Standard Site publication.
+
+aturi: at://did:plc:rwwdbpl76rghy7d5z4sd2ozp/site.standard.document/3mo7dqus5rp2r
+
+share:
+  image: https://res.cloudinary.com/jlengstorf/image/upload/f_auto/q_auto/v1781392715/standard-site-atproto-multiple-publications.jpg
+---
+
+import YouTube from '../../components/youtube.astro';
+import Figure from '../../components/figure.astro';
+import Aside from '../../components/aside.astro';
+import Heart from '../../components/heart.astro';
+
+{/* <Figure credit="Albert Woods" creditLink="https://www.instagram.com/albert_woods_photography/" creditType="Photos">
+  ![Over the shoulder view of code on a monitor. The text reads, "Build a web app, learn something new, earn rewards. Brought to you by Twilio and CodeTV. Web Dev Challenge"](https://res.cloudinary.com/jlengstorf/image/upload/f_auto/q_auto/v1762190557/wdc-hackathon-s2e11-build-a-hotline-social.jpg)
+</Figure> */}
+
+One of my first thoughts when I started tinkering with [Standard Site][standard-site] and [AT Protocol][atproto] was, ["can I use this to publish each series as its own publication?"][original-question]
+
+And it turns out [I can][follow-up-post]! And the good news is that it only requires a few steps for each series.
+
+### Step 1: Create a new publication record
+
+<Aside>
+  **NOTE:** There are options to automate creating atproto records, but I chose to do it manually to avoid falling into my usual trap of trying to build a whole system as a way of creatively procrastinating doing the actual publishing.
+</Aside>
+
+I referenced the [Standard Site publication lexicon][publication-lexicon] to put together the record:
+
+```json title="Standard Site publication record for a series"
+{
+  "$type": "site.standard.publication",
+  "url": "https://codetv.dev/series/web-dev-challenge",
+  "name": "Web Dev Challenge (a CodeTV production)",
+  "description": "Teams of developers build unique apps in just 4 hours.",
+  "icon": {
+    "$type": "blob",
+    "ref": {
+      "$link": "bafkreiejwkdrz74dbk54cuxbia62cv4tjt3bf34yqqx2ne3ddkcwgnieta"
+    },
+    "mimeType": "image/jpeg",
+    "size": 212367
+  },
+  "createdAt": "2024-06-26T19:00:00.000Z",
+  "preferences": {
+    "showInDiscover": true
+  }
+}
+```
+
+<Aside>
+  **Optional side quest:** I wanted to add my own icon, so I figured out [how to upload my own images as blobs using a small Node script][atproto-blobs].
+</Aside>
+
+### Step 2: Publish the publication record on atproto
+
+Once the record was ready, I used [Taproot][taproot] to publish the record. Again, this could be automated, but Taproot is extremely friendly to use so I just created these manually.
+
+1. Log in on Taproot
+2. View your own account (click your username in the dropdown off your avatar)
+3. Click the "create record" icon in the top right
+    <Figure caption="The “create record” button is in the top right when you're logged in and have permissions to create records for the current account.">
+      ![the logged in view](https://res.cloudinary.com/jlengstorf/image/upload/f_auto/q_auto/v1781074512/Screenshot_2026-06-09_at_23.54.51.png)
+    </Figure>
+4. Paste the new record into the "Record Content" field
+    <Figure caption="Create the new record using Standard Site’s publication lexicon.">
+      ![the create record view](https://res.cloudinary.com/jlengstorf/image/upload/f_auto/q_auto/v1781074812/Screenshot_2026-06-10_at_00.00.07.png)
+    </Figure>
+5. Click "create"
+6. Copy the newly created `at://` URI
+    <Figure caption="Copy the newly created at:// URI using the button at the top right.">
+      ![the created record](https://res.cloudinary.com/jlengstorf/image/upload/f_auto/q_auto/v1781074969/Screenshot_2026-06-10_at_00.02.44.png)
+    </Figure>
+
+### Step 3: Verify the publication on your website
+
+This is the part that’s different for multiple series: in the default scenario, we're told to create a file at `.well-known/site.standard.publication`, but when we're dealing with multiple publications we need to create additional nested folders.
+
+Instead of making a document called `site.standard.publication`, make it a directory. Inside, add new directories to match the path to each publication, with the final part of the URL path becoming the file.
+
+In CodeTV's case, we created the verification file at `.well-known/site.standard.publication/series/web-dev-challenge` for [_Web Dev Challenge_][web-dev-challenge]. (If you want, you can [see the verification file here][wdc-well-known].)
+
+```text title=".well-known/site.standard.publication/series/web-dev-challenge"
+at://did:plc:rwwdbpl76rghy7d5z4sd2ozp/site.standard.publication/3mnt7rtqnoo22
+```
+
+### Step 4: Repeat for each publication
+
+To add additional publications, repeat these steps and add a new verification with the new `at://` URI for each publication at its corresponding path inside `.well-known/site.standard.publication/`.
+
+## Adding documents to a publication
+
+Adding a document to the publications is no different than if you have a single publication, but for the sake of completeness I'll run through it here.
+
+### Step 1: Create a Standard Site document record
+
+Use the [Standard Site document lexicon][document-lexicon] to define a document record.
+
+```json title="Standard Site document record for an episode"
+{
+  "$type": "site.standard.document",
+  "site": "at://did:plc:rwwdbpl76rghy7d5z4sd2ozp/site.standard.publication/3mnt7rtqnoo22",
+  "path": "/s3/e4-rebuild-your-website-again",
+  "title": "Rebuild your website (again) | Web Dev Challenge Season 3",
+  "description": "Reclaim your lil corner of the internet with an atproto-powered website. Watch community devs build their own atmospheric websites on Web Dev Challenge from CodeTV.",
+  "textContent": "If we’re being honest — like, really honest — we all just kinda want to ignore all our work and redesign our personal sites for the hundredth time. So… let’s do that.\n\nThese days, it’s hard to know where we belong online. Platforms that used to feel open are locking down, and we can’t assume that everyone we meet has an account on every platform. We need a home online that’s actually ours: a personal website.\n\nThe only downside to a personal website has historically been that they’re hard to keep up to date, especially with all the social media giants restricting their APIs. But now, with the AT Protocol, we have a chance to actually own our data again, and use our activity across the whole “atmosphere” anywhere we want — including on our personal websites.",
+  "publishedAt": "2026-06-16T07:00:00+00:00",
+  "tags": [
+    "Web Dev Challenge",
+    "CodeTV",
+    "AT Protocol"
+  ]
+}
+```
+
+### Step 2: Publish the record
+
+I used Taproot for this step.
+
+### Step 3: Add a link metatag to the head of the published content
+
+On your website, add a `link` metatag with the `at://` URI of the document record:
+
+```html
+<link
+  rel="site.standard.document"
+  href="at://did:plc:rwwdbpl76rghy7d5z4sd2ozp/site.standard.document/3mntaeshvrd2u"
+/>
+```
+
+### Step 4: Validate that everything worked
+
+Once your site is published with the `.well-known` publication records and the `link` tags for your documents, you can validate that it all worked using the [Standard Site validator][validator].
+
+<Figure>
+  ![a validated site URL](https://res.cloudinary.com/jlengstorf/image/upload/f_auto/q_auto/v1781075985/Screenshot_2026-06-10_at_00.19.40.png)
+</Figure>
+
+## Heads up: different authors aren't supported yet
+
+One big thing that caught me off guard is that you can't specify an author for a blog post. That means the publication (in my case, CodeTV) will be listed as the author. There's no way around that right now, though there are [discussions about how to solve this](https://bsky.app/profile/jason.energy/post/3mnygvtb77c24). 
+
+## Resources
+
+- [Standard Site][standard-site]
+- [Taproot - AT Protocol Explorer][taproot]
+- [Standard Site validator][validator]
+
+
+[atproto]: https://atproto.com/
+[jason-on-atproto]: https://youtube.com/watch?v=S-XytKfGCO8&t=2284
+[standard-site]: https://standard.site
+[publication-lexicon]: https://standard.site/docs/lexicons/publication/
+[document-lexicon]: https://standard.site/docs/lexicons/document/
+[atproto-blobs]: /blog/upload-image-blobs-atproto
+[taproot]: https://atproto.at
+[original-question]: https://bsky.app/profile/jason.energy/post/3mnq4ihrt5k2o
+[follow-up-post]: https://bsky.app/profile/jason.energy/post/3mntbl3xh7s26
+[web-dev-challenge]: /series/web-dev-challenge
+[wdc-well-known]: https://codetv.dev/.well-known/site.standard.publication/series/web-dev-challenge
+[validator]: https://site-validator.fly.dev/
