@@ -22,6 +22,8 @@ const { columns = 3 } = Astro.props;
 		gap: var(--gap);
 		justify-content: center;
 		max-inline-size: 90cqi;
+		grid-template-columns: 1fr;
+		width: 100%;
 
 		@media (min-width: 600px) {
 			grid-template-columns: repeat(
