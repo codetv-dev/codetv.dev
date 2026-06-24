@@ -52,7 +52,7 @@
 		"@types/react-dom": "^19.2.3",
 		"@unpic/astro": "^1.0.2",
 		"algoliasearch": "^5.50.1",
-		"astro": "^5.18.1",
+		"astro": "^6.4.6",
 		"astro-expressive-code": "^0.41.7",
 		"cdn-cache-control": "^1.3.1",
 		"cloudinary": "^2.9.0",
