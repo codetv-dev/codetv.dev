@@ -85,6 +85,12 @@ https://codetv-links.netlify.app/*		https://codetv.dev/:splat					301!
 # Google hackathon
 /google-hackathon				https://shortclick.link/amf3t5
 
+
+# The Greenfield Games
+/gg											https://codetv.dev/series/greenfield-games/s1
+/gg/s1e1								https://codetv.dev/series/greenfield-games/s1/linear-project-management
+/gg/s1e2								https://codetv.dev/series/greenfield-games/s1/e2-workday-applicant-tracking-system
+
 # Learn With Jason
 /lwj										https://codetv.dev/series/learn-with-jason
 /learn-with-jason				https://codetv.dev/series/learn-with-jason
