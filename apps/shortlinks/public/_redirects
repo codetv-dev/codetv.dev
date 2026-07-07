@@ -60,7 +60,7 @@ https://codetv-links.netlify.app/*		https://codetv.dev/:splat					301!
 /wdc/s3e4										https://codetv.dev/series/web-dev-challenge/s3/e4-rebuild-your-website-again
 /wdc/s3e4										https://codetv.dev/series/web-dev-challenge/s3/e4-rebuild-your-website-again
 
-/wdc/hackathon							https://codetv.dev/hackathon/rebuild-your-website-again
+/wdc/hackathon							https://codetv-gsap-cloud.webflow.io/
 /wdc/hackathon/submit				/wdc/hackathon
 
 /wdc-giveaway								/wdc/hackathon
@@ -80,7 +80,7 @@ https://codetv-links.netlify.app/*		https://codetv.dev/:splat					301!
 /wdc-hackathon-s2e9-submit	https://forms.gle/BCzYMR61epV6RgRFA
 /wdc-hackathon-s2e10-submit	https://docs.google.com/forms/d/e/1FAIpQLSevu6FJQFlKCUQOiIDYymD8QhtmfQMo3ua-SqaYRT62ym7aFQ/viewform
 /wdc-hackathon-s2e11-submit	https://twitter.com/twilio/status/1987928456030560568
-/gsap-hackathon							https://webflow.com/feature/cloud
+/gsap-hackathon							https://codetv-gsap-cloud.webflow.io/
 
 /wdc-slc								https://ti.to/epicweb/epicweb-conf-2025/with/web-dev-challenge#tickets
 
