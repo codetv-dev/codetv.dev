@@ -58,6 +58,7 @@ https://codetv-links.netlify.app/*		https://codetv.dev/:splat					301!
 /wdc/s3e2										https://codetv.dev/series/web-dev-challenge/s3/e2-apps-for-building
 /wdc/s3e3										https://codetv.dev/series/web-dev-challenge/s3/e3-bring-people-together
 /wdc/s3e4										https://codetv.dev/series/web-dev-challenge/s3/e4-rebuild-your-website-again
+/wdc/s3e4										https://codetv.dev/series/web-dev-challenge/s3/e4-rebuild-your-website-again
 
 /wdc/hackathon							https://codetv.dev/hackathon/rebuild-your-website-again
 /wdc/hackathon/submit				/wdc/hackathon
@@ -79,6 +80,7 @@ https://codetv-links.netlify.app/*		https://codetv.dev/:splat					301!
 /wdc-hackathon-s2e9-submit	https://forms.gle/BCzYMR61epV6RgRFA
 /wdc-hackathon-s2e10-submit	https://docs.google.com/forms/d/e/1FAIpQLSevu6FJQFlKCUQOiIDYymD8QhtmfQMo3ua-SqaYRT62ym7aFQ/viewform
 /wdc-hackathon-s2e11-submit	https://twitter.com/twilio/status/1987928456030560568
+/gsap-hackathon							https://webflow.com/feature/cloud
 
 /wdc-slc								https://ti.to/epicweb/epicweb-conf-2025/with/web-dev-challenge#tickets
 
@@ -203,6 +205,7 @@ https://codetv-links.netlify.app/*		https://codetv.dev/:splat					301!
 /codex									https://openai.com/codex/?utm_source=codetv
 /replay									https://www.replay.io/?utm_source=codetv
 /bluesky								https://atproto.com/blog/atmospheric-website?utm_source=codetv
+/webflow								https://webflow.com/feature/cloud?utm_source=codetv
 
 /benq										https://www.benq.com/en-us/campaign/best-coding-monitor-for-programmers.html?utm_source=influencer_codetv&utm_medium=affiliate&utm_campaign=lcd_programming_rd280u_na_2025_us_awareness
 /uplift									https://www.upliftdesk.com/?utm_source=codetv&utm_medium=video&utm_campaign=web-dev-challenge
