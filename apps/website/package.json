@@ -58,7 +58,7 @@
 		"cloudinary": "^2.9.0",
 		"date-fns": "^4.1.0",
 		"drizzle-orm": "0.36.0",
-		"esbuild": "^0.27.2",
+		"esbuild": "^0.28.1",
 		"groq": "^5.6.0",
 		"human-readable-ids": "^1.0.4",
 		"inngest": "^3.54.0",
