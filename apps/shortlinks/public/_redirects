@@ -93,6 +93,12 @@ https://codetv-links.netlify.app/*		https://codetv.dev/:splat					301!
 /gg/s1e1								https://codetv.dev/series/greenfield-games/s1/linear-project-management
 /gg/s1e2								https://codetv.dev/series/greenfield-games/s1/e2-workday-applicant-tracking-system
 
+# The Full Stack
+/the-full-stack					https://codetv.dev/series/the-full-stack/s1
+/tfs										https://codetv.dev/series/the-full-stack/s1
+/tfs/s1e1								https://codetv.dev/series/the-full-stack/s1/e1-pitch-week
+/tfs/pitch-week					https://codetv.dev/series/the-full-stack/s1/e1-pitch-week
+
 # Learn With Jason
 /lwj										https://codetv.dev/series/learn-with-jason
 /learn-with-jason				https://codetv.dev/series/learn-with-jason
@@ -173,7 +179,7 @@ https://codetv-links.netlify.app/*		https://codetv.dev/:splat					301!
 /astra-db								https://docs.datastax.com/en/astra-db-serverless/index.html?utm_source=codetv&utm_medium=video&utm_campaign=4d1a
 /cloudinary							https://cloudinary.com/?ap=lwj
 /launchdarkly						https://launchdarkly.com/?utm_source=codetv&utm_medium=video&utm_campaign=galaxy-doc
-/aws										https://aws.amazon.com/?utm_source=codetv&utm_medium=video&utm_campaign=wdc
+/aws										https://aws.amazon.com/?utm_source=codetv&utm_medium=video&utm_campaign=tfs
 /amplify								https://docs.amplify.aws/?utm_source=codetv&utm_medium=video&utm_campaign=wdc
 /slack									https://slack.com/?utm_source=codetv&utm_medium=video&utm_campaign=renderatl
 /reactiflux							https://www.reactiflux.com/tmir/?utm_source=codetv&utm_medium=video&utm_campaign=renderatl
