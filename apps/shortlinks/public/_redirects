@@ -98,6 +98,16 @@ https://codetv-links.netlify.app/*		https://codetv.dev/:splat					301!
 /tfs										https://codetv.dev/series/the-full-stack/s1
 /tfs/s1e1								https://codetv.dev/series/the-full-stack/s1/e1-pitch-week
 /tfs/pitch-week					https://codetv.dev/series/the-full-stack/s1/e1-pitch-week
+/tfs/s1e2								https://codetv.dev/series/the-full-stack/s1/e2-prototype-week
+/tfs/prototype-week			https://codetv.dev/series/the-full-stack/s1/e2-prototype-week
+/tfs/s1e3								https://codetv.dev/series/the-full-stack/s1/e3-mvp-week
+/tfs/mvp-week						https://codetv.dev/series/the-full-stack/s1/e3-mvp-week
+/tfs/s1e4								https://codetv.dev/series/the-full-stack/s1/e4-ux-week
+/tfs/ux-week						https://codetv.dev/series/the-full-stack/s1/e4-ux-week
+/tfs/s1e5								https://codetv.dev/series/the-full-stack/s1/e5-launch-week
+/tfs/launch-week				https://codetv.dev/series/the-full-stack/s1/e5-launch-week
+/tfs/s1e6								https://codetv.dev/series/the-full-stack/s1/e6-finale
+/tfs/finale							https://codetv.dev/series/the-full-stack/s1/e6-finale
 
 # Learn With Jason
 /lwj										https://codetv.dev/series/learn-with-jason
