@@ -1,3 +1,15 @@
 packages:
   - 'apps/*'
   - 'libs/*'
+allowBuilds:
+  '@clerk/shared': true
+  '@parcel/watcher': true
+  '@swc/core': true
+  browser-tabs-lock: true
+  bufferutil: true
+  core-js: true
+  esbuild: true
+  nx: true
+  protobufjs: true
+  sharp: true
+  utf-8-validate: true
