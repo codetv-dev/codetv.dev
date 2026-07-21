@@ -19,7 +19,7 @@
 		"@algolia/autocomplete-preset-algolia": "^1.19.8",
 		"@astrojs/check": "^0.9.8",
 		"@astrojs/mdx": "^4.3.14",
-		"@astrojs/netlify": "^6.6.5",
+		"@astrojs/netlify": "^8.1.2",
 		"@astrojs/react": "^4.4.2",
 		"@astrojs/rss": "^4.0.18",
 		"@astrojs/sitemap": "^3.7.2",
