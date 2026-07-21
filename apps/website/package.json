@@ -21,7 +21,7 @@
 		"@astrojs/mdx": "^4.3.14",
 		"@astrojs/netlify": "^6.6.5",
 		"@astrojs/react": "^4.4.2",
-		"@astrojs/rss": "^4.0.18",
+		"@astrojs/rss": "^4.0.19",
 		"@astrojs/sitemap": "^3.7.2",
 		"@clerk/astro": "^2.17.9",
 		"@clerk/backend": "^2.33.1",
