@@ -1,5 +1,5 @@
 ---
-import { SignedIn, SignedOut } from "@clerk/astro/components";
+import { Show } from '@clerk/astro/components';
 
 export const prerender = false;
 
@@ -13,31 +13,35 @@ const loggedOutText =
 		: 'Become a Supporter';
 ---
 
-{!hasClerk ? (
-	<a href="https://dashboard.clerk.com/last-active?path=api-keys" class="account">
-		Add API Keys
-		<img
-			src="https://res.cloudinary.com/jlengstorf/image/upload/q_auto/f_auto/c_fill,w_60,ar_1/v1738215366/codetv/codetv-avatar.png"
-			alt="loading"
-		/>
-	</a>
-) : (
-
-<SignedIn>
-	{user ? (
-		<a href="/dashboard" class="account" title="Manage your account">
-			{user.firstName}
-			<img src={user.imageUrl} alt={user.fullName} width={60} />
+{
+	!hasClerk ? (
+		<a
+			href="https://dashboard.clerk.com/last-active?path=api-keys"
+			class="account"
+		>
+			Add API Keys
+			<img
+				src="https://res.cloudinary.com/jlengstorf/image/upload/q_auto/f_auto/c_fill,w_60,ar_1/v1738215366/codetv/codetv-avatar.png"
+				alt="loading"
+			/>
 		</a>
-	) : null}
-</SignedIn>
+	) : (
+		<Show when="signed-in">
+			<Fragment slot="fallback">
+				<a href="/dashboard/sign-in" class="button">
+					{loggedOutText}
+				</a>
+			</Fragment>
 
-<SignedOut>
-	<a href="/dashboard/sign-in" class="button">
-		{loggedOutText}
-	</a>
-</SignedOut>
-)}
+			{user ? (
+				<a href="/dashboard" class="account" title="Manage your account">
+					{user.firstName}
+					<img src={user.imageUrl} alt={user.fullName} width={60} />
+				</a>
+			) : null}
+		</Show>
+	)
+}
 
 <style>
 	.account {

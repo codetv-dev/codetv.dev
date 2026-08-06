@@ -1,5 +1,5 @@
 ---
-import { SignedIn, SignedOut, SignIn } from '@clerk/astro/components';
+import { Show, SignIn } from '@clerk/astro/components';
 import Layout from '../../layouts/default.astro';
 import { actions } from 'astro:actions';
 
@@ -14,7 +14,11 @@ const user = await Astro.locals.currentUser();
 
 <Layout title="Web Dev Challenge Filming Questionnaire">
 	<main>
-		<SignedIn>
+		<Show when="signed-in">
+			<Fragment slot="fallback">
+				<SignIn forceRedirectUrl={url.toString()} />
+			</Fragment>
+
 			<section class="wrapper">
 				<h2>Thanks, {user?.firstName}!</h2>
 
@@ -33,11 +37,7 @@ const user = await Astro.locals.currentUser();
 					</a>.
 				</p>
 			</section>
-		</SignedIn>
-
-		<SignedOut>
-			<SignIn forceRedirectUrl={url.toString()} />
-		</SignedOut>
+		</Show>
 	</main>
 </Layout>
 

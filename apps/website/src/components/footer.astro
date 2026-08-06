@@ -1,5 +1,5 @@
 ---
-import { SignedIn, SignedOut } from '@clerk/astro/components';
+import { Show } from '@clerk/astro/components';
 import Search from './search/search.astro';
 
 export const prerender = false;
@@ -27,13 +27,13 @@ export const prerender = false;
 
 	<nav class="links">
 		<Search />
-		<SignedOut>
-			<a href="/dashboard/sign-in">Supporter Log In</a>
-			<a href="/dashboard/sign-up">Become a Supporter</a>
-		</SignedOut>
-		<SignedIn>
+		<Show when="signed-in">
+			<Fragment slot="fallback">
+				<a href="/dashboard/sign-in">Supporter Log In</a>
+				<a href="/dashboard/sign-up">Become a Supporter</a>
+			</Fragment>
 			<a href="/dashboard">Dashboard</a>
-		</SignedIn>
+		</Show>
 		<a href="https://store.codetv.dev/">CodeTV Store</a>
 		<a href="/newsletter">Newsletter</a>
 		<a href="/blog">CodeTV Blog</a>

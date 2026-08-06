@@ -1,5 +1,5 @@
 ---
-import { SignedIn, SignedOut, SignIn } from '@clerk/astro/components';
+import { Show, SignIn } from '@clerk/astro/components';
 import { getPersonById } from '@codetv/sanity';
 import { actions } from 'astro:actions';
 import Layout from '../../layouts/default.astro';
@@ -21,7 +21,11 @@ if (result && !result.error) {
 
 <Layout title="Web Dev Challenge Filming Questionnaire">
 	<main>
-		<SignedIn>
+		<Show when="signed-in">
+			<Fragment slot="fallback">
+				<SignIn fallbackRedirectUrl={Astro.url.toString()} />
+			</Fragment>
+
 			<section class="form-wrapper">
 				<div class="instructions">
 					<h1>Web Dev Challenge Filming Questionnaire</h1>
@@ -369,11 +373,7 @@ if (result && !result.error) {
 					</form>
 				</div>
 			</section>
-		</SignedIn>
-
-		<SignedOut>
-			<SignIn fallbackRedirectUrl={Astro.url.toString()} />
-		</SignedOut>
+		</Show>
 	</main>
 </Layout>
 

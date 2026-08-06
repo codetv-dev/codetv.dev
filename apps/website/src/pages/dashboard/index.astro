@@ -5,6 +5,12 @@ import DashboardSupporter from '../../components/dashboard/supporter.astro';
 import LinksBio from '../../components/dashboard/links-bio.astro';
 import Perks from '../../components/dashboard/perks.astro';
 
+const { isAuthenticated, redirectToSignIn } = Astro.locals.auth();
+
+if (!isAuthenticated) {
+	return redirectToSignIn();
+}
+
 if (!Astro.cookies.has('has_codetv_account')) {
 	Astro.cookies.set('has_codetv_account', 'true');
 }

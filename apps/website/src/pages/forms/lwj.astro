@@ -1,5 +1,5 @@
 ---
-import { SignedIn, SignedOut, SignIn } from '@clerk/astro/components';
+import { Show, SignIn } from '@clerk/astro/components';
 import Layout from '../../layouts/default.astro';
 
 const url = Astro.url;
@@ -8,7 +8,10 @@ url.pathname = '/forms/lwj';
 
 <Layout title="Web Dev Challenge Filming Questionnaire">
 	<main>
-		<SignedIn>
+		<Show when="signed-in">
+			<Fragment slot="fallback">
+				<SignIn forceRedirectUrl={url.toString()} />
+			</Fragment>
 			<section class="wrapper">
 				<h2>Join Learn With Jason</h2>
 
@@ -18,11 +21,7 @@ url.pathname = '/forms/lwj';
 					Find Available Dates
 				</button>
 			</section>
-		</SignedIn>
-
-		<SignedOut>
-			<SignIn forceRedirectUrl={url.toString()} />
-		</SignedOut>
+		</Show>
 	</main>
 </Layout>
 

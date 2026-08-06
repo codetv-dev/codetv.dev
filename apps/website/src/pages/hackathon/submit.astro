@@ -1,5 +1,5 @@
 ---
-import { SignedIn, SignedOut, SignIn } from '@clerk/astro/components';
+import { Show, SignIn } from '@clerk/astro/components';
 import { inngest } from '@codetv/inngest';
 import Layout from '../../layouts/default.astro';
 import '../../styles/forms.css';
@@ -54,7 +54,11 @@ if (Astro.request.method === 'POST' && user) {
 
 <Layout title="Web Dev Challenge Submission - CodeTV">
 	<main>
-		<SignedIn>
+		<Show when="signed-in">
+			<Fragment slot="fallback">
+				<SignIn forceRedirectUrl={url.toString()} />
+			</Fragment>
+
 			<section class="form-wrapper">
 				{
 					submitted ? (
@@ -319,11 +323,7 @@ if (Astro.request.method === 'POST' && user) {
 					)
 				}
 			</section>
-		</SignedIn>
-
-		<SignedOut>
-			<SignIn forceRedirectUrl={url.toString()} />
-		</SignedOut>
+		</Show>
 	</main>
 </Layout>
 

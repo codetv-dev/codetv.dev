@@ -1,5 +1,5 @@
 ---
-import { SignedIn, SignedOut, SignIn } from '@clerk/astro/components';
+import { Show, SignIn } from '@clerk/astro/components';
 import Layout from '../../layouts/default.astro';
 import Aside from '../../components/aside.astro';
 
@@ -15,7 +15,11 @@ const discordAcct = user?.externalAccounts.find(
 
 <Layout title="Web Dev Challenge Filming Questionnaire">
 	<main>
-		<SignedIn>
+		<Show when="signed-in">
+			<Fragment slot="fallback">
+				<SignIn forceRedirectUrl={url.toString()} />
+			</Fragment>
+			
 			<section class="wrapper">
         {discordAcct ? (
           <h2>Join the CodeTV Discord</h2>
@@ -56,11 +60,8 @@ const discordAcct = user?.externalAccounts.find(
 					</Aside>
         )}
 			</section>
-		</SignedIn>
+		</Show>
 
-		<SignedOut>
-			<SignIn forceRedirectUrl={url.toString()} />
-		</SignedOut>
 	</main>
 </Layout>
 

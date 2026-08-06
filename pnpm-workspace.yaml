@@ -13,3 +13,6 @@ allowBuilds:
   protobufjs: true
   sharp: true
   utf-8-validate: true
+minimumReleaseAgeExclude:
+  - '@astrojs/netlify@8.2.0'
+  - astro@7.2.0
