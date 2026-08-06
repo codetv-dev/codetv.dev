@@ -16,10 +16,10 @@
 	"dependencies": {
 		"@codetv/cloudinary": "workspace:*",
 		"@codetv/types": "workspace:*",
-		"@sanity/client": "^7.20.0",
-		"groq": "^5.20.0"
+		"@sanity/client": "^7.26.2",
+		"groq": "^6.9.0"
 	},
 	"devDependencies": {
-		"@types/node": "^25.6.0"
+		"@types/node": "^26.1.2"
 	}
 }

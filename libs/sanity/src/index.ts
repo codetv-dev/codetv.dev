@@ -41,6 +41,7 @@ const client = createClient({
 
 const allSeriesQuery = groq`
   *[_type=="series"] {
+    _rev,
     title,
     'slug': slug.current,
     description,
@@ -177,6 +178,7 @@ const seriesBySlugQuery = groq`
 
 const allEpisodesQuery = groq`
   *[_type=="episode" && hidden != true] {
+    _rev,
     title,
     'slug': slug.current,
     description,

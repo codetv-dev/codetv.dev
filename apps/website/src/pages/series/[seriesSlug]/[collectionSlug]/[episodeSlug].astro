@@ -41,6 +41,7 @@ export async function getStaticPaths() {
 					episodeSlug: e.slug,
 				},
 				props: { episode },
+				cacheKey: e._rev,
 			};
 		}),
 	);

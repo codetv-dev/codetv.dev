@@ -56,5 +56,6 @@
 				}
 			}
 		}
-	]
+	],
+	"analytics": true
 }

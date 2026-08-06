@@ -11,6 +11,9 @@ import expressiveCode from 'astro-expressive-code';
 
 // https://astro.build/config
 export default defineConfig({
+	experimental: {
+		incrementalBuild: true,
+	},
 	site: 'https://codetv.dev',
 	output: 'server',
 	trailingSlash: 'never',

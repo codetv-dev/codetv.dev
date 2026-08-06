@@ -148,18 +148,18 @@ export const person = defineType({
       ],
       group: 'hackathons',
     }),
-    defineField({
-      name: 'badges',
-      type: 'array',
-      title: 'Badges',
-      description: 'Membership badges earned by this user.',
-      of: [
-        defineArrayMember({
-          type: 'reference',
-          to: [{type: 'badge'}],
-        }),
-      ],
-    }),
+    // defineField({
+    //   name: 'badges',
+    //   type: 'array',
+    //   title: 'Badges',
+    //   description: 'Membership badges earned by this user.',
+    //   of: [
+    //     defineArrayMember({
+    //       type: 'reference',
+    //       to: [{type: 'badge'}],
+    //     }),
+    //   ],
+    // }),
     defineField({
       title: 'atproto DID',
       name: 'atprotoDid',

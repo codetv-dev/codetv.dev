@@ -19,22 +19,22 @@
     "sanity"
   ],
   "dependencies": {
-    "@sanity/icons": "^3.7.4",
-    "@sanity/vision": "5.6.0",
-    "easymde": "^2.20.0",
-    "react": "^19.2.5",
-    "react-dom": "^19.2.5",
-    "sanity": "5.6.0",
-    "sanity-plugin-cloudinary": "^1.4.1",
-    "sanity-plugin-markdown": "8.0.4",
-    "sanity-plugin-mux-input": "^2.17.0",
-    "styled-components": "^6.4.0"
+    "@sanity/icons": "^5.2.1",
+    "@sanity/vision": "6.9.0",
+    "easymde": "^2.21.0",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "sanity": "6.9.0",
+    "sanity-plugin-cloudinary": "^2.1.0",
+    "sanity-plugin-markdown": "9.0.9",
+    "sanity-plugin-mux-input": "^5.0.8",
+    "styled-components": "^6.5.0"
   },
   "devDependencies": {
     "@sanity/eslint-config-studio": "6.0.0",
-    "@types/react": "^19.2.14",
+    "@types/react": "^19.2.18",
     "eslint": "^9.39.4",
-    "prettier": "^3.8.2",
+    "prettier": "^3.9.6",
     "typescript": "^5.9.3"
   },
   "prettier": {

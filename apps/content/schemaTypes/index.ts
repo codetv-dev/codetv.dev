@@ -1,9 +1,9 @@
 import {defineField, defineType} from 'sanity'
-import {FolderIcon} from '@sanity/icons'
+import {FolderIcon} from '@sanity/icons/Folder'
 import {person} from './documents/person'
 import {episode} from './documents/episode'
 import {extra} from './documents/extra'
-import {badge} from './documents/badge'
+// import {badge} from './documents/badge'
 import {hackathon} from './documents/hackathon'
 import {hackathonSubmission} from './documents/hackathon-submission'
 import {faq} from './documents/faqs'
@@ -313,7 +313,7 @@ export const schemaTypes = [
   series,
   collection,
   episode,
-  badge,
+  // badge,
   extra,
   hackathon,
   hackathonSubmission,
