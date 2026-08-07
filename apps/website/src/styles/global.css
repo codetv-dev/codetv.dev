@@ -68,6 +68,7 @@
 		--max-width: 1600px;
 
 		color: var(--text);
+		color-scheme: light dark;
 		font-family: var(--font-family);
 		line-height: 1.45;
 	}
