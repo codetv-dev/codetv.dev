@@ -1,4 +1,5 @@
 ---
+import { Show } from '@clerk/astro/components';
 import CodeTVLogo from '../assets/codetv-logo.svg';
 import UserButton from './user-button.astro';
 
@@ -8,7 +9,6 @@ const nav = [
 	{ path: 'https://store.codetv.dev/', label: 'Store' },
 	{ path: '/newsletter', label: 'Newsletter' },
 	{ path: 'https://partners.codetv.dev', label: 'Partners' },
-	{ path: '/dashboard/sign-in', label: 'Log In' },
 ];
 ---
 
@@ -19,6 +19,14 @@ const nav = [
 
 	<nav>
 		{nav.map(({ path, label }) => <a href={path}>{label}</a>)}
+
+		<Show when="signed-in">
+			<a href="/dashboard">Dashboard</a>
+		</Show>
+
+		<Show when="signed-out">
+			<a href="/dashboard/sign-in">Log In</a>
+		</Show>
 
 		<a
 			href="#search"
