@@ -1,5 +1,5 @@
 import {defineArrayMember, defineField, defineType} from 'sanity'
-import {LinkIcon, RocketIcon} from '@sanity/icons'
+import {LinkIcon} from '@sanity/icons/Link'
 
 function slugify(str: string) {
   return String(str)

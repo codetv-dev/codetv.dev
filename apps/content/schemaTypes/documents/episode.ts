@@ -1,5 +1,6 @@
 import {defineArrayMember, defineField, defineType} from 'sanity'
-import {PlayIcon, LinkIcon} from '@sanity/icons'
+import {LinkIcon} from '@sanity/icons/Link'
+import {PlayIcon} from '@sanity/icons/Play'
 
 export const episode = defineType({
   name: 'episode',

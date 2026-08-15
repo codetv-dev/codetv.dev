@@ -1,5 +1,5 @@
 import {defineField, defineType} from 'sanity'
-import {PlayIcon} from '@sanity/icons'
+import {PlayIcon} from '@sanity/icons/Play'
 
 export const extra = defineType({
   name: 'extra',
