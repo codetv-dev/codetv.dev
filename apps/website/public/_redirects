@@ -15,6 +15,9 @@
 /let-s-learn-minecraft      /series/learn-with-jason/s3
 /series/leet-heat/s1/christopher-vs-jeremy /series/leet-heat/s1/e4-christopher-vs-jeremy
 
+# Fix URL typos
+/series/the-full-stack/s1/e3-ux-week  /series/the-full-stack/s1/e4-ux-week
+
 # Old pages
 /partners                                 https://partners.codetv.dev         301!
 /support                                  /dashboard/sign-up                  301!
