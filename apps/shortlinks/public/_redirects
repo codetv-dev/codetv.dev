@@ -58,9 +58,10 @@ https://codetv-links.netlify.app/*		https://codetv.dev/:splat					301!
 /wdc/s3e2										https://codetv.dev/series/web-dev-challenge/s3/e2-apps-for-building
 /wdc/s3e3										https://codetv.dev/series/web-dev-challenge/s3/e3-bring-people-together
 /wdc/s3e4										https://codetv.dev/series/web-dev-challenge/s3/e4-rebuild-your-website-again
-/wdc/s3e4										https://codetv.dev/series/web-dev-challenge/s3/e4-rebuild-your-website-again
+/wdc/s3e5										https://codetv.dev/series/web-dev-challenge/s3/e5-best-landing-page-gsap
+/wdc/s3e6										https://codetv.dev/series/web-dev-challenge/s3/e6-app-works-while-away
 
-/wdc/hackathon							https://codetv-gsap-cloud.webflow.io/
+/wdc/hackathon							https://website-git-events-codetv-web-dev-challenge-inngest.vercel.app/events/codetv-web-dev-challenge
 /wdc/hackathon/submit				/wdc/hackathon
 
 /wdc-giveaway								/wdc/hackathon
@@ -222,6 +223,7 @@ https://codetv-links.netlify.app/*		https://codetv.dev/:splat					301!
 /replay									https://www.replay.io/?utm_source=codetv
 /bluesky								https://atproto.com/blog/atmospheric-website?utm_source=codetv
 /webflow								https://webflow.com/feature/cloud?utm_source=codetv
+/inngest								https://inngest.com/?utm_source=codetv
 
 /benq										https://www.benq.com/en-us/campaign/best-coding-monitor-for-programmers.html?utm_source=influencer_codetv&utm_medium=affiliate&utm_campaign=lcd_programming_rd280u_na_2025_us_awareness
 /uplift									https://www.upliftdesk.com/?utm_source=codetv&utm_medium=video&utm_campaign=web-dev-challenge
