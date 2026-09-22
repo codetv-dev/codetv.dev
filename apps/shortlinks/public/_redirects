@@ -61,7 +61,7 @@ https://codetv-links.netlify.app/*		https://codetv.dev/:splat					301!
 /wdc/s3e5										https://codetv.dev/series/web-dev-challenge/s3/e5-best-landing-page-gsap
 /wdc/s3e6										https://codetv.dev/series/web-dev-challenge/s3/e6-app-works-while-away
 
-/wdc/hackathon							https://website-git-events-codetv-web-dev-challenge-inngest.vercel.app/events/codetv-web-dev-challenge
+/wdc/hackathon							https://inngest.com/events/codetv-web-dev-challenge
 /wdc/hackathon/submit				/wdc/hackathon
 
 /wdc-giveaway								/wdc/hackathon
