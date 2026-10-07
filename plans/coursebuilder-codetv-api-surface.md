@@ -13,7 +13,7 @@
 2. Device auth, CASL ability helpers, `getUserAbilityForRequest`, and `withSkill`. — started: OAuth device-flow routes, discovery metadata, activation page, tRPC verification procedure, minimal ability helper, and `withSkill` wrapper added.
 3. CLI discovery and tRPC fetch-adapter route. — started: `/.well-known/coursebuilder-app`, `/api/trpc/*` fetch adapter route, health procedure, and `deviceVerification.verify` scaffolded.
 4. Core content CRUD: resources, edges, workshops, lessons, products. — started: public `/api` entrypoint, CLI-compatible `/api/resources` GET/POST/PUT, `/api/resources/edges` GET/POST/PATCH/DELETE, `/api/lessons` GET/PUT, `/api/workshops` GET/POST, and `/api/products` GET plus availability/enrollment smoke-tested.
-5. Pricing, checkout, Workshop Ticket purchase, and team claim flows.
+5. Pricing, checkout, Workshop Ticket purchase, and team claim flows. — started: `/workshops/{slug}` page, `prices-formatted` pricing with PPP opt-in and `?code=` coupons, enrollment window, sign-in-gated checkout through a CodeTV-owned `/api/coursebuilder/*` route, in-process webhook fulfillment, `/thanks/purchase` Purchase Processing, and `cb trpc` operator procedures (`commerce.*`). Team seats, Ticket Transfer, Invoice and purchase emails remain. Runbook: `docs/sop/workshop-launch.md`.
 6. Upload/media routes needed by creator/import workflows.
 7. Support, search, memory, shortlinks, surveys, and remaining operator surfaces.
 

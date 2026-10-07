@@ -136,7 +136,7 @@ export const POST: APIRoute = async ({ request }) =>
 
 		try {
 			const { product, merchantVerification } = await createVerifiedProduct(
-				body as { name?: unknown; price?: unknown },
+				body as Record<string, unknown>,
 			);
 			return json(
 				{ success: true, product, merchantVerification },
@@ -160,19 +160,13 @@ export const PUT: APIRoute = async ({ request }) =>
 			return json({ error: 'JSON body is required' }, { status: 400 });
 		}
 
-		const payload = body as {
-			id?: unknown;
-			productId?: unknown;
-			name?: unknown;
-			price?: unknown;
-		};
+		const payload = body as Record<string, unknown>;
 
 		try {
 			const { product, merchantVerification } =
 				await updateVerifiedProductPatch({
+					...payload,
 					id: payload.id ?? payload.productId,
-					name: payload.name,
-					price: payload.price,
 				});
 			return json({ success: true, product, merchantVerification });
 		} catch (error) {

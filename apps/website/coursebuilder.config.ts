@@ -1,7 +1,11 @@
 import { defineConfig } from '@coursebuilder/astro';
 import { userSchema } from '@coursebuilder/core/schemas';
 
-import { getStripeProvider } from './src/coursebuilder/stripe-provider';
+import { createInlineCommerceEvents } from './src/coursebuilder/fulfillment';
+import {
+	getCommerceBaseUrl,
+	getStripeProvider,
+} from './src/coursebuilder/stripe-provider';
 import { getCourseBuilderUserForClerkUser } from './src/coursebuilder/users';
 import { getCourseBuilderAdapter } from './src/db';
 
@@ -16,15 +20,19 @@ export default defineConfig(async (context) => {
 		return courseBuilderUser ? userSchema.parse(courseBuilderUser) : null;
 	};
 
+	const baseUrl = getCommerceBaseUrl();
+
 	return {
-		baseUrl:
-			process.env.COURSEBUILDER_URL ??
-			process.env.PUBLIC_SITE_URL ??
-			process.env.URL ??
-			'http://localhost:4321',
+		baseUrl,
 		basePath: '/api/coursebuilder',
 		adapter: getCourseBuilderAdapter(),
 		providers: stripeProvider ? [stripeProvider] : [],
+		// Webhook fulfillment runs in-process; see src/coursebuilder/fulfillment.ts.
+		inngest: createInlineCommerceEvents({
+			getAdapter: getCourseBuilderAdapter,
+			getPaymentProvider: () => stripeProvider,
+			siteRootUrl: baseUrl,
+		}),
 		getCurrentUser,
 		callbacks: {
 			session: async (request) => ({

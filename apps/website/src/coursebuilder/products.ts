@@ -1,7 +1,16 @@
 import { and, eq } from 'drizzle-orm';
+import { z } from 'zod';
 
 import { courseBuilderAdapter, db } from '../db';
-import { merchantPrice, merchantProduct, prices } from '../db/schema';
+import {
+	contentResource,
+	contentResourceProduct,
+	merchantPrice,
+	merchantProduct,
+	prices,
+	products,
+} from '../db/schema';
+import { ensureStripeMerchantAccount } from './merchant-account';
 import { getStripeProvider } from './stripe-provider';
 
 export type MerchantVerification = {
@@ -106,6 +115,136 @@ function assertProductName(value: unknown): string {
 	return name;
 }
 
+const isoDate = z
+	.string()
+	.refine((value) => !Number.isNaN(new Date(value).getTime()), {
+		message: 'must be an ISO date',
+	})
+	.transform((value) => new Date(value).toISOString());
+
+/**
+ * Optional product fields. `type`, `slug`, `state`, `visibility` and
+ * `quantityAvailable` are what `cb product create|update` already sends.
+ * `openEnrollment`, `closeEnrollment` and `resourceId` are CodeTV additions
+ * for Workshop Tickets (send them with `--body` through curl or the SOP).
+ */
+const ProductOptionsSchema = z.object({
+	type: z
+		.enum([
+			'self-paced',
+			'cohort',
+			'cohort-archive',
+			'membership',
+			'live',
+			'source-code-access',
+		])
+		.optional(),
+	slug: z
+		.string()
+		.regex(/^[a-z0-9]+(?:[-~][a-z0-9]+)*$/, 'must be a lowercase URL slug')
+		.max(191)
+		.optional(),
+	state: z.enum(['draft', 'published', 'archived', 'deleted']).optional(),
+	visibility: z.enum(['public', 'private', 'unlisted']).optional(),
+	quantityAvailable: z.number().int().min(-1).optional(),
+	openEnrollment: isoDate.nullable().optional(),
+	closeEnrollment: isoDate.nullable().optional(),
+	resourceId: z.string().min(1).optional(),
+});
+
+type ProductOptions = z.infer<typeof ProductOptionsSchema>;
+
+function parseProductOptions(input: unknown): ProductOptions {
+	const parsed = ProductOptionsSchema.safeParse(input ?? {});
+	if (!parsed.success) {
+		throw new ProductServiceError(
+			'Invalid product options',
+			400,
+			'INVALID_PRODUCT_OPTIONS',
+			z.treeifyError(parsed.error),
+		);
+	}
+	return parsed.data;
+}
+
+/** Merge field-level options into the product's `fields` JSON. */
+export async function applyProductFieldOptions(
+	productId: string,
+	options: ProductOptions,
+) {
+	const patch: Record<string, unknown> = {};
+	for (const key of [
+		'slug',
+		'state',
+		'visibility',
+		'openEnrollment',
+		'closeEnrollment',
+	] as const) {
+		if (options[key] !== undefined) patch[key] = options[key];
+	}
+
+	const columns: Partial<typeof products.$inferInsert> = {};
+	if (options.type) columns.type = options.type;
+	if (options.quantityAvailable !== undefined) {
+		columns.quantityAvailable = options.quantityAvailable;
+	}
+
+	if (Object.keys(patch).length === 0 && Object.keys(columns).length === 0) {
+		return;
+	}
+
+	const current = await db.query.products.findFirst({
+		where: eq(products.id, productId),
+	});
+	if (!current) {
+		throw new ProductServiceError(
+			'Product not found',
+			404,
+			'PRODUCT_NOT_FOUND',
+		);
+	}
+
+	const fields = { ...((current.fields ?? {}) as Record<string, unknown>) };
+	for (const [key, value] of Object.entries(patch)) {
+		if (value === null) delete fields[key];
+		else fields[key] = value;
+	}
+
+	await db
+		.update(products)
+		.set({ ...columns, fields })
+		.where(eq(products.id, productId));
+}
+
+/** Link a product to a Cohort or Workshop so its page can sell it. */
+async function linkProductToResource(productId: string, resourceId: string) {
+	const resource = await db.query.contentResource.findFirst({
+		where: eq(contentResource.id, resourceId),
+	});
+	if (!resource) {
+		throw new ProductServiceError(
+			'Resource not found',
+			404,
+			'RESOURCE_NOT_FOUND',
+		);
+	}
+
+	const existing = await db.query.contentResourceProduct.findFirst({
+		where: and(
+			eq(contentResourceProduct.productId, productId),
+			eq(contentResourceProduct.resourceId, resourceId),
+		),
+	});
+	if (existing) return;
+
+	await db.insert(contentResourceProduct).values({
+		productId,
+		resourceId,
+		position: 0,
+		metadata: { addedBy: 'api/products' },
+	});
+}
+
 export async function verifyMerchantProduct(
 	productId: string,
 ): Promise<MerchantVerification> {
@@ -189,23 +328,52 @@ export async function verifyMerchantProduct(
 	};
 }
 
-export async function createVerifiedProduct(input: {
-	name?: unknown;
-	price?: unknown;
-}) {
+export async function createVerifiedProduct(
+	input: {
+		name?: unknown;
+		price?: unknown;
+	} & Record<string, unknown>,
+) {
 	const name = assertProductName(input.name);
 	const price = parseUsdPrice(input.price);
+	const options = parseProductOptions({
+		type: input.type,
+		slug: input.slug,
+		state: input.state,
+		visibility: input.visibility,
+		quantityAvailable: input.quantityAvailable,
+		openEnrollment: input.openEnrollment,
+		closeEnrollment: input.closeEnrollment,
+		resourceId: input.resourceId,
+	});
 	let product: CourseBuilderProduct | null = null;
 
 	try {
+		await ensureStripeMerchantAccount();
+
 		product = (await courseBuilderAdapter.createProduct({
 			name,
 			price: price.amount,
-			type: 'self-paced',
-			quantityAvailable: -1,
-			state: 'draft',
-			visibility: 'unlisted',
+			type: options.type ?? 'self-paced',
+			quantityAvailable: options.quantityAvailable ?? -1,
+			state: options.state ?? 'draft',
+			visibility: options.visibility ?? 'unlisted',
+			...(options.openEnrollment && {
+				openEnrollment: options.openEnrollment,
+			}),
+			...(options.closeEnrollment && {
+				closeEnrollment: options.closeEnrollment,
+			}),
 		})) as CourseBuilderProduct;
+
+		if (options.slug) {
+			await applyProductFieldOptions(product.id, { slug: options.slug });
+		}
+		if (options.resourceId) {
+			await linkProductToResource(product.id, options.resourceId);
+		}
+		product = ((await courseBuilderAdapter.getProduct(product.id)) ??
+			product) as CourseBuilderProduct;
 
 		const merchantVerification = await verifyMerchantProduct(product.id);
 		if (!merchantVerification.verified) {
@@ -240,21 +408,50 @@ export async function createVerifiedProduct(input: {
 	}
 }
 
-export async function updateVerifiedProductPatch(input: {
-	id: unknown;
-	name?: unknown;
-	price?: unknown;
-}) {
+export async function updateVerifiedProductPatch(
+	input: {
+		id: unknown;
+		name?: unknown;
+		price?: unknown;
+	} & Record<string, unknown>,
+) {
 	const id = assertProductId(input.id);
 	const hasName = input.name !== undefined;
 	const hasPrice = input.price !== undefined;
+	const options = parseProductOptions({
+		slug: input.slug,
+		state: input.state,
+		visibility: input.visibility,
+		quantityAvailable: input.quantityAvailable,
+		openEnrollment: input.openEnrollment,
+		closeEnrollment: input.closeEnrollment,
+		resourceId: input.resourceId,
+	});
+	const { resourceId, ...fieldOptions } = options;
+	const hasOptions = Object.values(options).some(
+		(value) => value !== undefined,
+	);
 
-	if (!hasName && !hasPrice) {
+	if (!hasName && !hasPrice && !hasOptions) {
 		throw new ProductServiceError(
-			'Provide at least one field to update: name or price',
+			'Provide at least one field to update: name, price, slug, state, visibility, quantityAvailable, openEnrollment, closeEnrollment or resourceId',
 			400,
 			'NO_PRODUCT_UPDATES',
 		);
+	}
+
+	if (!hasName && !hasPrice) {
+		await applyProductFieldOptions(id, fieldOptions);
+		if (resourceId) await linkProductToResource(id, resourceId);
+		const product = await courseBuilderAdapter.getProduct(id);
+		if (!product) {
+			throw new ProductServiceError(
+				'Product not found',
+				404,
+				'PRODUCT_NOT_FOUND',
+			);
+		}
+		return { product, merchantVerification: await verifyMerchantProduct(id) };
 	}
 
 	const currentProduct = (await courseBuilderAdapter.getProduct(
@@ -305,6 +502,14 @@ export async function updateVerifiedProductPatch(input: {
 				.update(prices)
 				.set({ unitAmount: parsedPrice.unitAmount, nickname: name })
 				.where(eq(prices.id, currentProduct.price.id));
+			product = (await courseBuilderAdapter.getProduct(
+				id,
+			)) as CourseBuilderProduct;
+		}
+
+		if (hasOptions) {
+			await applyProductFieldOptions(id, fieldOptions);
+			if (resourceId) await linkProductToResource(id, resourceId);
 			product = (await courseBuilderAdapter.getProduct(
 				id,
 			)) as CourseBuilderProduct;

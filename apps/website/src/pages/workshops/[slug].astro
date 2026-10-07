@@ -1,0 +1,223 @@
+---
+import { SignInButton } from '@clerk/astro/components';
+import Layout from '../../layouts/default.astro';
+import Block from '../../components/design-system/block.astro';
+import { WorkshopPricing } from '../../components/workshops/workshop-pricing';
+import { getCourseBuilderUserForClerkUser } from '../../coursebuilder/users';
+import {
+	getTicketPurchase,
+	getWorkshopForSale,
+	resolveCouponCode,
+} from '../../coursebuilder/workshops';
+
+export const prerender = false;
+
+const slug = Astro.params.slug ?? '';
+const workshop = await getWorkshopForSale(slug);
+
+if (!workshop) {
+	return Astro.rewrite('/404');
+}
+
+const ticket = workshop.ticket;
+const clerkUser = await Astro.locals.currentUser?.();
+const viewer = await getCourseBuilderUserForClerkUser(clerkUser ?? null);
+const hasTicket =
+	viewer && ticket
+		? Boolean(await getTicketPurchase(viewer.id, [ticket.productId]))
+		: false;
+const couponId = ticket
+	? await resolveCouponCode(
+			Astro.url.searchParams.get('code'),
+			ticket.productId,
+		)
+	: null;
+
+// Return here after sign-in or a cancelled checkout, keeping the coupon code.
+const returnUrl = new URL(`/workshops/${workshop.slug}`, Astro.url);
+const code = Astro.url.searchParams.get('code');
+if (code) returnUrl.searchParams.set('code', code);
+
+const dateFormat = new Intl.DateTimeFormat('en-US', {
+	dateStyle: 'long',
+	timeZone: 'America/Los_Angeles',
+});
+const cohort = ticket?.cohort;
+const cohortDates =
+	cohort?.startsAt && cohort?.endsAt
+		? dateFormat.formatRange(cohort.startsAt, cohort.endsAt)
+		: cohort?.startsAt
+			? dateFormat.format(cohort.startsAt)
+			: null;
+
+// Placeholder copy until the CodeTV team writes the page. Matches the
+// Workshop Ticket definition in CONTEXT.md.
+const included = [
+	'A seat in this live Cohort',
+	'Lifetime access to the Workshop recordings and materials',
+];
+---
+
+<Layout
+	title={`${workshop.title} | CodeTV Workshop`}
+	description={workshop.description ?? undefined}
+>
+	<main class="workshop">
+		<Block variant="two-column-asymmetrical">
+			<div class="heading">
+				<p class="badge orange">Workshop</p>
+			</div>
+			<div class="copy-block">
+				<h1>{workshop.title}</h1>
+				{workshop.description && <p class="lede">{workshop.description}</p>}
+				{
+					cohortDates && (
+						<p class="dates">
+							<strong>Cohort:</strong> {cohortDates} (Pacific)
+						</p>
+					)
+				}
+			</div>
+		</Block>
+
+		<Block variant="two-column-asymmetrical" emphasized name="ticket">
+			<div class="heading"><h2>Get a ticket</h2></div>
+			<div class="copy-block">
+				{
+					ticket ? (
+						<>
+							<WorkshopPricing
+								client:load
+								productId={ticket.productId}
+								listPrice={ticket.unitAmount}
+								enrollment={{
+									state: ticket.enrollment.state,
+									opensAt: ticket.enrollment.opensAt?.toISOString() ?? null,
+									closesAt: ticket.enrollment.closesAt?.toISOString() ?? null,
+								}}
+								couponId={couponId}
+								canCheckout={Boolean(viewer)}
+								hasTicket={hasTicket}
+								checkoutNotice={Astro.url.searchParams.get('checkout')}
+								returnUrl={returnUrl.toString()}
+								devCountry={
+									import.meta.env.DEV
+										? Astro.url.searchParams.get('ppp_country')
+										: null
+								}
+							/>
+							{!viewer && ticket.enrollment.state === 'open' && (
+								<div class="sign-in">
+									<p>
+										Sign in or create a free CodeTV account to buy a ticket.
+									</p>
+									<SignInButton
+										asChild
+										mode="modal"
+										forceRedirectUrl={returnUrl.toString()}
+										signUpForceRedirectUrl={returnUrl.toString()}
+									>
+										<button type="button" class="button">
+											Sign in to buy
+										</button>
+									</SignInButton>
+								</div>
+							)}
+						</>
+					) : (
+						<p>Tickets aren’t on sale yet. Check back soon.</p>
+					)
+				}
+			</div>
+		</Block>
+
+		<Block variant="two-column-asymmetrical">
+			<div class="heading"><h2>What’s included</h2></div>
+			<div class="copy-block">
+				<ul>
+					{included.map((item) => <li>{item}</li>)}
+				</ul>
+				{
+					workshop.outline.length > 0 && (
+						<>
+							<h3>Workshop outline</h3>
+							<ol>
+								{workshop.outline.map((item) => (
+									<li>{item.title}</li>
+								))}
+							</ol>
+						</>
+					)
+				}
+			</div>
+		</Block>
+	</main>
+</Layout>
+
+<style>
+	.workshop {
+		h1 {
+			font-size: clamp(2rem, 6cqi, 3.5rem);
+			line-height: 1.05;
+		}
+
+		.lede {
+			font-size: 1.25rem;
+			margin-block-start: 16px;
+		}
+
+		.dates {
+			margin-block-start: 16px;
+		}
+
+		:is(ul, ol) {
+			margin-block-start: 16px;
+		}
+
+		li + li {
+			margin-block-start: 8px;
+		}
+
+		h3 {
+			margin-block-start: 32px;
+		}
+
+		.sign-in {
+			margin-block-start: 16px;
+		}
+	}
+
+	.workshop :global(.workshop-pricing) {
+		.price {
+			font-family: var(--font-family-heading);
+			font-size: 2.5rem;
+			font-weight: 900;
+			line-height: 1;
+		}
+
+		.full {
+			color: var(--text-muted);
+			font-size: 1.25rem;
+			font-weight: 400;
+		}
+
+		:is(.discount, .status, .closes, .notice, .ppp) {
+			margin-block-start: 12px;
+		}
+
+		.notice {
+			border-inline-start: 3px solid var(--orange);
+			padding-inline-start: 12px;
+		}
+
+		.ppp {
+			display: block;
+			font-size: 0.875rem;
+		}
+
+		.closes {
+			color: var(--text-muted);
+			font-size: 0.875rem;
+		}
+	}
+</style>
