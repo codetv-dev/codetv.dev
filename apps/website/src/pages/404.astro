@@ -1,7 +1,9 @@
 ---
 import Layout from '../layouts/default.astro';
 
-export const prerender = true;
+// On-demand pages (including workshops) rewrite here when a resource is missing.
+export const prerender = false;
+Astro.response.status = 404;
 
 const issueURL = new URL('https://github.com');
 issueURL.pathname = '/codetv-dev/codetv.dev/issues/new';
