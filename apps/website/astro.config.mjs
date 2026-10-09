@@ -28,7 +28,11 @@ export default defineConfig({
 				},
 			},
 		}),
-		coursebuilder({ configFile: './coursebuilder.config.ts' }),
+		// CodeTV owns /api/coursebuilder/* in src/pages/api/coursebuilder/[...coursebuilder].ts
+		coursebuilder({
+			configFile: './coursebuilder.config.ts',
+			injectEndpoints: false,
+		}),
 		expressiveCode({ themes: ['night-owl'] }),
 		mdx(),
 		react(),

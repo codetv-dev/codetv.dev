@@ -1,0 +1,62 @@
+---
+import Layout from '../../layouts/default.astro';
+import { PurchaseProcessing } from '../../components/workshops/purchase-processing';
+import {
+	getCheckoutStatus,
+	isCheckoutSessionId,
+} from '../../coursebuilder/checkout-status';
+
+export const prerender = false;
+
+// Stripe Checkout returns here: CourseBuilder core sets the success URL to
+// `${baseUrl}/thanks/purchase?session_id={CHECKOUT_SESSION_ID}&provider=stripe`.
+const sessionId = Astro.url.searchParams.get('session_id');
+
+if (!isCheckoutSessionId(sessionId)) {
+	return Astro.redirect('/');
+}
+
+const initialStatus = await getCheckoutStatus(sessionId as string);
+---
+
+<Layout title="Purchase Processing | CodeTV">
+	<main class="thanks">
+		<PurchaseProcessing
+			client:load
+			sessionId={sessionId as string}
+			initialStatus={initialStatus}
+			supportEmail="info@codetv.dev"
+		/>
+	</main>
+</Layout>
+
+<style>
+	.thanks {
+		margin: 80px auto;
+		max-inline-size: min(90dvi, 60ch);
+	}
+
+	.thanks :global(.purchase-processing) {
+		h1 {
+			font-size: clamp(2rem, 6cqi, 3rem);
+			line-height: 1.05;
+		}
+
+		.eyebrow {
+			color: var(--orange);
+			font-weight: 900;
+			letter-spacing: 0.1em;
+			text-transform: uppercase;
+		}
+
+		p + p,
+		h1 + p {
+			margin-block-start: 16px;
+		}
+
+		.hint {
+			color: var(--text-muted);
+			font-size: 0.875rem;
+		}
+	}
+</style>
