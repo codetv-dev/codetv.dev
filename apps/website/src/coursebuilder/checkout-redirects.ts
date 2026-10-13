@@ -52,3 +52,17 @@ export function getStripeCheckoutUrl(location: string | null): string | null {
 		return null;
 	}
 }
+
+/**
+ * Clerk session JWTs live about a minute and Clerk only refreshes an expired
+ * one on a GET (server-side refresh token or handshake redirect). A form POST
+ * that lands after expiry is reported signed out with this reason even though
+ * the browser holds a valid session.
+ */
+export function isExpiredSessionOnPost(authReason: unknown): boolean {
+	return (
+		typeof authReason === 'string' &&
+		authReason.startsWith('session-token-expired') &&
+		authReason.endsWith('non-eligible-non-get')
+	);
+}
