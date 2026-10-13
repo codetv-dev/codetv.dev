@@ -36,6 +36,8 @@ export type WorkshopForSale = {
 	title: string;
 	description: string | null;
 	body: string | null;
+	seoTitle: string | null;
+	seoDescription: string | null;
 	outline: Array<{ id: string; type: string; title: string }>;
 	ticket: WorkshopTicket | null;
 };
@@ -168,6 +170,9 @@ export async function getWorkshopForSale(
 		title: fields.title ?? 'Workshop',
 		description: fields.description ?? null,
 		body: typeof fields.body === 'string' ? fields.body : null,
+		seoTitle: typeof fields.seoTitle === 'string' ? fields.seoTitle : null,
+		seoDescription:
+			typeof fields.seoDescription === 'string' ? fields.seoDescription : null,
 		outline: workshop.resources
 			.map((link) => link.resource)
 			.filter(Boolean)
