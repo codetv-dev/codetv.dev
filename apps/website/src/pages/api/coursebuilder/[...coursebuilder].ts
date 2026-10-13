@@ -8,7 +8,6 @@ import {
 } from '../../../coursebuilder/checkout-coupons';
 import {
 	getSafeReturnUrl,
-	isExpiredSessionOnPost,
 	getStripeCheckoutUrl,
 } from '../../../coursebuilder/checkout-redirects';
 import { getTrustedCountry } from '../../../coursebuilder/request-country';
@@ -84,16 +83,6 @@ async function handleCheckout(context: APIContext) {
 
 	const viewer = await getViewer(context);
 	if (!viewer) {
-		// The session JWT expired between page load and click. Clerk can only
-		// refresh it on a GET, so replay this request as one; the viewer check
-		// then runs again with a refreshed session.
-		if (
-			context.request.method === 'POST' &&
-			isExpiredSessionOnPost(context.locals.authReason)
-		) {
-			console.info('checkout.retry', { productId, reason: 'session-expired' });
-			return redirect(url.toString());
-		}
 		console.info('checkout.blocked', {
 			productId,
 			reason: 'signed-out',
@@ -270,13 +259,7 @@ async function handleWebhook(context: APIContext) {
 	);
 }
 
-export const GET: APIRoute = (context) => {
-	// Only reached by the 303 replay of an expired-session POST above.
-	if (getAction(new URL(context.request.url)) === 'checkout') {
-		return handleCheckout(context);
-	}
-	return courseBuilderGet(context);
-};
+export const GET: APIRoute = (context) => courseBuilderGet(context);
 
 export const POST: APIRoute = async (context) => {
 	const action = getAction(new URL(context.request.url));

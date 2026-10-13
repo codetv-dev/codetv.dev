@@ -4,7 +4,6 @@ import { describe, it } from 'node:test';
 import {
 	getSafeReturnUrl,
 	getStripeCheckoutUrl,
-	isExpiredSessionOnPost,
 } from './checkout-redirects.ts';
 
 describe('getStripeCheckoutUrl', () => {
@@ -86,24 +85,5 @@ describe('getSafeReturnUrl', () => {
 			getSafeReturnUrl('/workshops/x', requestUrl, []).toString(),
 			'https://deploy-preview-12--codetv.netlify.app/workshops/x',
 		);
-	});
-});
-
-describe('isExpiredSessionOnPost', () => {
-	it('matches Clerk’s expired-token, non-GET refusal', () => {
-		assert.equal(
-			isExpiredSessionOnPost(
-				'session-token-expired-refresh-non-eligible-non-get',
-			),
-			true,
-		);
-	});
-
-	it('ignores other signed-out reasons', () => {
-		assert.equal(
-			isExpiredSessionOnPost('session-token-and-uat-missing'),
-			false,
-		);
-		assert.equal(isExpiredSessionOnPost(undefined), false);
 	});
 });
