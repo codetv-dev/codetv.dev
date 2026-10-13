@@ -24,4 +24,4 @@ A mounted Chromium check with synthetic fixtures and an accelerated clock proved
 
 ## Release and rollback
 
-Merge the alert-only reconciler first, then this PR. The second PR is stacked on the reconciler branch for review; retarget it to main after the first PR merges. Netlify deploys the thank-you page with the website. There is no feature flag. Restore the previous website deploy to roll back the UI. The reconciler stays alert-only and can remain deployed independently.
+Merge the alert-only reconciler (#88) first, then the waiting flow (#89). The waiting branch includes the reconciler commit, but targets main so Netlify produces a website deploy preview. Review the waiting-flow commit separately until #88 merges; the inherited reconciler file diff then disappears. Netlify deploys the thank-you page with the website. There is no feature flag. Restore the previous website deploy to roll back the UI. The reconciler stays alert-only and can remain deployed independently.
