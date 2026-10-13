@@ -1,10 +1,7 @@
 ---
 import Layout from '../../layouts/default.astro';
 import { PurchaseProcessing } from '../../components/workshops/purchase-processing';
-import {
-	getCheckoutStatus,
-	isCheckoutSessionId,
-} from '../../coursebuilder/checkout-status';
+import { isCheckoutSessionId } from '../../coursebuilder/checkout-status';
 
 export const prerender = false;
 
@@ -16,7 +13,9 @@ if (!isCheckoutSessionId(sessionId)) {
 	return Astro.redirect('/');
 }
 
-const initialStatus = await getCheckoutStatus(sessionId as string);
+// Render the steady shell without waiting on a database or Stripe request.
+// The React island owns the bounded check and only claims payment with evidence.
+const initialStatus = { status: 'processing', paymentStatus: null } as const;
 ---
 
 <Layout title="Purchase Processing | CodeTV">
@@ -37,6 +36,8 @@ const initialStatus = await getCheckoutStatus(sessionId as string);
 	}
 
 	.thanks :global(.purchase-processing) {
+		min-block-size: 280px;
+
 		h1 {
 			font-size: clamp(2rem, 6cqi, 3rem);
 			line-height: 1.05;
@@ -54,9 +55,21 @@ const initialStatus = await getCheckoutStatus(sessionId as string);
 			margin-block-start: 16px;
 		}
 
-		.hint {
-			color: var(--text-muted);
-			font-size: 0.875rem;
+		.purchase-actions {
+			display: flex;
+			flex-wrap: wrap;
+			align-items: center;
+			gap: 16px;
+			margin-block-start: 24px;
+		}
+	}
+
+	/* Waiting and support use static content, not a looping spinner. */
+	@media (prefers-reduced-motion: reduce) {
+		.thanks :global(.purchase-processing),
+		.thanks :global(.purchase-processing *) {
+			animation: none;
+			transition: none;
 		}
 	}
 </style>
