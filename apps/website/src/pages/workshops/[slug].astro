@@ -228,7 +228,7 @@ const included = [
 
 	/* Keep the shared Block grid, with a smaller heading-to-copy gap on mobile. */
 	.workshop :global([data-name='workshop-body-section']) {
-		row-gap: 1.25rem;
+		row-gap: 0.625rem;
 	}
 
 	.workshop-section-heading {
@@ -253,6 +253,10 @@ const included = [
 		max-inline-size: 68ch;
 		min-inline-size: 0;
 		overflow-wrap: anywhere;
+
+		:global(> :first-child) {
+			margin-block-start: 0;
+		}
 
 		:global(> * + *) {
 			margin-block-start: 1.25rem;
@@ -363,10 +367,6 @@ const included = [
 	@media (min-width: 800px) {
 		.workshop :global([data-name='workshop-body-section']) {
 			row-gap: 2.5rem;
-		}
-
-		.workshop-section-heading {
-			justify-self: end;
 		}
 
 		.workshop-body {
