@@ -86,11 +86,21 @@ const included = [
 
 		{
 			sections.map((section) => (
-				<Block variant="two-column-asymmetrical">
-					<div class="heading">
+				<Block variant="two-column-asymmetrical" name="workshop-body-section">
+					<div class="heading workshop-section-heading">
 						{section.headingHtml && <h2 set:html={section.headingHtml} />}
 					</div>
-					<div class="copy-block workshop-body" set:html={section.bodyHtml} />
+					<div
+						class:list={[
+							'copy-block workshop-body',
+							{
+								'workshop-faq': /faq|frequently asked questions/i.test(
+									section.headingHtml,
+								),
+							},
+						]}
+						set:html={section.bodyHtml}
+					/>
 				</Block>
 			))
 		}
@@ -174,7 +184,7 @@ const included = [
 		}
 
 		<Block>
-			<a class="button" href="#ticket">Get a ticket</a>
+			<a class="button workshop-bottom-cta" href="#ticket">Get a ticket</a>
 		</Block>
 	</main>
 </Layout>
@@ -216,17 +226,155 @@ const included = [
 		scroll-margin-block-start: 24px;
 	}
 
+	/* Keep the shared Block grid, with a smaller heading-to-copy gap on mobile. */
+	.workshop :global([data-name='workshop-body-section']) {
+		row-gap: 0.625rem;
+	}
+
+	/* Align all section labels, including the ticket/fallback labels. */
+	.workshop :global(.block > .heading:has(> h2)) {
+		justify-self: start;
+	}
+
+	.workshop-section-heading {
+		&:empty {
+			display: none;
+		}
+
+		h2 {
+			font-family: var(--font-family-heading);
+			font-size: clamp(1.375rem, 2.5cqi, 1.75rem);
+			line-height: 1.2;
+		}
+	}
+
 	.workshop-body {
+		color: var(--text);
+		font-family: var(--font-family);
+		font-size: 1.0625rem;
+		line-height: 1.6;
+		max-inline-size: 68ch;
+		min-inline-size: 0;
+		overflow-wrap: anywhere;
+
+		:global(> :first-child) {
+			margin-block-start: 0;
+		}
+
 		:global(> * + *) {
-			margin-block-start: 16px;
+			margin-block-start: 1.25rem;
+		}
+
+		:global(:is(h2, h3, h4)) {
+			color: var(--text-emphasized);
+			font-family: var(--font-family-heading);
+			line-height: 1.2;
+		}
+
+		:global(:is(h2, h3, h4):not(:first-child)) {
+			margin-block-start: 2.5rem;
+		}
+
+		:global(:is(h2, h3, h4) + *) {
+			margin-block-start: 0.75rem;
+		}
+
+		:global(h3) {
+			font-size: 1.25em;
+		}
+
+		:global(:is(ul, ol)) {
+			padding-inline-start: 1.5em;
+		}
+
+		:global(li) {
+			padding-inline-start: 0.25em;
 		}
 
 		:global(li + li) {
-			margin-block-start: 8px;
+			margin-block-start: 0.5rem;
+		}
+
+		:global(li::marker) {
+			color: var(--orange);
+		}
+
+		:global(li > :is(ul, ol, p) + *) {
+			margin-block-start: 0.75rem;
+		}
+
+		:global(blockquote) {
+			background: var(--bg);
+			border-inline-start: 0.25rem solid var(--orange);
+			color: var(--text-emphasized);
+			font-style: italic;
+			padding: 1rem 1.25rem;
+		}
+
+		:global(blockquote > * + *) {
+			margin-block-start: 1rem;
+		}
+
+		:global(blockquote + p) {
+			color: var(--text-muted);
+			font-size: 1rem;
+			margin-block-start: 0.75rem;
+		}
+
+		:global(a) {
+			color: var(--text-link);
+			text-decoration: underline;
+			text-decoration-thickness: 0.08em;
+			text-underline-offset: 0.15em;
 		}
 
 		:global(pre) {
+			max-inline-size: 100%;
 			overflow-x: auto;
+		}
+	}
+
+	.workshop-faq {
+		:global(p:has(> strong:first-child):not(:first-child)) {
+			margin-block-start: 2rem;
+		}
+
+		:global(p > strong:first-child) {
+			color: var(--text-emphasized);
+			display: block;
+			font-family: var(--font-family-heading);
+			font-size: 1.1em;
+			line-height: 1.35;
+			margin-block-end: 0.5rem;
+		}
+
+		:global(p:has(> strong:first-child) + p:not(:has(> strong:first-child))) {
+			margin-block-start: 0.5rem;
+		}
+	}
+
+	.workshop-bottom-cta {
+		font-size: 1.125rem;
+		line-height: 1.2;
+		min-block-size: 44px;
+		padding: 0.875rem 1.5rem;
+		text-align: center;
+	}
+
+	.workshop-body :global(a:focus-visible),
+	.workshop-bottom-cta:focus-visible {
+		outline: 3px solid var(--orange);
+		outline-offset: 4px;
+	}
+
+	@media (min-width: 800px) {
+		.workshop :global([data-name='workshop-body-section']) {
+			row-gap: 2.5rem;
+		}
+
+		.workshop-body {
+			font-size: 1.125rem;
+			grid-column: 2;
 		}
 	}
 
