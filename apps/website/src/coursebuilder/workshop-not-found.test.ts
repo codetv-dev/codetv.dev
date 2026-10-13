@@ -13,7 +13,7 @@ import { fileURLToPath } from 'node:url';
 import { it } from 'node:test';
 import { dev } from 'astro';
 
-it('rewrites an unknown workshop to the site 404 page with a 404 status', async () => {
+it('renders workshop sales copy and SEO, keeps the empty-body fallback, and rewrites missing workshops to 404', async () => {
 	// Exercise the real Astro pages and rewrite handler without database or Clerk
 	// credentials. Only external data and the surrounding layout are stubbed.
 	const root = await mkdtemp(join(tmpdir(), 'codetv-workshop-404-'));
@@ -46,11 +46,14 @@ it('rewrites an unknown workshop to the site 404 page with a 404 status', async 
 		);
 		await fixture(
 			'src/layouts/default.astro',
-			'<html><body><slot /></body></html>',
+			'---\nconst {title, description} = Astro.props;\n---\n<html><head><title>{title}</title><meta name="description" content={description} /></head><body><slot /></body></html>',
 		);
 		await fixture(
 			'src/components/design-system/block.astro',
-			'<div><slot /></div>',
+			await readFile(
+				new URL('../components/design-system/block.astro', import.meta.url),
+				'utf8',
+			),
 		);
 		await fixture(
 			'src/components/workshops/workshop-pricing.ts',
@@ -62,12 +65,22 @@ it('rewrites an unknown workshop to the site 404 page with a 404 status', async 
 		);
 		await fixture(
 			'src/coursebuilder/users.ts',
-			'export const getCourseBuilderUserForClerkUser = async () => { throw new Error("Unexpected user lookup for missing workshop"); };',
+			'export const getCourseBuilderUserForClerkUser = async () => null;',
+		);
+		await fixture(
+			'src/coursebuilder/workshop-page.ts',
+			await readFile(new URL('./workshop-page.ts', import.meta.url), 'utf8'),
 		);
 		await fixture(
 			'src/coursebuilder/workshops.ts',
 			`
-			export const getWorkshopForSale = async () => null;
+			export const getWorkshopForSale = async (slug) => slug === 'does-not-exist' ? null : ({
+				id: 'fixture', slug, title: 'Sample workshop', description: 'Sample description',
+				seoTitle: slug === 'sample' ? 'Sample SEO title' : null,
+				seoDescription: slug === 'sample' ? 'Sample SEO description' : null,
+				body: slug === 'sample' ? 'Intro **text**.\\n\\n## Sample section\\n\\n- Sample item\\n\\n## FAQ\\n\\nSample answer. <script>unsafe()</script>' : ' ',
+				outline: [], ticket: null,
+			});
 			export const getTicketPurchase = async () => { throw new Error('Unexpected ticket lookup'); };
 			export const resolveCouponCode = async () => { throw new Error('Unexpected coupon lookup'); };
 		`,
@@ -88,6 +101,40 @@ it('rewrites an unknown workshop to the site 404 page with a 404 status', async 
 		assert.match(html, /The page you requested was not found/);
 		assert.match(html, /open an issue/);
 		assert.doesNotMatch(html, /Get a ticket/);
+
+		const sample = await fetch(
+			`http://127.0.0.1:${server.address.port}/workshops/sample`,
+		);
+		assert.equal(sample.status, 200);
+		const sampleHtml = await sample.text();
+		assert.match(sampleHtml, /<title>Sample SEO title<\/title>/);
+		assert.match(sampleHtml, /content="Sample SEO description"/);
+		assert.match(sampleHtml, /<strong>text<\/strong>/);
+		assert.match(sampleHtml, /<h2[^>]*>Sample section<\/h2>/);
+		assert.match(sampleHtml, /<h2[^>]*>FAQ<\/h2>/);
+		assert.match(sampleHtml, /id="ticket"/);
+		assert.match(sampleHtml, /href="#ticket"/);
+		assert.doesNotMatch(sampleHtml, /What’s included|unsafe\(\)/);
+		assert.ok(
+			sampleHtml.indexOf('Sample section') < sampleHtml.indexOf('id="ticket"'),
+		);
+		assert.ok(
+			sampleHtml.indexOf('href="#ticket"') > sampleHtml.indexOf('id="ticket"'),
+		);
+
+		const fallback = await fetch(
+			`http://127.0.0.1:${server.address.port}/workshops/empty`,
+		);
+		const fallbackHtml = await fallback.text();
+		assert.match(
+			fallbackHtml,
+			/<title>Sample workshop \| CodeTV Workshop<\/title>/,
+		);
+		assert.match(fallbackHtml, /What’s included/);
+		assert.match(
+			fallbackHtml,
+			/Lifetime access to the Workshop recordings and materials/,
+		);
 	} finally {
 		await server?.stop();
 		await rm(root, { recursive: true, force: true });
