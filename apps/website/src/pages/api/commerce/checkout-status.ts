@@ -8,15 +8,25 @@ export const prerender = false;
 export const GET: APIRoute = async ({ url }) => {
 	const sessionId = url.searchParams.get('session_id') ?? '';
 	const attempt = url.searchParams.get('attempt');
+	// UI observations must not wait for another possibly stalled provider lookup.
+	if (attempt === 'slow' || attempt === 'gave-up') {
+		if (attempt === 'slow') {
+			console.info('purchase-processing.slow', { sessionId });
+		} else {
+			console.error('purchase-processing.gave-up', {
+				sessionId,
+				status: 'unconfirmed',
+			});
+			console.error('purchase-processing.support-shown', { sessionId });
+		}
+		return new Response(null, {
+			status: 204,
+			headers: { 'Cache-Control': 'no-store, max-age=0' },
+		});
+	}
 	const status = await getCheckoutStatus(sessionId);
 
-	if (attempt === 'gave-up' && status.status !== 'ready') {
-		// The buyer is looking at the "payment succeeded, setup delayed" message.
-		console.error('purchase-processing.gave-up', {
-			sessionId,
-			status: status.status,
-		});
-	} else if (status.status !== 'ready') {
+	if (status.status !== 'ready') {
 		console.info('purchase-processing.poll', {
 			sessionId,
 			attempt,

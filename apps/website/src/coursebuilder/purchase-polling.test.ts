@@ -19,18 +19,18 @@ describe('getPollStep', () => {
 		assert.equal(getPollStep(50_000, 30).delayMs, 3000);
 	});
 
-	it('stays optimistic for the first minute', () => {
+	it('stays optimistic for the first 10 seconds', () => {
 		assert.equal(getPollStep(OPTIMISTIC_WINDOW_MS - 1, 20).phase, 'processing');
 	});
 
-	it('escalates to "still setting up" after a minute but keeps polling', () => {
+	it('shows slow copy after 10 seconds but keeps polling', () => {
 		const step = getPollStep(OPTIMISTIC_WINDOW_MS, 25);
 
 		assert.equal(step.phase, 'slow');
 		assert.equal(step.delayMs, 3000);
 	});
 
-	it('gives up after about two minutes and stops polling', () => {
+	it('shows support after 90 seconds and stops polling', () => {
 		assert.deepEqual(getPollStep(GIVE_UP_AFTER_MS, 45), {
 			phase: 'failed',
 			delayMs: null,

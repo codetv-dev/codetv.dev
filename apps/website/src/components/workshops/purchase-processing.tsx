@@ -1,186 +1,155 @@
-import { useEffect, useState } from 'react';
-
-import {
-	getPollStep,
-	type CheckoutStatus,
-	type PollPhase,
+import { useEffect, useRef, useState } from 'react';
+import type {
+	CheckoutStatus,
+	PollPhase,
 } from '../../coursebuilder/purchase-polling';
+import {
+	isCheckoutStatus,
+	startPurchaseWait,
+} from '../../coursebuilder/purchase-wait';
 
 type Status = CheckoutStatus & { workshopPath?: string | null };
-
 type PurchaseProcessingProps = {
 	sessionId: string;
 	initialStatus: Status;
 	supportEmail: string;
 };
 
-/**
- * Purchase Processing screen, mirroring the AI Hero / Code with Antonio
- * thanks-page pattern: reassure the buyer right away, poll until the purchase
- * is verified in the database, then show the welcome state. After about two
- * minutes, show the shared "payment succeeded, setup delayed" message.
- *
- * TODO: invoice, Ticket Transfer and team distribution actions unlock here
- * once verified. Port ai-hero/apps/ai-hero/src/app/(commerce)/thanks/purchase/page.tsx.
- */
 export function PurchaseProcessing({
 	sessionId,
 	initialStatus,
 	supportEmail,
 }: PurchaseProcessingProps) {
 	const [status, setStatus] = useState<Status>(initialStatus);
-	const [phase, setPhase] = useState<PollPhase>('processing');
+	const [phase, setPhase] = useState<PollPhase>(
+		initialStatus.status === 'error' || initialStatus.status === 'not-paid'
+			? 'failed'
+			: 'processing',
+	);
+	const [retry, setRetry] = useState(0);
+	const heading = useRef<HTMLHeadingElement>(null);
+	const ready = status.status === 'ready';
+	const support = !ready && phase === 'failed';
+	const paid =
+		ready ||
+		(status.status === 'processing' && status.paymentStatus === 'paid');
 
 	useEffect(() => {
-		if (status.status !== 'processing') return;
-
-		let cancelled = false;
-		let timeoutId: ReturnType<typeof setTimeout> | undefined;
-		const startedAt = Date.now();
-
-		const schedule = (attempt: number) => {
-			const step = getPollStep(Date.now() - startedAt, attempt);
-			setPhase(step.phase);
-
-			if (step.phase === 'failed') {
-				// One last request so the server logs that this buyer saw the fallback.
-				void fetch(
-					`/api/commerce/checkout-status?${new URLSearchParams({
-						session_id: sessionId,
-						attempt: 'gave-up',
-					})}`,
-					{ cache: 'no-store' },
-				).catch(() => undefined);
-				return;
-			}
-
-			timeoutId = setTimeout(() => poll(attempt + 1), step.delayMs);
-		};
-
-		const poll = async (attempt: number) => {
-			try {
+		if (initialStatus.status !== 'processing' && retry === 0) return;
+		return startPurchaseWait({
+			check: async (attempt, signal) => {
 				const response = await fetch(
-					`/api/commerce/checkout-status?${new URLSearchParams({
-						session_id: sessionId,
-						attempt: String(attempt),
-					})}`,
-					{ cache: 'no-store' },
+					`/api/commerce/checkout-status?${new URLSearchParams({ session_id: sessionId, attempt: String(attempt) })}`,
+					{ cache: 'no-store', signal },
 				);
-				const next = (await response.json().catch(() => null)) as Status | null;
-				if (cancelled) return;
+				if (!response.ok) return null;
+				const next: unknown = await response.json();
+				return isCheckoutStatus(next) ? next : null;
+			},
+			onStatus: setStatus,
+			onPhase: setPhase,
+		});
+	}, [sessionId, initialStatus.status, retry]);
 
-				if (next && next.status !== 'processing') {
-					setStatus(next);
-					return;
-				}
-			} catch {
-				if (cancelled) return;
-			}
+	useEffect(() => {
+		if (phase !== 'slow' && phase !== 'failed') return;
+		// Best-effort telemetry cannot hold the waiting lifecycle open.
+		void fetch(
+			`/api/commerce/checkout-status?${new URLSearchParams({
+				session_id: sessionId,
+				attempt: phase === 'slow' ? 'slow' : 'gave-up',
+			})}`,
+			{ cache: 'no-store', keepalive: true, signal: AbortSignal.timeout(5000) },
+		).catch(() => undefined);
+	}, [phase, sessionId]);
 
-			schedule(attempt);
-		};
+	useEffect(() => {
+		if (ready || support) heading.current?.focus();
+	}, [ready, support]);
 
-		schedule(0);
-
-		return () => {
-			cancelled = true;
-			if (timeoutId) clearTimeout(timeoutId);
-		};
-	}, [sessionId, status.status]);
-
-	if (status.status === 'ready') {
-		return (
-			<div className="purchase-processing verified">
-				<p className="eyebrow">Purchase confirmed</p>
-				<h1>You’re in!</h1>
-				<p>
-					Your Workshop Ticket
-					{status.productName ? (
-						<>
-							{' '}
-							for <strong>{status.productName}</strong>
-						</>
-					) : null}{' '}
-					is confirmed and linked to your CodeTV account.
-				</p>
-				{status.purchaseStatus === 'Restricted' && (
-					<p>
-						You bought this ticket with regional pricing, so it’s tied to the
-						country you bought it from.
-					</p>
-				)}
-				<p>
-					We’ll share everything you need before the cohort starts. Questions?
-					Email <a href={`mailto:${supportEmail}`}>{supportEmail}</a>.
-				</p>
-				{status.workshopPath && (
-					<a className="button" href={status.workshopPath}>
-						Back to the workshop
-					</a>
-				)}
-			</div>
-		);
-	}
-
-	if (status.status === 'not-paid') {
-		return (
-			<div className="purchase-processing">
-				<h1>Your payment didn’t go through</h1>
-				<p>
-					Stripe didn’t complete this checkout, so you haven’t been charged.
-					Head back to the workshop page to try again, or email{' '}
-					<a href={`mailto:${supportEmail}`}>{supportEmail}</a>.
-				</p>
-			</div>
-		);
-	}
-
-	if (status.status === 'error') {
-		return (
-			<div className="purchase-processing">
-				<h1>We couldn’t find that checkout</h1>
-				<p>
-					{status.message} If you were charged, email{' '}
-					<a href={`mailto:${supportEmail}`}>{supportEmail}</a> and we’ll sort
-					it out.
-				</p>
-			</div>
-		);
-	}
-
-	if (phase === 'failed') {
-		return (
-			<div className="purchase-processing delayed">
-				<p className="eyebrow">Payment successful</p>
-				<h1>Your payment went through</h1>
-				<p>
-					We’re having a temporary problem setting up your ticket. You don’t
-					need to pay again.
-				</p>
-				<p>
-					If you haven’t received a confirmation email after 20–30 minutes,
-					email <a href={`mailto:${supportEmail}`}>{supportEmail}</a> and we’ll
-					help as soon as possible.
-				</p>
-			</div>
-		);
-	}
+	const retryCheck = () => {
+		// Preserve payment evidence, but give every retry its own 90-second deadline.
+		setStatus({ status: 'processing', paymentStatus: paid ? 'paid' : null });
+		setPhase('processing');
+		setRetry((attempt) => attempt + 1);
+	};
+	const title = ready
+		? 'Your ticket is confirmed'
+		: support
+			? 'Let’s check your ticket'
+			: 'Finalizing your ticket';
+	const supportHref = `mailto:${supportEmail}?${new URLSearchParams({ subject: 'Workshop ticket help', body: `Please help me check my workshop ticket.\nCheckout reference: ${sessionId}` })}`;
 
 	return (
-		<div className="purchase-processing" aria-live="polite">
-			<p className="eyebrow">Payment received</p>
-			<h1>Thanks for your purchase!</h1>
-			<p>
-				{phase === 'slow'
-					? 'Still setting up your ticket…'
-					: 'Finalizing your ticket…'}
+		<section
+			className={`purchase-processing${ready ? ' verified' : support ? ' delayed' : ''}`}
+			aria-labelledby="purchase-heading"
+			data-state={ready ? 'ready' : phase}
+		>
+			<p className="eyebrow">
+				{ready
+					? 'Purchase confirmed'
+					: paid
+						? 'Payment received'
+						: 'Workshop ticket'}
 			</p>
-			{phase === 'slow' && (
-				<p className="hint">
-					This usually takes a few seconds. You can leave this tab open while we
-					finish.
+			<h1 id="purchase-heading" ref={heading} tabIndex={-1}>
+				{title}
+			</h1>
+			<div role="status" aria-live="polite" aria-atomic="true">
+				{ready ? (
+					<p>
+						Your Workshop Ticket
+						{status.productName ? (
+							<>
+								{' '}
+								for <strong>{status.productName}</strong>
+							</>
+						) : null}{' '}
+						is confirmed and linked to your CodeTV account.
+					</p>
+				) : support ? (
+					<p>
+						{paid
+							? 'Your payment went through, but we haven’t confirmed your ticket yet. You don’t need to pay again.'
+							: 'We haven’t confirmed your ticket yet. This does not mean your payment failed. Please check with us before paying again.'}
+					</p>
+				) : (
+					<p>
+						{phase === 'slow'
+							? 'This is taking longer than usual. We’re still checking your ticket.'
+							: 'We’re checking your ticket. This usually takes a few seconds.'}
+					</p>
+				)}
+			</div>
+			{ready && status.purchaseStatus === 'Restricted' && (
+				<p>
+					You bought this ticket with regional pricing, so it’s tied to the
+					country you bought it from.
 				</p>
 			)}
-		</div>
+			{ready && (
+				<p>
+					We’ll share everything you need before the cohort starts. Questions?
+					Email <a href={supportHref}>{supportEmail}</a>.
+				</p>
+			)}
+			{support && (
+				<>
+					<p>You can check again or email us with your checkout reference.</p>
+					<div className="purchase-actions">
+						<button type="button" className="button" onClick={retryCheck}>
+							Check again
+						</button>
+						<a href={supportHref}>Email {supportEmail}</a>
+					</div>
+				</>
+			)}
+			{ready && status.workshopPath && (
+				<a className="button" href={status.workshopPath}>
+					Back to the workshop
+				</a>
+			)}
+		</section>
 	);
 }

@@ -1,15 +1,15 @@
 /**
  * Polling schedule for the Purchase Processing screen.
  *
- * CONTEXT.md: keep the buyer in an optimistic state for about 60 seconds,
- * keep polling up to about 2 minutes, then show the support-oriented
- * "payment succeeded, setup delayed" fallback.
+ * checking.waiting -> checking.polling -> checking.waiting; checking -> ready | failed.
+ * Slow copy at 10 seconds. Failed means checking stopped, not payment failed.
+ * Retry creates a new checking lifecycle. Exiting checking aborts the request.
  *
  * Keep this module dependency-free: it runs in a React island and `node --test`.
  */
 
-export const OPTIMISTIC_WINDOW_MS = 60_000;
-export const GIVE_UP_AFTER_MS = 120_000;
+export const OPTIMISTIC_WINDOW_MS = 10_000;
+export const GIVE_UP_AFTER_MS = 90_000;
 
 export type CheckoutStatus =
 	| {
