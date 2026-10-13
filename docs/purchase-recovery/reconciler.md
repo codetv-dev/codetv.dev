@@ -16,7 +16,13 @@ Each missing purchase produces one JSON log line per hourly sweep:
 {"event":"commerce.reconcile.missing","sessionId":"cs_test_example","productId":"workshop-ticket","ageSeconds":600}
 ```
 
-The site has no transactional mail sender. Alerts are log-only. Setting `RECONCILE_ALERT_EMAIL` produces `commerce.reconcile.email-unavailable`; it does not send mail or log the address. Existing Clerk identity mail and Kit subscription integrations are not operational alert senders. Connect a log alert before relying on this as an on-call notification.
+Set the optional `RECONCILE_ALERT_WEBHOOK_URL` in Netlify's production function environment to notify an operator through a Slack or Discord incoming webhook. Treat the URL as a secret; do not commit it. Each missing checkout sends one JSON POST with identical `text` and `content` fields:
+
+```json
+{"text":"CodeTV paid checkout with no ticket: session cs_test_example, product workshop-ticket, paid 10 min ago","content":"CodeTV paid checkout with no ticket: session cs_test_example, product workshop-ticket, paid 10 min ago"}
+```
+
+The request uses plain fetch with a five-second timeout. Network errors, timeouts and non-2xx responses log `commerce.reconcile.alert-failed` without throwing, so the sweep still finishes and subsequent missing checkouts are checked and alerted. Failure logs never include the webhook URL, response body or provider error message. Without a webhook URL, alerts remain log-only. `RECONCILE_ALERT_EMAIL` is no longer used; the site has no transactional mail sender.
 
 `commerce.reconcile.complete` includes `missingCount`. Stripe and database errors fail the sweep and log `commerce.reconcile.failed`; lookup failures never become missing-purchase alerts. There is no persistent deduplication: an unresolved checkout alerts again next hour until it leaves the window or gains a purchase.
 
@@ -26,4 +32,4 @@ Merge the reconciler PR first. Netlify discovers the function under `apps/websit
 
 ## Checks
 
-Node fixture tests cover the CourseBuilder marker, payment mode, paid/completed state, payment age boundaries, partial/full refunds, both purchase identity paths, async enumeration, and database failures. The function's CommonJS bundle imports with Node's ESM `require()` support disabled. `astro check` retains main's 11 pre-existing errors.
+Node fixture tests cover the CourseBuilder marker, payment mode, paid/completed state, payment age boundaries, partial/full refunds, both purchase identity paths, async enumeration, database failures, the Slack/Discord payload and five-second timeout, optional URL behavior, and webhook failures not breaking the sweep. The function's CommonJS bundle imports with Node's ESM `require()` support disabled. `astro check` retains main's 11 pre-existing errors.
