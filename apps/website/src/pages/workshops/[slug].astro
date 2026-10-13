@@ -231,9 +231,12 @@ const included = [
 		row-gap: 0.625rem;
 	}
 
-	.workshop-section-heading {
+	/* Align all section labels, including the ticket/fallback labels. */
+	.workshop :global(.block > .heading:has(> h2)) {
 		justify-self: start;
+	}
 
+	.workshop-section-heading {
 		&:empty {
 			display: none;
 		}
