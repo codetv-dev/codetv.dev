@@ -237,7 +237,10 @@ export function WorkshopPricing({
 			) : enrollment.state === 'closed' ? (
 				<p className="status">Ticket sales for this cohort are closed.</p>
 			) : canCheckout ? (
-				<form method="POST" action={checkoutAction}>
+				// Checkout redirects to checkout.stripe.com. Astro's client router
+				// submits forms with fetch, cannot follow a cross-origin redirect,
+				// and falls back to a GET of the action URL, which core rejects.
+				<form method="POST" action={checkoutAction} data-astro-reload>
 					<button type="submit" className="button" disabled={loading || failed}>
 						Buy a ticket
 					</button>
