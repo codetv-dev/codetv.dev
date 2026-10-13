@@ -83,7 +83,11 @@ async function handleCheckout(context: APIContext) {
 
 	const viewer = await getViewer(context);
 	if (!viewer) {
-		console.info('checkout.blocked', { productId, reason: 'signed-out' });
+		console.info('checkout.blocked', {
+			productId,
+			reason: 'signed-out',
+			authReason: context.locals.authReason,
+		});
 		return backTo(returnUrl, 'sign-in-required');
 	}
 
