@@ -8,7 +8,7 @@ Workshop pages render the default US price and guest checkout form in the shared
 - The entire fresh-plus-stale window ends **before** the default coupon expires or enrollment opens/closes. A five-second margin prevents a response generated near a boundary from crossing it. Near a boundary, the page uses `no-store`.
 - A failed default-price lookup is not cached.
 - A new deploy invalidates the cache automatically. We do not set `Netlify-Cache-ID`, which would opt out of that invalidation. This also prevents an old shell from calling an island with a new deploy's encryption key.
-- The first request to an empty cache after a deploy still invokes SSR. Later edge or durable hits avoid that invocation. A long idle period within the stale window does not force visitors to wait for SSR.
+- The first request to an empty country variation after a deploy still invokes SSR. Later edge or durable hits avoid that invocation. A long idle period within the stale window does not force visitors to wait for SSR.
 
 ## Anonymous versus private requests
 
@@ -18,7 +18,7 @@ Session evidence means an Authorization header, a `__session` or `__session_<suf
 
 The origin checks that decision again after Clerk runs. Authenticated responses, session evidence, coupon-code URLs, responses setting cookies, and non-200 responses are not shared. The ownership island always uses `private, no-store`.
 
-The cache varies on the decision header, the query string, and the US/non-US country group. The country group only preserves the existing regional-price refinement flag; no regional amount or account state enters the shared shell. Coupon-code requests remain uncached so their checkout coupon stays request-scoped.
+The cache varies on the decision header, the query string, and country. Country variations preserve the existing regional-price refinement flag; no regional amount or account state enters the shared shell. Full country variation keeps an unknown location, which falls back to the default country, separate from known non-US locations. Coupon-code requests remain uncached so their checkout coupon stays request-scoped.
 
 ## Purge after content or price edits
 

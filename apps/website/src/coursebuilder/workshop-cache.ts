@@ -42,7 +42,7 @@ export function guardWorkshopCache(
 	// lookup. Analytics cookies and zero UAT share the same anonymous entry.
 	response.headers.set(
 		'Netlify-Vary',
-		`query, header=${WORKSHOP_SESSION_HEADER}, country=us`,
+		`query, header=${WORKSHOP_SESSION_HEADER}, country`,
 	);
 	if (
 		isAuthenticated ||

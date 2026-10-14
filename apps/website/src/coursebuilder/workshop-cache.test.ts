@@ -66,7 +66,7 @@ it('analytics and signed-out Clerk cookies share the anonymous key, but every se
 		});
 		assert.equal(
 			response.headers.get('Netlify-Vary'),
-			`query, header=${WORKSHOP_SESSION_HEADER}, country=us`,
+			`query, header=${WORKSHOP_SESSION_HEADER}, country`,
 		);
 		assert.equal(response.headers.get('Vary'), 'Accept-Encoding');
 		if (expected === 'session') {
