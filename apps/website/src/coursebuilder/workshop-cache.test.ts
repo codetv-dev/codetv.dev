@@ -1,6 +1,11 @@
 import assert from 'node:assert/strict';
 import { it } from 'node:test';
-import { guardWorkshopCache, workshopCacheControl } from './workshop-cache';
+import workshopCacheKey from '../../netlify/edge-functions/workshop-cache-key.js';
+import {
+	guardWorkshopCache,
+	workshopCacheControl,
+	WORKSHOP_SESSION_HEADER,
+} from './workshop-cache';
 
 const url = 'https://codetv.dev/workshops/agentic-frontend-engineering';
 const shell = (headers = {}, status = 200) =>
@@ -13,54 +18,111 @@ const shell = (headers = {}, status = 200) =>
 			...headers,
 		},
 	});
+const anonymousRequest = (headers: Record<string, string> = {}) =>
+	new Request(url, {
+		headers: { [WORKSHOP_SESSION_HEADER]: 'anonymous', ...headers },
+	});
 
-it('partitions cache lookup by all credentials and refuses to store personalized responses', () => {
-	const anonymous = guardWorkshopCache(new Request(url), shell());
-	assert.match(anonymous.headers.get('Netlify-CDN-Cache-Control')!, /public/);
-	assert.equal(
-		anonymous.headers.get('Vary'),
-		'Accept-Encoding, Cookie, Authorization',
-	);
-	const credentials: Array<Record<string, string>> = [
-		{ Cookie: '__session=buyer-session' },
-		{ Cookie: '__session_app=buyer-session; __client_uat=123' },
-		{ Cookie: 'unknown_future_auth=buyer' },
-		{ Authorization: 'Bearer buyer-token' },
+it('analytics and signed-out Clerk cookies share the anonymous key, but every session variant bypasses', async () => {
+	const cases: Array<{ headers: Record<string, string>; expected: string }> = [
+		{ headers: {}, expected: 'anonymous' },
+		{ headers: { Cookie: '_fbp=fb.test' }, expected: 'anonymous' },
+		{
+			headers: {
+				Cookie: '_fbp=fb.test; __client_uat=0; __client_uat_instance=0',
+			},
+			expected: 'anonymous',
+		},
+		{
+			headers: { Cookie: '__session=fake; __client_uat=1700000000' },
+			expected: 'session',
+		},
+		{ headers: { Cookie: '__session_instance=' }, expected: 'session' },
+		{
+			headers: { Cookie: '__client_uat_future_instance=123' },
+			expected: 'session',
+		},
+		{ headers: { Cookie: '__client_uat=' }, expected: 'session' },
+		{ headers: { Authorization: 'Bearer fake' }, expected: 'session' },
 	];
-	for (const headers of credentials) {
-		const response = guardWorkshopCache(new Request(url, { headers }), shell());
-		assert.equal(response.headers.get('Netlify-CDN-Cache-Control'), 'no-store');
-		assert.equal(response.headers.get('Cache-Control'), 'private, no-store');
-		assert.equal(response.headers.get('Netlify-Cache-Tag'), null);
-		assert.equal(response.headers.get('Vary'), anonymous.headers.get('Vary'));
+	for (const { headers, expected } of cases) {
+		// Attempt to spoof the opposite classification. The edge MUST overwrite it.
+		const request = new Request(url, {
+			headers: {
+				...headers,
+				[WORKSHOP_SESSION_HEADER]:
+					expected === 'session' ? 'anonymous' : 'session',
+			},
+		});
+		const response = await workshopCacheKey(request, {
+			next: async (forwarded: Request) => {
+				assert.equal(forwarded.headers.get(WORKSHOP_SESSION_HEADER), expected);
+				assert.equal(
+					forwarded.headers.get('Cookie'),
+					request.headers.get('Cookie'),
+				);
+				return guardWorkshopCache(forwarded, shell());
+			},
+		});
+		assert.equal(
+			response.headers.get('Netlify-Vary'),
+			`query, header=${WORKSHOP_SESSION_HEADER}`,
+		);
+		assert.equal(response.headers.get('Vary'), 'Accept-Encoding');
+		if (expected === 'session') {
+			assert.equal(
+				response.headers.get('Netlify-CDN-Cache-Control'),
+				'no-store',
+			);
+			assert.equal(response.headers.get('Cache-Control'), 'private, no-store');
+			assert.equal(response.headers.get('Netlify-Cache-Tag'), null);
+		} else {
+			assert.match(
+				response.headers.get('Netlify-CDN-Cache-Control')!,
+				/public/,
+			);
+		}
 	}
 });
 
-it('refuses to cache a Clerk cookie mutation, redirect, missing workshop or failed price lookup', () => {
+it('refuses to cache Clerk cookie mutation, handshake auth, missing gate, errors and failed price lookup', () => {
 	for (const response of [
 		shell({ 'Set-Cookie': '__session=token' }),
 		shell({}, 307),
 		shell({}, 404),
 	]) {
 		assert.equal(
-			guardWorkshopCache(new Request(url), response).headers.get(
+			guardWorkshopCache(anonymousRequest(), response).headers.get(
 				'Netlify-CDN-Cache-Control',
 			),
 			'no-store',
 		);
 	}
-	// Clerk can authenticate via a handshake query as well as request headers.
-	const handshake = guardWorkshopCache(
-		new Request(`${url}?__clerk_handshake=opaque`),
-		shell(),
-		true,
-	);
-	assert.equal(handshake.headers.get('Netlify-CDN-Cache-Control'), 'no-store');
-	const failedPrice = shell({ 'Netlify-CDN-Cache-Control': 'no-store' });
 	assert.equal(
-		guardWorkshopCache(new Request(url), failedPrice).headers.get(
+		guardWorkshopCache(new Request(url), shell()).headers.get(
 			'Netlify-CDN-Cache-Control',
 		),
+		'no-store',
+	);
+	assert.equal(
+		guardWorkshopCache(anonymousRequest(), shell(), true).headers.get(
+			'Netlify-CDN-Cache-Control',
+		),
+		'no-store',
+	);
+	// Even a forged anonymous classification cannot make an authenticated origin response public.
+	assert.equal(
+		guardWorkshopCache(
+			anonymousRequest({ Cookie: '__session_instance=fake' }),
+			shell(),
+		).headers.get('Netlify-CDN-Cache-Control'),
+		'no-store',
+	);
+	assert.equal(
+		guardWorkshopCache(
+			anonymousRequest(),
+			shell({ 'Netlify-CDN-Cache-Control': 'no-store' }),
+		).headers.get('Netlify-CDN-Cache-Control'),
 		'no-store',
 	);
 });

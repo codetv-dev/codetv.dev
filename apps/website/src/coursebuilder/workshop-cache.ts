@@ -12,6 +12,23 @@ export function workshopCacheControl(
 	return `public, durable, s-maxage=${fresh}, stale-while-revalidate=${lifetime - fresh}`;
 }
 
+export const WORKSHOP_SESSION_HEADER = 'x-codetv-workshop-session';
+
+/** Clerk uses both legacy and instance-suffixed cookies. Zero UAT is signed out. */
+export function hasWorkshopSessionEvidence(request: Request) {
+	if (request.headers.has('Authorization')) return true;
+	return (request.headers.get('Cookie') ?? '').split(';').some((cookie) => {
+		const separator = cookie.indexOf('=');
+		const name = (separator < 0 ? cookie : cookie.slice(0, separator)).trim();
+		const value = separator < 0 ? '' : cookie.slice(separator + 1).trim();
+		return (
+			name === '__session' ||
+			name.startsWith('__session_') ||
+			(name.startsWith('__client_uat') && value !== '0')
+		);
+	});
+}
+
 /** Run AFTER Clerk: its injected auth state and Set-Cookie must never be shared. */
 export function guardWorkshopCache(
 	request: Request,
@@ -20,21 +37,17 @@ export function guardWorkshopCache(
 ) {
 	const url = new URL(request.url);
 	if (!/^\/workshops\/[^/]+$/.test(url.pathname)) return response;
-	// Cache lookup happens before middleware. Partition ALL cookies/credentials,
-	// not just known Clerk names, so authenticated requests cannot hit the public key.
-	const vary = new Set(
-		(response.headers.get('Vary') ?? '')
-			.split(',')
-			.map((s) => s.trim())
-			.filter(Boolean),
+	// The non-cached edge gate overwrites this header BEFORE downstream cache
+	// lookup. Analytics cookies and zero UAT share the same anonymous entry.
+	response.headers.set(
+		'Netlify-Vary',
+		`query, header=${WORKSHOP_SESSION_HEADER}`,
 	);
-	vary.add('Cookie');
-	vary.add('Authorization');
-	response.headers.set('Vary', [...vary].join(', '));
 	if (
 		isAuthenticated ||
-		request.headers.has('Cookie') ||
-		request.headers.has('Authorization') ||
+		hasWorkshopSessionEvidence(request) ||
+		// Fail closed when the edge gate is missing or failed to classify a request.
+		request.headers.get(WORKSHOP_SESSION_HEADER) !== 'anonymous' ||
 		response.headers.has('Set-Cookie') ||
 		response.status !== 200
 	) {
