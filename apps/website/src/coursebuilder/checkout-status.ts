@@ -1,4 +1,6 @@
-import { courseBuilderAdapter } from '../db';
+import { eq } from 'drizzle-orm';
+import { courseBuilderAdapter, db } from '../db';
+import { users } from '../db/schema';
 import type { CheckoutStatus } from './purchase-polling';
 import { getStripeProvider } from './stripe-provider';
 import { getWorkshopPathForProduct } from './workshops';
@@ -51,8 +53,15 @@ async function lookupCheckoutStatus(
 			false,
 		);
 
+		// Resolve only the user on this session's purchase, never the viewer or
+		// an email supplied by the browser. The session id is the bearer proof.
+		const buyer = await db.query.users.findFirst({
+			where: eq(users.id, purchase.userId),
+		});
+
 		return {
 			status: 'ready',
+			buyerEmail: buyer?.email ?? null,
 			purchaseId: purchase.id,
 			productName: product?.name ?? null,
 			purchaseStatus: purchase.status,

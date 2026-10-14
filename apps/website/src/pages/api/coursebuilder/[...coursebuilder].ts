@@ -82,14 +82,6 @@ async function handleCheckout(context: APIContext) {
 	if (!productId) return backTo(returnUrl, 'error');
 
 	const viewer = await getViewer(context);
-	if (!viewer) {
-		console.info('checkout.blocked', {
-			productId,
-			reason: 'signed-out',
-			authReason: context.locals.authReason,
-		});
-		return backTo(returnUrl, 'sign-in-required');
-	}
 
 	const ticket = await getTicketForProduct(productId);
 	if (!ticket) {
@@ -103,7 +95,7 @@ async function handleCheckout(context: APIContext) {
 	if (ticket.enrollment.state !== 'open') {
 		console.info('checkout.blocked', {
 			productId,
-			userId: viewer.id,
+			userId: viewer?.id,
 			reason: `enrollment-${ticket.enrollment.state}`,
 		});
 		return backTo(returnUrl, 'enrollment-closed');
@@ -112,7 +104,9 @@ async function handleCheckout(context: APIContext) {
 	// TODO: team seats. Port the AI Hero bulk purchase path
 	// (ai-hero/apps/ai-hero/src/app/(content)/cohorts/[slug]/_components/cohort-pricing-widget-container.tsx)
 	// before allowing quantity > 1 or a second ticket for the same Viewer.
-	if (await getTicketPurchase(viewer.id, [productId])) {
+	// Guests are identified by Stripe's email at fulfillment, so we cannot
+	// check ownership before checkout. Signed-in owners still cannot buy twice.
+	if (viewer && (await getTicketPurchase(viewer.id, [productId]))) {
 		console.info('checkout.blocked', {
 			productId,
 			userId: viewer.id,
@@ -132,7 +126,9 @@ async function handleCheckout(context: APIContext) {
 	// Rebuild the query from scratch; nothing else from the browser reaches core.
 	const checkoutUrl = new URL(url.pathname, url);
 	checkoutUrl.searchParams.set('productId', productId);
-	checkoutUrl.searchParams.set('userId', viewer.id);
+	// Omitting userId invokes core's guest checkout. Stripe collects the email;
+	// fulfillment finds or creates the Course Builder user with that email.
+	if (viewer) checkoutUrl.searchParams.set('userId', viewer.id);
 	checkoutUrl.searchParams.set('quantity', '1');
 	checkoutUrl.searchParams.set('bulk', 'false');
 	checkoutUrl.searchParams.set('country', coupon.country);
@@ -164,7 +160,7 @@ async function handleCheckout(context: APIContext) {
 	if (!stripeCheckoutUrl) {
 		console.error('checkout.failed', {
 			productId,
-			userId: viewer.id,
+			userId: viewer?.id,
 			status: response.status,
 		});
 		return backTo(returnUrl, 'error');
@@ -172,7 +168,7 @@ async function handleCheckout(context: APIContext) {
 
 	console.info('checkout.redirect', {
 		productId,
-		userId: viewer.id,
+		userId: viewer?.id,
 		coupon: coupon.reason,
 	});
 	return redirect(stripeCheckoutUrl);

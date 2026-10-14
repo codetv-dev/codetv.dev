@@ -22,12 +22,13 @@ it('renders one accessible shell with evidence-based copy and a real support rou
 			jsx: 'automatic',
 		});
 		const { PurchaseProcessing } = createRequire(import.meta.url)(file);
-		const render = (initialStatus: unknown) =>
+		const render = (initialStatus: unknown, signedIn = false) =>
 			renderToStaticMarkup(
 				createElement(PurchaseProcessing, {
 					sessionId: 'cs_test_fixture',
 					supportEmail: 'info@codetv.dev',
 					initialStatus,
+					signedIn,
 				}),
 			);
 		const pending = render({ status: 'processing', paymentStatus: null });
@@ -59,10 +60,30 @@ it('renders one accessible shell with evidence-based copy and a real support rou
 			status: 'ready',
 			purchaseId: 'p_fixture',
 			productName: 'Workshop',
+			buyerEmail: 'guest@example.com',
 			purchaseStatus: 'Valid',
 			workshopPath: '/workshops/fixture',
 		});
 		assert.match(ready, /Your ticket is confirmed/);
+		assert.match(ready, /You’re in\. Sign in or create your CodeTV account/);
+		assert.match(ready, /guest@example.com/);
+		assert.match(
+			ready,
+			/href="\/dashboard\/sign-in\?redirect_url=%2Fworkshops%2Ffixture"/,
+		);
+		assert.doesNotMatch(ready, /linked to your CodeTV account/);
+		const signedInReady = render(
+			{
+				status: 'ready',
+				purchaseId: 'p_fixture',
+				productName: 'Workshop',
+				purchaseStatus: 'Valid',
+				workshopPath: '/workshops/fixture',
+			},
+			true,
+		);
+		assert.match(signedInReady, /linked to your CodeTV account/);
+		assert.doesNotMatch(signedInReady, /Sign in or create/);
 		assert.match(ready, /href="\/workshops\/fixture"/);
 		assert.doesNotMatch(ready, /Check again/);
 		for (const html of [pending, support, ready])

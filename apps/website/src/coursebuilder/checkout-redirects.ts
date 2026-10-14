@@ -29,7 +29,8 @@ export function getSafeReturnUrl(
  *
  * For `cohort`, `live` and `membership` products core 1.2.1 redirects to
  * `${baseUrl}/subscribe/verify-login?checkoutUrl=<stripe url>`. CodeTV has
- * already verified the Viewer, so it goes straight to Stripe. Anything that
+ * permits guest tickets and links the buyer by email at fulfillment, so it
+ * goes straight to Stripe. Anything that
  * isn't an https checkout.stripe.com URL (including core's error redirect to
  * the site root) returns null.
  */

@@ -1,5 +1,4 @@
 ---
-import { SignInButton } from '@clerk/astro/components';
 import Layout from '../../layouts/default.astro';
 import Block from '../../components/design-system/block.astro';
 import { WorkshopPricing } from '../../components/workshops/workshop-pricing';
@@ -141,7 +140,7 @@ const included = [
 									closesAt: ticket.enrollment.closesAt?.toISOString() ?? null,
 								}}
 								couponId={couponId}
-								canCheckout={Boolean(viewer)}
+								canCheckout={true}
 								hasTicket={hasTicket}
 								checkoutNotice={Astro.url.searchParams.get('checkout')}
 								returnUrl={returnUrl.toString()}
@@ -151,23 +150,6 @@ const included = [
 										: null
 								}
 							/>
-							{!viewer && ticket.enrollment.state === 'open' && (
-								<div class="sign-in">
-									<p>
-										Sign in or create a free CodeTV account to buy a ticket.
-									</p>
-									<SignInButton
-										asChild
-										mode="modal"
-										forceRedirectUrl={returnUrl.toString()}
-										signUpForceRedirectUrl={returnUrl.toString()}
-									>
-										<button type="button" class="button">
-											Sign in to buy
-										</button>
-									</SignInButton>
-								</div>
-							)}
 						</>
 					) : (
 						<p>Tickets aren’t on sale yet. Check back soon.</p>

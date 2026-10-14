@@ -25,7 +25,10 @@ export function isCheckoutStatus(value: unknown): value is CheckoutStatus {
 			'purchaseStatus' in value &&
 			typeof value.purchaseStatus === 'string' &&
 			'productName' in value &&
-			(value.productName === null || typeof value.productName === 'string')
+			(value.productName === null || typeof value.productName === 'string') &&
+			(!('buyerEmail' in value) ||
+				value.buyerEmail === null ||
+				typeof value.buyerEmail === 'string')
 		);
 	if (value.status === 'processing' || value.status === 'not-paid')
 		return (

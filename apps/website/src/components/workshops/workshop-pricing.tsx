@@ -73,7 +73,6 @@ const dateFormat = new Intl.DateTimeFormat('en-US', {
 });
 
 const notices: Record<string, string> = {
-	'sign-in-required': 'Sign in to buy a ticket.',
 	'enrollment-closed': 'Ticket sales for this cohort are closed.',
 	'already-purchased': 'You already have a ticket for this cohort.',
 	error:

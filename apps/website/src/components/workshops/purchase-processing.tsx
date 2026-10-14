@@ -13,12 +13,14 @@ type PurchaseProcessingProps = {
 	sessionId: string;
 	initialStatus: Status;
 	supportEmail: string;
+	signedIn?: boolean;
 };
 
 export function PurchaseProcessing({
 	sessionId,
 	initialStatus,
 	supportEmail,
+	signedIn = false,
 }: PurchaseProcessingProps) {
 	const [status, setStatus] = useState<Status>(initialStatus);
 	const [phase, setPhase] = useState<PollPhase>(
@@ -97,7 +99,18 @@ export function PurchaseProcessing({
 				{title}
 			</h1>
 			<div role="status" aria-live="polite" aria-atomic="true">
-				{ready ? (
+				{ready && !signedIn ? (
+					<p>
+						You’re in. Sign in or create your CodeTV account
+						{status.buyerEmail ? (
+							<>
+								{' '}
+								with <strong>{status.buyerEmail}</strong>
+							</>
+						) : null}{' '}
+						to get your ticket.
+					</p>
+				) : ready ? (
 					<p>
 						Your Workshop Ticket
 						{status.productName ? (
@@ -145,8 +158,19 @@ export function PurchaseProcessing({
 					</div>
 				</>
 			)}
+			{ready && !signedIn && (
+				<a
+					className="button"
+					href={`/dashboard/sign-in?${new URLSearchParams({ redirect_url: status.workshopPath ?? '/dashboard' })}`}
+				>
+					Sign in or create an account
+				</a>
+			)}
 			{ready && status.workshopPath && (
-				<a className="button" href={status.workshopPath}>
+				<a
+					className={signedIn ? 'button' : undefined}
+					href={status.workshopPath}
+				>
 					Back to the workshop
 				</a>
 			)}
