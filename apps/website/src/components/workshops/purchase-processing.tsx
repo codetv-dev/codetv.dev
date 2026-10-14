@@ -98,6 +98,11 @@ export function PurchaseProcessing({
 			<h1 id="purchase-heading" ref={heading} tabIndex={-1}>
 				{title}
 			</h1>
+			{ready && status.buyerEmail && (
+				<p>
+					Your ticket is for <strong>{status.buyerEmail}</strong>.
+				</p>
+			)}
 			<div role="status" aria-live="polite" aria-atomic="true">
 				{ready && !signedIn ? (
 					<p>

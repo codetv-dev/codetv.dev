@@ -16,7 +16,9 @@ Coupon selection, opt-in PPP, quantity limits, enrollment windows and safe cance
 
 The purchase wait page works without a sign-in. It polls by Stripe checkout session id, not a browser-supplied email or user id. Once the purchase exists, it resolves the buyer email from that purchase's user. Treat the checkout session URL as private bearer proof; do not share it.
 
-Signed-out buyers see their checkout email and a sign-in/create-account link. The sign-in page permits only a same-origin return URL and returns them to the workshop after either flow.
+Buyers see “Your ticket is for <email>”. Signed-out buyers also see a sign-in/create-account link. The sign-in page permits only a same-origin return URL and returns them to the workshop after either flow.
+
+AI Hero's purchase transfer flow sends an expiring acceptance email to the new address. CodeTV has neither that sender nor a transfer acceptance route. Transfer is deferred rather than exposing an unsafe or unusable endpoint; buyers can contact `info@codetv.dev` for an email correction.
 
 ## Confirmation mail follow-up
 
@@ -28,6 +30,6 @@ No provider or dependency was added. Before relying on guest checkout in product
 
 Run `node --test src/coursebuilder/guest-checkout.test.ts` from `apps/website` with `CODETV_GUEST_TEST_MYSQL_URL` set to a **local disposable MySQL 8 admin URL**. Never use a production database URL. Without that variable, the integration test explicitly skips.
 
-The test creates a uniquely named `codetv_guest_<timestamp>` schema, applies the checked-in migration and drops only that schema in cleanup. It exercises real core checkout/fulfillment, DrizzleAdapter, Clerk linking, ticket lookup, checkout ownership guards and session-scoped confirmation lookup. Stripe I/O and Astro's config loader are fixture boundaries. No Stripe charge occurs.
+The test creates a uniquely named `codetv_guest_<timestamp>` schema, applies the checked-in migration and drops only that schema in cleanup. It exercises real core checkout/fulfillment, DrizzleAdapter, Clerk linking, ticket lookup, checkout ownership guards and session-scoped confirmation lookup. Stripe session creation and the database connection are fixture boundaries; the actual Astro server, site config and core provider selection execute in the test. No Stripe charge occurs.
 
 Deploy-preview acceptance remains a separate check: signed out, follow Buy to `checkout.stripe.com`, check the amount ($300 default; $250 with `?code=MEMBER-5E6D28`), and leave both sessions unpaid.

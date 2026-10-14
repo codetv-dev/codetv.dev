@@ -66,7 +66,10 @@ it('renders one accessible shell with evidence-based copy and a real support rou
 		});
 		assert.match(ready, /Your ticket is confirmed/);
 		assert.match(ready, /You’re in\. Sign in or create your CodeTV account/);
-		assert.match(ready, /guest@example.com/);
+		assert.match(
+			ready,
+			/Your ticket is for <strong>guest@example.com<\/strong>/,
+		);
 		assert.match(
 			ready,
 			/href="\/dashboard\/sign-in\?redirect_url=%2Fworkshops%2Ffixture"/,

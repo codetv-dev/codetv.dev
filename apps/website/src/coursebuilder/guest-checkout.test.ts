@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { pathToFileURL } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { mkdtemp, readFile, rm } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
 import { it } from 'node:test';
@@ -10,8 +10,9 @@ import mysql from 'mysql2/promise';
  * Opt-in local MySQL proof. Never uses DATABASE_URL. The supplied admin URL
  * must point to loopback; this test creates and drops only its own schema.
  * Run: CODETV_GUEST_TEST_MYSQL_URL=<local admin URL> pnpm test
- * Only Stripe I/O and Astro's config loader are replaced. Core fulfillment,
- * core checkout, DrizzleAdapter, Clerk linking, access and route guards run real code.
+ * Only Stripe session creation and the database connection are replaced. The
+ * actual Astro server, site config, provider selection, core fulfillment,
+ * DrizzleAdapter, Clerk linking, access and route guards run real code.
  */
 it(
 	'guest fulfillment grants the email user a ticket, Clerk links it, and owners cannot buy twice',
@@ -32,6 +33,22 @@ it(
 		let connection:
 			Awaited<ReturnType<typeof mysql.createConnection>> | undefined;
 		let created = false;
+		const env = {
+			COURSEBUILDER_URL: '',
+			PUBLIC_SITE_URL: '',
+			CONTEXT: 'deploy-preview',
+			DEPLOY_PRIME_URL: 'https://codetv.dev',
+			COURSEBUILDER_STRIPE_SECRET_TOKEN: '',
+			COURSEBUILDER_STRIPE_SECRET_KEY: '',
+			STRIPE_SECRET_TOKEN: '',
+			STRIPE_SECRET_KEY: 'sk_test_fixture',
+			COURSEBUILDER_STRIPE_WEBHOOK_SECRET: '',
+			STRIPE_WEBHOOK_SECRET: 'whsec_fixture',
+		};
+		const previousEnv = Object.fromEntries(
+			Object.keys(env).map((key) => [key, process.env[key]]),
+		);
+		Object.assign(process.env, env);
 		try {
 			await admin.query(`CREATE DATABASE \`${schemaName}\``);
 			created = true;
@@ -56,7 +73,7 @@ it(
 					export { getTicketPurchase } from './src/coursebuilder/workshops';
 					export { getCheckoutStatus } from './src/coursebuilder/checkout-status';
 					export { POST } from './src/pages/api/coursebuilder/[...coursebuilder]';
-					export { checkoutAttempts } from '@coursebuilder/astro/server';
+					export { checkoutAttempts } from './src/coursebuilder/stripe-provider';
 				`,
 					resolveDir: process.cwd(),
 					loader: 'ts',
@@ -66,7 +83,7 @@ it(
 				platform: 'node',
 				format: 'esm',
 				packages: 'external',
-				define: { 'import.meta.env.DEV': 'false' },
+				define: { 'import.meta.env.DEV': 'false', 'import.meta.env': '{}' },
 				plugins: [
 					{
 						name: 'local-database-and-stripe-boundary',
@@ -78,6 +95,7 @@ it(
 							import * as schema from './schema';
 							import { mysqlTable } from './mysql-table';
 							export let db, courseBuilderAdapter;
+							export const getCourseBuilderAdapter = () => courseBuilderAdapter;
 							export function configure(connection) {
 								db = drizzle(connection, { schema, mode: 'default' });
 								courseBuilderAdapter = DrizzleAdapter(db, mysqlTable);
@@ -88,29 +106,38 @@ it(
 							}));
 							builder.onResolve(
 								{ filter: /^@coursebuilder\/astro\/server$/ },
-								() => ({ path: 'astro-fixture', namespace: 'fixture' }),
+								() => ({
+									path: fileURLToPath(
+										import.meta.resolve('@coursebuilder/astro/server'),
+									),
+								}),
 							);
-							builder.onLoad({ filter: /.*/, namespace: 'fixture' }, () => ({
-								contents: `
-							import { checkout } from '@coursebuilder/core/lib/actions/checkout';
-							import { courseBuilderAdapter } from './src/db/index';
-							export const checkoutAttempts = [];
-							export function Coursebuilder() {
-								return { GET: () => {}, POST: async (context) => {
-									const url = new URL(context.request.url);
-									return checkout({query: Object.fromEntries(url.searchParams), headers: {}}, [], {
-										baseUrl: 'https://codetv.dev', adapter: courseBuilderAdapter,
-										provider: {createCheckoutSession: async (params) => {
+							builder.onResolve({ filter: /^coursebuilder:config$/ }, () => ({
+								path: resolve('coursebuilder.config.ts'),
+							}));
+							builder.onLoad(
+								{ filter: /src\/coursebuilder\/stripe-provider\.ts$/ },
+								async (args) => ({
+									contents:
+										(await readFile(args.path, 'utf8')).replace(
+											'export function getStripeProvider()',
+											'function getConfiguredStripeProvider()',
+										) +
+										`
+									export const checkoutAttempts = [];
+									export function getStripeProvider() {
+										const provider = getConfiguredStripeProvider();
+										if (provider) provider.createCheckoutSession = async (params) => {
 											checkoutAttempts.push(params);
 											return {redirect: 'https://checkout.stripe.com/c/pay/cs_test_fixture'};
-										}}
-									});
-								}};
-							}
-						`,
-								loader: 'ts',
-								resolveDir: process.cwd(),
-							}));
+										};
+										return provider;
+									}
+								`,
+									loader: 'ts',
+									resolveDir: resolve('src/coursebuilder'),
+								}),
+							);
 						},
 					},
 				],
@@ -118,31 +145,25 @@ it(
 			const fixture = await import(pathToFileURL(outfile).href);
 			fixture.configure(connection);
 			const { db, schema, courseBuilderAdapter: adapter } = fixture;
-			await db
-				.insert(schema.products)
-				.values({
-					id: 'ticket',
-					name: 'Workshop Ticket',
-					type: 'cohort',
-					status: 1,
-					fields: { slug: 'fixture' },
-				});
-			await db
-				.insert(schema.merchantAccount)
-				.values({
-					id: 'merchant',
-					identifier: 'stripe',
-					label: 'stripe',
-					status: 1,
-				});
-			await db
-				.insert(schema.merchantProduct)
-				.values({
-					id: 'mproduct',
-					identifier: 'prod_fixture',
-					merchantAccountId: 'merchant',
-					productId: 'ticket',
-				});
+			await db.insert(schema.products).values({
+				id: 'ticket',
+				name: 'Workshop Ticket',
+				type: 'cohort',
+				status: 1,
+				fields: { slug: 'fixture' },
+			});
+			await db.insert(schema.merchantAccount).values({
+				id: 'merchant',
+				identifier: 'stripe',
+				label: 'stripe',
+				status: 1,
+			});
+			await db.insert(schema.merchantProduct).values({
+				id: 'mproduct',
+				identifier: 'prod_fixture',
+				merchantAccountId: 'merchant',
+				productId: 'ticket',
+			});
 
 			const context = (clerkUser: unknown = null) => {
 				const url = new URL(
@@ -329,6 +350,10 @@ it(
 				'error',
 			);
 		} finally {
+			for (const [key, value] of Object.entries(previousEnv)) {
+				if (value === undefined) delete process.env[key];
+				else process.env[key] = value;
+			}
 			await connection?.end();
 			if (created) {
 				await admin.query(`DROP DATABASE \`${schemaName}\``);

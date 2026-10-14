@@ -17,19 +17,21 @@ export function getCommerceBaseUrl() {
 			: undefined;
 
 	return (
-		process.env.COURSEBUILDER_URL ??
-		netlifyPreviewUrl ??
-		process.env.PUBLIC_SITE_URL ??
-		process.env.URL ??
+		process.env.COURSEBUILDER_URL ||
+		netlifyPreviewUrl ||
+		process.env.PUBLIC_SITE_URL ||
+		process.env.URL ||
 		'http://localhost:4321'
 	).replace(/\/$/, '');
 }
 
 function getStripeToken() {
+	// Astro env schema defaults optional aliases to ''. An empty override must
+	// not hide a configured fallback, or core receives no payment provider.
 	return (
-		process.env.COURSEBUILDER_STRIPE_SECRET_TOKEN ??
-		process.env.COURSEBUILDER_STRIPE_SECRET_KEY ??
-		process.env.STRIPE_SECRET_TOKEN ??
+		process.env.COURSEBUILDER_STRIPE_SECRET_TOKEN ||
+		process.env.COURSEBUILDER_STRIPE_SECRET_KEY ||
+		process.env.STRIPE_SECRET_TOKEN ||
 		process.env.STRIPE_SECRET_KEY
 	);
 }
@@ -41,7 +43,7 @@ export function isStripeLiveMode() {
 
 function getStripeWebhookSecret() {
 	return (
-		process.env.COURSEBUILDER_STRIPE_WEBHOOK_SECRET ??
+		process.env.COURSEBUILDER_STRIPE_WEBHOOK_SECRET ||
 		process.env.STRIPE_WEBHOOK_SECRET
 	);
 }
