@@ -3,6 +3,13 @@ import { SignIn as ClerkSignIn } from '@clerk/astro/components';
 import Layout from '../../layouts/default.astro';
 import PageHeader from '../../components/page-header.astro';
 import Heart from '../../components/heart.astro';
+import { getSafeReturnUrl } from '../../coursebuilder/checkout-redirects';
+
+// Guest buyers return to their workshop after either sign-in or sign-up.
+const requestedReturn = Astro.url.searchParams.get('redirect_url');
+const returnUrl = requestedReturn
+	? getSafeReturnUrl(requestedReturn, Astro.url, []).toString()
+	: undefined;
 ---
 
 <Layout title="Sign In to CodeTV">
@@ -44,7 +51,10 @@ import Heart from '../../components/heart.astro';
 			</div>
 
 			<div class="auth">
-				<ClerkSignIn />
+				<ClerkSignIn
+					forceRedirectUrl={returnUrl}
+					signUpForceRedirectUrl={returnUrl}
+				/>
 			</div>
 		</section>
 	</main>

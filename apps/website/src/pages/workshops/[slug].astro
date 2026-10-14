@@ -9,7 +9,11 @@ import {
 } from '../../coursebuilder/workshop-page';
 import { getDefaultWorkshopOffer } from '../../coursebuilder/workshop-price';
 import { workshopCacheControl } from '../../coursebuilder/workshop-cache';
-import { getWorkshopForSale } from '../../coursebuilder/workshops';
+import {
+	getWorkshopForSale,
+	resolveCouponCode,
+} from '../../coursebuilder/workshops';
+import { getTrustedCountry } from '../../coursebuilder/request-country';
 
 export const prerender = false;
 
@@ -50,6 +54,13 @@ Astro.response.headers.set(
 			]),
 );
 Astro.response.headers.set('Netlify-Cache-Tag', `workshop:${workshop.id}`);
+// Code offers remain request-scoped and uncached; preserve their checkout coupon.
+const couponId = ticket
+	? await resolveCouponCode(
+			Astro.url.searchParams.get('code'),
+			ticket.productId,
+		)
+	: null;
 
 // Return here after sign-in or a cancelled checkout, keeping the coupon code.
 const returnUrl = new URL(`/workshops/${workshop.slug}`, Astro.url);
@@ -130,47 +141,28 @@ const included = [
 				{
 					ticket ? (
 						<>
-							<WorkshopTicket
-								server:defer
-								ticket={{
-									productId: ticket.productId,
-									enrollment: {
-										state: ticket.enrollment.state,
-										opensAt: ticket.enrollment.opensAt?.toISOString() ?? null,
-										closesAt: ticket.enrollment.closesAt?.toISOString() ?? null,
-									},
-								}}
+							<WorkshopPricing
+								client:load
+								productId={ticket.productId}
 								initialPrice={initialPrice}
-								returnUrl={returnUrl.toString()}
+								refineRegionalPrice={getTrustedCountry(Astro) !== 'US'}
+								enrollment={{
+									state: ticket.enrollment.state,
+									opensAt: ticket.enrollment.opensAt?.toISOString() ?? null,
+									closesAt: ticket.enrollment.closesAt?.toISOString() ?? null,
+								}}
+								couponId={couponId}
+								canCheckout={true}
+								hasTicket={false}
 								checkoutNotice={Astro.url.searchParams.get('checkout')}
+								returnUrl={returnUrl.toString()}
 								devCountry={
 									import.meta.env.DEV
 										? Astro.url.searchParams.get('ppp_country')
 										: null
 								}
-							>
-								<WorkshopPricing
-									slot="fallback"
-									productId={ticket.productId}
-									initialPrice={initialPrice}
-									refineRegionalPrice={false}
-									enrollment={{
-										state: ticket.enrollment.state,
-										opensAt: ticket.enrollment.opensAt?.toISOString() ?? null,
-										closesAt: ticket.enrollment.closesAt?.toISOString() ?? null,
-									}}
-									couponId={null}
-									canCheckout={false}
-									hasTicket={false}
-									checkoutNotice={Astro.url.searchParams.get('checkout')}
-									returnUrl={returnUrl.toString()}
-									devCountry={
-										import.meta.env.DEV
-											? Astro.url.searchParams.get('ppp_country')
-											: null
-									}
-								/>
-							</WorkshopTicket>
+							/>
+							<WorkshopTicket server:defer productId={ticket.productId} />
 						</>
 					) : (
 						<p>Tickets aren’t on sale yet. Check back soon.</p>
@@ -209,6 +201,17 @@ const included = [
 </Layout>
 
 <style>
+	/* The cached shell can sell to guests immediately. Only the private island
+	   can hide buying controls for an owner. Checkout still enforces access. */
+	.workshop
+		:global(
+			[data-name='ticket']:has([data-ticket-owned])
+				.workshop-pricing
+				:is(form, .ppp, .closes)
+		) {
+		display: none;
+	}
+
 	.workshop {
 		h1 {
 			font-size: clamp(2rem, 6cqi, 3.5rem);

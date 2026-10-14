@@ -41,10 +41,11 @@ export function guardWorkshopCache(
 	// lookup. Analytics cookies and zero UAT share the same anonymous entry.
 	response.headers.set(
 		'Netlify-Vary',
-		`query, header=${WORKSHOP_SESSION_HEADER}`,
+		`query, header=${WORKSHOP_SESSION_HEADER}, country=us`,
 	);
 	if (
 		isAuthenticated ||
+		url.searchParams.has('code') ||
 		hasWorkshopSessionEvidence(request) ||
 		// Fail closed when the edge gate is missing or failed to classify a request.
 		request.headers.get(WORKSHOP_SESSION_HEADER) !== 'anonymous' ||

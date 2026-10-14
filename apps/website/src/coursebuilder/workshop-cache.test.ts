@@ -66,7 +66,7 @@ it('analytics and signed-out Clerk cookies share the anonymous key, but every se
 		});
 		assert.equal(
 			response.headers.get('Netlify-Vary'),
-			`query, header=${WORKSHOP_SESSION_HEADER}`,
+			`query, header=${WORKSHOP_SESSION_HEADER}, country=us`,
 		);
 		assert.equal(response.headers.get('Vary'), 'Accept-Encoding');
 		if (expected === 'session') {
@@ -98,6 +98,15 @@ it('refuses to cache Clerk cookie mutation, handshake auth, missing gate, errors
 			'no-store',
 		);
 	}
+	assert.equal(
+		guardWorkshopCache(
+			new Request(`${url}?code=buyer-code`, {
+				headers: { [WORKSHOP_SESSION_HEADER]: 'anonymous' },
+			}),
+			shell(),
+		).headers.get('Netlify-CDN-Cache-Control'),
+		'no-store',
+	);
 	assert.equal(
 		guardWorkshopCache(new Request(url), shell()).headers.get(
 			'Netlify-CDN-Cache-Control',
