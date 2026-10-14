@@ -225,6 +225,11 @@ const included = [
 		}
 	}
 
+	.workshop :global([data-name='ticket']) {
+		/* Leave enough scroll runway for the final section's anchor to land. */
+		min-block-size: calc(100svh - 2.5rem);
+	}
+
 	#ticket {
 		/* Clear the sticky/fixed header and leave room above the label. */
 		scroll-margin-block-start: 5rem;
