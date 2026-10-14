@@ -5,13 +5,24 @@ import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { build } from 'esbuild';
 import { formatPricesForProduct } from '@coursebuilder/core';
+import { stripeCheckout } from '@coursebuilder/core/pricing/stripe-checkout';
 import { decideCheckoutCoupon } from './checkout-coupons.ts';
 import { isActiveSupporter } from './supporter-coupons.ts';
 
 const productId = 'product-4gmhd';
 const merchants: Record<string, any> = {
-	member: { id: 'member', type: 'special', percentageDiscount: 0.5 },
-	early: { id: 'early', type: 'special', percentageDiscount: 0.4 },
+	member: {
+		id: 'member',
+		identifier: 'stripe_member_50',
+		type: 'special',
+		percentageDiscount: 0.5,
+	},
+	early: {
+		id: 'early',
+		identifier: 'stripe_early_40',
+		type: 'special',
+		percentageDiscount: 0.4,
+	},
 };
 const coupon = {
 	id: 'coupon_hw5vh',
@@ -31,7 +42,21 @@ const adapter: any = {
 		defaultCoupon: { id: 'early-site' },
 		defaultMerchantCoupon: merchants.early,
 	}),
-	getProduct: async () => ({ id: productId, type: 'cohort', status: 1 }),
+	getProduct: async () => ({
+		id: productId,
+		name: 'Workshop Ticket',
+		type: 'cohort',
+		status: 1,
+	}),
+	getUser: async (id: string) => ({ id, email: 'fixture@example.test' }),
+	getMerchantCustomerForUserId: async () => ({ identifier: 'cus_fixture' }),
+	getMerchantProductForProductId: async () => ({
+		id: 'merchant_product',
+		identifier: 'prod_fixture',
+	}),
+	getMerchantPriceForProductId: async () => ({
+		identifier: 'price_fixture_500',
+	}),
 	getPriceForProduct: async () => ({ unitAmount: 500 }),
 	getCoupon: async (id: string) => (id === coupon.id ? coupon : null),
 	getMerchantCoupon: async (id: string) => merchants[id],
@@ -80,6 +105,54 @@ it('real CourseBuilder price calculation charges guests/non-supporters $300 and 
 			ctx: adapter,
 		});
 		assert.equal(price.calculatedPrice, expected);
+
+		// Execute the real core checkout through its Stripe network boundary.
+		// Assert the exact base price and coupon sent to Stripe, not a duplicate
+		// implementation of the checkout arithmetic.
+		let session: any;
+		const promotions: string[] = [];
+		const result = await stripeCheckout({
+			params: {
+				productId,
+				quantity: 1,
+				country: decision.country,
+				couponId: decision.couponId,
+				usedCouponId: decision.usedCouponId,
+				...(user && { userId: 'fixture_clerk' }),
+			} as any,
+			adapter,
+			config: {
+				baseSuccessUrl: 'https://preview.example',
+				cancelUrl: 'https://preview.example/workshops/fixture',
+				paymentsAdapter: {
+					getPrice: async () => ({ unit_amount: 50000 }),
+					getCouponPercentOff: async (id: string) =>
+						id === 'stripe_member_50' ? 50 : 40,
+					getCouponAmountOff: async () => 0,
+					createPromotionCode: async ({ coupon }: { coupon: string }) => {
+						promotions.push(coupon);
+						return `promo_${coupon}`;
+					},
+					createCheckoutSession: async (params: any) => {
+						session = params;
+						return 'https://checkout.stripe.com/c/pay/cs_test_fixture';
+					},
+				},
+			} as any,
+		});
+		assert.equal(
+			result.redirect,
+			'https://checkout.stripe.com/c/pay/cs_test_fixture',
+		);
+		assert.deepEqual(session.line_items, [
+			{ price: 'price_fixture_500', quantity: 1 },
+		]);
+		const expectedCoupon =
+			expected === 250 ? 'stripe_member_50' : 'stripe_early_40';
+		assert.deepEqual(promotions, [expectedCoupon]);
+		assert.deepEqual(session.discounts, [
+			{ promotion_code: `promo_${expectedCoupon}` },
+		]);
 	}
 });
 
