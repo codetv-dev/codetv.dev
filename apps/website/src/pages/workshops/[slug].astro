@@ -8,6 +8,8 @@ import {
 	renderWorkshopBody,
 } from '../../coursebuilder/workshop-page';
 import { getCourseBuilderUserForClerkUser } from '../../coursebuilder/users';
+import { getDefaultWorkshopPrice } from '../../coursebuilder/workshop-price';
+import { getTrustedCountry } from '../../coursebuilder/request-country';
 import {
 	getTicketPurchase,
 	getWorkshopForSale,
@@ -27,6 +29,15 @@ const sections = renderWorkshopBody(workshop.body);
 const hasBody = Boolean(workshop.body?.trim());
 const seo = getWorkshopSeo(workshop);
 const ticket = workshop.ticket;
+const initialPrice = ticket
+	? await getDefaultWorkshopPrice(ticket.productId).catch((error) => {
+			console.error('workshop.default-price.failed', {
+				productId: ticket.productId,
+				error,
+			});
+			return null;
+		})
+	: null;
 const clerkUser = await Astro.locals.currentUser?.();
 const viewer = await getCourseBuilderUserForClerkUser(clerkUser ?? null);
 const hasTicket =
@@ -44,6 +55,7 @@ const couponId = ticket
 const returnUrl = new URL(`/workshops/${workshop.slug}`, Astro.url);
 const code = Astro.url.searchParams.get('code');
 if (code) returnUrl.searchParams.set('code', code);
+returnUrl.hash = 'ticket';
 
 const dateFormat = new Intl.DateTimeFormat('en-US', {
 	dateStyle: 'long',
@@ -67,7 +79,7 @@ const included = [
 
 <Layout title={seo.title} description={seo.description}>
 	<main class="workshop">
-		<Block variant="two-column-asymmetrical">
+		<Block variant="two-column-asymmetrical" name="workshop-hero">
 			<div class="heading">
 				<p class="badge orange">Workshop</p>
 			</div>
@@ -121,7 +133,8 @@ const included = [
 							<WorkshopPricing
 								client:load
 								productId={ticket.productId}
-								listPrice={ticket.unitAmount}
+								initialPrice={initialPrice}
+								refineRegionalPrice={getTrustedCountry(Astro) !== 'US'}
 								enrollment={{
 									state: ticket.enrollment.state,
 									opensAt: ticket.enrollment.opensAt?.toISOString() ?? null,
@@ -226,9 +239,28 @@ const included = [
 	}
 
 	.workshop :global([data-name='ticket']) {
-		/* Leave enough scroll runway for the final section's anchor to land. */
-		min-block-size: calc(100svh - 2.5rem);
 		align-content: start;
+		row-gap: 1rem;
+	}
+
+	.workshop :global([data-name='workshop-hero']) {
+		padding-block-end: 1.5rem;
+	}
+
+	@media (min-width: 1180px) {
+		.workshop :global([data-name='workshop-hero']) {
+			/* The desktop header is fixed rather than in normal flow. */
+			padding-block-start: 5rem;
+		}
+	}
+
+	.workshop :global([data-name='workshop-body-section']) {
+		padding-block: 2rem;
+	}
+
+	.workshop
+		:global([data-name='workshop-hero'] + [data-name='workshop-body-section']) {
+		padding-block-start: 1.5rem;
 	}
 
 	#ticket {
@@ -334,7 +366,11 @@ const included = [
 		:global(blockquote + p) {
 			color: var(--text-muted);
 			font-size: 1rem;
-			margin-block-start: 0.75rem;
+			margin-block-start: 0.5rem;
+		}
+
+		:global(blockquote + p + *) {
+			margin-block-start: 1rem;
 		}
 
 		:global(a) {
@@ -370,7 +406,7 @@ const included = [
 	}
 
 	.workshop-hero-cta {
-		margin-block-start: 1.25rem;
+		margin-block-start: 1rem;
 		font-size: 1.125rem;
 		line-height: 1.2;
 		min-block-size: 44px;
