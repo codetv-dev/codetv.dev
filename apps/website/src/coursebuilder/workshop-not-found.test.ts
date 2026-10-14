@@ -65,12 +65,13 @@ it('renders guest checkout in the public shell, defers ownership privately, and 
 			'src/middleware.ts',
 			`
 			import { defineMiddleware } from 'astro:middleware';
-			import { guardWorkshopCache, hasWorkshopSessionEvidence, WORKSHOP_SESSION_HEADER } from './coursebuilder/workshop-cache';
+			import { guardWorkshopCache, hasWorkshopSessionEvidence, WORKSHOP_SESSION_HEADER, WORKSHOP_QUERY_HEADER } from './coursebuilder/workshop-cache';
 			export const onRequest = defineMiddleware(async (context, next) => {
 				const authenticated = context.request.headers.get('Cookie')?.includes('__session=fixture') ?? false;
 				context.locals.currentUser = async () => authenticated ? { id: 'clerk-fixture' } : null;
 				const headers = new Headers(context.request.headers);
 				headers.set(WORKSHOP_SESSION_HEADER, hasWorkshopSessionEvidence(context.request) ? 'session' : 'anonymous');
+				headers.set(WORKSHOP_QUERY_HEADER, 'fixture-query');
 				context.request = new Request(context.request, { headers });
 				return guardWorkshopCache(context.request, await next(), authenticated);
 			});
@@ -90,7 +91,7 @@ it('renders guest checkout in the public shell, defers ownership privately, and 
 				} : null,
 			});
 			export const getTicketPurchase = async (userId) => userId === 'test-viewer' ? {id: 'purchase-fixture'} : null;
-			export const resolveCouponCode = async () => null;
+			export const resolveCouponCode = async () => { throw new Error('Shell must not resolve a coupon'); };
 		`,
 		);
 		server = await dev({
@@ -145,6 +146,11 @@ it('renders guest checkout in the public shell, defers ownership privately, and 
 			sample.headers.get('Netlify-CDN-Cache-Control')!,
 			/public, durable/,
 		);
+
+		const coded = await fetch(`${base}/workshops/sample?code=fixture-member`);
+		const codedHtml = await coded.text();
+		assert.match(codedHtml, /\$300/);
+		assert.doesNotMatch(codedHtml, /fixture-member|usedCouponId=/);
 
 		const islandPath = html.match(
 			/href="([^"]*\/_server-islands\/WorkshopTicket[^"]*)"/,

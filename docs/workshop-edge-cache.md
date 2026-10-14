@@ -12,13 +12,13 @@ Workshop pages render the default US price and guest checkout form in the shared
 
 ## Anonymous versus private requests
 
-The uncached `workshop-cache-key` edge function runs before the shell cache lookup. It overwrites `x-codetv-workshop-session` with an anonymous/session decision. Clients cannot supply a trusted decision.
+The uncached `workshop-cache-key` edge function runs before the shell cache lookup. It overwrites `x-codetv-workshop-session` with an anonymous/session decision. It removes `code` from the forwarded URL and overwrites `x-codetv-workshop-query` with a SHA-256 fingerprint of the remaining query string. Clients cannot supply either trusted key.
 
 Session evidence means an Authorization header, a `__session` or `__session_<suffix>` cookie, or any `__client_uat*` cookie whose value is not `0`. Analytics cookies and zero UAT values stay on the anonymous cache entry.
 
-The origin checks that decision again after Clerk runs. Authenticated responses, session evidence, coupon-code URLs, responses setting cookies, and non-200 responses are not shared. The ownership island always uses `private, no-store`.
+The origin checks that decision again after Clerk runs. Authenticated responses, session evidence, responses setting cookies, and non-200 responses are not shared. The ownership island always uses `private, no-store`.
 
-The cache varies only on the decision header and query string, not country. Every visitor sees the same default US price in initial HTML. The client always calls the existing pricing action in the background; the server reads the trusted country and returns any regional offer. The default price stays visible while that request loads. No regional amount or account state enters the shared shell. Coupon-code requests remain uncached so their checkout coupon stays request-scoped.
+The cache varies only on those two trusted headers, not country or coupon code. Every visitor sees the same default US price in initial HTML. The client always calls the existing pricing action in the background; the server reads the trusted country and returns any regional offer. The default price stays visible while that request loads. No regional amount or account state enters the shared shell. Coupon links share the base shell. The browser reads its original `?code=`, resolves it through the private pricing action, and preserves the validated coupon in checkout plus the original code in the cancel URL. Unknown or expired codes leave the default offer unchanged.
 
 ## Purge after content or price edits
 

@@ -5,6 +5,7 @@ import {
 	guardWorkshopCache,
 	workshopCacheControl,
 	WORKSHOP_SESSION_HEADER,
+	WORKSHOP_QUERY_HEADER,
 } from './workshop-cache';
 
 const url = 'https://codetv.dev/workshops/agentic-frontend-engineering';
@@ -20,7 +21,11 @@ const shell = (headers = {}, status = 200) =>
 	});
 const anonymousRequest = (headers: Record<string, string> = {}) =>
 	new Request(url, {
-		headers: { [WORKSHOP_SESSION_HEADER]: 'anonymous', ...headers },
+		headers: {
+			[WORKSHOP_SESSION_HEADER]: 'anonymous',
+			[WORKSHOP_QUERY_HEADER]: 'fixture',
+			...headers,
+		},
 	});
 
 it('analytics and signed-out Clerk cookies share the anonymous key, but every session variant bypasses', async () => {
@@ -66,7 +71,7 @@ it('analytics and signed-out Clerk cookies share the anonymous key, but every se
 		});
 		assert.equal(
 			response.headers.get('Netlify-Vary'),
-			`query, header=${WORKSHOP_SESSION_HEADER}`,
+			`header=${WORKSHOP_SESSION_HEADER}|${WORKSHOP_QUERY_HEADER}`,
 		);
 		assert.equal(response.headers.get('Vary'), 'Accept-Encoding');
 		if (expected === 'session') {
@@ -83,6 +88,33 @@ it('analytics and signed-out Clerk cookies share the anonymous key, but every se
 			);
 		}
 	}
+});
+
+it('coupon links share the base shell key without losing other query or credential variations', async () => {
+	const keys: string[] = [];
+	for (const suffix of [
+		'',
+		'?code=VALID',
+		'?code=UNKNOWN',
+		'?checkout=error&code=VALID',
+	]) {
+		await workshopCacheKey(
+			new Request(url + suffix, {
+				headers: { [WORKSHOP_QUERY_HEADER]: 'spoof' },
+			}),
+			{
+				next: async (request: Request) => {
+					assert.equal(new URL(request.url).searchParams.has('code'), false);
+					keys.push(request.headers.get(WORKSHOP_QUERY_HEADER)!);
+					return shell();
+				},
+			},
+		);
+	}
+	assert.equal(keys[0], keys[1]);
+	assert.equal(keys[0], keys[2]);
+	assert.notEqual(keys[0], keys[3]);
+	assert.notEqual(keys[0], 'spoof');
 });
 
 it('refuses to cache Clerk cookie mutation, handshake auth, missing gate, errors and failed price lookup', () => {

@@ -14,6 +14,7 @@ export function workshopCacheControl(
 }
 
 export const WORKSHOP_SESSION_HEADER = 'x-codetv-workshop-session';
+export const WORKSHOP_QUERY_HEADER = 'x-codetv-workshop-query';
 
 /** Clerk uses both legacy and instance-suffixed cookies. Zero UAT is signed out. */
 export function hasWorkshopSessionEvidence(request: Request) {
@@ -42,7 +43,7 @@ export function guardWorkshopCache(
 	// lookup. Analytics cookies and zero UAT share the same anonymous entry.
 	response.headers.set(
 		'Netlify-Vary',
-		`query, header=${WORKSHOP_SESSION_HEADER}`,
+		`header=${WORKSHOP_SESSION_HEADER}|${WORKSHOP_QUERY_HEADER}`,
 	);
 	if (
 		isAuthenticated ||
@@ -50,6 +51,7 @@ export function guardWorkshopCache(
 		hasWorkshopSessionEvidence(request) ||
 		// Fail closed when the edge gate is missing or failed to classify a request.
 		request.headers.get(WORKSHOP_SESSION_HEADER) !== 'anonymous' ||
+		!request.headers.get(WORKSHOP_QUERY_HEADER) ||
 		response.headers.has('Set-Cookie') ||
 		response.status !== 200
 	) {

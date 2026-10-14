@@ -9,10 +9,7 @@ import {
 } from '../../coursebuilder/workshop-page';
 import { getDefaultWorkshopOffer } from '../../coursebuilder/workshop-price';
 import { workshopCacheControl } from '../../coursebuilder/workshop-cache';
-import {
-	getWorkshopForSale,
-	resolveCouponCode,
-} from '../../coursebuilder/workshops';
+import { getWorkshopForSale } from '../../coursebuilder/workshops';
 
 export const prerender = false;
 
@@ -56,18 +53,8 @@ Astro.response.headers.set(
 	'Netlify-Cache-Tag',
 	`workshop:${workshop.id},workshop:${workshop.slug}`,
 );
-// Code offers remain request-scoped and uncached; preserve their checkout coupon.
-const couponId = ticket
-	? await resolveCouponCode(
-			Astro.url.searchParams.get('code'),
-			ticket.productId,
-		)
-	: null;
-
-// Return here after sign-in or a cancelled checkout, keeping the coupon code.
+// The client preserves its original coupon code after resolving it privately.
 const returnUrl = new URL(`/workshops/${workshop.slug}`, Astro.url);
-const code = Astro.url.searchParams.get('code');
-if (code) returnUrl.searchParams.set('code', code);
 returnUrl.hash = 'ticket';
 
 const dateFormat = new Intl.DateTimeFormat('en-US', {
@@ -153,7 +140,7 @@ const included = [
 									opensAt: ticket.enrollment.opensAt?.toISOString() ?? null,
 									closesAt: ticket.enrollment.closesAt?.toISOString() ?? null,
 								}}
-								couponId={couponId}
+								couponId={null}
 								canCheckout={true}
 								hasTicket={false}
 								checkoutNotice={Astro.url.searchParams.get('checkout')}
