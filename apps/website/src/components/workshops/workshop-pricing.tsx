@@ -36,11 +36,12 @@ export type FormattedPrice = {
 	appliedCouponLabel?: string;
 	availableCoupons?: Array<MerchantCoupon | undefined>;
 	usedCouponId?: string;
+	/** Validated site coupon for the browser's code; never supplied by the shell. */
+	resolvedCouponId?: string | null;
 };
 
 export type WorkshopPricingProps = {
 	productId: string;
-	memberCheckoutUrl?: string | null;
 	initialPrice: FormattedPrice | null;
 	/** Fetch country-specific offers only where regional pricing may apply. */
 	refineRegionalPrice: boolean;
@@ -90,7 +91,6 @@ function percentOff(coupon?: MerchantCoupon) {
 
 export function WorkshopPricing({
 	productId,
-	memberCheckoutUrl,
 	initialPrice,
 	refineRegionalPrice,
 	enrollment,
@@ -102,16 +102,21 @@ export function WorkshopPricing({
 	devCountry,
 }: WorkshopPricingProps) {
 	const [price, setPrice] = useState<FormattedPrice | null>(initialPrice);
+	const [resolvedCouponId, setResolvedCouponId] = useState(couponId);
+	const [code, setCode] = useState<string | null>(null);
 	const [ppp, setPpp] = useState(false);
 	const [loading, setLoading] = useState(!initialPrice);
 	const [failed, setFailed] = useState(false);
 
 	useEffect(() => {
+		const urlCode = new URLSearchParams(window.location.search).get('code');
+		setCode(urlCode);
 		// The server already resolved the default sale price. Fetch only to
 		// refine a code/regional offer, or recover a failed server lookup.
 		if (
 			initialPrice &&
 			!couponId &&
+			!urlCode &&
 			!refineRegionalPrice &&
 			!devCountry &&
 			!ppp
@@ -135,6 +140,7 @@ export function WorkshopPricing({
 			body: JSON.stringify({
 				productId,
 				...(couponId && { couponId }),
+				...(urlCode && { code: urlCode }),
 				ppp,
 			}),
 		})
@@ -146,6 +152,7 @@ export function WorkshopPricing({
 			.then((formatted) => {
 				if (cancelled) return;
 				setPrice(formatted);
+				setResolvedCouponId(formatted.resolvedCouponId ?? couponId);
 				setFailed(false);
 			})
 			.catch((error) => {
@@ -175,18 +182,22 @@ export function WorkshopPricing({
 		price && price.calculatedPrice < price.fullPrice ? price : null;
 
 	const checkoutAction = useMemo(() => {
-		const params = new URLSearchParams({ productId, cancelUrl: returnUrl });
-		if (couponId) params.set('usedCouponId', couponId);
+		const cancelUrl = new URL(returnUrl);
+		if (code) cancelUrl.searchParams.set('code', code);
+		const params = new URLSearchParams({
+			productId,
+			cancelUrl: cancelUrl.toString(),
+		});
+		if (resolvedCouponId) params.set('usedCouponId', resolvedCouponId);
 		if (pppApplied) params.set('ppp', '1');
 		if (devCountry) params.set('ppp_country', devCountry);
 		return `/api/coursebuilder/checkout/stripe?${params.toString()}`;
-	}, [productId, returnUrl, couponId, pppApplied, devCountry]);
+	}, [productId, returnUrl, resolvedCouponId, code, pppApplied, devCountry]);
 
 	const opensAt = enrollment.opensAt ? new Date(enrollment.opensAt) : null;
 	const closesAt = enrollment.closesAt ? new Date(enrollment.closesAt) : null;
 	const noticeKey = checkoutNotice ?? price?.checkoutNotice;
 	const notice = noticeKey ? notices[noticeKey] : null;
-	const memberUrl = price?.memberCheckoutUrl ?? memberCheckoutUrl;
 
 	return (
 		<div className="workshop-pricing" aria-busy={loading}>
@@ -222,14 +233,6 @@ export function WorkshopPricing({
 							(percentOff(price.appliedMerchantCoupon) > 0
 								? `${percentOff(price.appliedMerchantCoupon)}% off applied`
 								: 'Discount applied'))}
-				</p>
-			)}
-
-			{memberUrl && !hasTicket && enrollment.state === 'open' && (
-				<p>
-					<a href={memberUrl} data-astro-reload>
-						Use your member price: 50% off ($250)
-					</a>
 				</p>
 			)}
 

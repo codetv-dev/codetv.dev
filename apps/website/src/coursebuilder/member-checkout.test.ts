@@ -37,7 +37,14 @@ const coupon = {
 	merchantCoupon: merchants.member,
 };
 const adapter: any = {
-	couponForIdOrCode: async () => coupon,
+	couponForIdOrCode: async ({
+		couponId: id,
+		code,
+	}: {
+		couponId?: string | null;
+		code?: string;
+	}) => (id === coupon.id || code === coupon.code ? coupon : null),
+	availableUpgradesForProduct: async () => [],
 	getDefaultCoupon: async () => ({
 		defaultCoupon: { id: 'early-site' },
 		defaultMerchantCoupon: merchants.early,
@@ -210,18 +217,29 @@ it('member HTTP route preserves sign-in return URL and shares ownership/coupon g
 				{
 					name: 'external-io',
 					setup(b) {
+						b.onResolve(
+							{
+								filter:
+									/^@coursebuilder\/core\/lib\/actions\/prices-formatted$/,
+							},
+							(args) => ({ path: args.path, external: true }),
+						);
 						b.onResolve({ filter: /^@coursebuilder\/astro\/server$/ }, () => ({
 							path: 'core',
 							namespace: 'fixture',
 						}));
 						b.onLoad({ filter: /.*/, namespace: 'fixture' }, () => ({
 							contents: `
+					import { getPricesFormatted } from '@coursebuilder/core/lib/actions/prices-formatted';
 					export function Coursebuilder() { return {
 						GET: async () => new Response(null, {status: 405}),
 						POST: async (ctx) => {
 							const url = new URL(ctx.request.url);
 							globalThis.memberRequests.push(url);
-							if (url.pathname.endsWith('prices-formatted')) return Response.json(await ctx.request.json());
+							if (url.pathname.endsWith('prices-formatted')) {
+								const result = await getPricesFormatted({body: await ctx.request.json(), headers: {'x-vercel-ip-country': 'US'}}, [], {adapter: globalThis.memberAdapter});
+								return Response.json(result.body);
+							}
 							return new Response(null, { status: 303, headers: { Location: 'https://checkout.stripe.com/c/pay/cs_test_fixture' } });
 						}
 					}; }`,
@@ -336,6 +354,7 @@ it('member HTTP route preserves sign-in return URL and shares ownership/coupon g
 		const json = await price.json();
 		assert.equal(json.couponId, undefined);
 		assert.equal(json.checkoutNotice, 'supporter-required');
+		assert.equal(json.calculatedPrice, 300);
 		assert.equal(price.headers.get('cache-control'), 'private, no-store');
 		const memberPrice = await route.POST(
 			context('/api/coursebuilder/prices-formatted', active, 'POST', {
@@ -343,7 +362,32 @@ it('member HTTP route preserves sign-in return URL and shares ownership/coupon g
 				couponId: coupon.id,
 			}),
 		);
-		assert.equal((await memberPrice.json()).memberCheckoutUrl, memberPath);
+		const memberJson = await memberPrice.json();
+		assert.equal(memberJson.memberCheckoutUrl, memberPath);
+		assert.equal(memberJson.calculatedPrice, 250);
+		for (const user of [null, { id: 'nonmember' }, active]) {
+			const refined = await route.POST(
+				context('/api/coursebuilder/prices-formatted', user, 'POST', {
+					productId,
+					code: 'MEMBER-5E6D28',
+				}),
+			);
+			const formatted = await refined.json();
+			assert.equal(
+				formatted.calculatedPrice,
+				isActiveSupporter(user) ? 250 : 300,
+			);
+			assert.equal(
+				formatted.resolvedCouponId,
+				isActiveSupporter(user) ? coupon.id : null,
+			);
+		}
+		const autoMember = await route.POST(
+			context('/api/coursebuilder/prices-formatted', active, 'POST', {
+				productId,
+			}),
+		);
+		assert.equal((await autoMember.json()).calculatedPrice, 250);
 		delete globals.memberAdapter;
 		delete globals.memberRequests;
 	} finally {

@@ -211,20 +211,48 @@ async function handlePricesFormatted(context: APIContext) {
 	const trustedCountry = getTrustedCountry(context);
 	const clerkUser = await context.locals.currentUser?.();
 	const isSupporter = isActiveSupporter(clerkUser);
-	const [viewer, siteCoupon, pppCoupon] = await Promise.all([
+	const requestedCouponId =
+		typeof body.code === 'string'
+			? await resolveCouponCode(body.code, productId)
+			: typeof body.couponId === 'string'
+				? body.couponId
+				: null;
+	const [viewer, requestedCoupon, memberCoupon, pppCoupon] = await Promise.all([
 		getCourseBuilderUserForClerkUser(clerkUser ?? null),
 		getValidSiteCoupon(
-			typeof body.couponId === 'string' ? body.couponId : null,
+			requestedCouponId,
 			productId,
 			courseBuilderAdapter,
 			undefined,
 			isSupporter,
 		),
+		isSupporter
+			? getValidSiteCoupon(
+					MEMBER_WORKSHOPS[productId]?.couponId,
+					productId,
+					courseBuilderAdapter,
+					undefined,
+					true,
+				)
+			: null,
 		body.ppp === true
 			? getPppMerchantCoupon(trustedCountry, courseBuilderAdapter)
 			: null,
 	]);
 
+	// Private refinement automatically offers an active supporter the better
+	// member price. Send the same validated site id back for checkout.
+	const siteCoupon =
+		memberCoupon &&
+		Number(memberCoupon.percentageDiscount) >=
+			Number(requestedCoupon?.percentageDiscount ?? 0)
+			? memberCoupon
+			: requestedCoupon;
+	const denied = Boolean(
+		requestedCouponId &&
+		SUPPORTER_ONLY_COUPON_IDS.has(requestedCouponId) &&
+		!isSupporter,
+	);
 	const headers = new Headers(context.request.headers);
 	headers.delete('content-length');
 	headers.set('content-type', 'application/json');
@@ -251,17 +279,31 @@ async function handlePricesFormatted(context: APIContext) {
 		),
 	);
 	if (!response.ok) return response;
-	const denied =
-		typeof body.couponId === 'string' &&
-		SUPPORTER_ONLY_COUPON_IDS.has(body.couponId) &&
-		!isSupporter;
+	const formatted = await response.json();
+	const label = siteCoupon?.fields?.label;
+	const appliesSiteCoupon =
+		siteCoupon &&
+		formatted.appliedMerchantCoupon?.id === siteCoupon.merchantCouponId;
+	const percent = Math.round(
+		Number(formatted.appliedMerchantCoupon?.percentageDiscount ?? 0) * 100,
+	);
+	const responseHeaders = new Headers(response.headers);
+	responseHeaders.delete('content-length');
+	responseHeaders.set('Cache-Control', 'private, no-store');
 	return Response.json(
 		{
-			...(await response.json()),
+			...formatted,
+			resolvedCouponId: siteCoupon?.id ?? null,
 			memberCheckoutUrl: isSupporter ? memberCheckoutPath(productId) : null,
 			...(denied && { checkoutNotice: 'supporter-required' }),
+			...(appliesSiteCoupon &&
+				!formatted.appliedCouponLabel &&
+				typeof label === 'string' &&
+				label.trim() && {
+					appliedCouponLabel: percent > 0 ? `${label}: ${percent}% off` : label,
+				}),
 		},
-		{ headers: { 'Cache-Control': 'private, no-store' } },
+		{ headers: responseHeaders },
 	);
 }
 
