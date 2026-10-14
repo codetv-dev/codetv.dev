@@ -134,7 +134,7 @@ it('real CourseBuilder price calculation charges guests/non-supporters $300 and 
 				paymentsAdapter: {
 					getPrice: async () => ({ unit_amount: 50000 }),
 					getCouponPercentOff: async (id: string) =>
-						id === 'stripe_member_50' ? 50 : 40,
+						id === 'stripe_member_50' ? 0.5 : 0.4,
 					getCouponAmountOff: async () => 0,
 					createPromotionCode: async ({ coupon }: { coupon: string }) => {
 						promotions.push(coupon);
@@ -157,6 +157,7 @@ it('real CourseBuilder price calculation charges guests/non-supporters $300 and 
 		const expectedCoupon =
 			expected === 250 ? 'stripe_member_50' : 'stripe_early_40';
 		assert.deepEqual(promotions, [expectedCoupon]);
+		assert.equal(session.metadata.discountAmount, expected === 250 ? 50 : 40);
 		assert.deepEqual(session.discounts, [
 			{ promotion_code: `promo_${expectedCoupon}` },
 		]);
