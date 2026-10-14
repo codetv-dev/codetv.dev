@@ -1,0 +1,75 @@
+---
+import { SignInButton } from '@clerk/astro/components';
+import { WorkshopPricing, type FormattedPrice } from './workshop-pricing';
+import { getCourseBuilderUserForClerkUser } from '../../coursebuilder/users';
+import { getTrustedCountry } from '../../coursebuilder/request-country';
+import {
+	getTicketPurchase,
+	resolveCouponCode,
+	type WorkshopTicket,
+} from '../../coursebuilder/workshops';
+
+interface Props {
+	ticket: WorkshopTicket;
+	initialPrice: FormattedPrice | null;
+	returnUrl: string;
+	checkoutNotice: string | null;
+	devCountry: string | null;
+}
+const { ticket, initialPrice, returnUrl, checkoutNotice, devCountry } =
+	Astro.props;
+// Astro.url is the island endpoint here, not the workshop URL.
+const pageUrl = new URL(returnUrl);
+const clerkUser = await Astro.locals.currentUser?.();
+const viewer = await getCourseBuilderUserForClerkUser(clerkUser ?? null);
+const hasTicket = viewer
+	? Boolean(await getTicketPurchase(viewer.id, [ticket.productId]))
+	: false;
+const couponId = await resolveCouponCode(
+	pageUrl.searchParams.get('code'),
+	ticket.productId,
+);
+Astro.response.headers.set('Cache-Control', 'private, no-store');
+Astro.response.headers.set('Netlify-CDN-Cache-Control', 'no-store');
+---
+
+<WorkshopPricing
+	client:load
+	productId={ticket.productId}
+	initialPrice={initialPrice}
+	refineRegionalPrice={getTrustedCountry(Astro) !== 'US'}
+	enrollment={{
+		state: ticket.enrollment.state,
+		opensAt: ticket.enrollment.opensAt?.toISOString() ?? null,
+		closesAt: ticket.enrollment.closesAt?.toISOString() ?? null,
+	}}
+	couponId={couponId}
+	canCheckout={Boolean(viewer)}
+	hasTicket={hasTicket}
+	checkoutNotice={checkoutNotice}
+	returnUrl={returnUrl}
+	devCountry={devCountry}
+/>
+{
+	!viewer && ticket.enrollment.state === 'open' && (
+		<div class="sign-in">
+			<p>Sign in or create a free CodeTV account to buy a ticket.</p>
+			<SignInButton
+				asChild
+				mode="modal"
+				forceRedirectUrl={returnUrl}
+				signUpForceRedirectUrl={returnUrl}
+			>
+				<button type="button" class="button">
+					Sign in to buy
+				</button>
+			</SignInButton>
+		</div>
+	)
+}
+
+<style>
+	.sign-in {
+		margin-block-start: 16px;
+	}
+</style>

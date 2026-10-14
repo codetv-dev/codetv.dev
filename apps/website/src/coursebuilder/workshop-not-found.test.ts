@@ -12,6 +12,7 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { it } from 'node:test';
 import { dev } from 'astro';
+import netlify from '@astrojs/netlify';
 
 it('renders workshop sales copy and SEO, keeps the empty-body fallback, and rewrites missing workshops to 404', async () => {
 	// Exercise the real Astro pages and rewrite handler without database or Clerk
@@ -36,9 +37,33 @@ it('renders workshop sales copy and SEO, keeps the empty-body fallback, and rewr
 		await fixture(
 			'src/pages/workshops/[slug].astro',
 			workshopPage.replace(
-				"'@clerk/astro/components'",
-				"'../../coursebuilder/stubs'",
+				"import { WorkshopPricing } from '../../components/workshops/workshop-pricing';",
+				"import WorkshopPricing from '../../components/workshops/pricing-fixture.astro';",
 			),
+		);
+		await fixture(
+			'src/components/workshops/workshop-ticket.astro',
+			(
+				await readFile(
+					new URL(
+						'../components/workshops/workshop-ticket.astro',
+						import.meta.url,
+					),
+					'utf8',
+				)
+			).replace("'@clerk/astro/components'", "'../../coursebuilder/stubs'"),
+		);
+		await fixture(
+			'src/coursebuilder/workshop-cache.ts',
+			await readFile(new URL('./workshop-cache.ts', import.meta.url), 'utf8'),
+		);
+		await fixture(
+			'src/coursebuilder/workshop-price.ts',
+			`export const getDefaultWorkshopOffer = async () => ({ expiresAt: new Date('2026-11-04T07:59:00Z'), price: { unitPrice: 500, fullPrice: 500, calculatedPrice: 300 } });`,
+		);
+		await fixture(
+			'src/coursebuilder/request-country.ts',
+			'export const getTrustedCountry = () => "US";',
 		);
 		await fixture(
 			'src/pages/404.astro',
@@ -60,6 +85,10 @@ it('renders workshop sales copy and SEO, keeps the empty-body fallback, and rewr
 			'export const WorkshopPricing = () => null;',
 		);
 		await fixture(
+			'src/components/workshops/pricing-fixture.astro',
+			'---\nconst {initialPrice} = Astro.props;\n---\n<p>${initialPrice.calculatedPrice} <s class="full">${initialPrice.fullPrice}</s></p>',
+		);
+		await fixture(
 			'src/coursebuilder/stubs.ts',
 			'export const SignInButton = () => null;',
 		);
@@ -79,7 +108,10 @@ it('renders workshop sales copy and SEO, keeps the empty-body fallback, and rewr
 				seoTitle: slug === 'sample' ? 'Sample SEO title' : null,
 				seoDescription: slug === 'sample' ? 'Sample SEO description' : null,
 				body: slug === 'sample' ? 'Intro **text**.\\n\\n## Sample section\\n\\n- Sample item\\n\\n## FAQ\\n\\nSample answer. <script>unsafe()</script>' : ' ',
-				outline: [], ticket: null,
+				outline: [], ticket: slug === 'sale' ? {
+					productId: 'test-product', cohort: null,
+					enrollment: { state: 'open', opensAt: null, closesAt: null },
+				} : null,
 			});
 			export const getTicketPurchase = async () => { throw new Error('Unexpected ticket lookup'); };
 			export const resolveCouponCode = async () => { throw new Error('Unexpected coupon lookup'); };
@@ -89,14 +121,15 @@ it('renders workshop sales copy and SEO, keeps the empty-body fallback, and rewr
 			root,
 			configFile: false,
 			output: 'server',
+			adapter: netlify(),
 			server: { host: '127.0.0.1', port: 0 },
 			logLevel: 'silent',
 		});
 		const response = await fetch(
 			`http://127.0.0.1:${server.address.port}/workshops/does-not-exist`,
 		);
-		assert.equal(response.status, 404);
 		const html = await response.text();
+		assert.equal(response.status, 404, html);
 		assert.match(html, /Page Not Found/);
 		assert.match(html, /The page you requested was not found/);
 		assert.match(html, /open an issue/);
@@ -113,13 +146,24 @@ it('renders workshop sales copy and SEO, keeps the empty-body fallback, and rewr
 		assert.match(sampleHtml, /<h2[^>]*>Sample section<\/h2>/);
 		assert.match(sampleHtml, /<h2[^>]*>FAQ<\/h2>/);
 		assert.match(sampleHtml, /id="ticket"/);
-		assert.match(sampleHtml, /href="#ticket"/);
+		assert.doesNotMatch(sampleHtml, /href="#ticket"/);
 		assert.doesNotMatch(sampleHtml, /What’s included|unsafe\(\)/);
 		assert.ok(
 			sampleHtml.indexOf('Sample section') < sampleHtml.indexOf('id="ticket"'),
 		);
-		assert.ok(
-			sampleHtml.indexOf('href="#ticket"') > sampleHtml.indexOf('id="ticket"'),
+		const sale = await fetch(
+			`http://127.0.0.1:${server.address.port}/workshops/sale`,
+		);
+		assert.equal(sale.status, 200);
+		const saleHtml = await sale.text();
+		assert.match(saleHtml, /href="#ticket"/);
+		assert.match(saleHtml, /\$300/);
+		assert.match(saleHtml, /<s class="full">\$500<\/s>/);
+		assert.match(saleHtml, /_server-islands\//);
+		assert.doesNotMatch(saleHtml, /Sign in to buy/);
+		assert.match(
+			sale.headers.get('Netlify-CDN-Cache-Control')!,
+			/public, durable/,
 		);
 
 		const fallback = await fetch(
