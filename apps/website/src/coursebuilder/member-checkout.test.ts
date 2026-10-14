@@ -83,6 +83,39 @@ it('real CourseBuilder price calculation charges guests/non-supporters $300 and 
 	}
 });
 
+it('EGGHEAD40 remains an open coupon for a guest', async () => {
+	const openCoupon = {
+		...coupon,
+		id: 'coupon_egghead',
+		code: 'EGGHEAD40',
+		percentageDiscount: '0.4',
+		merchantCouponId: 'early',
+		merchantCoupon: merchants.early,
+	};
+	const ctx = {
+		...adapter,
+		couponForIdOrCode: async () => openCoupon,
+		getCoupon: async () => openCoupon,
+	};
+	const decision = await decideCheckoutCoupon({
+		productId,
+		trustedCountry: 'US',
+		requestedPpp: false,
+		usedCouponId: openCoupon.id,
+		adapter: ctx,
+	});
+	assert.equal(decision.usedCouponId, openCoupon.id);
+	const price = await formatPricesForProduct({
+		productId,
+		quantity: 1,
+		autoApplyPPP: false,
+		merchantCouponId: decision.couponId,
+		usedCouponId: decision.usedCouponId,
+		ctx,
+	});
+	assert.equal(price.calculatedPrice, 300);
+});
+
 it('member HTTP route preserves sign-in return URL and shares ownership/coupon guards with raw checkout', async () => {
 	// Replace external IO only; exercise the actual Astro route and coupon policy.
 	const dir = await mkdtemp(join(process.cwd(), '.member-checkout-test-'));
@@ -230,6 +263,14 @@ it('member HTTP route preserves sign-in return URL and shares ownership/coupon g
 		const json = await price.json();
 		assert.equal(json.couponId, undefined);
 		assert.equal(json.checkoutNotice, 'supporter-required');
+		assert.equal(price.headers.get('cache-control'), 'private, no-store');
+		const memberPrice = await route.POST(
+			context('/api/coursebuilder/prices-formatted', active, 'POST', {
+				productId,
+				couponId: coupon.id,
+			}),
+		);
+		assert.equal((await memberPrice.json()).memberCheckoutUrl, memberPath);
 		delete globals.memberAdapter;
 		delete globals.memberRequests;
 	} finally {

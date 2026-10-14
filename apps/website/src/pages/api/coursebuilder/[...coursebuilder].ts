@@ -63,7 +63,10 @@ function withRequest(context: APIContext, request: Request): APIContext {
 }
 
 function redirect(location: string, status = 303) {
-	return new Response(null, { status, headers: { Location: location } });
+	return new Response(null, {
+		status,
+		headers: { Location: location, 'Cache-Control': 'private, no-store' },
+	});
 }
 
 function backTo(returnUrl: URL, checkout: string) {
@@ -252,11 +255,14 @@ async function handlePricesFormatted(context: APIContext) {
 		typeof body.couponId === 'string' &&
 		SUPPORTER_ONLY_COUPON_IDS.has(body.couponId) &&
 		!isSupporter;
-	return Response.json({
-		...(await response.json()),
-		memberCheckoutUrl: isSupporter ? memberCheckoutPath(productId) : null,
-		...(denied && { checkoutNotice: 'supporter-required' }),
-	});
+	return Response.json(
+		{
+			...(await response.json()),
+			memberCheckoutUrl: isSupporter ? memberCheckoutPath(productId) : null,
+			...(denied && { checkoutNotice: 'supporter-required' }),
+		},
+		{ headers: { 'Cache-Control': 'private, no-store' } },
+	);
 }
 
 /**
