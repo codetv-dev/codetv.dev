@@ -1,4 +1,5 @@
 import { isAfter } from 'date-fns';
+import { SUPPORTER_ONLY_COUPON_IDS } from './supporter-coupons.ts';
 
 import type { CourseBuilderAdapter } from '@coursebuilder/core/adapters';
 import { getPPPDiscountPercent } from '@coursebuilder/core/pricing/parity-coupon';
@@ -45,11 +46,13 @@ export async function getValidSiteCoupon(
 	productId: string,
 	adapter: CouponAdapter,
 	now = new Date(),
+	isSupporter = false,
 ) {
 	if (!couponId) return null;
 
 	const coupon = await adapter.couponForIdOrCode({ couponId });
 	if (!coupon || coupon.status !== 1) return null;
+	if (SUPPORTER_ONLY_COUPON_IDS.has(coupon.id) && !isSupporter) return null;
 	if (
 		coupon.restrictedToProductId &&
 		coupon.restrictedToProductId !== productId
@@ -90,6 +93,7 @@ export async function decideCheckoutCoupon({
 	usedCouponId,
 	adapter,
 	now,
+	isSupporter = false,
 }: {
 	productId: string;
 	trustedCountry: string;
@@ -97,6 +101,7 @@ export async function decideCheckoutCoupon({
 	usedCouponId?: string | null;
 	adapter: CouponAdapter;
 	now?: Date;
+	isSupporter?: boolean;
 }): Promise<CheckoutCouponDecision> {
 	if (requestedPpp) {
 		const pppCoupon = await getPppMerchantCoupon(trustedCountry, adapter);
@@ -110,12 +115,17 @@ export async function decideCheckoutCoupon({
 	}
 
 	const [siteCoupon, defaults] = await Promise.all([
-		getValidSiteCoupon(usedCouponId, productId, adapter, now),
+		getValidSiteCoupon(usedCouponId, productId, adapter, now, isSupporter),
 		adapter.getDefaultCoupon([productId]),
 	]);
 
 	const siteMerchantCoupon = siteCoupon?.merchantCoupon ?? null;
-	const defaultMerchantCoupon = defaults?.defaultMerchantCoupon ?? null;
+	const allowedDefaults =
+		defaults &&
+		(isSupporter || !SUPPORTER_ONLY_COUPON_IDS.has(defaults.defaultCoupon.id))
+			? defaults
+			: null;
+	const defaultMerchantCoupon = allowedDefaults?.defaultMerchantCoupon ?? null;
 
 	if (
 		siteCoupon &&
@@ -130,11 +140,11 @@ export async function decideCheckoutCoupon({
 		};
 	}
 
-	if (defaults?.defaultMerchantCoupon) {
+	if (allowedDefaults?.defaultMerchantCoupon) {
 		return {
 			country: NON_PPP_COUNTRY,
-			couponId: defaults.defaultMerchantCoupon.id,
-			usedCouponId: defaults.defaultCoupon.id,
+			couponId: allowedDefaults.defaultMerchantCoupon.id,
+			usedCouponId: allowedDefaults.defaultCoupon.id,
 			reason: 'default-coupon',
 		};
 	}

@@ -26,6 +26,8 @@ type MerchantCoupon = {
 };
 
 export type FormattedPrice = {
+	checkoutNotice?: string;
+	memberCheckoutUrl?: string | null;
 	unitPrice: number;
 	fullPrice: number;
 	calculatedPrice: number;
@@ -38,6 +40,7 @@ export type FormattedPrice = {
 
 export type WorkshopPricingProps = {
 	productId: string;
+	memberCheckoutUrl?: string | null;
 	initialPrice: FormattedPrice | null;
 	/** Fetch country-specific offers only where regional pricing may apply. */
 	refineRegionalPrice: boolean;
@@ -73,6 +76,7 @@ const dateFormat = new Intl.DateTimeFormat('en-US', {
 });
 
 const notices: Record<string, string> = {
+	'supporter-required': 'The member price is for CodeTV supporters.',
 	'enrollment-closed': 'Ticket sales for this cohort are closed.',
 	'already-purchased': 'You already have a ticket for this cohort.',
 	error:
@@ -86,6 +90,7 @@ function percentOff(coupon?: MerchantCoupon) {
 
 export function WorkshopPricing({
 	productId,
+	memberCheckoutUrl,
 	initialPrice,
 	refineRegionalPrice,
 	enrollment,
@@ -179,13 +184,18 @@ export function WorkshopPricing({
 
 	const opensAt = enrollment.opensAt ? new Date(enrollment.opensAt) : null;
 	const closesAt = enrollment.closesAt ? new Date(enrollment.closesAt) : null;
-	const notice = checkoutNotice ? notices[checkoutNotice] : null;
+	const noticeKey = checkoutNotice ?? price?.checkoutNotice;
+	const notice = noticeKey ? notices[noticeKey] : null;
+	const memberUrl = price?.memberCheckoutUrl ?? memberCheckoutUrl;
 
 	return (
 		<div className="workshop-pricing" aria-busy={loading}>
 			{notice && (
 				<p className="notice" role="status">
-					{notice}
+					{notice}{' '}
+					{noticeKey === 'supporter-required' && (
+						<a href="/dashboard/sign-up">Become a supporter</a>
+					)}
 				</p>
 			)}
 
@@ -212,6 +222,14 @@ export function WorkshopPricing({
 							(percentOff(price.appliedMerchantCoupon) > 0
 								? `${percentOff(price.appliedMerchantCoupon)}% off applied`
 								: 'Discount applied'))}
+				</p>
+			)}
+
+			{memberUrl && !hasTicket && enrollment.state === 'open' && (
+				<p>
+					<a href={memberUrl} data-astro-reload>
+						Use your member price: 50% off ($250)
+					</a>
 				</p>
 			)}
 

@@ -1,0 +1,238 @@
+import assert from 'node:assert/strict';
+import { it } from 'node:test';
+import { mkdtemp, rm } from 'node:fs/promises';
+import { join } from 'node:path';
+import { pathToFileURL } from 'node:url';
+import { build } from 'esbuild';
+import { formatPricesForProduct } from '@coursebuilder/core';
+import { decideCheckoutCoupon } from './checkout-coupons.ts';
+import { isActiveSupporter } from './supporter-coupons.ts';
+
+const productId = 'product-4gmhd';
+const merchants: Record<string, any> = {
+	member: { id: 'member', type: 'special', percentageDiscount: 0.5 },
+	early: { id: 'early', type: 'special', percentageDiscount: 0.4 },
+};
+const coupon = {
+	id: 'coupon_hw5vh',
+	code: 'MEMBER-5E6D28',
+	status: 1,
+	maxUses: -1,
+	usedCount: 0,
+	expires: null,
+	percentageDiscount: '0.5',
+	restrictedToProductId: productId,
+	merchantCouponId: 'member',
+	merchantCoupon: merchants.member,
+};
+const adapter: any = {
+	couponForIdOrCode: async () => coupon,
+	getDefaultCoupon: async () => ({
+		defaultCoupon: { id: 'early-site' },
+		defaultMerchantCoupon: merchants.early,
+	}),
+	getProduct: async () => ({ id: productId, type: 'cohort', status: 1 }),
+	getPriceForProduct: async () => ({ unitAmount: 500 }),
+	getCoupon: async (id: string) => (id === coupon.id ? coupon : null),
+	getMerchantCoupon: async (id: string) => merchants[id],
+	getPurchasesForUser: async () => [],
+	getMerchantCouponsForTypeAndPercent: async () => [],
+	getEntitlementTypeByName: async () => null,
+};
+
+it('real CourseBuilder price calculation charges guests/non-supporters $300 and every active tier $250', async () => {
+	for (const [user, expected] of [
+		[null, 300],
+		[{ publicMetadata: {} }, 300],
+		[
+			{
+				publicMetadata: {
+					stripe: { status: 'past_due', level: 'Gold Tier Supporter' },
+				},
+			},
+			300,
+		],
+		...[
+			'Bronze Tier Supporter',
+			'Silver Tier Supporter',
+			'Gold Tier Supporter',
+			'Platinum Tier Supporter',
+		].map((level) => [
+			{ publicMetadata: { stripe: { status: 'active', level } } },
+			250,
+		]),
+	] as const) {
+		const decision = await decideCheckoutCoupon({
+			productId,
+			trustedCountry: 'US',
+			requestedPpp: false,
+			usedCouponId: coupon.id,
+			isSupporter: isActiveSupporter(user),
+			adapter,
+		});
+		const price = await formatPricesForProduct({
+			productId,
+			country: decision.country,
+			quantity: 1,
+			autoApplyPPP: false,
+			merchantCouponId: decision.couponId,
+			usedCouponId: decision.usedCouponId,
+			ctx: adapter,
+		});
+		assert.equal(price.calculatedPrice, expected);
+	}
+});
+
+it('member HTTP route preserves sign-in return URL and shares ownership/coupon guards with raw checkout', async () => {
+	// Replace external IO only; exercise the actual Astro route and coupon policy.
+	const dir = await mkdtemp(join(process.cwd(), '.member-checkout-test-'));
+	try {
+		const outfile = join(dir, 'route.mjs');
+		await build({
+			stdin: {
+				contents: `export { GET, POST } from './src/pages/api/coursebuilder/[...coursebuilder]';`,
+				resolveDir: process.cwd(),
+				loader: 'ts',
+			},
+			outfile,
+			bundle: true,
+			platform: 'node',
+			format: 'esm',
+			packages: 'external',
+			define: { 'import.meta.env.DEV': 'false' },
+			plugins: [
+				{
+					name: 'external-io',
+					setup(b) {
+						b.onResolve({ filter: /^@coursebuilder\/astro\/server$/ }, () => ({
+							path: 'core',
+							namespace: 'fixture',
+						}));
+						b.onLoad({ filter: /.*/, namespace: 'fixture' }, () => ({
+							contents: `
+					export function Coursebuilder() { return {
+						GET: async () => new Response(null, {status: 405}),
+						POST: async (ctx) => {
+							const url = new URL(ctx.request.url);
+							globalThis.memberRequests.push(url);
+							if (url.pathname.endsWith('prices-formatted')) return Response.json(await ctx.request.json());
+							return new Response(null, { status: 303, headers: { Location: 'https://checkout.stripe.com/c/pay/cs_test_fixture' } });
+						}
+					}; }`,
+							loader: 'ts',
+						}));
+						b.onLoad({ filter: /src\/db\/index\.ts$/ }, () => ({
+							contents:
+								'export const courseBuilderAdapter = globalThis.memberAdapter;',
+							loader: 'ts',
+						}));
+						b.onLoad({ filter: /src\/coursebuilder\/users\.ts$/ }, () => ({
+							contents:
+								'export async function getCourseBuilderUserForClerkUser(user) { return user ? {id: user.id} : null; }',
+							loader: 'ts',
+						}));
+						b.onLoad({ filter: /src\/coursebuilder\/workshops\.ts$/ }, () => ({
+							contents: `
+					export async function getTicketForProduct() { return { enrollment: {state: 'open'} }; }
+					export async function getTicketPurchase(id) { return id === 'owner' ? {id: 'purchase'} : null; }
+					export async function resolveCouponCode(code) { return code ? 'coupon_hw5vh' : null; }
+				`,
+							loader: 'ts',
+						}));
+						b.onLoad(
+							{ filter: /src\/coursebuilder\/stripe-provider\.ts$/ },
+							() => ({
+								contents: `export const getCommerceBaseUrl = () => 'https://codetv.dev'; export const verifyStripeWebhookSignature = () => false;`,
+								loader: 'ts',
+							}),
+						);
+					},
+				},
+			],
+		});
+		const globals = globalThis as any;
+		globals.memberAdapter = adapter;
+		globals.memberRequests = [];
+		const route = await import(pathToFileURL(outfile).href);
+		const context = (
+			path: string,
+			user: unknown = null,
+			method = 'GET',
+			body?: any,
+		) => {
+			const url = new URL(path, 'https://preview.example');
+			return {
+				url,
+				request: new Request(url, {
+					method,
+					...(body && { body: JSON.stringify(body) }),
+				}),
+				locals: { currentUser: async () => user },
+				clientAddress: '127.0.0.1',
+			};
+		};
+		const memberPath = `/api/coursebuilder/member-checkout?productId=${productId}`;
+		const signedOut = await route.GET(context(memberPath));
+		assert.equal(signedOut.status, 303);
+		const signIn = new URL(signedOut.headers.get('location'));
+		assert.equal(signIn.pathname, '/dashboard/sign-in');
+		assert.equal(
+			signIn.searchParams.get('redirect_url'),
+			`https://preview.example${memberPath}`,
+		);
+		const nonmember = await route.GET(context(memberPath, { id: 'nonmember' }));
+		assert.equal(
+			new URL(nonmember.headers.get('location')).searchParams.get('checkout'),
+			'supporter-required',
+		);
+		const active = {
+			id: 'supporter',
+			publicMetadata: {
+				stripe: { status: 'active', level: 'Bronze Tier Supporter' },
+			},
+		};
+		assert.equal((await route.GET(context(memberPath, active))).status, 303);
+		assert.equal(
+			globals.memberRequests.at(-1).searchParams.get('couponId'),
+			'member',
+		);
+		assert.equal(
+			(await route.GET(context(memberPath, { ...active, id: 'owner' }))).headers
+				.get('location')
+				?.includes('already-purchased'),
+			true,
+		);
+		for (const user of [null, { id: 'nonmember' }]) {
+			for (const query of ['usedCouponId=coupon_hw5vh', 'code=MEMBER-5E6D28']) {
+				await route.POST(
+					context(
+						`/api/coursebuilder/checkout/stripe?productId=${productId}&${query}`,
+						user,
+						'POST',
+					),
+				);
+				const sent = globals.memberRequests.at(-1);
+				assert.equal(sent.searchParams.get('couponId'), 'early');
+				assert.equal(
+					new URL(sent.searchParams.get('cancelUrl')).searchParams.get(
+						'checkout',
+					),
+					'supporter-required',
+				);
+			}
+		}
+		const price = await route.POST(
+			context('/api/coursebuilder/prices-formatted', null, 'POST', {
+				productId,
+				couponId: coupon.id,
+			}),
+		);
+		const json = await price.json();
+		assert.equal(json.couponId, undefined);
+		assert.equal(json.checkoutNotice, 'supporter-required');
+		delete globals.memberAdapter;
+		delete globals.memberRequests;
+	} finally {
+		await rm(dir, { recursive: true, force: true });
+	}
+});

@@ -61,6 +61,13 @@ it('renders workshop sales copy and SEO, keeps the empty-body fallback, and rewr
 			),
 		);
 		await fixture(
+			'src/coursebuilder/supporter-coupons.ts',
+			await readFile(
+				new URL('./supporter-coupons.ts', import.meta.url),
+				'utf8',
+			),
+		);
+		await fixture(
 			'src/coursebuilder/workshop-price.ts',
 			'export const getDefaultWorkshopPrice = async () => ({unitPrice: 500, fullPrice: 500, calculatedPrice: 300});',
 		);

@@ -1,6 +1,10 @@
 ---
 import Layout from '../../layouts/default.astro';
 import Block from '../../components/design-system/block.astro';
+import {
+	isActiveSupporter,
+	memberCheckoutPath,
+} from '../../coursebuilder/supporter-coupons';
 import { WorkshopPricing } from '../../components/workshops/workshop-pricing';
 import {
 	getWorkshopSeo,
@@ -132,6 +136,11 @@ const included = [
 							<WorkshopPricing
 								client:load
 								productId={ticket.productId}
+								memberCheckoutUrl={
+									isActiveSupporter(clerkUser)
+										? memberCheckoutPath(ticket.productId)
+										: null
+								}
 								initialPrice={initialPrice}
 								refineRegionalPrice={getTrustedCountry(Astro) !== 'US'}
 								enrollment={{

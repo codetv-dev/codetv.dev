@@ -1,5 +1,9 @@
 ---
 import PerkCard from '../perk-card.astro';
+import {
+	isActiveSupporter,
+	memberCheckoutPath,
+} from '../../coursebuilder/supporter-coupons';
 import Panel from './panel.astro';
 
 const user = await Astro.locals.currentUser();
@@ -195,6 +199,24 @@ if (isSubscriber && ['Platinum Tier Supporter'].includes(level)) {
 
 					<p slot="claimed-description">You’ve unlocked exclusive discounts!</p>
 				</PerkCard>
+				{
+					isActiveSupporter(user) && (
+						<PerkCard
+							claimCondition={true}
+							title="Agentic Frontend Engineering with Mike Ryan: 50% off ($250)"
+						>
+							<p slot="claimed-description">
+								Available to every active supporter tier.
+								<a
+									href={memberCheckoutPath('product-4gmhd')!}
+									data-astro-reload
+								>
+									Use your member price &rarr;
+								</a>
+							</p>
+						</PerkCard>
+					)
+				}
 			</div>
 		</div>
 	</Fragment>
