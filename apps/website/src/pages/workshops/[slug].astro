@@ -247,6 +247,13 @@ const included = [
 		padding-block-end: 1.5rem;
 	}
 
+	@media (min-width: 1180px) {
+		.workshop :global([data-name='workshop-hero']) {
+			/* The desktop header is fixed rather than in normal flow. */
+			padding-block-start: 5rem;
+		}
+	}
+
 	.workshop :global([data-name='workshop-body-section']) {
 		padding-block: 2rem;
 	}
