@@ -1,6 +1,10 @@
 ---
 import { getCourseBuilderUserForClerkUser } from '../../coursebuilder/users';
 import { getTicketPurchase } from '../../coursebuilder/workshops';
+import {
+	isActiveSupporter,
+	memberCheckoutPath,
+} from '../../coursebuilder/supporter-coupons';
 
 interface Props {
 	productId: string;
@@ -11,9 +15,23 @@ const viewer = await getCourseBuilderUserForClerkUser(clerkUser ?? null);
 const hasTicket = viewer
 	? Boolean(await getTicketPurchase(viewer.id, [productId]))
 	: false;
+const memberUrl =
+	!hasTicket && isActiveSupporter(clerkUser)
+		? memberCheckoutPath(productId)
+		: null;
 Astro.response.headers.set('Cache-Control', 'private, no-store');
 Astro.response.headers.set('Netlify-CDN-Cache-Control', 'no-store');
 ---
+
+{
+	memberUrl && (
+		<p data-member-offer>
+			<a href={memberUrl} data-astro-reload>
+				Use your member price: 50% off ($250)
+			</a>
+		</p>
+	)
+}
 
 {
 	hasTicket && (

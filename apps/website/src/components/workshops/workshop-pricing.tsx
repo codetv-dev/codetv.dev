@@ -26,6 +26,8 @@ type MerchantCoupon = {
 };
 
 export type FormattedPrice = {
+	checkoutNotice?: string;
+	memberCheckoutUrl?: string | null;
 	unitPrice: number;
 	fullPrice: number;
 	calculatedPrice: number;
@@ -75,6 +77,7 @@ const dateFormat = new Intl.DateTimeFormat('en-US', {
 });
 
 const notices: Record<string, string> = {
+	'supporter-required': 'The member price is for CodeTV supporters.',
 	'enrollment-closed': 'Ticket sales for this cohort are closed.',
 	'already-purchased': 'You already have a ticket for this cohort.',
 	error:
@@ -193,13 +196,17 @@ export function WorkshopPricing({
 
 	const opensAt = enrollment.opensAt ? new Date(enrollment.opensAt) : null;
 	const closesAt = enrollment.closesAt ? new Date(enrollment.closesAt) : null;
-	const notice = checkoutNotice ? notices[checkoutNotice] : null;
+	const noticeKey = checkoutNotice ?? price?.checkoutNotice;
+	const notice = noticeKey ? notices[noticeKey] : null;
 
 	return (
 		<div className="workshop-pricing" aria-busy={loading}>
 			{notice && (
 				<p className="notice" role="status">
-					{notice}
+					{notice}{' '}
+					{noticeKey === 'supporter-required' && (
+						<a href="/dashboard/sign-up">Become a supporter</a>
+					)}
 				</p>
 			)}
 

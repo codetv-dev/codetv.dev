@@ -39,6 +39,7 @@ it('renders guest checkout in the public shell, defers ownership privately, and 
 			'components/design-system/block.astro',
 			'coursebuilder/workshop-page.ts',
 			'coursebuilder/workshop-cache.ts',
+			'coursebuilder/supporter-coupons.ts',
 		]) {
 			await fixture(
 				`src/${path}`,
@@ -59,7 +60,7 @@ it('renders guest checkout in the public shell, defers ownership privately, and 
 		);
 		await fixture(
 			'src/coursebuilder/users.ts',
-			'export const getCourseBuilderUserForClerkUser = async (user) => user ? {id: "test-viewer"} : null;',
+			'export const getCourseBuilderUserForClerkUser = async (user) => user ? {id: user.id === "clerk-fixture" ? "test-viewer" : user.id} : null;',
 		);
 		await fixture(
 			'src/middleware.ts',
@@ -67,8 +68,11 @@ it('renders guest checkout in the public shell, defers ownership privately, and 
 			import { defineMiddleware } from 'astro:middleware';
 			import { guardWorkshopCache, hasWorkshopSessionEvidence, WORKSHOP_SESSION_HEADER, WORKSHOP_QUERY_HEADER } from './coursebuilder/workshop-cache';
 			export const onRequest = defineMiddleware(async (context, next) => {
-				const authenticated = context.request.headers.get('Cookie')?.includes('__session=fixture') ?? false;
-				context.locals.currentUser = async () => authenticated ? { id: 'clerk-fixture' } : null;
+				const cookie = context.request.headers.get('Cookie') ?? '';
+				const authenticated = cookie.includes('__session=');
+				context.locals.currentUser = async () => cookie.includes('__session=supporter')
+					? {id: 'clerk-supporter', publicMetadata: {stripe: {status: 'active', level: 'Bronze Tier Supporter'}}}
+					: authenticated ? {id: 'clerk-fixture'} : null;
 				const headers = new Headers(context.request.headers);
 				headers.set(WORKSHOP_SESSION_HEADER, hasWorkshopSessionEvidence(context.request) ? 'session' : 'anonymous');
 				headers.set(WORKSHOP_QUERY_HEADER, 'fixture-query');
@@ -86,7 +90,7 @@ it('renders guest checkout in the public shell, defers ownership privately, and 
 				seoDescription: slug === 'sample' ? 'Sample SEO description' : null,
 				body: slug === 'sample' ? 'Intro **text**.\\n\\n## Sample section\\n\\n- Sample item\\n\\n## FAQ\\n\\nSample answer. <script>unsafe()</script>' : ' ',
 				outline: [], ticket: slug === 'sample' ? {
-					productId: 'ticket', cohort: null,
+					productId: 'product-4gmhd', cohort: null,
 					enrollment: { state: 'open', opensAt: new Date('2026-09-01T00:00:00Z'), closesAt: new Date('2026-11-16T00:00:00Z') },
 				} : null,
 			});
@@ -172,6 +176,24 @@ it('renders guest checkout in the public shell, defers ownership privately, and 
 		assert.equal(
 			ownerIsland.headers.get('Netlify-CDN-Cache-Control'),
 			'no-store',
+		);
+		const supporterIsland = await fetch(islandUrl, {
+			headers: { Cookie: '__session=supporter' },
+		});
+		assert.match(
+			await supporterIsland.text(),
+			/data-member-offer.*Use your member price: 50% off \(\$250\)/s,
+		);
+		assert.equal(
+			supporterIsland.headers.get('Cache-Control'),
+			'private, no-store',
+		);
+		const supporterShell = await fetch(`${base}/workshops/sample`, {
+			headers: { Cookie: '__session=supporter' },
+		});
+		assert.doesNotMatch(
+			await supporterShell.text(),
+			/data-member-offer|Use your member price/,
 		);
 		const ownerShell = await fetch(`${base}/workshops/sample`, {
 			headers: { Cookie: '__session=fixture' },

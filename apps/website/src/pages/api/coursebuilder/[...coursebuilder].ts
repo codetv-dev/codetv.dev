@@ -17,6 +17,12 @@ import {
 } from '../../../coursebuilder/stripe-provider';
 import { getCourseBuilderUserForClerkUser } from '../../../coursebuilder/users';
 import {
+	isActiveSupporter,
+	MEMBER_WORKSHOPS,
+	memberCheckoutPath,
+	SUPPORTER_ONLY_COUPON_IDS,
+} from '../../../coursebuilder/supporter-coupons';
+import {
 	getTicketForProduct,
 	getTicketPurchase,
 	resolveCouponCode,
@@ -57,18 +63,16 @@ function withRequest(context: APIContext, request: Request): APIContext {
 }
 
 function redirect(location: string, status = 303) {
-	return new Response(null, { status, headers: { Location: location } });
+	return new Response(null, {
+		status,
+		headers: { Location: location, 'Cache-Control': 'private, no-store' },
+	});
 }
 
 function backTo(returnUrl: URL, checkout: string) {
 	const url = new URL(returnUrl);
 	url.searchParams.set('checkout', checkout);
 	return redirect(url.toString());
-}
-
-async function getViewer(context: APIContext) {
-	const clerkUser = await context.locals.currentUser?.();
-	return getCourseBuilderUserForClerkUser(clerkUser ?? null);
 }
 
 async function handleCheckout(context: APIContext) {
@@ -82,7 +86,9 @@ async function handleCheckout(context: APIContext) {
 
 	if (!productId) return backTo(returnUrl, 'error');
 
-	const viewer = await getViewer(context);
+	const clerkUser = await context.locals.currentUser?.();
+	const viewer = await getCourseBuilderUserForClerkUser(clerkUser ?? null);
+	const isSupporter = isActiveSupporter(clerkUser);
 
 	const ticket = await getTicketForProduct(productId);
 	if (!ticket) {
@@ -116,11 +122,26 @@ async function handleCheckout(context: APIContext) {
 		return backTo(returnUrl, 'already-purchased');
 	}
 
+	const usedCouponId = await resolveCouponCode(
+		url.searchParams.get('usedCouponId') ?? url.searchParams.get('code'),
+		productId,
+	);
+	if (
+		usedCouponId &&
+		SUPPORTER_ONLY_COUPON_IDS.has(usedCouponId) &&
+		!isSupporter
+	) {
+		// Proceed at the normal sale price; the cancelled checkout retains the notice.
+		returnUrl.searchParams.delete('code');
+		returnUrl.searchParams.set('checkout', 'supporter-required');
+	}
+
 	const coupon = await decideCheckoutCoupon({
 		productId,
 		trustedCountry: getTrustedCountry(context),
 		requestedPpp: url.searchParams.get('ppp') === '1',
-		usedCouponId: url.searchParams.get('usedCouponId'),
+		usedCouponId,
+		isSupporter,
 		adapter: courseBuilderAdapter,
 	});
 
@@ -188,20 +209,50 @@ async function handlePricesFormatted(context: APIContext) {
 		return Response.json('productId is required', { status: 400 });
 
 	const trustedCountry = getTrustedCountry(context);
+	const clerkUser = await context.locals.currentUser?.();
+	const isSupporter = isActiveSupporter(clerkUser);
 	const requestedCouponId =
 		typeof body.code === 'string'
 			? await resolveCouponCode(body.code, productId)
 			: typeof body.couponId === 'string'
 				? body.couponId
 				: null;
-	const [viewer, siteCoupon, pppCoupon] = await Promise.all([
-		getViewer(context),
-		getValidSiteCoupon(requestedCouponId, productId, courseBuilderAdapter),
+	const [viewer, requestedCoupon, memberCoupon, pppCoupon] = await Promise.all([
+		getCourseBuilderUserForClerkUser(clerkUser ?? null),
+		getValidSiteCoupon(
+			requestedCouponId,
+			productId,
+			courseBuilderAdapter,
+			undefined,
+			isSupporter,
+		),
+		isSupporter
+			? getValidSiteCoupon(
+					MEMBER_WORKSHOPS[productId]?.couponId,
+					productId,
+					courseBuilderAdapter,
+					undefined,
+					true,
+				)
+			: null,
 		body.ppp === true
 			? getPppMerchantCoupon(trustedCountry, courseBuilderAdapter)
 			: null,
 	]);
 
+	// Private refinement automatically offers an active supporter the better
+	// member price. Send the same validated site id back for checkout.
+	const siteCoupon =
+		memberCoupon &&
+		Number(memberCoupon.percentageDiscount) >=
+			Number(requestedCoupon?.percentageDiscount ?? 0)
+			? memberCoupon
+			: requestedCoupon;
+	const denied = Boolean(
+		requestedCouponId &&
+		SUPPORTER_ONLY_COUPON_IDS.has(requestedCouponId) &&
+		!isSupporter,
+	);
 	const headers = new Headers(context.request.headers);
 	headers.delete('content-length');
 	headers.set('content-type', 'application/json');
@@ -243,6 +294,8 @@ async function handlePricesFormatted(context: APIContext) {
 		{
 			...formatted,
 			resolvedCouponId: siteCoupon?.id ?? null,
+			memberCheckoutUrl: isSupporter ? memberCheckoutPath(productId) : null,
+			...(denied && { checkoutNotice: 'supporter-required' }),
 			...(appliesSiteCoupon &&
 				!formatted.appliedCouponLabel &&
 				typeof label === 'string' &&
@@ -283,7 +336,39 @@ async function handleWebhook(context: APIContext) {
 	);
 }
 
-export const GET: APIRoute = (context) => courseBuilderGet(context);
+export const GET: APIRoute = async (context) => {
+	if (getAction(new URL(context.request.url)) !== 'member-checkout')
+		return courseBuilderGet(context);
+
+	const productId = context.url.searchParams.get('productId') ?? '';
+	const offer = MEMBER_WORKSHOPS[productId];
+	if (!offer) return new Response('Not found', { status: 404 });
+	const clerkUser = await context.locals.currentUser?.();
+	if (!clerkUser) {
+		const signIn = new URL('/dashboard/sign-in', context.url);
+		signIn.searchParams.set(
+			'redirect_url',
+			new URL(memberCheckoutPath(productId)!, context.url).toString(),
+		);
+		return redirect(signIn.toString());
+	}
+	const returnUrl = new URL(offer.path, context.url);
+	returnUrl.hash = 'ticket';
+	if (!isActiveSupporter(clerkUser))
+		return backTo(returnUrl, 'supporter-required');
+
+	// Reuse every checkout guard and the same core session creation path.
+	const checkoutUrl = new URL(
+		'/api/coursebuilder/checkout/stripe',
+		context.url,
+	);
+	checkoutUrl.searchParams.set('productId', productId);
+	checkoutUrl.searchParams.set('usedCouponId', offer.couponId);
+	checkoutUrl.searchParams.set('cancelUrl', returnUrl.toString());
+	return handleCheckout(
+		withRequest(context, new Request(checkoutUrl, { method: 'POST' })),
+	);
+};
 
 export const POST: APIRoute = async (context) => {
 	const action = getAction(new URL(context.request.url));

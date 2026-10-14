@@ -6,7 +6,7 @@ import {
 	workshopCacheControl,
 	WORKSHOP_SESSION_HEADER,
 	WORKSHOP_QUERY_HEADER,
-} from './workshop-cache';
+} from './workshop-cache.ts';
 
 const url = 'https://codetv.dev/workshops/agentic-frontend-engineering';
 const shell = (headers = {}, status = 200) =>
