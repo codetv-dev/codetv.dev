@@ -12,6 +12,7 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { it } from 'node:test';
 import { dev } from 'astro';
+import react from '@astrojs/react';
 
 it('renders workshop sales copy and SEO, keeps the empty-body fallback, and rewrites missing workshops to 404', async () => {
 	// Exercise the real Astro pages and rewrite handler without database or Clerk
@@ -33,13 +34,7 @@ it('renders workshop sales copy and SEO, keeps the empty-body fallback, and rewr
 			new URL('../pages/workshops/[slug].astro', import.meta.url),
 			'utf8',
 		);
-		await fixture(
-			'src/pages/workshops/[slug].astro',
-			workshopPage.replace(
-				"'@clerk/astro/components'",
-				"'../../coursebuilder/stubs'",
-			),
-		);
+		await fixture('src/pages/workshops/[slug].astro', workshopPage);
 		await fixture(
 			'src/pages/404.astro',
 			await readFile(new URL('../pages/404.astro', import.meta.url), 'utf8'),
@@ -56,12 +51,22 @@ it('renders workshop sales copy and SEO, keeps the empty-body fallback, and rewr
 			),
 		);
 		await fixture(
-			'src/components/workshops/workshop-pricing.ts',
-			'export const WorkshopPricing = () => null;',
+			'src/components/workshops/workshop-pricing.tsx',
+			await readFile(
+				new URL(
+					'../components/workshops/workshop-pricing.tsx',
+					import.meta.url,
+				),
+				'utf8',
+			),
 		);
 		await fixture(
-			'src/coursebuilder/stubs.ts',
-			'export const SignInButton = () => null;',
+			'src/coursebuilder/workshop-price.ts',
+			'export const getDefaultWorkshopPrice = async () => ({unitPrice: 500, fullPrice: 500, calculatedPrice: 300});',
+		);
+		await fixture(
+			'src/coursebuilder/request-country.ts',
+			"export const getTrustedCountry = () => 'US';",
 		);
 		await fixture(
 			'src/coursebuilder/users.ts',
@@ -79,16 +84,20 @@ it('renders workshop sales copy and SEO, keeps the empty-body fallback, and rewr
 				seoTitle: slug === 'sample' ? 'Sample SEO title' : null,
 				seoDescription: slug === 'sample' ? 'Sample SEO description' : null,
 				body: slug === 'sample' ? 'Intro **text**.\\n\\n## Sample section\\n\\n- Sample item\\n\\n## FAQ\\n\\nSample answer. <script>unsafe()</script>' : ' ',
-				outline: [], ticket: null,
+				outline: [], ticket: slug === 'sample' ? {
+					productId: 'ticket', enrollment: {state: 'open', opensAt: null, closesAt: null},
+				} : null,
 			});
 			export const getTicketPurchase = async () => { throw new Error('Unexpected ticket lookup'); };
-			export const resolveCouponCode = async () => { throw new Error('Unexpected coupon lookup'); };
+			export const resolveCouponCode = async () => null;
 		`,
 		);
 		server = await dev({
 			root,
 			configFile: false,
 			output: 'server',
+			integrations: [react()],
+			vite: { ssr: { noExternal: ['@astrojs/react'] } },
 			server: { host: '127.0.0.1', port: 0 },
 			logLevel: 'silent',
 		});
@@ -114,12 +123,20 @@ it('renders workshop sales copy and SEO, keeps the empty-body fallback, and rewr
 		assert.match(sampleHtml, /<h2[^>]*>FAQ<\/h2>/);
 		assert.match(sampleHtml, /id="ticket"/);
 		assert.match(sampleHtml, /href="#ticket"/);
+		assert.match(sampleHtml, /Buy a ticket/);
+		assert.match(sampleHtml, /\$300/);
+		assert.match(
+			sampleHtml,
+			/<form[^>]*action="\/api\/coursebuilder\/checkout\/stripe\?/,
+		);
+		assert.match(sampleHtml, /<form[^>]*method="post"/i);
+		assert.doesNotMatch(
+			sampleHtml,
+			/Sign in to buy|Sign in or create a free CodeTV account/,
+		);
 		assert.doesNotMatch(sampleHtml, /What’s included|unsafe\(\)/);
 		assert.ok(
 			sampleHtml.indexOf('Sample section') < sampleHtml.indexOf('id="ticket"'),
-		);
-		assert.ok(
-			sampleHtml.indexOf('href="#ticket"') > sampleHtml.indexOf('id="ticket"'),
 		);
 
 		const fallback = await fetch(

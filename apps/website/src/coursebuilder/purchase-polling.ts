@@ -15,6 +15,7 @@ export type CheckoutStatus =
 	| {
 			status: 'ready';
 			purchaseId: string;
+			buyerEmail?: string | null;
 			productName: string | null;
 			purchaseStatus: string;
 	  }

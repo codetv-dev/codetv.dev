@@ -25,6 +25,7 @@ const initialStatus = { status: 'processing', paymentStatus: null } as const;
 			sessionId={sessionId as string}
 			initialStatus={initialStatus}
 			supportEmail="info@codetv.dev"
+			signedIn={Astro.locals.auth().isAuthenticated}
 		/>
 	</main>
 </Layout>
