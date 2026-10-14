@@ -19,6 +19,7 @@ import { getCourseBuilderUserForClerkUser } from '../../../coursebuilder/users';
 import {
 	getTicketForProduct,
 	getTicketPurchase,
+	resolveCouponCode,
 } from '../../../coursebuilder/workshops';
 import { courseBuilderAdapter } from '../../../db';
 
@@ -187,13 +188,15 @@ async function handlePricesFormatted(context: APIContext) {
 		return Response.json('productId is required', { status: 400 });
 
 	const trustedCountry = getTrustedCountry(context);
+	const requestedCouponId =
+		typeof body.code === 'string'
+			? await resolveCouponCode(body.code, productId)
+			: typeof body.couponId === 'string'
+				? body.couponId
+				: null;
 	const [viewer, siteCoupon, pppCoupon] = await Promise.all([
 		getViewer(context),
-		getValidSiteCoupon(
-			typeof body.couponId === 'string' ? body.couponId : null,
-			productId,
-			courseBuilderAdapter,
-		),
+		getValidSiteCoupon(requestedCouponId, productId, courseBuilderAdapter),
 		body.ppp === true
 			? getPppMerchantCoupon(trustedCountry, courseBuilderAdapter)
 			: null,
@@ -207,7 +210,7 @@ async function handlePricesFormatted(context: APIContext) {
 
 	// Only the fields the pricing block needs, decided server-side. PPP is
 	// opt-in: it shows up in `availableCoupons` and applies only when chosen.
-	return courseBuilderPost(
+	const response = await courseBuilderPost(
 		withRequest(
 			context,
 			new Request(context.request.url, {
@@ -223,6 +226,31 @@ async function handlePricesFormatted(context: APIContext) {
 				}),
 			}),
 		),
+	);
+	if (!response.ok) return response;
+	const formatted = await response.json();
+	const label = siteCoupon?.fields?.label;
+	const appliesSiteCoupon =
+		siteCoupon &&
+		formatted.appliedMerchantCoupon?.id === siteCoupon.merchantCouponId;
+	const percent = Math.round(
+		Number(formatted.appliedMerchantCoupon?.percentageDiscount ?? 0) * 100,
+	);
+	const responseHeaders = new Headers(response.headers);
+	responseHeaders.delete('content-length');
+	responseHeaders.set('Cache-Control', 'private, no-store');
+	return Response.json(
+		{
+			...formatted,
+			resolvedCouponId: siteCoupon?.id ?? null,
+			...(appliesSiteCoupon &&
+				!formatted.appliedCouponLabel &&
+				typeof label === 'string' &&
+				label.trim() && {
+					appliedCouponLabel: percent > 0 ? `${label}: ${percent}% off` : label,
+				}),
+		},
+		{ headers: responseHeaders },
 	);
 }
 

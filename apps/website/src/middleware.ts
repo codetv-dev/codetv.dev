@@ -1,5 +1,6 @@
 import { clerkMiddleware } from '@clerk/astro/server';
 import { defineMiddleware, sequence } from 'astro:middleware';
+import { guardWorkshopCache } from './coursebuilder/workshop-cache';
 
 import {
 	dedupeClerkCookies,
@@ -32,7 +33,18 @@ const pinResponseCookies = defineMiddleware(async (context, next) => {
 	return fixClerkCookieResponse(response, cookieHeader);
 });
 
+const workshopCacheGuard = defineMiddleware(async (context, next) => {
+	const response = await next();
+	return guardWorkshopCache(
+		context.request,
+		response,
+		context.url.pathname.startsWith('/workshops/') &&
+			Boolean(context.locals.auth?.().userId),
+	);
+});
+
 export const onRequest = sequence(
+	workshopCacheGuard,
 	pinResponseCookies,
 	dedupeRequestCookies,
 	clerkMiddleware(),

@@ -1,0 +1,24 @@
+---
+import { getCourseBuilderUserForClerkUser } from '../../coursebuilder/users';
+import { getTicketPurchase } from '../../coursebuilder/workshops';
+
+interface Props {
+	productId: string;
+}
+const { productId } = Astro.props;
+const clerkUser = await Astro.locals.currentUser?.();
+const viewer = await getCourseBuilderUserForClerkUser(clerkUser ?? null);
+const hasTicket = viewer
+	? Boolean(await getTicketPurchase(viewer.id, [productId]))
+	: false;
+Astro.response.headers.set('Cache-Control', 'private, no-store');
+Astro.response.headers.set('Netlify-CDN-Cache-Control', 'no-store');
+---
+
+{
+	hasTicket && (
+		<div class="workshop-pricing" data-ticket-owned>
+			<p class="status">You have a ticket for this cohort.</p>
+		</div>
+	)
+}
