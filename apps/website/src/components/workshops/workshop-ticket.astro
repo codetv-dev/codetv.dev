@@ -1,16 +1,23 @@
 ---
 import { SignInButton } from '@clerk/astro/components';
-import { WorkshopPricing, type FormattedPrice } from './workshop-pricing';
+import {
+	WorkshopPricing,
+	type FormattedPrice,
+	type WorkshopPricingProps,
+} from './workshop-pricing';
 import { getCourseBuilderUserForClerkUser } from '../../coursebuilder/users';
 import { getTrustedCountry } from '../../coursebuilder/request-country';
 import {
 	getTicketPurchase,
 	resolveCouponCode,
-	type WorkshopTicket,
 } from '../../coursebuilder/workshops';
 
 interface Props {
-	ticket: WorkshopTicket;
+	// Server island props cross a JSON boundary. Dates must already be strings.
+	ticket: {
+		productId: string;
+		enrollment: WorkshopPricingProps['enrollment'];
+	};
 	initialPrice: FormattedPrice | null;
 	returnUrl: string;
 	checkoutNotice: string | null;
@@ -38,11 +45,7 @@ Astro.response.headers.set('Netlify-CDN-Cache-Control', 'no-store');
 	productId={ticket.productId}
 	initialPrice={initialPrice}
 	refineRegionalPrice={getTrustedCountry(Astro) !== 'US'}
-	enrollment={{
-		state: ticket.enrollment.state,
-		opensAt: ticket.enrollment.opensAt?.toISOString() ?? null,
-		closesAt: ticket.enrollment.closesAt?.toISOString() ?? null,
-	}}
+	enrollment={ticket.enrollment}
 	couponId={couponId}
 	canCheckout={Boolean(viewer)}
 	hasTicket={hasTicket}

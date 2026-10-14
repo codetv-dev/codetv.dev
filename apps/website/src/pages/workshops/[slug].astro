@@ -132,7 +132,14 @@ const included = [
 						<>
 							<WorkshopTicket
 								server:defer
-								ticket={ticket}
+								ticket={{
+									productId: ticket.productId,
+									enrollment: {
+										state: ticket.enrollment.state,
+										opensAt: ticket.enrollment.opensAt?.toISOString() ?? null,
+										closesAt: ticket.enrollment.closesAt?.toISOString() ?? null,
+									},
+								}}
 								initialPrice={initialPrice}
 								returnUrl={returnUrl.toString()}
 								checkoutNotice={Astro.url.searchParams.get('checkout')}

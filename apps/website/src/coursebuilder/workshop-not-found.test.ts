@@ -51,7 +51,16 @@ it('renders workshop sales copy and SEO, keeps the empty-body fallback, and rewr
 					),
 					'utf8',
 				)
-			).replace("'@clerk/astro/components'", "'../../coursebuilder/stubs'"),
+			)
+				.replace(
+					"import { SignInButton } from '@clerk/astro/components';",
+					"import SignInButton from '../../coursebuilder/sign-in-stub.astro';",
+				)
+				.replace(
+					/import \{[^}]*\} from '\.\/workshop-pricing';/,
+					"import WorkshopPricing from './pricing-fixture.astro';",
+				)
+				.replace('client:load', ''),
 		);
 		await fixture(
 			'src/coursebuilder/workshop-cache.ts',
@@ -88,10 +97,7 @@ it('renders workshop sales copy and SEO, keeps the empty-body fallback, and rewr
 			'src/components/workshops/pricing-fixture.astro',
 			'---\nconst {initialPrice} = Astro.props;\n---\n<p>${initialPrice.calculatedPrice} <s class="full">${initialPrice.fullPrice}</s></p>',
 		);
-		await fixture(
-			'src/coursebuilder/stubs.ts',
-			'export const SignInButton = () => null;',
-		);
+		await fixture('src/coursebuilder/sign-in-stub.astro', '<slot />');
 		await fixture(
 			'src/coursebuilder/users.ts',
 			'export const getCourseBuilderUserForClerkUser = async () => null;',
@@ -110,11 +116,11 @@ it('renders workshop sales copy and SEO, keeps the empty-body fallback, and rewr
 				body: slug === 'sample' ? 'Intro **text**.\\n\\n## Sample section\\n\\n- Sample item\\n\\n## FAQ\\n\\nSample answer. <script>unsafe()</script>' : ' ',
 				outline: [], ticket: slug === 'sale' ? {
 					productId: 'test-product', cohort: null,
-					enrollment: { state: 'open', opensAt: null, closesAt: null },
+					enrollment: { state: 'open', opensAt: new Date('2026-09-01T00:00:00Z'), closesAt: new Date('2026-11-16T00:00:00Z') },
 				} : null,
 			});
 			export const getTicketPurchase = async () => { throw new Error('Unexpected ticket lookup'); };
-			export const resolveCouponCode = async () => { throw new Error('Unexpected coupon lookup'); };
+			export const resolveCouponCode = async () => null;
 		`,
 		);
 		server = await dev({
@@ -161,6 +167,19 @@ it('renders workshop sales copy and SEO, keeps the empty-body fallback, and rewr
 		assert.match(saleHtml, /<s class="full">\$500<\/s>/);
 		assert.match(saleHtml, /_server-islands\//);
 		assert.doesNotMatch(saleHtml, /Sign in to buy/);
+		// Fetch the real encrypted island endpoint. Enrollment dates cross JSON;
+		// calling Date methods on the decoded props used to break buying with a 500.
+		const islandPath = saleHtml.match(
+			/href="([^"]*\/_server-islands\/WorkshopTicket[^"]*)"/,
+		)?.[1];
+		assert.ok(islandPath, 'Missing ticket island preload URL');
+		const island = await fetch(
+			new URL(islandPath.replaceAll('&amp;', '&'), sale.url),
+		);
+		const islandHtml = await island.text();
+		assert.equal(island.status, 200, islandHtml);
+		assert.match(islandHtml, /Sign in to buy/);
+		assert.equal(island.headers.get('Cache-Control'), 'private, no-store');
 		assert.match(
 			sale.headers.get('Netlify-CDN-Cache-Control')!,
 			/public, durable/,
