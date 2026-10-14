@@ -25,7 +25,7 @@ type MerchantCoupon = {
 	status?: number;
 };
 
-type FormattedPrice = {
+export type FormattedPrice = {
 	unitPrice: number;
 	fullPrice: number;
 	calculatedPrice: number;
@@ -38,7 +38,9 @@ type FormattedPrice = {
 
 export type WorkshopPricingProps = {
 	productId: string;
-	listPrice: number | null;
+	initialPrice: FormattedPrice | null;
+	/** Fetch country-specific offers only where regional pricing may apply. */
+	refineRegionalPrice: boolean;
 	enrollment: {
 		state: EnrollmentState;
 		opensAt: string | null;
@@ -85,7 +87,8 @@ function percentOff(coupon?: MerchantCoupon) {
 
 export function WorkshopPricing({
 	productId,
-	listPrice,
+	initialPrice,
+	refineRegionalPrice,
 	enrollment,
 	couponId,
 	canCheckout,
@@ -94,12 +97,25 @@ export function WorkshopPricing({
 	returnUrl,
 	devCountry,
 }: WorkshopPricingProps) {
-	const [price, setPrice] = useState<FormattedPrice | null>(null);
+	const [price, setPrice] = useState<FormattedPrice | null>(initialPrice);
 	const [ppp, setPpp] = useState(false);
-	const [loading, setLoading] = useState(true);
+	const [loading, setLoading] = useState(!initialPrice);
 	const [failed, setFailed] = useState(false);
 
 	useEffect(() => {
+		// The server already resolved the default sale price. Fetch only to
+		// refine a code/regional offer, or recover a failed server lookup.
+		if (
+			initialPrice &&
+			!couponId &&
+			!refineRegionalPrice &&
+			!devCountry &&
+			!ppp
+		) {
+			setPrice(initialPrice);
+			setLoading(false);
+			return;
+		}
 		let cancelled = false;
 		setLoading(true);
 
@@ -140,7 +156,7 @@ export function WorkshopPricing({
 		return () => {
 			cancelled = true;
 		};
-	}, [productId, couponId, ppp, devCountry]);
+	}, [productId, couponId, ppp, devCountry, initialPrice, refineRegionalPrice]);
 
 	const pppOffer = useMemo(
 		() =>
@@ -184,11 +200,7 @@ export function WorkshopPricing({
 					</>
 				) : (
 					<span className="amount">
-						{price
-							? usd.format(price.calculatedPrice)
-							: listPrice !== null
-								? usd.format(listPrice)
-								: '—'}
+						{price ? usd.format(price.calculatedPrice) : '—'}
 					</span>
 				)}
 			</p>
