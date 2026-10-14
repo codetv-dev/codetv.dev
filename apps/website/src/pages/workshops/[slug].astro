@@ -81,6 +81,13 @@ const included = [
 						</p>
 					)
 				}
+				{
+					ticket && (
+						<a class="button workshop-hero-cta" href="#ticket">
+							Get a ticket
+						</a>
+					)
+				}
 			</div>
 		</Block>
 
@@ -182,10 +189,6 @@ const included = [
 				</Block>
 			)
 		}
-
-		<Block>
-			<a class="button workshop-bottom-cta" href="#ticket">Get a ticket</a>
-		</Block>
 	</main>
 </Layout>
 
@@ -223,7 +226,14 @@ const included = [
 	}
 
 	#ticket {
-		scroll-margin-block-start: 24px;
+		/* Clear the sticky/fixed header and leave room above the label. */
+		scroll-margin-block-start: 5rem;
+	}
+
+	@media (prefers-reduced-motion: no-preference) {
+		:global(html:has(.workshop)) {
+			scroll-behavior: smooth;
+		}
 	}
 
 	/* Keep the shared Block grid, with a smaller heading-to-copy gap on mobile. */
@@ -353,7 +363,8 @@ const included = [
 		}
 	}
 
-	.workshop-bottom-cta {
+	.workshop-hero-cta {
+		margin-block-start: 1.25rem;
 		font-size: 1.125rem;
 		line-height: 1.2;
 		min-block-size: 44px;
@@ -362,7 +373,7 @@ const included = [
 	}
 
 	.workshop-body :global(a:focus-visible),
-	.workshop-bottom-cta:focus-visible {
+	.workshop-hero-cta:focus-visible {
 		outline: 3px solid var(--orange);
 		outline-offset: 4px;
 	}
