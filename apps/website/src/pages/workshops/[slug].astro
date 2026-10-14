@@ -13,7 +13,6 @@ import {
 	getWorkshopForSale,
 	resolveCouponCode,
 } from '../../coursebuilder/workshops';
-import { getTrustedCountry } from '../../coursebuilder/request-country';
 
 export const prerender = false;
 
@@ -148,7 +147,7 @@ const included = [
 								client:load
 								productId={ticket.productId}
 								initialPrice={initialPrice}
-								refineRegionalPrice={getTrustedCountry(Astro) !== 'US'}
+								refineRegionalPrice={true}
 								enrollment={{
 									state: ticket.enrollment.state,
 									opensAt: ticket.enrollment.opensAt?.toISOString() ?? null,
