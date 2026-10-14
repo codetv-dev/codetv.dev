@@ -6,7 +6,8 @@ export function workshopCacheControl(
 	const remaining = boundaries
 		.filter((date): date is Date => date !== null)
 		.map((date) => Math.floor((date.getTime() - now.getTime()) / 1000) - 5);
-	const lifetime = Math.min(300, ...remaining);
+	// Keep a filled cache usable across quiet periods; freshness stays one minute.
+	const lifetime = Math.min(60 + 86_400, ...remaining);
 	if (lifetime < 1) return 'no-store';
 	const fresh = Math.min(60, lifetime);
 	return `public, durable, s-maxage=${fresh}, stale-while-revalidate=${lifetime - fresh}`;

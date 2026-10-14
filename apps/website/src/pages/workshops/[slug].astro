@@ -53,7 +53,10 @@ Astro.response.headers.set(
 				),
 			]),
 );
-Astro.response.headers.set('Netlify-Cache-Tag', `workshop:${workshop.id}`);
+Astro.response.headers.set(
+	'Netlify-Cache-Tag',
+	`workshop:${workshop.id},workshop:${workshop.slug}`,
+);
 // Code offers remain request-scoped and uncached; preserve their checkout coupon.
 const couponId = ticket
 	? await resolveCouponCode(

@@ -147,8 +147,17 @@ it('never serves stale sale HTML across the early-bird or enrollment boundary', 
 			fresh + stale < seconds,
 			`${policy} could cross the price change`,
 		);
-		assert.ok(fresh + stale <= 300);
 	}
+	// A quiet ten-minute spell must not send a signed-out visitor back to SSR.
+	const quiet = workshopCacheControl(
+		[end],
+		new Date(end.getTime() - 3_600_000),
+	);
+	const usable =
+		Number(quiet.match(/s-maxage=(\d+)/)![1]) +
+		Number(quiet.match(/stale-while-revalidate=(\d+)/)![1]);
+	assert.ok(usable > 600);
+	assert.ok(usable < 3_600);
 	for (const seconds of [5, 1, 0, -1]) {
 		assert.equal(
 			workshopCacheControl([end], new Date(end.getTime() - seconds * 1000)),
