@@ -71,7 +71,7 @@ it('renders guest checkout in the public shell, defers ownership privately, and 
 				const cookie = context.request.headers.get('Cookie') ?? '';
 				const authenticated = cookie.includes('__session=');
 				context.locals.currentUser = async () => cookie.includes('__session=supporter')
-					? {id: 'clerk-supporter', publicMetadata: {stripe: {status: 'active', level: 'Bronze Tier Supporter'}}}
+					? {id: 'clerk-supporter', publicMetadata: {stripe: {status: 'active', level: 'Gold Tier Supporter'}}}
 					: authenticated ? {id: 'clerk-fixture'} : null;
 				const headers = new Headers(context.request.headers);
 				headers.set(WORKSHOP_SESSION_HEADER, hasWorkshopSessionEvidence(context.request) ? 'session' : 'anonymous');
