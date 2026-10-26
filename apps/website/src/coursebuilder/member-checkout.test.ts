@@ -72,7 +72,7 @@ const adapter: any = {
 	getEntitlementTypeByName: async () => null,
 };
 
-it('real CourseBuilder price calculation charges guests/non-supporters $300 and every active tier $250', async () => {
+it('real CourseBuilder price calculation charges only active Gold and Platinum supporters $250, everyone else $300', async () => {
 	for (const [user, expected] of [
 		[null, 300],
 		[{ publicMetadata: {} }, 300],
@@ -85,13 +85,13 @@ it('real CourseBuilder price calculation charges guests/non-supporters $300 and 
 			300,
 		],
 		...[
-			'Bronze Tier Supporter',
-			'Silver Tier Supporter',
-			'Gold Tier Supporter',
-			'Platinum Tier Supporter',
-		].map((level) => [
+			['Bronze Tier Supporter', 300],
+			['Silver Tier Supporter', 300],
+			['Gold Tier Supporter', 250],
+			['Platinum Tier Supporter', 250],
+		].map(([level, expected]) => [
 			{ publicMetadata: { stripe: { status: 'active', level } } },
-			250,
+			expected,
 		]),
 	] as const) {
 		const decision = await decideCheckoutCoupon({
@@ -313,7 +313,7 @@ it('member HTTP route preserves sign-in return URL and shares ownership/coupon g
 		const active = {
 			id: 'supporter',
 			publicMetadata: {
-				stripe: { status: 'active', level: 'Bronze Tier Supporter' },
+				stripe: { status: 'active', level: 'Gold Tier Supporter' },
 			},
 		};
 		assert.equal((await route.GET(context(memberPath, active))).status, 303);
@@ -327,7 +327,19 @@ it('member HTTP route preserves sign-in return URL and shares ownership/coupon g
 				?.includes('already-purchased'),
 			true,
 		);
-		for (const user of [null, { id: 'nonmember' }]) {
+		const silver = {
+			...active,
+			publicMetadata: {
+				stripe: { status: 'active', level: 'Silver Tier Supporter' },
+			},
+		};
+		assert.equal(
+			new URL(
+				(await route.GET(context(memberPath, silver))).headers.get('location'),
+			).searchParams.get('checkout'),
+			'supporter-required',
+		);
+		for (const user of [null, { id: 'nonmember' }, silver]) {
 			for (const query of ['usedCouponId=coupon_hw5vh', 'code=MEMBER-5E6D28']) {
 				await route.POST(
 					context(
@@ -366,7 +378,7 @@ it('member HTTP route preserves sign-in return URL and shares ownership/coupon g
 		const memberJson = await memberPrice.json();
 		assert.equal(memberJson.memberCheckoutUrl, memberPath);
 		assert.equal(memberJson.calculatedPrice, 250);
-		for (const user of [null, { id: 'nonmember' }, active]) {
+		for (const user of [null, { id: 'nonmember' }, silver, active]) {
 			const refined = await route.POST(
 				context('/api/coursebuilder/prices-formatted', user, 'POST', {
 					productId,
