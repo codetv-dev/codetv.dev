@@ -9,6 +9,8 @@
 		"preview": "astro preview",
 		"test": "node --test 'src/**/*.test.ts'",
 		"astro": "astro",
+		"typecheck": "tsrs --noEmit -p tsconfig.json",
+		"typecheck:tsc": "tsc --noEmit",
 		"db:generate": "dotenv drizzle-kit generate",
 		"db:push": "dotenv drizzle-kit push",
 		"db:studio": "dotenv drizzle-kit studio",
@@ -80,6 +82,7 @@
 		"dotenv-cli": "^7.4.4",
 		"drizzle-kit": "0.27.1",
 		"fast-check": "4.10.2",
-		"netlify-plugin-inngest": "^1.0.1"
+		"netlify-plugin-inngest": "^1.0.1",
+		"tsrs": "0.18.0-ts7.1.0-dev.20260929"
 	}
 }
