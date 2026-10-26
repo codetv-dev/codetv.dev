@@ -1,4 +1,5 @@
 import type { APIRoute } from 'astro';
+import { publicWorkshopContent } from '../../coursebuilder/workshop-lessons';
 import { and, asc, eq, or, sql } from 'drizzle-orm';
 
 import { db } from '../../db';
@@ -13,7 +14,14 @@ import {
 import { withSkill } from '../../server/with-skill';
 
 function json(body: unknown, init: ResponseInit = {}) {
-	return Response.json(body, init);
+	return Response.json(body, {
+		...init,
+		headers: {
+			'Cache-Control': 'private, no-store',
+			'Netlify-CDN-Cache-Control': 'no-store',
+			...Object.fromEntries(new Headers(init.headers)),
+		},
+	});
 }
 
 async function readJsonBody(request: Request) {
@@ -110,7 +118,7 @@ export const GET: APIRoute = async ({ request }) =>
 				return json({ ...product, merchantVerification });
 			}
 
-			return json(product);
+			return json(publicWorkshopContent(product));
 		}
 
 		const result = await db.query.products.findMany({
@@ -118,7 +126,9 @@ export const GET: APIRoute = async ({ request }) =>
 			with: productWithFullStructure,
 		});
 
-		return json(result);
+		return json(
+			canSeeInactiveProducts ? result : publicWorkshopContent(result),
+		);
 	})(request);
 
 export const POST: APIRoute = async ({ request }) =>

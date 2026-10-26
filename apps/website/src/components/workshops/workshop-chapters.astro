@@ -1,0 +1,45 @@
+---
+import {
+	getWorkshopForSale,
+	getTicketPurchase,
+} from '../../coursebuilder/workshops';
+import { getCourseBuilderUserForClerkUser } from '../../coursebuilder/users';
+import {
+	chapterUnlockLabel,
+	isChapterUnlocked,
+	privateLessonHeaders,
+} from '../../coursebuilder/workshop-lessons';
+interface Props {
+	slug: string;
+}
+const workshop = await getWorkshopForSale(Astro.props.slug);
+const clerkUser = await Astro.locals.currentUser?.();
+const viewer = await getCourseBuilderUserForClerkUser(clerkUser ?? null);
+const hasTicket = Boolean(
+	viewer &&
+	workshop &&
+	(await getTicketPurchase(viewer.id, workshop.accessProductIds)),
+);
+for (const [key, value] of Object.entries(privateLessonHeaders))
+	Astro.response.headers.set(key, value);
+const now = new Date();
+---
+
+{
+	workshop && (
+		<ol>
+			{workshop.chapters.map((chapter) => (
+				<li>
+					{hasTicket && isChapterUnlocked(chapter.startsAt, now) ? (
+						<a href={`/workshops/${workshop.slug}/${chapter.slug}`}>
+							{chapter.title}
+						</a>
+					) : (
+						<span>{chapter.title}</span>
+					)}
+					<p>{chapterUnlockLabel(chapter.startsAt)}</p>
+				</li>
+			))}
+		</ol>
+	)
+}

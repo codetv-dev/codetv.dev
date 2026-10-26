@@ -1,0 +1,136 @@
+---
+import { and, eq } from 'drizzle-orm';
+import Layout from '../../../layouts/default.astro';
+import MuxVideoPlayer from '../../../components/mux-video-player.astro';
+import {
+	getWorkshopForSale,
+	getTicketPurchase,
+} from '../../../coursebuilder/workshops';
+import { getCourseBuilderUserForClerkUser } from '../../../coursebuilder/users';
+import {
+	chapterUnlockLabel,
+	getLessonPlayback,
+	isChapterUnlocked,
+	privateLessonHeaders,
+} from '../../../coursebuilder/workshop-lessons';
+import { renderWorkshopBody } from '../../../coursebuilder/workshop-page';
+import { db } from '../../../db';
+import { contentResource } from '../../../db/schema';
+
+export const prerender = false;
+for (const [key, value] of Object.entries(privateLessonHeaders))
+	Astro.response.headers.set(key, value);
+const workshop = await getWorkshopForSale(Astro.params.slug ?? '');
+const index =
+	workshop?.chapters.findIndex(
+		(chapter) =>
+			chapter.slug === Astro.params.lesson ||
+			chapter.id === Astro.params.lesson,
+	) ?? -1;
+if (!workshop || index < 0) return Astro.rewrite('/404');
+const chapter = workshop.chapters[index];
+const clerkUser = await Astro.locals.currentUser?.();
+const viewer = await getCourseBuilderUserForClerkUser(clerkUser ?? null);
+const hasTicket = Boolean(
+	viewer && (await getTicketPurchase(viewer.id, workshop.accessProductIds)),
+);
+const now = new Date();
+const unlocked = isChapterUnlocked(chapter.startsAt, now);
+let body: string | null = null;
+const playback = await getLessonPlayback({
+	hasTicket,
+	startsAt: chapter.startsAt,
+	now,
+	loadVideo: async () => {
+		const lesson = await db.query.contentResource.findFirst({
+			where: and(
+				eq(contentResource.id, chapter.id),
+				eq(contentResource.type, 'lesson'),
+			),
+			with: { resources: { with: { resource: true } } },
+		});
+		const fields = (lesson?.fields ?? {}) as Record<string, unknown>;
+		body = typeof fields.body === 'string' ? fields.body : null;
+		if (typeof fields.videoResourceId !== 'string') {
+			return (
+				lesson?.resources.find(
+					(link) => link.resource?.type === 'videoResource',
+				)?.resource?.fields ?? null
+			);
+		}
+		const video = await db.query.contentResource.findFirst({
+			where: and(
+				eq(contentResource.id, fields.videoResourceId),
+				eq(contentResource.type, 'videoResource'),
+			),
+		});
+		return video?.fields ?? null;
+	},
+});
+const sections = renderWorkshopBody(body);
+const previous = workshop.chapters[index - 1];
+const next = workshop.chapters[index + 1];
+const path = `/workshops/${workshop.slug}`;
+---
+
+<Layout title={`${chapter.title} | ${workshop.title}`}>
+	<main style="max-width: 72rem; margin: 3rem auto; padding: 1rem;">
+		<a href={path}>{workshop.title}</a>
+		<h1>{chapter.title}</h1>
+		{
+			!hasTicket ? (
+				<p>
+					<a href={`${path}#ticket`}>Get a ticket</a> to watch this workshop.{' '}
+					{!clerkUser && (
+						<a
+							href={`/dashboard/sign-in?redirect_url=${encodeURIComponent(Astro.url.pathname)}`}
+						>
+							Sign in
+						</a>
+					)}
+				</p>
+			) : !unlocked ? (
+				<p>{chapterUnlockLabel(chapter.startsAt)}</p>
+			) : (
+				<>
+					{playback ? (
+						<MuxVideoPlayer
+							playback_ids={[playback]}
+							title={chapter.title}
+							publish_date={chapter.startsAt}
+							autoplay={false}
+							workshopAccess={true}
+						/>
+					) : (
+						<p>The video is not available yet.</p>
+					)}
+					<article>
+						{sections.map((section) => (
+							<section>
+								{section.headingHtml && <h2 set:html={section.headingHtml} />}
+								<div set:html={section.bodyHtml} />
+							</section>
+						))}
+					</article>
+				</>
+			)
+		}
+		<nav aria-label="Lessons">
+			{
+				previous && (
+					<a rel="prev" href={`${path}/${previous.slug}`}>
+						Previous: {previous.title}
+					</a>
+				)
+			}
+			{' '}
+			{
+				next && (
+					<a rel="next" href={`${path}/${next.slug}`}>
+						Next: {next.title}
+					</a>
+				)
+			}
+		</nav>
+	</main>
+</Layout>

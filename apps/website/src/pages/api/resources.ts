@@ -1,4 +1,5 @@
 import type { APIRoute } from 'astro';
+import { publicWorkshopContent } from '../../coursebuilder/workshop-lessons';
 import { and, eq, or } from 'drizzle-orm';
 
 import { db } from '../../db';
@@ -7,7 +8,14 @@ import { getUserAbilityForRequest } from '../../server/ability';
 import { withSkill } from '../../server/with-skill';
 
 function json(body: unknown, init: ResponseInit = {}) {
-	return Response.json(body, init);
+	return Response.json(body, {
+		...init,
+		headers: {
+			'Cache-Control': 'private, no-store',
+			'Netlify-CDN-Cache-Control': 'no-store',
+			...Object.fromEntries(new Headers(init.headers)),
+		},
+	});
 }
 
 function slugify(value: string) {
@@ -52,7 +60,11 @@ export const GET: APIRoute = async ({ request }) =>
 			return json({ error: 'Resource not found' }, { status: 404 });
 		}
 
-		return json(resource);
+		return json(
+			ability.can('update', 'Content')
+				? resource
+				: publicWorkshopContent(resource),
+		);
 	})(request);
 
 export const POST: APIRoute = async ({ request }) =>

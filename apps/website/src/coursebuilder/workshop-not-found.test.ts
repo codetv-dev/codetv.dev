@@ -33,6 +33,9 @@ it('renders guest checkout in the public shell, defers ownership privately, and 
 		);
 		for (const path of [
 			'pages/workshops/[slug].astro',
+			'pages/workshops/[slug]/[lesson].astro',
+			'components/workshops/workshop-chapters.astro',
+			'coursebuilder/workshop-lessons.ts',
 			'pages/404.astro',
 			'components/workshops/workshop-ticket.astro',
 			'components/workshops/workshop-pricing.tsx',
@@ -89,7 +92,9 @@ it('renders guest checkout in the public shell, defers ownership privately, and 
 				seoTitle: slug === 'sample' ? 'Sample SEO title' : null,
 				seoDescription: slug === 'sample' ? 'Sample SEO description' : null,
 				body: slug === 'sample' ? 'Intro **text**.\\n\\n## Sample section\\n\\n- Sample item\\n\\n## FAQ\\n\\nSample answer. <script>unsafe()</script>' : ' ',
-				outline: [], ticket: slug === 'sample' ? {
+				outline: [], accessProductIds: ['product-4gmhd'],
+				chapters: [{id: 'released', slug: 'released', title: 'Released chapter', startsAt: '2020-11-09T08:00:00Z'}, {id: 'future', slug: 'future', title: 'Future chapter', startsAt: '2099-11-10T08:00:00Z'}],
+				ticket: slug === 'sample' ? {
 					productId: 'product-4gmhd', cohort: null,
 					enrollment: { state: 'open', opensAt: new Date('2026-09-01T00:00:00Z'), closesAt: new Date('2026-11-16T00:00:00Z') },
 				} : null,
@@ -97,6 +102,18 @@ it('renders guest checkout in the public shell, defers ownership privately, and 
 			export const getTicketPurchase = async (userId) => userId === 'test-viewer' ? {id: 'purchase-fixture'} : null;
 			export const resolveCouponCode = async () => { throw new Error('Shell must not resolve a coupon'); };
 		`,
+		);
+		await fixture(
+			'src/components/mux-video-player.astro',
+			'---\nconst {playback_ids} = Astro.props;\n---\n<mux-player playback-id={playback_ids[0].id} />',
+		);
+		await fixture(
+			'src/db/schema.ts',
+			`import { mysqlTable, varchar } from 'drizzle-orm/mysql-core'; export const contentResource = mysqlTable('ContentResource', {id: varchar('id', {length: 255}), type: varchar('type', {length: 255})});`,
+		);
+		await fixture(
+			'src/db/index.ts',
+			`export const db = {query: {contentResource: {findFirst: async () => ({fields: {body: 'EXERCISE_FIXTURE', videoResourceId: 'video-fixture', playback_ids: [{id: 'SIGNED_PLAYBACK_FIXTURE', policy: 'signed'}]}})}}};`,
 		);
 		server = await dev({
 			root,
@@ -208,6 +225,44 @@ it('renders guest checkout in the public shell, defers ownership privately, and 
 			ownerShell.headers.get('Netlify-CDN-Cache-Control'),
 			'no-store',
 		);
+
+		// Exercise the real lesson route and its purchase/release gate, not markup.
+		for (const [lesson, cookie, expected] of [
+			['released', '', false],
+			['future', '__session=fixture', false],
+			['released', '__session=fixture', true],
+		] as const) {
+			const response = await fetch(`${base}/workshops/sample/${lesson}`, {
+				headers: { Cookie: cookie },
+			});
+			const output = await response.text();
+			assert.equal(response.status, 200, output);
+			assert.equal(output.includes('SIGNED_PLAYBACK_FIXTURE'), expected);
+			assert.equal(output.includes('EXERCISE_FIXTURE'), expected);
+			assert.equal(
+				response.headers.get('Netlify-CDN-Cache-Control'),
+				'no-store',
+			);
+		}
+		assert.doesNotMatch(
+			html,
+			/SIGNED_PLAYBACK_FIXTURE|EXERCISE_FIXTURE|test-viewer|You have a ticket/,
+		);
+		const chapterIslandPath = html.match(
+			/href="([^"]*\/_server-islands\/WorkshopChapters[^"]*)"/,
+		)?.[1];
+		assert.ok(chapterIslandPath);
+		const chapterIsland = await fetch(
+			new URL(chapterIslandPath.replaceAll('&amp;', '&'), base),
+			{ headers: { Cookie: '__session=fixture' } },
+		);
+		assert.equal(
+			chapterIsland.headers.get('Cache-Control'),
+			'private, no-store',
+		);
+		const chapterOutput = await chapterIsland.text();
+		assert.match(chapterOutput, /href="\/workshops\/sample\/released"/);
+		assert.doesNotMatch(chapterOutput, /href="\/workshops\/sample\/future"/);
 
 		const fallback = await fetch(`${base}/workshops/empty`);
 		const fallbackHtml = await fallback.text();

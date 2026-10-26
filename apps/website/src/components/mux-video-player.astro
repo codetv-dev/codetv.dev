@@ -12,6 +12,8 @@ import Heart from './heart.astro';
 export const prerender = false;
 
 export interface Props {
+	/** Server-only: caller has checked workshop purchase and release time. */
+	workshopAccess?: boolean;
 	playback_ids: Array<{ id: string; policy: 'public' | 'signed' }>;
 	thumbnail?: {
 		public_id: string | null;
@@ -39,15 +41,14 @@ const mux = new Mux({
 
 let user;
 try {
-	user = await Astro.locals.currentUser();
+	user = Astro.props.workshopAccess ? undefined : await Astro.locals.currentUser();
 } catch (e) {
 	user = undefined;
 }
 
-console.log(user);
-
+// Workshop authorization is independent of the supporter subscription.
 // @ts-ignore
-const isSubscriber = user && user?.publicMetadata?.stripe?.status === 'active';
+const isSubscriber = Astro.props.workshopAccess || (user && user?.publicMetadata?.stripe?.status === 'active');
 
 const {
 	playback_ids,
@@ -61,7 +62,7 @@ const {
 } = Astro.props;
 
 const signedPlayback = playback_ids.find((pid) => pid.policy === 'signed');
-const publicPlayback = playback_ids.find((pid) => pid.policy === 'public');
+const publicPlayback = Astro.props.workshopAccess ? undefined : playback_ids.find((pid) => pid.policy === 'public');
 
 let videoPlaybackToken, thumbnailPlaybackToken, storyboardPlaybackToken;
 if (isSubscriber && signedPlayback) {
@@ -88,9 +89,15 @@ const headers = new CacheHeaders()
 		`video-${publicPlayback?.id}${signedPlayback?.id}-${user?.id}`,
 	]);
 
-headers.forEach((value, key) => {
-	Astro.response.headers.set(key, value);
-});
+if (Astro.props.workshopAccess) {
+	Astro.response.headers.set('Cache-Control', 'private, no-store');
+	Astro.response.headers.set('Netlify-CDN-Cache-Control', 'no-store');
+	Astro.response.headers.set('CDN-Cache-Control', 'no-store');
+} else {
+	headers.forEach((value, key) => {
+		Astro.response.headers.set(key, value);
+	});
+}
 
 let thumbnailSrc;
 

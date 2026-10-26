@@ -1,4 +1,5 @@
 import type { APIRoute } from 'astro';
+import { publicWorkshopContent } from '../../../coursebuilder/workshop-lessons';
 import { and, asc, eq, max } from 'drizzle-orm';
 
 import { db } from '../../../db';
@@ -7,7 +8,14 @@ import { getUserAbilityForRequest } from '../../../server/ability';
 import { withSkill } from '../../../server/with-skill';
 
 function json(body: unknown, init: ResponseInit = {}) {
-	return Response.json(body, init);
+	return Response.json(body, {
+		...init,
+		headers: {
+			'Cache-Control': 'private, no-store',
+			'Netlify-CDN-Cache-Control': 'no-store',
+			...Object.fromEntries(new Headers(init.headers)),
+		},
+	});
 }
 
 function isObject(value: unknown): value is Record<string, unknown> {
@@ -29,7 +37,11 @@ export const GET: APIRoute = async ({ request }) =>
 			orderBy: asc(contentResourceResource.position),
 		});
 
-		return json({ parentId, count: edges.length, edges });
+		const { ability } = await getUserAbilityForRequest(request);
+		const result = { parentId, count: edges.length, edges };
+		return json(
+			ability.can('update', 'Content') ? result : publicWorkshopContent(result),
+		);
 	})(request);
 
 export const POST: APIRoute = async ({ request }) =>

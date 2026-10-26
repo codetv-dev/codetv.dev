@@ -1,4 +1,5 @@
 import type { APIRoute } from 'astro';
+import { publicWorkshopContent } from '../../coursebuilder/workshop-lessons';
 import { and, desc, eq, or } from 'drizzle-orm';
 
 import { db } from '../../db';
@@ -7,7 +8,14 @@ import { getUserAbilityForRequest } from '../../server/ability';
 import { withSkill } from '../../server/with-skill';
 
 function json(body: unknown, init: ResponseInit = {}) {
-	return Response.json(body, init);
+	return Response.json(body, {
+		...init,
+		headers: {
+			'Cache-Control': 'private, no-store',
+			'Netlify-CDN-Cache-Control': 'no-store',
+			...Object.fromEntries(new Headers(init.headers)),
+		},
+	});
 }
 
 function isPublicLesson(lesson: typeof contentResource.$inferSelect) {
@@ -26,7 +34,10 @@ export const GET: APIRoute = async ({ request }) =>
 			const lesson = await db.query.contentResource.findFirst({
 				where: and(
 					eq(contentResource.type, 'lesson'),
-					or(eq(contentResource.id, slugOrId), eq(contentResource.slug, slugOrId)),
+					or(
+						eq(contentResource.id, slugOrId),
+						eq(contentResource.slug, slugOrId),
+					),
 				),
 				with: {
 					resources: {
@@ -42,7 +53,7 @@ export const GET: APIRoute = async ({ request }) =>
 				return json({ error: 'Lesson not found' }, { status: 404 });
 			}
 
-			return json(lesson);
+			return json(canManageContent ? lesson : publicWorkshopContent(lesson));
 		}
 
 		const lessons = await db.query.contentResource.findMany({
@@ -54,7 +65,9 @@ export const GET: APIRoute = async ({ request }) =>
 		return json(
 			canManageContent
 				? lessons
-				: lessons.filter((lesson) => isPublicLesson(lesson)),
+				: publicWorkshopContent(
+						lessons.filter((lesson) => isPublicLesson(lesson)),
+					),
 		);
 	})(request);
 
@@ -71,7 +84,10 @@ export const PUT: APIRoute = async ({ request }) =>
 		if (!id) return json({ error: 'Missing lesson ID' }, { status: 400 });
 
 		const lesson = await db.query.contentResource.findFirst({
-			where: and(eq(contentResource.id, id), eq(contentResource.type, 'lesson')),
+			where: and(
+				eq(contentResource.id, id),
+				eq(contentResource.type, 'lesson'),
+			),
 		});
 
 		if (!lesson) return json({ error: 'Lesson not found' }, { status: 404 });
