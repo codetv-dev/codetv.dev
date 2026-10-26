@@ -78,6 +78,7 @@ export default async function () {
 				);
 				await postReconcileAlert(missing, {
 					url: process.env.RECONCILE_ALERT_WEBHOOK_URL,
+					key: process.env.RECONCILE_ALERT_WEBHOOK_KEY,
 				});
 			},
 			nowSeconds,

@@ -59,11 +59,15 @@ export function missingCheckout(
 	};
 }
 
-/** Best-effort Slack/Discord notification. Never log the webhook URL or provider error text. */
+/**
+ * Best-effort alert to a Slack/Discord webhook, or the ShitRat chat webhook when
+ * `key` is set (sent as a bearer token). Never log the URL, key or provider error text.
+ */
 export async function postReconcileAlert(
 	missing: MissingCheckout,
 	options: {
 		url?: string;
+		key?: string;
 		fetch?: typeof fetch;
 		log?: (event: string, fields: Record<string, unknown>) => void;
 	},
@@ -76,8 +80,20 @@ export async function postReconcileAlert(
 	try {
 		const response = await (options.fetch ?? fetch)(options.url, {
 			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ text: msg, content: msg }),
+			headers: {
+				'Content-Type': 'application/json',
+				...(options.key ? { Authorization: `Bearer ${options.key}` } : {}),
+			},
+			// text/content for Slack and Discord; message/event/source for ShitRat.
+			body: JSON.stringify({
+				text: msg,
+				content: msg,
+				message: msg,
+				event: 'needs_joel',
+				source: 'codetv-reconcile',
+				links: [],
+				ts: new Date().toISOString(),
+			}),
 			signal: AbortSignal.timeout(5000),
 		});
 		if (!response.ok)
