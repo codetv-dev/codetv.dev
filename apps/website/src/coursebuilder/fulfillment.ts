@@ -56,6 +56,43 @@ function createInlineStep(dispatch: (event: CommerceEvent) => Promise<void>) {
 	};
 }
 
+/**
+ * Stripe only emails a receipt when `receipt_email` is set on the
+ * PaymentIntent, and this account doesn't send them automatically. Guest
+ * checkout means the email is only known once Stripe has collected it, so set
+ * it here, after the purchase is recorded.
+ *
+ * - Skips when the PaymentIntent already has `receipt_email` (webhook retry,
+ *   or an email set at session creation) so the buyer gets one receipt.
+ * - Never throws: the ticket matters more than the receipt.
+ */
+async function sendReceipt(
+	paymentProvider: PaymentsProviderConfig,
+	session: Record<string, any> | undefined,
+) {
+	const checkoutSessionId = session?.id;
+	const email = session?.customer_details?.email;
+	try {
+		if (!session?.payment_intent || !email) return;
+		const adapter = paymentProvider.options.paymentsAdapter as any;
+		const paymentIntentId =
+			typeof session.payment_intent === 'string'
+				? session.payment_intent
+				: session.payment_intent.id;
+		const paymentIntent =
+			await adapter.stripe.paymentIntents.retrieve(paymentIntentId);
+		if (paymentIntent.receipt_email) return;
+		await adapter.stripe.paymentIntents.update(paymentIntentId, {
+			receipt_email: email,
+		});
+	} catch (error) {
+		console.error('commerce.receipt.failed', {
+			checkoutSessionId,
+			error: error instanceof Error ? error.message : String(error),
+		});
+	}
+}
+
 export function createInlineCommerceEvents(context: InlineCommerceContext) {
 	async function dispatch(event: CommerceEvent): Promise<void> {
 		switch (event.name) {
@@ -87,6 +124,11 @@ export function createInlineCommerceEvents(context: InlineCommerceContext) {
 					emailProvider: undefined,
 					getAuthConfig: () => ({}),
 				} as any)) as { txnId?: string; purchase?: { id: string } } | undefined;
+
+				await sendReceipt(
+					paymentProvider,
+					event.data?.stripeEvent?.data?.object,
+				);
 
 				console.info('commerce.fulfillment.completed', {
 					txnId: result?.txnId,
