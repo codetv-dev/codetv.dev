@@ -1,6 +1,7 @@
 import { and, asc, eq, inArray, isNull, or } from 'drizzle-orm';
 
 import { courseBuilderAdapter, db } from '../db';
+import type { Chapter } from './workshop-lessons';
 import {
 	contentResource,
 	contentResourceResource,
@@ -39,6 +40,8 @@ export type WorkshopForSale = {
 	seoTitle: string | null;
 	seoDescription: string | null;
 	outline: Array<{ id: string; type: string; title: string }>;
+	chapters: Chapter[];
+	accessProductIds: string[];
 	ticket: WorkshopTicket | null;
 };
 
@@ -117,7 +120,16 @@ export async function getWorkshopForSale(
 		),
 		with: {
 			resources: {
-				with: { resource: true },
+				with: {
+					resource: {
+						with: {
+							resources: {
+								with: { resource: true },
+								orderBy: asc(contentResourceResource.position),
+							},
+						},
+					},
+				},
 				orderBy: asc(contentResourceResource.position),
 			},
 			resourceProducts: {
@@ -181,6 +193,35 @@ export async function getWorkshopForSale(
 				type: resource.type,
 				title: ((resource.fields ?? {}) as Fields).title ?? 'Untitled',
 			})),
+		accessProductIds: candidates.map(({ ticket }) => ticket.productId),
+		chapters: workshop.resources.flatMap((link) => {
+			const resource = link.resource;
+			if (!resource) return [];
+			const lessons =
+				resource.type === 'section'
+					? resource.resources.map((child) => child.resource)
+					: [resource];
+			return lessons
+				.filter(
+					(lesson) =>
+						lesson?.type === 'lesson' &&
+						(lesson.fields as Fields)?.state === 'published',
+				)
+				.map((lesson) => {
+					const lessonFields = (lesson.fields ?? {}) as Fields;
+					const startsAt =
+						lessonFields.startsAt ??
+						(resource.type === 'section'
+							? (resource.fields as Fields)?.startsAt
+							: null);
+					return {
+						id: lesson.id,
+						slug: lesson.slug ?? lessonFields.slug ?? lesson.id,
+						title: lessonFields.title ?? 'Lesson',
+						startsAt: typeof startsAt === 'string' ? startsAt : null,
+					};
+				});
+		}),
 		ticket: pickCurrentTicket(candidates)?.ticket ?? null,
 	};
 }

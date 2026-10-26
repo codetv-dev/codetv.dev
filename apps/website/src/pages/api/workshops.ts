@@ -1,4 +1,5 @@
 import type { APIRoute } from 'astro';
+import { publicWorkshopContent } from '../../coursebuilder/workshop-lessons';
 import { asc, desc, eq, or, and } from 'drizzle-orm';
 import { z } from 'zod';
 
@@ -50,7 +51,14 @@ const WorkshopCreateSchema = z.object({
 });
 
 function json(body: unknown, init: ResponseInit = {}) {
-	return Response.json(body, init);
+	return Response.json(body, {
+		...init,
+		headers: {
+			'Cache-Control': 'private, no-store',
+			'Netlify-CDN-Cache-Control': 'no-store',
+			...Object.fromEntries(new Headers(init.headers)),
+		},
+	});
 }
 
 function isVisibleWorkshop(
@@ -120,7 +128,7 @@ export const GET: APIRoute = async ({ request }) =>
 				return json({ error: 'Workshop not found' }, { status: 404 });
 			}
 
-			return json(workshop);
+			return json(canSeeDrafts ? workshop : publicWorkshopContent(workshop));
 		}
 
 		const workshops = await db.query.contentResource.findMany({
@@ -138,8 +146,10 @@ export const GET: APIRoute = async ({ request }) =>
 		return json(
 			canSeeDrafts
 				? workshops
-				: workshops.filter((workshop) =>
-						isVisibleWorkshop(workshop, canSeeDrafts),
+				: publicWorkshopContent(
+						workshops.filter((workshop) =>
+							isVisibleWorkshop(workshop, canSeeDrafts),
+						),
 					),
 		);
 	})(request);

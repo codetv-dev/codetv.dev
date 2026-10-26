@@ -1,5 +1,7 @@
 ---
 import WorkshopTicket from '../../components/workshops/workshop-ticket.astro';
+import WorkshopChapters from '../../components/workshops/workshop-chapters.astro';
+import { chapterUnlockLabel } from '../../coursebuilder/workshop-lessons';
 import Layout from '../../layouts/default.astro';
 import Block from '../../components/design-system/block.astro';
 import { WorkshopPricing } from '../../components/workshops/workshop-pricing';
@@ -122,6 +124,28 @@ const included = [
 					/>
 				</Block>
 			))
+		}
+
+		{
+			workshop.chapters.length > 0 && (
+				<Block variant="two-column-asymmetrical" name="chapters">
+					<div class="heading">
+						<h2>Chapters</h2>
+					</div>
+					<div class="copy-block">
+						<WorkshopChapters server:defer slug={workshop.slug}>
+							<ol slot="fallback">
+								{workshop.chapters.map((chapter) => (
+									<li>
+										{chapter.title}
+										<p>{chapterUnlockLabel(chapter.startsAt)}</p>
+									</li>
+								))}
+							</ol>
+						</WorkshopChapters>
+					</div>
+				</Block>
+			)
 		}
 
 		<Block variant="two-column-asymmetrical" emphasized name="ticket">
