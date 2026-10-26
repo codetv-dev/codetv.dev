@@ -146,10 +146,10 @@ describe('paid checkout reconciliation fixtures', () => {
 						});
 						const msg =
 							'CodeTV paid checkout with no ticket: session cs_test_fixture, product workshop-ticket, paid 10 min ago';
-						assert.deepEqual(JSON.parse(String(init?.body)), {
-							text: msg,
-							content: msg,
-						});
+						const body = JSON.parse(String(init?.body));
+						assert.equal(body.text, msg);
+						assert.equal(body.content, msg);
+						assert.equal(body.message, msg);
 						assert.ok(init?.signal instanceof AbortSignal);
 						return new Response(null, { status: 204 });
 					},
@@ -159,6 +159,24 @@ describe('paid checkout reconciliation fixtures', () => {
 		} finally {
 			AbortSignal.timeout = timeout;
 		}
+	});
+	it('sends the ShitRat bearer key only when one is configured', async () => {
+		let headers: HeadersInit | undefined;
+		await postReconcileAlert(
+			{ sessionId: session.id, productId: 'workshop-ticket', ageSeconds: 659 },
+			{
+				url: 'https://example.invalid/synthetic-webhook',
+				key: 'synthetic-key',
+				fetch: async (_url, init) => {
+					headers = init?.headers;
+					return new Response(null, { status: 204 });
+				},
+			},
+		);
+		assert.deepEqual(headers, {
+			'Content-Type': 'application/json',
+			Authorization: 'Bearer synthetic-key',
+		});
 	});
 	it('webhook transport, timeout and HTTP failures do not break the sweep or leak the URL', async () => {
 		for (const failure of ['network', 'timeout', 'http']) {
