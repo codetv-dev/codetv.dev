@@ -85,7 +85,7 @@ function fakeStripeCheckoutSession() {
 	};
 }
 
-function setup() {
+function setup(options: { receiptEmail?: string; updateError?: Error } = {}) {
 	const calls: Record<string, unknown[]> = {};
 	const record = (name: string, value: unknown) => {
 		(calls[name] ??= []).push(value);
@@ -133,6 +133,18 @@ function setup() {
 					record('getCheckoutSession', id);
 					return fakeStripeCheckoutSession();
 				},
+				stripe: {
+					paymentIntents: {
+						retrieve: async (id: string) => ({
+							id,
+							receipt_email: options.receiptEmail ?? null,
+						}),
+						update: async (id: string, params: unknown) => {
+							record('paymentIntentUpdate', { id, params });
+							if (options.updateError) throw options.updateError;
+						},
+					},
+				},
 			},
 		},
 	};
@@ -173,6 +185,34 @@ describe('createInlineCommerceEvents', () => {
 		assert.equal(purchase.checkoutSessionId, checkoutSessionId);
 		assert.equal(purchase.usedCouponId, 'coupon_early_bird');
 		assert.equal(purchase.quantity, 1);
+	});
+
+	it('emails the buyer a Stripe receipt by setting receipt_email once', async () => {
+		const { events, calls } = setup();
+		await events.send({
+			name: 'stripe/checkout-session-completed',
+			data: { stripeEvent: checkoutSessionCompletedEvent('payment') },
+		});
+		assert.deepEqual(calls.paymentIntentUpdate, [
+			{ id: 'pi_test_1', params: { receipt_email: 'viewer@example.com' } },
+		]);
+
+		// A webhook retry sees receipt_email already set and doesn't resend.
+		const retry = setup({ receiptEmail: 'viewer@example.com' });
+		await retry.events.send({
+			name: 'stripe/checkout-session-completed',
+			data: { stripeEvent: checkoutSessionCompletedEvent('payment') },
+		});
+		assert.equal(retry.calls.paymentIntentUpdate, undefined);
+	});
+
+	it('still fulfils the purchase when the receipt update fails', async () => {
+		const { events, calls } = setup({ updateError: new Error('stripe down') });
+		await events.send({
+			name: 'stripe/checkout-session-completed',
+			data: { stripeEvent: checkoutSessionCompletedEvent('payment') },
+		});
+		assert.equal(calls.createMerchantChargeAndPurchase?.length, 1);
 	});
 
 	it('ignores subscription checkouts, like the Inngest trigger does', async () => {
