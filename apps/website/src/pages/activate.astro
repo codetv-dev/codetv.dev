@@ -44,11 +44,12 @@ const clerkUser = await Astro.locals.currentUser?.();
 		const response = await fetch('/api/trpc/deviceVerification.verify', {
 			method: 'POST',
 			headers: { 'content-type': 'application/json' },
-			body: JSON.stringify({ json: { userCode } }),
+			// The tRPC router has no transformer, so input is plain JSON.
+			body: JSON.stringify({ userCode }),
 		});
 		const payload = await response.json();
-		const result = payload?.result?.data?.json ?? payload?.result?.data;
-		const nextStatus = result?.status ?? 'unknown';
+		const result = payload?.result?.data;
+		const nextStatus = result?.status ?? payload?.error?.data?.code ?? 'unknown';
 
 		if (status) {
 			status.textContent =
