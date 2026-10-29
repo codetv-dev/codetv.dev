@@ -6,6 +6,8 @@ import {
 	stripeCheckoutSessionComplete,
 } from '@coursebuilder/core/inngest/stripe/event-checkout-session-completed';
 import type { PaymentsProviderConfig } from '@coursebuilder/core/types';
+import { workshopKit } from './kit-workshops.ts';
+import { workshopMarketing } from './workshop-interest.ts';
 
 /**
  * In-process stand-in for the Inngest client that CourseBuilder core expects
@@ -22,8 +24,7 @@ import type { PaymentsProviderConfig } from '@coursebuilder/core/types';
  * - `createMerchantChargeAndPurchase` is idempotent on the Stripe charge, so a
  *   retried delivery returns the existing purchase.
  *
- * TODO: move to a real Inngest function when post-purchase work lands
- * (emails, Discord role, Kit sync). Port
+ * TODO: move to a real Inngest function for durable post-purchase retries. Port
  * `ai-hero/apps/ai-hero/src/inngest/functions/post-purchase-workflow.ts` and
  * register core's `stripeCheckoutSessionComplete` with
  * `createInngestMiddleware` instead of this runner.
@@ -138,8 +139,38 @@ export function createInlineCommerceEvents(context: InlineCommerceContext) {
 				return;
 			}
 			case NEW_PURCHASE_CREATED_EVENT:
-				// TODO: post-purchase email, Discord role and Kit sync. Port
-				// ai-hero/apps/ai-hero/src/inngest/functions/post-purchase-workflow.ts.
+				try {
+					const adapter = context.getAdapter();
+					const purchase = await adapter.getPurchase(event.data?.purchaseId);
+					if (!purchase) throw new Error('Purchase not found for Kit sync');
+					const product = await adapter.getProduct(purchase.productId);
+					const config =
+						workshopMarketing[
+							purchase.productId as keyof typeof workshopMarketing
+						];
+					if (
+						!config &&
+						product?.type !== 'cohort' &&
+						product?.type !== 'workshop'
+					)
+						return;
+					const user = await adapter.getUserById(purchase.userId);
+					const slug = config?.productSlug ?? product?.fields?.slug;
+					if (!user?.email || !slug)
+						throw new Error('Buyer email or workshop slug missing');
+					await workshopKit().purchase({
+						email: user.email,
+						productId: purchase.productId,
+						slug,
+						purchasedAt: new Date(purchase.createdAt),
+					});
+				} catch (error) {
+					// The ticket matters more than the tag. Never send welcome mail here.
+					console.error('commerce.kit-sync.failed', {
+						purchaseId: event.data?.purchaseId,
+						error: error instanceof Error ? error.message : String(error),
+					});
+				}
 				console.info('commerce.purchase.created', {
 					txnId: event.data?.txnId,
 					purchaseId: event.data?.purchaseId,

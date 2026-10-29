@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { describe, it } from 'node:test';
+import { describe, it, mock } from 'node:test';
 
 import { createInlineCommerceEvents } from './fulfillment.ts';
 
@@ -85,7 +85,13 @@ function fakeStripeCheckoutSession() {
 	};
 }
 
-function setup(options: { receiptEmail?: string; updateError?: Error } = {}) {
+function setup(
+	options: {
+		receiptEmail?: string;
+		updateError?: Error;
+		kitPurchase?: boolean;
+	} = {},
+) {
 	const calls: Record<string, unknown[]> = {};
 	const record = (name: string, value: unknown) => {
 		(calls[name] ??= []).push(value);
@@ -99,6 +105,16 @@ function setup(options: { receiptEmail?: string; updateError?: Error } = {}) {
 	const adapter = {
 		getMerchantAccount: async () => ({ id: 'ctv-stripe-merchant-account' }),
 		getUserByEmail: async () => user,
+		getUserById: async () => user,
+		getPurchase: async () =>
+			options.kitPurchase
+				? {
+						id: 'purch_1',
+						productId: 'product-4gmhd',
+						userId: user.id,
+						createdAt: new Date('2026-10-29T12:00:00Z'),
+					}
+				: null,
 		getPurchaseForStripeCharge: async () => null,
 		getPurchasesForUser: async () => [],
 		findOrCreateUser: async (email: string) => {
@@ -213,6 +229,35 @@ describe('createInlineCommerceEvents', () => {
 			data: { stripeEvent: checkoutSessionCompletedEvent('payment') },
 		});
 		assert.equal(calls.createMerchantChargeAndPurchase?.length, 1);
+	});
+
+	it('still fulfils and sends the receipt when Kit is unavailable, without leaking fetch error URLs', async () => {
+		const oldSecret = process.env.KIT_SECRET_KEY;
+		process.env.KIT_SECRET_KEY = 'fixture-secret';
+		const fetchMock = mock.method(globalThis, 'fetch', async () => {
+			throw new Error('failed URL with api_secret=fixture-secret');
+		});
+		const logs = mock.method(console, 'error', () => {});
+		try {
+			const { events, calls } = setup({ kitPurchase: true });
+			await events.send({
+				name: 'stripe/checkout-session-completed',
+				data: { stripeEvent: checkoutSessionCompletedEvent('payment') },
+			});
+			assert.equal(calls.createMerchantChargeAndPurchase?.length, 1);
+			assert.equal(calls.paymentIntentUpdate?.length, 1);
+			assert.ok(
+				logs.mock.calls.some(
+					(call) => call.arguments[0] === 'commerce.kit-sync.failed',
+				),
+			);
+			assert.doesNotMatch(JSON.stringify(logs.mock.calls), /fixture-secret/);
+		} finally {
+			fetchMock.mock.restore();
+			logs.mock.restore();
+			if (oldSecret === undefined) delete process.env.KIT_SECRET_KEY;
+			else process.env.KIT_SECRET_KEY = oldSecret;
+		}
 	});
 
 	it('ignores subscription checkouts, like the Inngest trigger does', async () => {

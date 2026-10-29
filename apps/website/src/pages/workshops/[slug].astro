@@ -195,7 +195,7 @@ const included = [
 								couponId={null}
 								canCheckout={true}
 								hasTicket={false}
-								checkoutNotice={Astro.url.searchParams.get('checkout')}
+								checkoutNotice={null}
 								returnUrl={returnUrl.toString()}
 								devCountry={
 									import.meta.env.DEV
@@ -240,6 +240,11 @@ const included = [
 		}
 	</main>
 </Layout>
+
+<script>
+	import { watchWorkshopInterest } from '../../components/workshops/workshop-interest';
+	document.addEventListener('astro:page-load', watchWorkshopInterest);
+</script>
 
 <style>
 	/* The cached shell can sell to guests immediately. Only the private island
