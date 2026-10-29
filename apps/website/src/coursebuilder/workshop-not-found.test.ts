@@ -39,6 +39,8 @@ it('renders guest checkout in the public shell, defers ownership privately, and 
 			'pages/404.astro',
 			'components/workshops/workshop-ticket.astro',
 			'components/workshops/workshop-pricing.tsx',
+			'components/workshops/workshop-interest.ts',
+			'coursebuilder/workshop-interest.ts',
 			'components/design-system/block.astro',
 			'coursebuilder/workshop-page.ts',
 			'coursebuilder/workshop-cache.ts',
@@ -168,10 +170,15 @@ it('renders guest checkout in the public shell, defers ownership privately, and 
 			/public, durable/,
 		);
 
-		const coded = await fetch(`${base}/workshops/sample?code=fixture-member`);
+		const coded = await fetch(
+			`${base}/workshops/sample?code=fixture-member&ck_subscriber_id=987654321&checkout=fixture-notice`,
+		);
 		const codedHtml = await coded.text();
 		assert.match(codedHtml, /\$300/);
-		assert.doesNotMatch(codedHtml, /fixture-member|usedCouponId=/);
+		assert.doesNotMatch(
+			codedHtml,
+			/fixture-member|987654321|fixture-notice|usedCouponId=/,
+		);
 
 		const islandPath = html.match(
 			/href="([^"]*\/_server-islands\/WorkshopTicket[^"]*)"/,

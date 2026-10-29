@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 
 import type { EnrollmentState } from '../../coursebuilder/enrollment';
+import { trackWorkshopInterest } from './workshop-interest';
 
 /**
  * Pricing block for a Workshop Ticket.
@@ -107,6 +108,14 @@ export function WorkshopPricing({
 	const [ppp, setPpp] = useState(false);
 	const [loading, setLoading] = useState(!initialPrice);
 	const [failed, setFailed] = useState(false);
+	const [clientNotice, setClientNotice] = useState(checkoutNotice);
+
+	useEffect(() => {
+		setClientNotice(
+			new URLSearchParams(window.location.search).get('checkout') ??
+				checkoutNotice,
+		);
+	}, [checkoutNotice]);
 
 	useEffect(() => {
 		const urlCode = new URLSearchParams(window.location.search).get('code');
@@ -196,7 +205,7 @@ export function WorkshopPricing({
 
 	const opensAt = enrollment.opensAt ? new Date(enrollment.opensAt) : null;
 	const closesAt = enrollment.closesAt ? new Date(enrollment.closesAt) : null;
-	const noticeKey = checkoutNotice ?? price?.checkoutNotice;
+	const noticeKey = clientNotice ?? price?.checkoutNotice;
 	const notice = noticeKey ? notices[noticeKey] : null;
 
 	return (
@@ -272,7 +281,12 @@ export function WorkshopPricing({
 				// Checkout redirects to checkout.stripe.com. Astro's client router
 				// submits forms with fetch, cannot follow a cross-origin redirect,
 				// and falls back to a GET of the action URL, which core rejects.
-				<form method="POST" action={checkoutAction} data-astro-reload>
+				<form
+					method="POST"
+					action={checkoutAction}
+					data-astro-reload
+					onSubmit={() => trackWorkshopInterest('checkout')}
+				>
 					<button type="submit" className="button" disabled={loading || failed}>
 						Buy a ticket
 					</button>
