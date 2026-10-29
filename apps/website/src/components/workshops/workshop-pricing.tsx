@@ -262,7 +262,7 @@ export function WorkshopPricing({
 			{hasTicket ? (
 				<p className="status">You have a ticket for this cohort.</p>
 			) : enrollment.state === 'not-yet-open' ? (
-				<p className="status">
+				<p className="status coming-soon">
 					Ticket sales open
 					{opensAt ? ` ${dateFormat.format(opensAt)}` : ' soon'}.
 				</p>
