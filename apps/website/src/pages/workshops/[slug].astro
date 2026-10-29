@@ -71,6 +71,23 @@ const cohortDates =
 			? dateFormat.format(cohort.startsAt)
 			: null;
 
+// Before sales open the page must not read as buyable: the hero and the
+// ticket section say "Coming soon" with the open time. The shell cache
+// already expires at opensAt, so this flips back without a deploy.
+const comingSoon = ticket?.enrollment.state === 'not-yet-open';
+const opensAt = ticket?.enrollment.opensAt ?? null;
+const opensLabel = opensAt
+	? new Intl.DateTimeFormat('en-US', {
+			weekday: 'long',
+			month: 'long',
+			day: 'numeric',
+			hour: 'numeric',
+			minute: '2-digit',
+			timeZone: 'America/Los_Angeles',
+			timeZoneName: 'short',
+		}).format(opensAt)
+	: null;
+
 // Placeholder copy until the CodeTV team writes the page. Matches the
 // Workshop Ticket definition in CONTEXT.md.
 const included = [
@@ -96,11 +113,20 @@ const included = [
 					)
 				}
 				{
-					ticket && (
-						<a class="button workshop-hero-cta" href="#ticket">
-							Get a ticket
-						</a>
-					)
+					ticket &&
+						(comingSoon ? (
+							<div class="workshop-coming-soon">
+								<p>
+									<span class="badge orange">Coming soon</span>
+									Ticket sales open {opensLabel ?? 'soon'}.
+								</p>
+								<a href="#ticket">See pricing</a>
+							</div>
+						) : (
+							<a class="button workshop-hero-cta" href="#ticket">
+								Get a ticket
+							</a>
+						))
 				}
 			</div>
 		</Block>
@@ -149,7 +175,9 @@ const included = [
 		}
 
 		<Block variant="two-column-asymmetrical" emphasized name="ticket">
-			<div class="heading"><h2 id="ticket">Get a ticket</h2></div>
+			<div class="heading">
+				<h2 id="ticket">{comingSoon ? 'Coming soon' : 'Get a ticket'}</h2>
+			</div>
 			<div class="copy-block">
 				{
 					ticket ? (
@@ -280,6 +308,34 @@ const included = [
 	.workshop
 		:global([data-name='workshop-hero'] + [data-name='workshop-body-section']) {
 		padding-block-start: 1.5rem;
+	}
+
+	.workshop-coming-soon {
+		margin-block-start: 24px;
+
+		p {
+			align-items: center;
+			color: var(--text-emphasized);
+			display: flex;
+			flex-wrap: wrap;
+			font-size: 1.25rem;
+			font-weight: 700;
+			gap: 0.5rem 0.75rem;
+		}
+
+		a {
+			display: inline-block;
+			margin-block-start: 12px;
+		}
+	}
+
+	.workshop :global(.workshop-pricing .status.coming-soon) {
+		border: 2px solid var(--orange, currentColor);
+		border-radius: 8px;
+		color: var(--text-emphasized);
+		font-size: 1.25rem;
+		font-weight: 700;
+		padding: 0.75rem 1rem;
 	}
 
 	#ticket {
