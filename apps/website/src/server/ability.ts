@@ -3,7 +3,6 @@ import { eq } from 'drizzle-orm';
 import { db } from '../db';
 import { deviceAccessToken, users } from '../db/schema';
 
-const TOKEN_TTL_HOURS = 24;
 
 type AbilityUser = typeof users.$inferSelect;
 
@@ -36,18 +35,7 @@ export async function getUserAbilityForRequest(request: Request) {
 		return { user: null, ability: getAbility() };
 	}
 
-	if (token.createdAt) {
-		const ageMs = Date.now() - token.createdAt.getTime();
-		const ttlMs = TOKEN_TTL_HOURS * 60 * 60 * 1000;
-		if (ageMs > ttlMs) {
-			console.warn('auth.token-expired', {
-				token: `${authToken.slice(0, 8)}…`,
-				ageHours: Math.round(ageMs / 3_600_000),
-				ttlHours: TOKEN_TTL_HOURS,
-			});
-			return { user: null, ability: getAbility() };
-		}
-	}
+	// Device tokens don't expire. Revoke one by deleting its DeviceAccessToken row.
 
 	const user =
 		(await db.query.users.findFirst({ where: eq(users.id, token.userId) })) ??
