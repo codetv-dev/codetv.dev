@@ -4,7 +4,7 @@ import Newsletter from '../components/home/newsletter.astro';
 import Layout from './default.astro';
 
 const { frontmatter, headings } = Astro.props;
-const url = Astro.url.toString();
+const url = new URL(Astro.url.pathname, Astro.url.origin).toString();
 
 const { title, description, aturi } = frontmatter;
 
@@ -27,7 +27,7 @@ og.image = frontmatter.share?.image ?? generateDefaultImage({ text: og.title });
 		<meta property="og:title" content={og.title} />
 		<meta property="og:site_name" content="CodeTV" />
 		<meta property="og:description" content={og.description} />
-		<meta property="og:url" content={Astro.url} />
+		<meta property="og:url" content={url} />
 
 		<meta property="og:image" content={og.image} />
 		<meta property="og:image:width" content="1600" />

@@ -16,6 +16,10 @@ const {
 	description = 'tv for developers',
 	image = 'https://res.cloudinary.com/jlengstorf/image/upload/f_auto/q_auto/v1775517565/codetv-social-sharing-04-2026.jpg',
 } = Astro.props;
+
+// Shared pages are edge-cached, so never echo the visitor's query string
+// (ck_subscriber_id, code, checkout) into the shell.
+const pageUrl = new URL(Astro.url.pathname, Astro.url.origin).toString();
 ---
 
 <html lang="en">
@@ -75,7 +79,7 @@ const {
 			<meta property="og:title" content={title} />
 			<meta property="og:site_name" content="CodeTV" />
 			<meta property="og:description" content={description} />
-			<meta property="og:url" content={Astro.url} />
+			<meta property="og:url" content={pageUrl} />
 
 			<meta property="og:image" content={image} />
 			<meta property="og:image:width" content="1600" />
