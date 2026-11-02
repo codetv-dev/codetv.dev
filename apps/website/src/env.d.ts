@@ -7,6 +7,7 @@
 declare namespace App {
 	interface Locals {
 		adminViewer?: import('./server/admin-access').AdminViewer;
+		contentViewer?: import('./server/ability-rules').AbilityUser;
 	}
 }
 

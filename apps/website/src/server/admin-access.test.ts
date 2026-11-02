@@ -51,7 +51,7 @@ async function loadModule(path: string, mockDb?: string) {
 	);
 }
 
-it('denies guest, reviewer and contributor sessions/bearers on all admin paths, and rejects cross-site admin writes', async () => {
+it('denies guest, reviewer and contributor sessions/bearers on admin-only paths, and rejects cross-site admin writes', async () => {
 	const { guardAdminRequest, isAdminPath } =
 		await loadModule('./admin-access.ts');
 	const { getUserAbilityForRequest } = await loadModule(
@@ -69,7 +69,6 @@ it('denies guest, reviewer and contributor sessions/bearers on all admin paths, 
 		'/admin/missing',
 		'/api/admin',
 		'/api/admin/users',
-		'/api/admin/mcp',
 	]) {
 		assert.equal(isAdminPath(path), true);
 		for (const role of [null, 'user', 'reviewer', 'contributor']) {

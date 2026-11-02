@@ -43,6 +43,7 @@
 		"@coursebuilder/astro": "2.0.2",
 		"@coursebuilder/core": "1.2.1",
 		"@coursebuilder/nodash": "0.0.3",
+		"@modelcontextprotocol/sdk": "^1.32.2",
 		"@mux/mux-node": "^12.8.1",
 		"@mux/mux-player": "^3.11.7",
 		"@mux/mux-player-react": "^3.11.7",

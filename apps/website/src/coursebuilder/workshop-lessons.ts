@@ -66,6 +66,7 @@ export function publicWorkshopContent(value: unknown): unknown {
 	if (!value || typeof value !== 'object' || value instanceof Date)
 		return value;
 	const node = value as Record<string, unknown>;
+	if (node.deletedAt) return null;
 	if (
 		typeof node.type === 'string' &&
 		['lesson', 'section', 'videoResource'].includes(node.type)

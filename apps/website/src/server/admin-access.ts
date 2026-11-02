@@ -11,20 +11,39 @@ export function isAdminPath(path: string) {
 	return /^\/(?:api\/)?admin(?:\/|$)/.test(path);
 }
 
+/** Only these API branches admit scoped content roles; admin pages stay admin-only. */
+export function isContentApiPath(path: string) {
+	try {
+		path = decodeURIComponent(path);
+	} catch {
+		/* Router rejects malformed escapes. */
+	}
+	return /^\/api\/admin\/(?:resources|mcp)(?:\/|$)/.test(path);
+}
+
 /** Outer response wrapper also covers denied requests and unknown admin routes. */
 export async function guardAdminRequest(
 	request: Request,
 	resolveViewer: () => Promise<AdminViewer | null>,
 	next: (viewer: AdminViewer) => Promise<Response>,
+	access: 'admin' | 'content' = 'admin',
 ) {
 	const viewer = await resolveViewer();
 	let response: Response;
-	if (!viewer || getAbility({ user: viewer }).cannot('manage', 'all')) {
+	if (
+		!viewer ||
+		(access === 'content'
+			? !['admin', 'reviewer', 'contributor'].includes(viewer.role)
+			: getAbility({ user: viewer }).cannot('manage', 'all'))
+	) {
 		response = Response.json(
 			{
 				error: 'Not found',
-				why: 'Admin access is required.',
-				next: 'Sign in with an admin account.',
+				why:
+					access === 'admin'
+						? 'Admin access is required.'
+						: 'An admin, reviewer or contributor role is required.',
+				next: 'Sign in with an authorized account.',
 			},
 			{ status: 404 },
 		);
@@ -38,7 +57,7 @@ export async function guardAdminRequest(
 			{
 				error: 'Forbidden',
 				why: 'Cross-origin writes are not allowed.',
-				next: 'Submit from this site or use an admin bearer token.',
+				next: 'Submit from this site or use an authorized bearer token.',
 			},
 			{ status: 403 },
 		);
