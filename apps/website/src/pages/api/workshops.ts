@@ -89,7 +89,7 @@ export const GET: APIRoute = async ({ request }) =>
 		const { searchParams } = new URL(request.url);
 		const slugOrId = searchParams.get('slugOrId');
 		const { ability } = await getUserAbilityForRequest(request);
-		const canSeeDrafts = ability.can('update', 'Content');
+		const canSeeDrafts = ability.can('update', 'all');
 
 		if (slugOrId) {
 			const workshop = await db.query.contentResource.findFirst({
@@ -159,7 +159,7 @@ export const POST: APIRoute = async ({ request }) =>
 		const { user, ability } = await getUserAbilityForRequest(request);
 
 		if (!user) return json({ error: 'Unauthorized' }, { status: 401 });
-		if (ability.cannot('create', 'Content')) {
+		if (ability.cannot('create', 'all')) {
 			return json({ error: 'Forbidden' }, { status: 403 });
 		}
 

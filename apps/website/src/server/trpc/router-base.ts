@@ -16,7 +16,7 @@ export const operatorProcedure = t.procedure.use(async ({ ctx, next }) => {
 	const { user, ability } = await getUserAbilityForRequest(ctx.req);
 
 	if (!user) throw new TRPCError({ code: 'UNAUTHORIZED' });
-	if (ability.cannot('update', 'Content')) {
+	if (ability.cannot('update', 'all')) {
 		throw new TRPCError({ code: 'FORBIDDEN' });
 	}
 

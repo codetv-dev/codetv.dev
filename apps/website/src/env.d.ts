@@ -4,6 +4,12 @@
 /// <reference types="astro/client" />
 /// <reference types="@clerk/astro/env" />
 
+declare namespace App {
+	interface Locals {
+		adminViewer?: import('./server/admin-access').AdminViewer;
+	}
+}
+
 type Subscription = {
 	status: Stripe.Status;
 	level: string;

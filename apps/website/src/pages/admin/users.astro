@@ -1,0 +1,127 @@
+---
+import AdminLayout from '../../layouts/admin.astro';
+import { ADMIN_ROLES } from '../../server/admin-access';
+export const prerender = false;
+---
+
+<AdminLayout title="Users">
+	<p>
+		Find an existing user by email. New users must sign in once before you can
+		assign a role.
+	</p>
+	<form id="user-search">
+		<label
+			>Email <input
+				name="email"
+				type="email"
+				required
+				autocomplete="off"
+			/></label
+		>
+		<button type="submit">Find user</button>
+	</form>
+	<p id="user-status" role="status" aria-live="polite"></p>
+	<section id="user-result" hidden>
+		<h2 id="user-email"></h2>
+		<p id="current-role"></p>
+		<form id="role-form">
+			<label
+				>New role <select name="role"
+					>{
+						ADMIN_ROLES.map((role) => <option value={role}>{role}</option>)
+					}</select
+				></label
+			>
+			<button type="submit">Change role…</button>
+		</form>
+		<p>You cannot demote yourself or remove the last admin.</p>
+		<h3>Recent purchases (up to 100)</h3>
+		<table>
+			<thead
+				><tr
+					><th>Product</th><th>Status</th><th>Amount (USD)</th><th>Time</th></tr
+				></thead
+			><tbody id="user-purchases"></tbody>
+		</table>
+	</section>
+</AdminLayout>
+<script>
+	const search = document.querySelector<HTMLFormElement>('#user-search')!;
+	const roleForm = document.querySelector<HTMLFormElement>('#role-form')!;
+	const result = document.querySelector<HTMLElement>('#user-result')!;
+	const status = document.querySelector<HTMLElement>('#user-status')!;
+	let user: { id: string; email: string; role: string } | null = null;
+	async function loadUser() {
+		result.hidden = true;
+		user = null;
+		status.textContent = 'Looking up user…';
+		const email = String(new FormData(search).get('email') ?? '');
+		const response = await fetch(
+			`/api/admin/users?email=${encodeURIComponent(email)}`,
+		);
+		const data = await response.json();
+		if (!response.ok) throw new Error(`${data.why} ${data.next}`);
+		if (!data.user) {
+			status.textContent = data.message;
+			return;
+		}
+		user = data.user;
+		document.querySelector('#user-email')!.textContent = data.user.email;
+		document.querySelector('#current-role')!.textContent =
+			`Current role: ${data.user.role}`;
+		roleForm.querySelector('select')!.value = data.user.role;
+		const body = document.querySelector('#user-purchases')!;
+		body.replaceChildren();
+		for (const purchase of data.purchases) {
+			const row = document.createElement('tr');
+			for (const text of [
+				purchase.productName ?? purchase.productId,
+				purchase.status,
+				purchase.amount,
+				new Date(purchase.createdAt).toLocaleString(),
+			]) {
+				const cell = document.createElement('td');
+				cell.textContent = String(text);
+				row.append(cell);
+			}
+			body.append(row);
+		}
+		result.hidden = false;
+		status.textContent = data.purchases.length ? '' : 'No purchases found.';
+	}
+	search.addEventListener('submit', async (event) => {
+		event.preventDefault();
+		try {
+			await loadUser();
+		} catch (error) {
+			status.textContent = String(error);
+		}
+	});
+	roleForm.addEventListener('submit', async (event) => {
+		event.preventDefault();
+		if (!user) return;
+		const role = String(new FormData(roleForm).get('role'));
+		if (!window.confirm(`Change ${user.email} from ${user.role} to ${role}?`))
+			return;
+		const button = roleForm.querySelector('button')!;
+		button.disabled = true;
+		try {
+			const response = await fetch(
+				`/api/admin/users/${encodeURIComponent(user.id)}/role`,
+				{
+					method: 'PUT',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ role, confirmed: true }),
+				},
+			);
+			const data = await response.json();
+			if (!response.ok) throw new Error(`${data.why} ${data.next}`);
+			await loadUser();
+			status.textContent = 'Role updated.';
+		} catch (error) {
+			status.textContent = String(error);
+		} finally {
+			button.disabled = false;
+		}
+	});
+</script>

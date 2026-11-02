@@ -80,6 +80,9 @@ importers:
 
   apps/website:
     dependencies:
+      '@casl/ability':
+        specifier: ^6.5.0
+        version: 6.8.3
       '@algolia/autocomplete-core':
         specifier: ^1.19.8
         version: 1.19.9(@algolia/client-search@5.56.0)(algoliasearch@5.56.0)(search-insights@2.17.3)
@@ -430,6 +433,21 @@ importers:
         version: 20.4.1(@types/node@26.2.0)
 
 packages:
+
+  '@casl/ability@6.8.3':
+    resolution: {integrity: sha512-z8TkmbPCJAJX1S8Wms0TDkuTyuR5hW5zep3C9REvSfghnY11zW3F7uppW1QSzQLz5toGPNlmr8RF1VXg2XU+wQ==}
+
+  '@ucast/core@1.10.2':
+    resolution: {integrity: sha512-ons5CwXZ/51wrUPfoduC+cO7AS1/wRb0ybpQJ9RrssossDxVy4t49QxWoWgfBDvVKsz9VXzBk9z0wqTdZ+Cq8g==}
+
+  '@ucast/js@3.1.0':
+    resolution: {integrity: sha512-eJ7yQeYtMK85UZjxoxBEbTWx6UMxEXKbjVyp+NlzrT5oMKV5Gpo/9bjTl3r7msaXTVC8iD9NJacqJ8yp7joX+Q==}
+
+  '@ucast/mongo2js@1.4.1':
+    resolution: {integrity: sha512-9aeg5cmqwRQnKCXHN6I17wk83Rcm487bHelaG8T4vfpWneAI469wSI3Srnbu+PuZ5znWRbnwtVq9RgPL+bN6CA==}
+
+  '@ucast/mongo@2.4.3':
+    resolution: {integrity: sha512-XcI8LclrHWP83H+7H2anGCEeDq0n+12FU2mXCTz6/Tva9/9ddK/iacvvhCyW6cijAAOILmt0tWplRyRhVyZLsA==}
 
   '@acemir/cssom@0.9.31':
     resolution: {integrity: sha512-ZnR3GSaH+/vJ0YlHau21FjfLYjMpYVIzTD8M8vIEQvIGxeOXyXdzCI140rrCY862p/C/BbzWsjc1dgnM9mkoTA==}
@@ -14875,6 +14893,26 @@ packages:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
 
 snapshots:
+
+  '@casl/ability@6.8.3':
+    dependencies:
+      '@ucast/mongo2js': 1.4.1
+
+  '@ucast/core@1.10.2': {}
+
+  '@ucast/js@3.1.0':
+    dependencies:
+      '@ucast/core': 1.10.2
+
+  '@ucast/mongo2js@1.4.1':
+    dependencies:
+      '@ucast/core': 1.10.2
+      '@ucast/js': 3.1.0
+      '@ucast/mongo': 2.4.3
+
+  '@ucast/mongo@2.4.3':
+    dependencies:
+      '@ucast/core': 1.10.2
 
   '@acemir/cssom@0.9.31': {}
 

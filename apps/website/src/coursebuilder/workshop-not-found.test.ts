@@ -45,6 +45,14 @@ it('renders guest checkout in the public shell, defers ownership privately, and 
 			'coursebuilder/workshop-page.ts',
 			'coursebuilder/workshop-cache.ts',
 			'coursebuilder/supporter-coupons.ts',
+			'server/ability-rules.ts',
+			'server/admin-access.ts',
+			'server/admin-http.ts',
+			'pages/admin/index.astro',
+			'pages/admin/users.astro',
+			'layouts/admin.astro',
+			'pages/api/admin/users.ts',
+			'pages/api/admin/users/[id]/role.ts',
 		]) {
 			await fixture(
 				`src/${path}`,
@@ -65,19 +73,37 @@ it('renders guest checkout in the public shell, defers ownership privately, and 
 		);
 		await fixture(
 			'src/coursebuilder/users.ts',
-			'export const getCourseBuilderUserForClerkUser = async (user) => user ? {id: user.id === "clerk-fixture" ? "test-viewer" : user.id} : null;',
+			'export const getCourseBuilderUserForClerkUser = async (user) => user ? {id: user.id === "clerk-fixture" ? "test-viewer" : user.id, role: user.role ?? "user"} : null;',
+		);
+		await fixture(
+			'src/server/admin-users.ts',
+			`
+			export class AdminInputError extends Error { constructor(message, status=400) {super(message);this.status=status;} }
+			export const findAdminUser = async (email) => ({user:{id:'target',email,role:'user'},purchases:[]});
+			export const setAdminUserRole = async (actor,id,role) => ({user:{id,role}});
+		`,
+		);
+		await fixture(
+			'src/server/content-access.ts',
+			`
+			import {getAbility, contentSubject} from './ability-rules';
+			export const getLessonPreviewAccess = async (user, id) => getAbility({user}).can('read', contentSubject({id, ownerIds: ['contributor']}));
+		`,
 		);
 		await fixture(
 			'src/middleware.ts',
 			`
 			import { defineMiddleware } from 'astro:middleware';
+			import {guardAdminRequest,isAdminPath} from './server/admin-access';
 			import { guardWorkshopCache, hasWorkshopSessionEvidence, WORKSHOP_SESSION_HEADER, WORKSHOP_QUERY_HEADER } from './coursebuilder/workshop-cache';
 			export const onRequest = defineMiddleware(async (context, next) => {
 				const cookie = context.request.headers.get('Cookie') ?? '';
 				const authenticated = cookie.includes('__session=');
 				context.locals.currentUser = async () => cookie.includes('__session=supporter')
 					? {id: 'clerk-supporter', publicMetadata: {stripe: {status: 'active', level: 'Gold Tier Supporter'}}}
+					: /__session=(admin|reviewer|contributor|foreign)/.test(cookie) ? {id: cookie.split('__session=')[1],role: cookie.includes('foreign') ? 'contributor' : cookie.split('__session=')[1]}
 					: authenticated ? {id: 'clerk-fixture'} : null;
+				if(isAdminPath(context.url.pathname)) return guardAdminRequest(context.request, context.locals.currentUser, async(user) => {context.locals.adminViewer=user;return next();});
 				const headers = new Headers(context.request.headers);
 				headers.set(WORKSHOP_SESSION_HEADER, hasWorkshopSessionEvidence(context.request) ? 'session' : 'anonymous');
 				headers.set(WORKSHOP_QUERY_HEADER, 'fixture-query');
@@ -120,6 +146,7 @@ it('renders guest checkout in the public shell, defers ownership privately, and 
 		server = await dev({
 			root,
 			configFile: false,
+			devToolbar: { enabled: false },
 			output: 'server',
 			adapter: netlify(),
 			integrations: [react()],
@@ -128,6 +155,51 @@ it('renders guest checkout in the public shell, defers ownership privately, and 
 			logLevel: 'silent',
 		});
 		const base = `http://127.0.0.1:${server.address.port}`;
+		for (const path of [
+			'/admin',
+			'/admin/users',
+			'/admin/missing',
+			'/api/admin/users?email=buyer@example.test',
+		]) {
+			for (const cookie of [
+				'',
+				'__session=reviewer',
+				'__session=contributor',
+			]) {
+				const denied = await fetch(`${base}${path}`, {
+					headers: { Cookie: cookie },
+				});
+				assert.equal(denied.status, 404);
+				assert.equal(
+					denied.headers.get('Netlify-CDN-Cache-Control'),
+					'no-store',
+				);
+			}
+		}
+		const adminPage = await fetch(`${base}/admin/users`, {
+			headers: { Cookie: '__session=admin' },
+		});
+		assert.equal(adminPage.status, 200);
+		assert.match(await adminPage.text(), /Find an existing user by email/);
+		const found = await fetch(
+			`${base}/api/admin/users?email=buyer@example.test`,
+			{ headers: { Cookie: '__session=admin' } },
+		);
+		assert.equal((await found.json()).user.email, 'buyer@example.test');
+		const change = async (confirmed: boolean) =>
+			fetch(`${base}/api/admin/users/target/role`, {
+				method: 'PUT',
+				headers: {
+					Cookie: '__session=admin',
+					Origin: base,
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({ role: 'reviewer', confirmed }),
+			});
+		assert.equal((await change(false)).status, 400);
+		const changed = await change(true);
+		assert.equal(changed.status, 200);
+		assert.equal((await changed.json()).user.role, 'reviewer');
 		const missing = await fetch(`${base}/workshops/does-not-exist`);
 		const missingHtml = await missing.text();
 		assert.equal(missing.status, 404, missingHtml);
@@ -238,6 +310,10 @@ it('renders guest checkout in the public shell, defers ownership privately, and 
 			['released', '', false],
 			['future', '__session=fixture', false],
 			['released', '__session=fixture', true],
+			['future', '__session=reviewer', true],
+			['future', '__session=admin', true],
+			['future', '__session=contributor', true],
+			['future', '__session=foreign', false],
 		] as const) {
 			const response = await fetch(`${base}/workshops/sample/${lesson}`, {
 				headers: { Cookie: cookie },
@@ -246,6 +322,8 @@ it('renders guest checkout in the public shell, defers ownership privately, and 
 			assert.equal(response.status, 200, output);
 			assert.equal(output.includes('SIGNED_PLAYBACK_FIXTURE'), expected);
 			assert.equal(output.includes('EXERCISE_FIXTURE'), expected);
+			if (lesson === 'future' && expected)
+				assert.match(output, /Preview: unlocks for buyers/);
 			assert.equal(
 				response.headers.get('Netlify-CDN-Cache-Control'),
 				'no-store',
@@ -270,6 +348,40 @@ it('renders guest checkout in the public shell, defers ownership privately, and 
 		const chapterOutput = await chapterIsland.text();
 		assert.match(chapterOutput, /href="\/workshops\/sample\/released"/);
 		assert.doesNotMatch(chapterOutput, /href="\/workshops\/sample\/future"/);
+
+		const adminShell = await fetch(`${base}/workshops/sample`, {
+			headers: { Cookie: '__session=admin' },
+		});
+		const adminHtml = await adminShell.text();
+		// Astro randomizes island UUIDs/encrypted props and emits dev timings.
+		// Normalize only those framework fields; all viewer-facing shell bytes match.
+		const shellBytes = (value: string) => {
+			const ids = [...value.matchAll(/data-island-id="([^"]+)"/g)].map(
+				(match) => match[1],
+			);
+			for (const [index, id] of ids.entries())
+				value = value.replaceAll(id, `ISLAND_${index}`);
+			return value
+				.replace(/([?&](?:amp;)?[ep]=)[^&"'\s<>]+/g, '$1NONCE')
+				.replace(/server-render-time="[^"]*"/g, 'server-render-time="TIMING"');
+		};
+		const adminBytes = shellBytes(adminHtml);
+		const guestBytes = shellBytes(html);
+		const firstDifference = [...adminBytes].findIndex(
+			(byte, index) => byte !== guestBytes[index],
+		);
+		assert.ok(
+			adminBytes === guestBytes,
+			`Shell differs at ${firstDifference}: admin ${JSON.stringify(adminBytes.slice(firstDifference, firstDifference + 180))}; guest ${JSON.stringify(guestBytes.slice(firstDifference, firstDifference + 180))}`,
+		);
+		const reviewerChapters = await fetch(
+			new URL(chapterIslandPath.replaceAll('&amp;', '&'), base),
+			{ headers: { Cookie: '__session=reviewer' } },
+		);
+		assert.match(
+			await reviewerChapters.text(),
+			/href="\/workshops\/sample\/future"/,
+		);
 
 		const fallback = await fetch(`${base}/workshops/empty`);
 		const fallbackHtml = await fallback.text();

@@ -1,6 +1,9 @@
 import { clerkMiddleware } from '@clerk/astro/server';
 import { defineMiddleware, sequence } from 'astro:middleware';
 import { guardWorkshopCache } from './coursebuilder/workshop-cache';
+import { guardAdminRequest, isAdminPath } from './server/admin-access';
+import { findCourseBuilderUserForClerkUser } from './coursebuilder/users';
+import { getUserAbilityForRequest } from './server/ability';
 
 import {
 	dedupeClerkCookies,
@@ -43,9 +46,27 @@ const workshopCacheGuard = defineMiddleware(async (context, next) => {
 	);
 });
 
+const adminGuard = defineMiddleware(async (context, next) => {
+	if (!isAdminPath(context.url.pathname)) return next();
+	return guardAdminRequest(
+		context.request,
+		async () =>
+			context.request.headers.has('authorization')
+				? (await getUserAbilityForRequest(context.request)).user
+				: findCourseBuilderUserForClerkUser(
+						(await context.locals.currentUser?.()) ?? null,
+					),
+		async (viewer) => {
+			context.locals.adminViewer = viewer;
+			return next();
+		},
+	);
+});
+
 export const onRequest = sequence(
 	workshopCacheGuard,
 	pinResponseCookies,
 	dedupeRequestCookies,
 	clerkMiddleware(),
+	adminGuard,
 );

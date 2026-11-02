@@ -1,0 +1,12 @@
+---
+import AdminLayout from '../../layouts/admin.astro';
+export const prerender = false;
+---
+
+<AdminLayout title="Admin">
+	<p><a href="/admin/users">Find a user and manage their role</a></p>
+	<p>
+		Admins can manage access. Reviewers can preview every lesson. Contributors
+		can preview content they own.
+	</p>
+</AdminLayout>

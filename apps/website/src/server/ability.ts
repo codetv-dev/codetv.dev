@@ -3,25 +3,13 @@ import { eq } from 'drizzle-orm';
 import { db } from '../db';
 import { deviceAccessToken, users } from '../db/schema';
 
-
-type AbilityUser = typeof users.$inferSelect;
-
-export function getAbility(options: { user?: AbilityUser | null } = {}) {
-	const role = options.user?.role ?? 'user';
-	return {
-		can(action: string, _subject?: string) {
-			if (role === 'admin') return true;
-			if (action === 'read') return Boolean(options.user);
-			return false;
-		},
-		cannot(action: string, subject?: string) {
-			return !this.can(action, subject);
-		},
-	};
-}
+import { getAbility } from './ability-rules';
+export { getAbility } from './ability-rules';
 
 export async function getUserAbilityForRequest(request: Request) {
-	const authToken = request.headers.get('Authorization')?.split(' ')[1];
+	const authToken = request.headers
+		.get('Authorization')
+		?.match(/^Bearer\s+(\S+)$/i)?.[1];
 
 	if (!authToken) {
 		return { user: null, ability: getAbility() };

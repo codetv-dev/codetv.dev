@@ -4,6 +4,7 @@ import {
 	getTicketPurchase,
 } from '../../coursebuilder/workshops';
 import { getCourseBuilderUserForClerkUser } from '../../coursebuilder/users';
+import { getLessonPreviewAccess } from '../../server/content-access';
 import {
 	chapterUnlockLabel,
 	isChapterUnlocked,
@@ -12,9 +13,11 @@ import {
 interface Props {
 	slug: string;
 }
-const workshop = await getWorkshopForSale(Astro.props.slug);
 const clerkUser = await Astro.locals.currentUser?.();
 const viewer = await getCourseBuilderUserForClerkUser(clerkUser ?? null);
+const workshop = await getWorkshopForSale(Astro.props.slug, new Date(), (id) =>
+	getLessonPreviewAccess(viewer, id),
+);
 const hasTicket = Boolean(
 	viewer &&
 	workshop &&
@@ -22,6 +25,13 @@ const hasTicket = Boolean(
 );
 for (const [key, value] of Object.entries(privateLessonHeaders))
 	Astro.response.headers.set(key, value);
+const previews = new Set<string>();
+if (workshop) {
+	for (const chapter of workshop.chapters) {
+		if (await getLessonPreviewAccess(viewer, chapter.id))
+			previews.add(chapter.id);
+	}
+}
 const now = new Date();
 ---
 
@@ -30,14 +40,20 @@ const now = new Date();
 		<ol>
 			{workshop.chapters.map((chapter) => (
 				<li>
-					{hasTicket && isChapterUnlocked(chapter.startsAt, now) ? (
+					{previews.has(chapter.id) ||
+					(hasTicket && isChapterUnlocked(chapter.startsAt, now)) ? (
 						<a href={`/workshops/${workshop.slug}/${chapter.slug}`}>
 							{chapter.title}
 						</a>
 					) : (
 						<span>{chapter.title}</span>
 					)}
-					<p>{chapterUnlockLabel(chapter.startsAt)}</p>
+					<p>
+						{previews.has(chapter.id) &&
+						!isChapterUnlocked(chapter.startsAt, now)
+							? `Preview: ${chapterUnlockLabel(chapter.startsAt).replace('Unlocks', 'unlocks for buyers')}`
+							: chapterUnlockLabel(chapter.startsAt)}
+					</p>
 				</li>
 			))}
 		</ol>

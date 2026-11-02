@@ -42,6 +42,22 @@ function getPrimaryEmail(user: ClerkCommerceUser) {
 	);
 }
 
+/** Admin authorization only reads existing users; it never provisions an account. */
+export async function findCourseBuilderUserForClerkUser(
+	clerkUser: ClerkCommerceUser | null,
+) {
+	if (!clerkUser?.id) return null;
+	const byId = await db.query.users.findFirst({
+		where: eq(users.externalId, clerkUser.id),
+	});
+	if (byId) return byId;
+	return (
+		(await db.query.users.findFirst({
+			where: eq(users.email, getPrimaryEmail(clerkUser)),
+		})) ?? null
+	);
+}
+
 export async function getCourseBuilderUserForClerkUser(
 	clerkUser: ClerkCommerceUser | null,
 ) {

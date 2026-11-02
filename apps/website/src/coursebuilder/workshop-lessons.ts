@@ -31,19 +31,23 @@ export const privateLessonHeaders = {
 	'CDN-Cache-Control': 'no-store',
 };
 
-/** Load video data only after both gates pass. Never fall back to public Mux. */
+/** Load video only after buyer gates or a server-resolved preview role. */
 export async function getLessonPlayback({
 	hasTicket,
+	previewAccess = false,
 	startsAt,
 	now = new Date(),
 	loadVideo,
 }: {
 	hasTicket: boolean;
+	/** Server-resolved CASL permission for this lesson, never client input. */
+	previewAccess?: boolean;
 	startsAt: string | null;
 	now?: Date;
 	loadVideo: () => Promise<unknown>;
 }): Promise<{ id: string; policy: 'signed' } | null> {
-	if (!hasTicket || !isChapterUnlocked(startsAt, now)) return null;
+	if (!previewAccess && (!hasTicket || !isChapterUnlocked(startsAt, now)))
+		return null;
 	const fields = (await loadVideo()) as Record<string, unknown> | null;
 	const ids = fields?.playback_ids;
 	if (!Array.isArray(ids)) return null;

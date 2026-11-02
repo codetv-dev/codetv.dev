@@ -56,14 +56,12 @@ export const GET: APIRoute = async ({ request }) =>
 		const isPublicResource =
 			fields.state === 'published' && fields.visibility === 'public';
 
-		if (!isPublicResource && ability.cannot('update', 'Content')) {
+		if (!isPublicResource && ability.cannot('update', 'all')) {
 			return json({ error: 'Resource not found' }, { status: 404 });
 		}
 
 		return json(
-			ability.can('update', 'Content')
-				? resource
-				: publicWorkshopContent(resource),
+			ability.can('update', 'all') ? resource : publicWorkshopContent(resource),
 		);
 	})(request);
 
@@ -72,7 +70,7 @@ export const POST: APIRoute = async ({ request }) =>
 		const { user, ability } = await getUserAbilityForRequest(request);
 
 		if (!user) return json({ error: 'Unauthorized' }, { status: 401 });
-		if (ability.cannot('create', 'Content')) {
+		if (ability.cannot('create', 'all')) {
 			return json({ error: 'Forbidden' }, { status: 403 });
 		}
 
@@ -126,7 +124,7 @@ export const PUT: APIRoute = async ({ request }) =>
 		const { user, ability } = await getUserAbilityForRequest(request);
 
 		if (!user) return json({ error: 'Unauthorized' }, { status: 401 });
-		if (ability.cannot('update', 'Content')) {
+		if (ability.cannot('update', 'all')) {
 			return json({ error: 'Forbidden' }, { status: 403 });
 		}
 		if (!id) return json({ error: 'Missing id parameter' }, { status: 400 });
