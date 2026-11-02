@@ -112,6 +112,8 @@ function toTicket(
 export async function getWorkshopForSale(
 	slug: string,
 	now = new Date(),
+	/** Only private lesson pages/islands supply a server-resolved CASL check. */
+	canPreview?: (resourceId: string) => Promise<boolean>,
 ): Promise<WorkshopForSale | null> {
 	const workshop = await db.query.contentResource.findFirst({
 		where: and(
@@ -141,7 +143,8 @@ export async function getWorkshopForSale(
 	if (!workshop) return null;
 
 	const fields = (workshop.fields ?? {}) as Fields;
-	if (!isWorkshopVisible(fields)) return null;
+	if (!isWorkshopVisible(fields) && !(await canPreview?.(workshop.id)))
+		return null;
 
 	const cohortLinks = await db.query.contentResourceResource.findMany({
 		where: eq(contentResourceResource.resourceId, workshop.id),
@@ -176,6 +179,39 @@ export async function getWorkshopForSale(
 			cohortStartsAt: ticket.cohort?.startsAt ?? null,
 		}));
 
+	const chapterCandidates = workshop.resources.flatMap((link) => {
+		const resource = link.resource;
+		if (!resource) return [];
+		const lessons =
+			resource.type === 'section'
+				? resource.resources.map((child) => child.resource)
+				: [resource];
+		return lessons
+			.filter((lesson) => lesson?.type === 'lesson')
+			.map((lesson) => ({
+				lesson,
+				section: resource.type === 'section' ? resource : null,
+			}));
+	});
+	const visibleChapters = await Promise.all(
+		chapterCandidates.map(async ({ lesson, section }) => {
+			const lessonFields = (lesson.fields ?? {}) as Fields;
+			if (
+				lessonFields.state !== 'published' &&
+				!(await canPreview?.(lesson.id))
+			)
+				return null;
+			const startsAt =
+				lessonFields.startsAt ?? (section?.fields as Fields)?.startsAt;
+			return {
+				id: lesson.id,
+				slug: lesson.slug ?? lessonFields.slug ?? lesson.id,
+				title: lessonFields.title ?? 'Lesson',
+				startsAt: typeof startsAt === 'string' ? startsAt : null,
+			};
+		}),
+	);
+
 	return {
 		id: workshop.id,
 		slug: workshop.slug ?? slug,
@@ -194,34 +230,9 @@ export async function getWorkshopForSale(
 				title: ((resource.fields ?? {}) as Fields).title ?? 'Untitled',
 			})),
 		accessProductIds: candidates.map(({ ticket }) => ticket.productId),
-		chapters: workshop.resources.flatMap((link) => {
-			const resource = link.resource;
-			if (!resource) return [];
-			const lessons =
-				resource.type === 'section'
-					? resource.resources.map((child) => child.resource)
-					: [resource];
-			return lessons
-				.filter(
-					(lesson) =>
-						lesson?.type === 'lesson' &&
-						(lesson.fields as Fields)?.state === 'published',
-				)
-				.map((lesson) => {
-					const lessonFields = (lesson.fields ?? {}) as Fields;
-					const startsAt =
-						lessonFields.startsAt ??
-						(resource.type === 'section'
-							? (resource.fields as Fields)?.startsAt
-							: null);
-					return {
-						id: lesson.id,
-						slug: lesson.slug ?? lessonFields.slug ?? lesson.id,
-						title: lessonFields.title ?? 'Lesson',
-						startsAt: typeof startsAt === 'string' ? startsAt : null,
-					};
-				});
-		}),
+		chapters: visibleChapters.filter(
+			(chapter): chapter is Chapter => chapter !== null,
+		),
 		ticket: pickCurrentTicket(candidates)?.ticket ?? null,
 	};
 }

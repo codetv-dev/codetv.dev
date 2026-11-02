@@ -40,7 +40,7 @@ export const GET: APIRoute = async ({ request }) =>
 		const { ability } = await getUserAbilityForRequest(request);
 		const result = { parentId, count: edges.length, edges };
 		return json(
-			ability.can('update', 'Content') ? result : publicWorkshopContent(result),
+			ability.can('update', 'all') ? result : publicWorkshopContent(result),
 		);
 	})(request);
 
@@ -48,7 +48,7 @@ export const POST: APIRoute = async ({ request }) =>
 	withSkill(async (request) => {
 		const { user, ability } = await getUserAbilityForRequest(request);
 		if (!user) return json({ error: 'Unauthorized' }, { status: 401 });
-		if (ability.cannot('create', 'Content')) {
+		if (ability.cannot('create', 'all')) {
 			return json({ error: 'Forbidden' }, { status: 403 });
 		}
 
@@ -136,7 +136,7 @@ export const PATCH: APIRoute = async ({ request }) =>
 	withSkill(async (request) => {
 		const { user, ability } = await getUserAbilityForRequest(request);
 		if (!user) return json({ error: 'Unauthorized' }, { status: 401 });
-		if (ability.cannot('update', 'Content')) {
+		if (ability.cannot('update', 'all')) {
 			return json({ error: 'Forbidden' }, { status: 403 });
 		}
 
@@ -227,7 +227,7 @@ export const DELETE: APIRoute = async ({ request }) =>
 					{ status: 400 },
 				);
 			}
-			if (ability.cannot('manage', 'Content')) {
+			if (ability.cannot('manage', 'all')) {
 				return json({ error: 'Forbidden' }, { status: 403 });
 			}
 
@@ -247,7 +247,7 @@ export const DELETE: APIRoute = async ({ request }) =>
 			});
 		}
 
-		if (ability.cannot('delete', 'Content')) {
+		if (ability.cannot('delete', 'all')) {
 			return json({ error: 'Forbidden' }, { status: 403 });
 		}
 

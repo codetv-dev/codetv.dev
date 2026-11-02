@@ -28,7 +28,7 @@ export const GET: APIRoute = async ({ request }) =>
 		const { searchParams } = new URL(request.url);
 		const slugOrId = searchParams.get('slugOrId');
 		const { ability } = await getUserAbilityForRequest(request);
-		const canManageContent = ability.can('update', 'Content');
+		const canManageContent = ability.can('update', 'all');
 
 		if (slugOrId) {
 			const lesson = await db.query.contentResource.findFirst({
@@ -78,7 +78,7 @@ export const PUT: APIRoute = async ({ request }) =>
 		const { user, ability } = await getUserAbilityForRequest(request);
 
 		if (!user) return json({ error: 'Unauthorized' }, { status: 401 });
-		if (ability.cannot('update', 'Content')) {
+		if (ability.cannot('update', 'all')) {
 			return json({ error: 'Forbidden' }, { status: 403 });
 		}
 		if (!id) return json({ error: 'Missing lesson ID' }, { status: 400 });

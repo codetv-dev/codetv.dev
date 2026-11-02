@@ -93,7 +93,7 @@ export const GET: APIRoute = async ({ request }) =>
 		const { searchParams } = new URL(request.url);
 		const slugOrId = searchParams.get('slugOrId');
 		const { ability } = await getUserAbilityForRequest(request);
-		const canSeeInactiveProducts = ability.can('update', 'Content');
+		const canSeeInactiveProducts = ability.can('update', 'all');
 
 		if (slugOrId) {
 			const slugOrIdCondition = or(
@@ -135,7 +135,7 @@ export const POST: APIRoute = async ({ request }) =>
 	withSkill(async (request) => {
 		const { user, ability } = await getUserAbilityForRequest(request);
 		if (!user) return json({ error: 'Unauthorized' }, { status: 401 });
-		if (!ability.can('create', 'Content')) {
+		if (!ability.can('create', 'all')) {
 			return json({ error: 'Forbidden' }, { status: 403 });
 		}
 
@@ -161,7 +161,7 @@ export const PUT: APIRoute = async ({ request }) =>
 	withSkill(async (request) => {
 		const { user, ability } = await getUserAbilityForRequest(request);
 		if (!user) return json({ error: 'Unauthorized' }, { status: 401 });
-		if (!ability.can('update', 'Content')) {
+		if (!ability.can('update', 'all')) {
 			return json({ error: 'Forbidden' }, { status: 403 });
 		}
 

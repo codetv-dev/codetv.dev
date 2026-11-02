@@ -1,0 +1,45 @@
+---
+import Layout from './default.astro';
+interface Props {
+	title: string;
+}
+---
+
+<Layout title={`${Astro.props.title} | CodeTV Admin`}>
+	<main class="admin">
+		<nav aria-label="Admin">
+			<a href="/admin">Admin</a> · <a href="/admin/users">Users</a>
+		</nav>
+		<h1>{Astro.props.title}</h1>
+		<slot />
+	</main>
+</Layout>
+<style>
+	.admin {
+		max-width: 72rem;
+		margin: 3rem auto;
+		padding: 1rem;
+	}
+	.admin :global(input),
+	.admin :global(select),
+	.admin :global(button) {
+		font: inherit;
+		padding: 0.5rem;
+		border: 1px solid #888;
+		border-radius: 0.25rem;
+	}
+	.admin :global(button) {
+		cursor: pointer;
+	}
+	.admin :global(table) {
+		width: 100%;
+		border-collapse: collapse;
+		margin: 1rem 0;
+	}
+	.admin :global(td),
+	.admin :global(th) {
+		text-align: left;
+		padding: 0.75rem;
+		border-bottom: 1px solid #888;
+	}
+</style>

@@ -29,7 +29,7 @@ export const GET: APIRoute = async ({ request, params }) =>
 		if (!user) {
 			return json({ error: 'Unauthorized' }, { status: 401 });
 		}
-		if (ability.cannot('update', 'Content')) {
+		if (ability.cannot('update', 'all')) {
 			return json({ error: 'Forbidden' }, { status: 403 });
 		}
 
