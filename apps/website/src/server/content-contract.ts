@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { commerceInputs } from './commerce-contract';
 
 export const resourceId = z.string().trim().min(1).max(255);
 export const resourceType = z.enum([
@@ -27,6 +28,7 @@ const userInput = z
 
 /** These contracts are used by both HTTP and MCP, before any database write. */
 export const contentInputs = {
+	...commerceInputs,
 	list_resources: z
 		.object({
 			type: resourceType.optional(),
@@ -102,12 +104,14 @@ export class ContentError extends Error {
 		public status: number,
 		public why: string,
 		public next: string,
+		public error?: string,
 	) {
 		super(why);
 	}
 	toJSON() {
 		return {
-			error: this.status === 404 ? 'Not found' : 'Request refused',
+			error:
+				this.error ?? (this.status === 404 ? 'Not found' : 'Request refused'),
 			why: this.why,
 			next: this.next,
 		};
@@ -129,10 +133,16 @@ export function parseContentInput<K extends ContentOperation>(
 }
 
 export const readOperations = new Set<ContentOperation>([
+	'list_sales',
+	'list_coupons',
 	'list_resources',
 	'get_resource',
 ]);
 export const adminOperations = new Set<ContentOperation>([
+	'list_sales',
+	'list_coupons',
+	'create_coupon',
+	'deactivate_coupon',
 	'list_contributors',
 	'add_contributor',
 	'remove_contributor',
