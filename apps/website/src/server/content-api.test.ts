@@ -13,6 +13,8 @@ import netlify from '@astrojs/netlify';
 import { pathToFileURL } from 'node:url';
 import { build } from 'esbuild';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
+import { validateCoupon } from '@coursebuilder/core/utils/validate-coupon';
+import { couponSchema } from '@coursebuilder/core/schemas/coupon-schema';
 import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js';
 import type {
 	ContentStore,
@@ -209,17 +211,165 @@ function memoryStore() {
 	return { store, rows, edges, people, contributions };
 }
 
+function memoryCommerce() {
+	const couponBase = {
+		organizationId: null,
+		code: null,
+		createdAt: new Date('2026-01-01Z'),
+		expires: null,
+		fields: {},
+		maxUses: -1,
+		default: false,
+		merchantCouponId: 'special40',
+		status: 1,
+		usedCount: 0,
+		percentageDiscount: '0.40',
+		amountDiscount: null,
+		restrictedToProductId: 'product',
+	};
+	const couponRows: any[] = [
+		{ ...couponBase, id: 'discount', code: 'EXISTING40' },
+		{ ...couponBase, id: 'default', code: 'DEFAULT', default: true },
+		{
+			...couponBase,
+			id: 'global',
+			code: 'GLOBAL',
+			restrictedToProductId: null,
+		},
+		{
+			...couponBase,
+			id: 'other-coupon',
+			restrictedToProductId: 'other-product',
+		},
+	];
+	const saleBase = {
+		userId: 'buyer',
+		buyerEmail: 'buyer@example.test',
+		status: 'Valid',
+		couponId: 'discount',
+		couponCode: 'EXISTING40',
+		bulkCouponId: null,
+		bulkCouponCode: null,
+		redeemedBulkCouponId: null,
+		redeemedBulkCouponCode: null,
+	};
+	const saleRows = [
+		{
+			...saleBase,
+			id: 'sale3',
+			amount: '120.15',
+			createdAt: new Date('2026-03-03Z'),
+			productId: 'product',
+		},
+		{
+			...saleBase,
+			id: 'sale2',
+			amount: '0.00',
+			buyerEmail: null,
+			status: 'Valid',
+			couponId: null,
+			couponCode: null,
+			redeemedBulkCouponId: 'free',
+			redeemedBulkCouponCode: 'FREE',
+			createdAt: new Date('2026-03-02Z'),
+			productId: 'product',
+		},
+		{
+			...saleBase,
+			id: 'sale1',
+			amount: '50.25',
+			status: 'Refunded',
+			createdAt: new Date('2026-03-01Z'),
+			productId: 'product',
+		},
+		{
+			...saleBase,
+			id: 'foreign-sale',
+			amount: '999.00',
+			createdAt: new Date('2026-04-01Z'),
+			productId: 'other-product',
+		},
+	];
+	const commerceEvents: string[] = [];
+	const aggregate = (rows: any[]) => ({
+		purchaseCount: rows.length,
+		recordedAmount: (
+			rows.reduce((n, r) => n + Math.round(Number(r.amount) * 100), 0) / 100
+		).toFixed(2),
+	});
+	const commerce: any = {
+		transaction: async (run: any) => run(commerce),
+		product: async (id: string) => {
+			commerceEvents.push('product');
+			return ['product', 'other-product'].includes(id)
+				? { id, name: id, organizationId: null }
+				: null;
+		},
+		sales: async ({ productId, limit, offset }: any) => {
+			commerceEvents.push('sales');
+			const matching = saleRows.filter((r) => r.productId === productId);
+			return {
+				purchases: matching
+					.slice(offset, offset + limit)
+					.map(({ productId, ...row }) => row),
+				totals: aggregate(matching),
+				byStatus: [...new Set(matching.map((r) => r.status))].map((status) => ({
+					status,
+					...aggregate(matching.filter((r) => r.status === status)),
+				})),
+			};
+		},
+		coupons: async ({ productId, limit, offset }: any) =>
+			couponRows
+				.filter(
+					(r) =>
+						!r.restrictedToProductId || r.restrictedToProductId === productId,
+				)
+				.slice(offset, offset + limit),
+		discounts: async (productId: string) =>
+			productId === 'product'
+				? [
+						{ id: 'special40', percentageDiscount: '0.40' },
+						{ id: 'special50', percentageDiscount: '0.50' },
+					]
+				: [],
+		coupon: async (id: string) => couponRows.find((r) => r.id === id) ?? null,
+		codeExists: async (code: string) =>
+			couponRows.some(
+				(r) => r.code?.toLowerCase() === code.toLowerCase() || r.id === code,
+			),
+		insertCoupon: async (row: any) => {
+			commerceEvents.push('insert');
+			couponRows.push(row);
+		},
+		deactivateCoupon: async (id: string, expires: Date) => {
+			commerceEvents.push('deactivate');
+			Object.assign(
+				couponRows.find((r) => r.id === id),
+				{ status: 0, expires },
+			);
+		},
+	};
+	return { commerce, couponRows, saleRows, commerceEvents };
+}
+
 async function fixture(run: (f: any) => Promise<void>) {
 	const dir = await mkdtemp(
 		new URL('../../.test-content-', import.meta.url).pathname,
 	);
-	const state = memoryStore();
+	const state = { ...memoryStore(), ...memoryCommerce() };
 	(globalThis as any).__contentDbFixture = state;
 	try {
 		const files: Record<string, string> = {
 			'./admin-access.ts': 'guardAdminRequest,isContentApiPath',
 			'./ability.ts': 'getUserAbilityForRequest',
 			'./content-operations.ts': 'createOperationRunner',
+			'./commerce-service.ts': 'createCommerceService',
+			'../pages/api/admin/products/[productId]/sales.ts': 'GET as listSales',
+			'../pages/api/admin/products/[productId]/coupons/index.ts':
+				'GET as listCoupons,POST as createCoupon',
+			'../pages/api/admin/products/[productId]/coupons/[id]/deactivate.ts':
+				'POST as deactivateCoupon',
 			'../pages/api/admin/resources/index.ts':
 				'GET as listResources,POST as createResource',
 			'../pages/api/admin/resources/[id].ts':
@@ -283,17 +433,22 @@ async function fixture(run: (f: any) => Promise<void>) {
 		});
 		const api = await import(pathToFileURL(`${dir}/api.mjs`).href);
 		(globalThis as any).__contentRuntime = (user: any) =>
-			api.createOperationRunner(state.store, user, {
-				find_user: async ({ email }: any) => ({
-					user: state.people.find((u) => u.email === email) ?? null,
-					purchases: [],
-				}),
-				set_user_role: async ({ id, role }: any) => {
-					const person = state.people.find((u) => u.id === id)!;
-					person.role = role;
-					return { user: person };
+			api.createOperationRunner(
+				state.store,
+				user,
+				{
+					find_user: async ({ email }: any) => ({
+						user: state.people.find((u) => u.email === email) ?? null,
+						purchases: [],
+					}),
+					set_user_role: async ({ id, role }: any) => {
+						const person = state.people.find((u) => u.id === id)!;
+						person.role = role;
+						return { user: person };
+					},
 				},
-			});
+				api.createCommerceService(state.commerce, user),
+			);
 		const call = async (
 			handler: string,
 			path: string,
@@ -316,7 +471,11 @@ async function fixture(run: (f: any) => Promise<void>) {
 		async function route(request: Request, handler = 'mcp') {
 			const url = new URL(request.url);
 			const parts = url.pathname.split('/');
-			const params = { id: parts[4], action: parts[5] };
+			const params = {
+				productId: parts[4],
+				id: parts[3] === 'products' ? parts[6] : parts[4],
+				action: parts[5],
+			};
 			return api.guardAdminRequest(
 				request,
 				async () => (await api.getUserAbilityForRequest(request)).user,
@@ -343,6 +502,11 @@ async function fixture(run: (f: any) => Promise<void>) {
 				api.createOperationRunner(
 					state.store,
 					state.people.find((u) => u.id === id)!,
+					undefined,
+					api.createCommerceService(
+						state.commerce,
+						state.people.find((u) => u.id === id)!,
+					),
 				),
 		});
 	} finally {
@@ -740,6 +904,207 @@ it('only admins assign existing contributors and direct revocation removes inher
 		);
 	}));
 
+it('admin sales and coupons use recorded purchases and exact existing discounts, with confirmed free tickets and effective revocation', async () =>
+	fixture(
+		async ({ call, execute, couponRows, saleRows, commerceEvents }: any) => {
+			const path = '/api/admin/products/product';
+			const originalSales = JSON.stringify(saleRows);
+			for (const token of [undefined, 'user', 'reviewer', 'mike']) {
+				const before = commerceEvents.length;
+				for (const [handler, url, method, body] of [
+					['listSales', `${path}/sales`, 'GET'],
+					['listCoupons', `${path}/coupons`, 'GET'],
+					['createCoupon', `${path}/coupons`, 'POST', {}],
+					[
+						'deactivateCoupon',
+						`${path}/coupons/discount/deactivate`,
+						'POST',
+						{ confirmed: true },
+					],
+				]) {
+					const response = await call(handler, url, token, method, body);
+					assert.equal(response.status, 404);
+					assert.equal(
+						response.headers.get('Cache-Control'),
+						'private, no-store',
+					);
+				}
+				assert.equal(commerceEvents.length, before);
+			}
+			await assert.rejects(
+				execute('mike')('list_sales', { productId: 'product' }),
+				(e: any) => e.status === 404,
+			);
+			const firstResponse = await call(
+				'listSales',
+				`${path}/sales?limit=1`,
+				'admin',
+			);
+			assert.equal(firstResponse.status, 200);
+			const first = await firstResponse.json();
+			assert.equal(first.purchases.length, 1);
+			assert.equal(first.purchases[0].buyerEmail, 'buyer@example.test');
+			assert.equal(first.purchases[0].amount, '120.15');
+			assert.equal(first.purchases[0].couponCode, 'EXISTING40');
+			assert.equal(first.purchases[0].createdAt, '2026-03-03T00:00:00.000Z');
+			assert.deepEqual(first.totals, {
+				purchaseCount: 3,
+				recordedAmount: '170.40',
+			});
+			assert.equal(
+				first.byStatus.find((s: any) => s.status === 'Refunded').recordedAmount,
+				'50.25',
+			);
+			assert.equal(first.nextOffset, 1);
+			assert.equal(first.currency, null);
+			const second = await (
+				await call('listSales', `${path}/sales?limit=1&offset=1`, 'admin')
+			).json();
+			assert.equal(second.purchases[0].buyerEmail, null);
+			assert.equal(second.purchases[0].redeemedBulkCouponCode, 'FREE');
+			assert.deepEqual(second.totals, first.totals);
+			assert.equal(
+				(await call('listSales', `${path}/sales?limit=0`, 'admin')).status,
+				400,
+			);
+			assert.equal(
+				(await call('listSales', '/api/admin/products/missing/sales', 'admin'))
+					.status,
+				404,
+			);
+			const listed = await (
+				await call('listCoupons', `${path}/coupons`, 'admin')
+			).json();
+			assert.deepEqual(listed.availableDiscountFractions, [0.4, 0.5]);
+			assert.ok(
+				listed.coupons.some(
+					(r: any) => r.id === 'global' && r.scope === 'global',
+				),
+			);
+			assert.ok(!listed.coupons.some((r: any) => r.id === 'other-coupon'));
+			const expires = new Date(Date.now() + 86_400_000).toISOString();
+			const create = (body: any) =>
+				call('createCoupon', `${path}/coupons`, 'admin', 'POST', body);
+			const body = {
+				code: 'TEST40',
+				percentageDiscount: 0.4,
+				maxUses: 50,
+				expires,
+			};
+			const createdResponse = await create(body);
+			assert.equal(createdResponse.status, 201);
+			const created = (await createdResponse.json()).coupon;
+			assert.equal(created.merchantCouponId, 'special40');
+			assert.equal(created.percentageDiscount, '0.40');
+			assert.equal(created.restrictedToProductId, 'product');
+			assert.equal(created.default, false);
+			assert.equal((await create(body)).status, 409);
+			assert.equal((await create({ ...body, code: 'discount' })).status, 409);
+			const missing = await create({
+				...body,
+				code: 'MISSING33',
+				percentageDiscount: 0.33,
+			});
+			assert.equal(missing.status, 409);
+			const missingError = await missing.json();
+			assert.match(missingError.error, /No active special/);
+			assert.match(missingError.next, /0.4, 0.5/);
+			assert.match(missingError.next, /desk/);
+			for (const percentageDiscount of [0, 0.401, 1.01])
+				assert.equal(
+					(await create({ ...body, percentageDiscount })).status,
+					400,
+				);
+			assert.equal((await create({ ...body, default: true })).status, 400);
+			assert.equal(
+				(await create({ ...body, merchantCouponId: 'forged' })).status,
+				400,
+			);
+			assert.equal(
+				(await create({ ...body, expires: '2020-01-01T00:00:00Z' })).status,
+				400,
+			);
+			assert.equal(
+				(await create({ percentageDiscount: 1, maxUses: 3 })).status,
+				400,
+			);
+			const freeResponse = await create({
+				percentageDiscount: 1,
+				maxUses: 3,
+				confirmed: true,
+			});
+			assert.equal(freeResponse.status, 201);
+			const free = await freeResponse.json();
+			assert.match(free.message, /free ticket/);
+			assert.equal(free.coupon.merchantCouponId, null);
+			assert.match(free.coupon.code, /^CTV_/);
+			const freeRow = couponRows.find((r: any) => r.id === free.coupon.id);
+			assert.equal(
+				validateCoupon(couponSchema.parse(freeRow), ['product']).isRedeemable,
+				true,
+			);
+			assert.equal(
+				(
+					await call(
+						'deactivateCoupon',
+						`${path}/coupons/${freeRow.id}/deactivate`,
+						'admin',
+						'POST',
+						{},
+					)
+				).status,
+				400,
+			);
+			const deactivated = await call(
+				'deactivateCoupon',
+				`${path}/coupons/${freeRow.id}/deactivate`,
+				'admin',
+				'POST',
+				{ confirmed: true },
+			);
+			assert.equal(deactivated.status, 200);
+			assert.equal(freeRow.status, 0);
+			assert.ok(freeRow.expires.getTime() < Date.now());
+			assert.equal(
+				validateCoupon(couponSchema.parse(freeRow), ['product']).isRedeemable,
+				false,
+			);
+			const oldExpiry = new Date('2025-01-01Z');
+			freeRow.expires = oldExpiry;
+			freeRow.usedCount = 2;
+			assert.equal(
+				(
+					await call(
+						'deactivateCoupon',
+						`${path}/coupons/${freeRow.id}/deactivate`,
+						'admin',
+						'POST',
+						{ confirmed: true },
+					)
+				).status,
+				200,
+			);
+			assert.equal(freeRow.expires.getTime(), oldExpiry.getTime());
+			assert.equal(freeRow.usedCount, 2);
+			for (const id of ['default', 'global', 'other-coupon']) {
+				assert.equal(
+					(
+						await call(
+							'deactivateCoupon',
+							`${path}/coupons/${id}/deactivate`,
+							'admin',
+							'POST',
+							{ confirmed: true },
+						)
+					).status,
+					409,
+				);
+				assert.equal(couponRows.find((r: any) => r.id === id).status, 1);
+			}
+			assert.equal(JSON.stringify(saleRows), originalSales);
+		},
+	));
+
 it('MCP Streamable HTTP client round-trips through the same operations, filters tools and never upgrades a token role', async () =>
 	fixture(async ({ route, rows }: any) => {
 		async function clientFor(token: string) {
@@ -767,7 +1132,10 @@ it('MCP Streamable HTTP client round-trips through the same operations, filters 
 				'find_user',
 				'add_contributor',
 				'attach_mux_asset',
-				'sales_summary',
+				'list_sales',
+				'list_coupons',
+				'create_coupon',
+				'deactivate_coupon',
 			])
 				assert.ok(!names.includes(name));
 			const readNames = (await reviewer.listTools()).tools.map((t) => t.name);
@@ -796,6 +1164,38 @@ it('MCP Streamable HTTP client round-trips through the same operations, filters 
 			assert.equal(roleDenied.isError, true);
 			const adminNames = (await admin.listTools()).tools.map((t) => t.name);
 			assert.ok(adminNames.includes('add_contributor'));
+			for (const name of [
+				'list_sales',
+				'list_coupons',
+				'create_coupon',
+				'deactivate_coupon',
+			])
+				assert.ok(adminNames.includes(name));
+			const sales = await admin.callTool({
+				name: 'list_sales',
+				arguments: { productId: 'product', limit: 1 },
+			});
+			assert.equal(
+				(sales.structuredContent as any).data.totals.recordedAmount,
+				'170.40',
+			);
+			const coupon = await admin.callTool({
+				name: 'create_coupon',
+				arguments: {
+					productId: 'product',
+					percentageDiscount: 0.5,
+					maxUses: 10,
+				},
+			});
+			assert.equal(
+				(coupon.structuredContent as any).data.coupon.merchantCouponId,
+				'special50',
+			);
+			const commerceDenied = await contributor.callTool({
+				name: 'list_sales',
+				arguments: { productId: 'product' },
+			});
+			assert.equal(commerceDenied.isError, true);
 			const assigned = await admin.callTool({
 				name: 'add_contributor',
 				arguments: { id: 'workshop', email: 'new-contributor@example.test' },
@@ -855,6 +1255,10 @@ it('Astro routes wire real middleware, session CSRF and resource/MCP handlers wi
 			'server/ability.ts',
 			'server/content-http.ts',
 			'server/content-contract.ts',
+			'server/commerce-contract.ts',
+			'pages/api/admin/products/[productId]/sales.ts',
+			'pages/api/admin/products/[productId]/coupons/index.ts',
+			'pages/api/admin/products/[productId]/coupons/[id]/deactivate.ts',
 			'server/content-mcp.ts',
 			'pages/api/admin/mcp.ts',
 			'pages/api/admin/resources/index.ts',
@@ -915,6 +1319,34 @@ it('Astro routes wire real middleware, session CSRF and resource/MCP handlers wi
 			const guest = await fetch(`${base}/api/admin/resources`);
 			assert.equal(guest.status, 404);
 			assert.equal(guest.headers.get('Netlify-CDN-Cache-Control'), 'no-store');
+			const deniedSales = await fetch(
+				`${base}/api/admin/products/product/sales`,
+				{ headers: { Authorization: 'Bearer mike' } },
+			);
+			assert.equal(deniedSales.status, 404);
+			const sales = await fetch(
+				`${base}/api/admin/products/product/sales?limit=1`,
+				{ headers: { Authorization: 'Bearer admin' } },
+			);
+			assert.equal(sales.status, 200, await sales.clone().text());
+			assert.equal((await sales.json()).totals.recordedAmount, '170.40');
+			const couponRequest = (origin?: string) =>
+				fetch(`${base}/api/admin/products/product/coupons`, {
+					method: 'POST',
+					headers: {
+						Cookie: '__session=admin',
+						'Content-Type': 'application/json',
+						...(origin ? { Origin: origin } : {}),
+					},
+					body: JSON.stringify({ percentageDiscount: 0.4, maxUses: 5 }),
+				});
+			assert.equal((await couponRequest()).status, 403);
+			const couponResponse = await couponRequest(base);
+			assert.equal(
+				couponResponse.status,
+				201,
+				await couponResponse.clone().text(),
+			);
 			const read = await fetch(`${base}/api/admin/resources/lesson`, {
 				headers: { Authorization: 'Bearer mike' },
 			});

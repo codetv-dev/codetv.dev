@@ -8,6 +8,11 @@ import {
 } from './content-contract';
 import { createContentService } from './content-service';
 import type { ContentStore } from './content-store';
+import {
+	commerceInputs,
+	type CommerceOperation,
+	type CommerceOperations,
+} from './commerce-contract';
 
 export type OperationRunner = (
 	operation: ContentOperation,
@@ -23,6 +28,7 @@ export function createOperationRunner(
 	store: ContentStore,
 	user: AbilityUser,
 	userOperations?: UserOperations,
+	commerceOperations?: CommerceOperations,
 ): OperationRunner {
 	const service = createContentService(store, user);
 	return async (operation, raw) => {
@@ -56,7 +62,21 @@ export function createOperationRunner(
 				input as ContentInput<'set_user_role'>,
 			);
 		}
-		const handler = service[operation] as (input: unknown) => Promise<unknown>;
+		if (operation in commerceInputs) {
+			if (!commerceOperations)
+				throw new ContentError(
+					503,
+					'Commerce operations are unavailable.',
+					'Try again later.',
+				);
+			const handler = commerceOperations[operation as CommerceOperation] as (
+				input: unknown,
+			) => Promise<unknown>;
+			return handler(input);
+		}
+		const handler = service[operation as keyof typeof service] as (
+			input: unknown,
+		) => Promise<unknown>;
 		return handler(input);
 	};
 }

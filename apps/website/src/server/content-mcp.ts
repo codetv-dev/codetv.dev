@@ -12,6 +12,14 @@ import {
 import type { OperationRunner } from './content-operations';
 
 const descriptions: Record<ContentOperation, string> = {
+	list_sales:
+		'Admin only: list product purchases with buyer email, recorded amount, coupon, status, date and totals. DB-only; not reconciled payment revenue.',
+	list_coupons:
+		'Admin only: list product-specific and global coupons, plus available exact provider discount fractions. Global and default offers are read-only here.',
+	create_coupon:
+		'Admin only: create a product-specific code using the existing Coupon model. Fractions 0.01–0.99 need an exact existing provider discount; 1 creates a free ticket and requires confirmed:true. No Stripe write or price change.',
+	deactivate_coupon:
+		'Admin only: deactivate and expire a product-specific non-default code after confirmation. Existing purchases are unchanged. Global/default offer changes are refused.',
 	list_resources:
 		'List content you can read. Pagination counts scanned rows: continue nextOffset even after an empty page.',
 	get_resource: 'Read a content resource and its accessible child relations.',
