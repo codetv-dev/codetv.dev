@@ -209,7 +209,29 @@ export function createContentService(store: ContentStore, user: AbilityUser) {
 						: 'unpublish',
 			);
 	}
-	async function patch(input: ContentInput<'update_resource'>) {
+	function protectWorkshop(
+		resource: ContentResourceRow,
+		fields: Record<string, any>,
+		intent?: 'publish' | 'unpublish' | 'archive' | 'delete',
+	) {
+		if (resource.type !== 'workshop' || ability.can('manage', 'all')) return;
+		if (
+			intent ||
+			['slug', 'state', 'visibility'].some(
+				(key) =>
+					fields[key] !== undefined && fields[key] !== resource.fields?.[key],
+			)
+		)
+			throw new ContentError(
+				403,
+				'Workshop reachability is admin-owned because buyers and scheduled emails depend on it.',
+				'Ask an admin to change the workshop slug, state, visibility or deletion. You can still edit workshop text and owned chapters.',
+			);
+	}
+	async function patch(
+		input: ContentInput<'update_resource'>,
+		intent?: 'publish' | 'unpublish' | 'archive',
+	) {
 		validateFields(
 			(await target(store, input.id, 'update')).type,
 			input.fields,
@@ -222,6 +244,7 @@ export function createContentService(store: ContentStore, user: AbilityUser) {
 					: []),
 			]);
 			const resource = await target(tx, input.id, 'update');
+			protectWorkshop(resource, input.fields, intent);
 			await statePermission(tx, input.id, input.fields);
 			await videoReference(tx, input.fields);
 			const fields = { ...resource.fields, ...input.fields };
@@ -325,6 +348,20 @@ export function createContentService(store: ContentStore, user: AbilityUser) {
 				slug: input.fields.slug ?? `${slug(input.title)}~${id.split('~')[1]}`,
 			};
 			validateFields(input.type, fields);
+			// A caller-chosen duplicate workshop slug could shadow a sold workshop
+			// even while the new row is a draft. Contributor creations use our slug.
+			if (
+				input.type === 'workshop' &&
+				ability.cannot('manage', 'all') &&
+				(fields.state !== 'draft' ||
+					fields.visibility !== 'unlisted' ||
+					input.fields.slug !== undefined)
+			)
+				throw new ContentError(
+					403,
+					'New contributor workshops must be server-slugged, unlisted drafts.',
+					'Create a default draft and ask an admin to set its reachability or publish it.',
+				);
 			if (fields.state === 'published' && ability.cannot('publish', proposed))
 				throw new ContentError(
 					403,
@@ -346,6 +383,7 @@ export function createContentService(store: ContentStore, user: AbilityUser) {
 			return store.transaction(async (tx) => {
 				await tx.lock([input.id]);
 				const resource = await target(tx, input.id, 'delete');
+				protectWorkshop(resource, {}, 'delete');
 				await tx.patch(
 					input.id,
 					{ ...resource.fields, state: 'archived' },
@@ -362,11 +400,11 @@ export function createContentService(store: ContentStore, user: AbilityUser) {
 			});
 		},
 		publish: (input: ContentInput<'publish'>) =>
-			patch({ id: input.id, fields: { state: 'published' } }),
+			patch({ id: input.id, fields: { state: 'published' } }, 'publish'),
 		unpublish: (input: ContentInput<'unpublish'>) =>
-			patch({ id: input.id, fields: { state: 'draft' } }),
+			patch({ id: input.id, fields: { state: 'draft' } }, 'unpublish'),
 		archive: (input: ContentInput<'archive'>) =>
-			patch({ id: input.id, fields: { state: 'archived' } }),
+			patch({ id: input.id, fields: { state: 'archived' } }, 'archive'),
 		async add_to_workshop(input: ContentInput<'add_to_workshop'>) {
 			return store.transaction(async (tx) => {
 				await tx.lock([input.parentId, input.childId]);

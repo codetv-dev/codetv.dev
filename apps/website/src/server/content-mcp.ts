@@ -16,14 +16,14 @@ const descriptions: Record<ContentOperation, string> = {
 		'List content you can read. Pagination counts scanned rows: continue nextOffset even after an empty page.',
 	get_resource: 'Read a content resource and its accessible child relations.',
 	create_resource:
-		'Create a workshop, section, lesson or videoResource owned by you. Defaults to draft/unlisted.',
+		'Create owned content. Contributor workshops must use a server-generated slug and remain unlisted drafts until an admin publishes.',
 	update_resource:
-		'Merge fields on content you own. Raw Mux identity is admin-only; videoResourceId must reference an owned video.',
+		'Merge fields on owned content. Workshop slug/state/visibility and raw Mux identity are admin-only. videoResourceId must reference an owned video.',
 	delete_resource:
-		'Soft-delete content you own after explicit confirmation. Does not delete descendants or Mux assets.',
-	publish: 'Publish content you own.',
-	unpublish: 'Move owned content back to draft.',
-	archive: 'Archive owned content.',
+		'Soft-delete owned content after confirmation. Workshops require admin. Does not delete descendants or Mux assets.',
+	publish: 'Publish owned content. Workshops require admin.',
+	unpublish: 'Move owned content back to draft. Workshops require admin.',
+	archive: 'Archive owned content. Workshops require admin.',
 	add_to_workshop:
 		'Attach owned content: workshop to section/lesson, section to lesson, or lesson to videoResource. Both endpoints must be owned.',
 	update_relation:

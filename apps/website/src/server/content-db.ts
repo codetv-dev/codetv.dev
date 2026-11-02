@@ -106,10 +106,15 @@ export function createContentStore(connection: Connection = db): ContentStore {
 					metadata: contentResourceResource.metadata,
 				})
 				.from(contentResourceResource)
+				.innerJoin(
+					contentResource,
+					eq(contentResourceResource.resourceId, contentResource.id),
+				)
 				.where(
 					and(
 						eq(contentResourceResource.resourceOfId, id),
 						isNull(contentResourceResource.deletedAt),
+						isNull(contentResource.deletedAt),
 					),
 				)
 				.orderBy(

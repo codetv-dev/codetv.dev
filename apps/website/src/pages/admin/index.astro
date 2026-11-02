@@ -1,6 +1,14 @@
 ---
 import AdminLayout from '../../layouts/admin.astro';
+import { privateLessonHeaders } from '../../coursebuilder/workshop-lessons';
 export const prerender = false;
+for (const [key, value] of Object.entries(privateLessonHeaders))
+	Astro.response.headers.set(key, value);
+if (!Astro.locals.adminViewer)
+	return new Response('Not found', {
+		status: 404,
+		headers: privateLessonHeaders,
+	});
 ---
 
 <AdminLayout title="Admin">

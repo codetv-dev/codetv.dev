@@ -29,7 +29,12 @@ function memoryStore() {
 				id: 'workshop',
 				type: 'workshop',
 				createdById: 'admin',
-				fields: { title: 'Workshop', state: 'published' },
+				fields: {
+					title: 'Workshop',
+					state: 'published',
+					slug: 'sold-workshop',
+					visibility: 'public',
+				},
 			},
 		],
 		[
@@ -137,7 +142,12 @@ function memoryStore() {
 		},
 		edges: async (id) =>
 			edges
-				.filter((e) => e.resourceOfId === id)
+				.filter(
+					(e) =>
+						e.resourceOfId === id &&
+						rows.has(e.resourceId) &&
+						!rows.get(e.resourceId)?.deletedAt,
+				)
 				.sort((a, b) => a.position - b.position),
 		insert: async (row) => {
 			rows.set(row.id, row);
@@ -390,6 +400,71 @@ it('HTTP uses the stored bearer role, scopes every resource, and rejects a contr
 			403,
 		);
 		assert.equal(rows.get('foreign').fields.body, 'FOREIGN_SECRET');
+		for (const fields of [
+			{ slug: 'changed-slug' },
+			{ state: 'draft' },
+			{ visibility: 'private' },
+		]) {
+			assert.equal(
+				(
+					await call(
+						'updateResource',
+						'/api/admin/resources/workshop',
+						'mike',
+						'PUT',
+						{ fields },
+					)
+				).status,
+				403,
+			);
+		}
+		assert.equal(
+			(
+				await call(
+					'deleteResource',
+					'/api/admin/resources/workshop',
+					'mike',
+					'DELETE',
+					{ confirmed: true },
+				)
+			).status,
+			403,
+		);
+		assert.equal(
+			(
+				await call(
+					'action',
+					'/api/admin/resources/workshop/unpublish',
+					'mike',
+					'POST',
+				)
+			).status,
+			403,
+		);
+		assert.equal(
+			(
+				await call(
+					'updateResource',
+					'/api/admin/resources/workshop',
+					'mike',
+					'PUT',
+					{ fields: { body: 'Workshop text remains editable' } },
+				)
+			).status,
+			200,
+		);
+		assert.equal(
+			(
+				await call(
+					'updateResource',
+					'/api/admin/resources/workshop',
+					'admin',
+					'PUT',
+					{ fields: { slug: 'admin-changed-slug' } },
+				)
+			).status,
+			200,
+		);
 		const edited = await call(
 			'updateResource',
 			'/api/admin/resources/lesson',
@@ -495,6 +570,14 @@ it('owned content CRUD covers structure, ordering, publish state and tombstones 
 			type: 'workshop',
 			title: 'My workshop',
 		});
+		await assert.rejects(
+			run('create_resource', {
+				type: 'workshop',
+				title: 'Shadow sold workshop',
+				fields: { slug: 'sold-workshop' },
+			}),
+			/server-slugged/,
+		);
 		const lesson = await run('create_resource', {
 			type: 'lesson',
 			title: 'My chapter',
@@ -559,6 +642,12 @@ it('owned content CRUD covers structure, ordering, publish state and tombstones 
 				fields: { startsAt: 'tomorrow' },
 			}),
 			/ISO timestamp/,
+		);
+		await run('delete_resource', { id: lesson.id, confirmed: true });
+		await run('reorder', { id: workshop.id, childIds: [] });
+		assert.deepEqual(
+			(await run('get_resource', { id: workshop.id })).children,
+			[],
 		);
 	}));
 
