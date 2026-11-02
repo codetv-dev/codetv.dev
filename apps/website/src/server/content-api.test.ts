@@ -365,6 +365,7 @@ async function fixture(run: (f: any) => Promise<void>) {
 			'./ability.ts': 'getUserAbilityForRequest',
 			'./content-operations.ts': 'createOperationRunner',
 			'./commerce-service.ts': 'createCommerceService',
+			'./content-contract.ts': 'contentInputs',
 			'../pages/api/admin/products/[productId]/sales.ts': 'GET as listSales',
 			'../pages/api/admin/products/[productId]/coupons/index.ts':
 				'GET as listCoupons,POST as createCoupon',
@@ -904,9 +905,16 @@ it('only admins assign existing contributors and direct revocation removes inher
 		);
 	}));
 
-it('admin sales and coupons use recorded purchases and exact existing discounts, with confirmed free tickets and effective revocation', async () =>
+it('admin sales and coupons use recorded purchases and exact discounts, refuse unsupported free tickets and expire legacy codes', async () =>
 	fixture(
-		async ({ call, execute, couponRows, saleRows, commerceEvents }: any) => {
+		async ({
+			call,
+			execute,
+			api,
+			couponRows,
+			saleRows,
+			commerceEvents,
+		}: any) => {
 			const path = '/api/admin/products/product';
 			const originalSales = JSON.stringify(saleRows);
 			for (const token of [undefined, 'user', 'reviewer', 'mike']) {
@@ -985,6 +993,17 @@ it('admin sales and coupons use recorded purchases and exact existing discounts,
 			const expires = new Date(Date.now() + 86_400_000).toISOString();
 			const create = (body: any) =>
 				call('createCoupon', `${path}/coupons`, 'admin', 'POST', body);
+			assert.deepEqual(
+				[0.07, 0.29, 0.57, 0.075].map(
+					(percentageDiscount) =>
+						api.contentInputs.create_coupon.safeParse({
+							productId: 'product',
+							percentageDiscount,
+							maxUses: 1,
+						}).success,
+				),
+				[true, true, true, false],
+			);
 			const body = {
 				code: 'TEST40',
 				percentageDiscount: 0.4,
@@ -1028,17 +1047,29 @@ it('admin sales and coupons use recorded purchases and exact existing discounts,
 				(await create({ percentageDiscount: 1, maxUses: 3 })).status,
 				400,
 			);
+			const beforeFree = couponRows.length;
 			const freeResponse = await create({
 				percentageDiscount: 1,
 				maxUses: 3,
 				confirmed: true,
 			});
-			assert.equal(freeResponse.status, 201);
-			const free = await freeResponse.json();
-			assert.match(free.message, /free ticket/);
-			assert.equal(free.coupon.merchantCouponId, null);
-			assert.match(free.coupon.code, /^CTV_/);
-			const freeRow = couponRows.find((r: any) => r.id === free.coupon.id);
+			assert.equal(freeResponse.status, 409);
+			assert.equal(
+				(await freeResponse.json()).error,
+				"Free-ticket codes can't be redeemed on codetv.dev yet.",
+			);
+			assert.equal(couponRows.length, beforeFree);
+			// Legacy/existing full-discount codes must still be revocable through
+			// the existing model even though this API cannot create new ones.
+			const freeRow = {
+				...couponRows[0],
+				id: 'legacy-free',
+				code: 'LEGACY_FREE',
+				percentageDiscount: '1.00',
+				merchantCouponId: null,
+				maxUses: 3,
+			};
+			couponRows.push(freeRow);
 			assert.equal(
 				validateCoupon(couponSchema.parse(freeRow), ['product']).isRedeemable,
 				true,

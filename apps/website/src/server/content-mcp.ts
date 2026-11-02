@@ -17,7 +17,7 @@ const descriptions: Record<ContentOperation, string> = {
 	list_coupons:
 		'Admin only: list product-specific and global coupons, plus available exact provider discount fractions. Global and default offers are read-only here.',
 	create_coupon:
-		'Admin only: create a product-specific code using the existing Coupon model. Fractions 0.01–0.99 need an exact existing provider discount; 1 creates a free ticket and requires confirmed:true. No Stripe write or price change.',
+		'Admin only: create a product-specific discount code using the existing Coupon model. Fractions 0.01–0.99 need an exact existing provider discount. Free-ticket creation returns 409 until Team Claim Link redemption ships; confirmed:true does not bypass this. No Stripe write or price change.',
 	deactivate_coupon:
 		'Admin only: deactivate and expire a product-specific non-default code after confirmation. Existing purchases are unchanged. Global/default offer changes are refused.',
 	list_resources:

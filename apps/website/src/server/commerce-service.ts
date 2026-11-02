@@ -80,6 +80,15 @@ export function createCommerceService(
 		async create_coupon(input) {
 			return store.transaction(async (tx) => {
 				const item = await product(tx, input.productId, true);
+				// The site has no Team Claim Link redemption flow yet. Before enabling
+				// free-ticket creation, require finite maxUses; -1 gives unlimited seats.
+				if (input.percentageDiscount === 1)
+					throw new ContentError(
+						409,
+						'Checkout excludes full discounts and the Team Claim Link redemption flow has not shipped.',
+						'Ask the desk to grant access directly, or build the Team Claim Link redeem flow first.',
+						"Free-ticket codes can't be redeemed on codetv.dev yet.",
+					);
 				const now = new Date();
 				const expires = input.expires ? new Date(input.expires) : null;
 				if (expires && expires <= now)
@@ -96,22 +105,17 @@ export function createCommerceService(
 						'This code is already in use or conflicts with a coupon id.',
 						'Choose a different code.',
 					);
-				const freeTicket = input.percentageDiscount === 1;
-				let merchantCouponId: string | null = null;
-				if (!freeTicket) {
-					const discounts = await tx.discounts(input.productId);
-					const exact = discounts.find(
-						(d) => Number(d.percentageDiscount) === input.percentageDiscount,
+				const discounts = await tx.discounts(input.productId);
+				const exact = discounts.find(
+					(d) => Number(d.percentageDiscount) === input.percentageDiscount,
+				);
+				if (!exact)
+					throw new ContentError(
+						409,
+						'Checkout could not apply this code without a matching provider discount.',
+						`Use an available fraction (${availableFractions(discounts).join(', ') || 'none available'}), or ask an admin or the desk to provision a provider discount at this percentage.`,
+						'No active special MerchantCoupon with a provider id matches that percentage.',
 					);
-					if (!exact)
-						throw new ContentError(
-							409,
-							'Checkout could not apply this code without a matching provider discount.',
-							`Use an available fraction (${availableFractions(discounts).join(', ') || 'none available'}), or ask an admin or the desk to provision a provider discount at this percentage.`,
-							'No active special MerchantCoupon with a provider id matches that percentage.',
-						);
-					merchantCouponId = exact.id;
-				}
 				const row = {
 					id: `coupon_${randomUUID()}`,
 					code,
@@ -125,7 +129,7 @@ export function createCommerceService(
 					default: false,
 					percentageDiscount: input.percentageDiscount.toFixed(2),
 					amountDiscount: null,
-					merchantCouponId,
+					merchantCouponId: exact.id,
 					fields: { createdById: user.id, createdVia: 'admin-api' },
 				};
 				try {
@@ -145,10 +149,9 @@ export function createCommerceService(
 				}
 				return {
 					coupon: row,
-					kind: freeTicket ? 'free-ticket' : 'discount',
-					message: freeTicket
-						? 'Created a free ticket code. Each redemption gives away a ticket.'
-						: 'Created a product-specific discount code using an existing provider discount. No Stripe write or product price change was made.',
+					kind: 'discount',
+					message:
+						'Created a product-specific discount code using an existing provider discount. No Stripe write or product price change was made.',
 				};
 			});
 		},
