@@ -1,5 +1,5 @@
 ---
-import { and, eq } from 'drizzle-orm';
+import { and, eq, isNull } from 'drizzle-orm';
 import Layout from '../../../layouts/default.astro';
 import MuxVideoPlayer from '../../../components/mux-video-player.astro';
 import {
@@ -52,6 +52,7 @@ const playback = await getLessonPlayback({
 		const lesson = await db.query.contentResource.findFirst({
 			where: and(
 				eq(contentResource.id, chapter.id),
+				isNull(contentResource.deletedAt),
 				eq(contentResource.type, 'lesson'),
 			),
 			with: { resources: { with: { resource: true } } },
@@ -61,13 +62,17 @@ const playback = await getLessonPlayback({
 		if (typeof fields.videoResourceId !== 'string') {
 			return (
 				lesson?.resources.find(
-					(link) => link.resource?.type === 'videoResource',
+					(link) =>
+						link.resource?.type === 'videoResource' &&
+						!link.deletedAt &&
+						!link.resource.deletedAt,
 				)?.resource?.fields ?? null
 			);
 		}
 		const video = await db.query.contentResource.findFirst({
 			where: and(
 				eq(contentResource.id, fields.videoResourceId),
+				isNull(contentResource.deletedAt),
 				eq(contentResource.type, 'videoResource'),
 			),
 		});

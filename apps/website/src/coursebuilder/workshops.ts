@@ -118,14 +118,17 @@ export async function getWorkshopForSale(
 	const workshop = await db.query.contentResource.findFirst({
 		where: and(
 			eq(contentResource.type, 'workshop'),
+			isNull(contentResource.deletedAt),
 			or(eq(contentResource.slug, slug), eq(contentResource.id, slug)),
 		),
 		with: {
 			resources: {
+				where: isNull(contentResourceResource.deletedAt),
 				with: {
 					resource: {
 						with: {
 							resources: {
+								where: isNull(contentResourceResource.deletedAt),
 								with: { resource: true },
 								orderBy: asc(contentResourceResource.position),
 							},
@@ -181,13 +184,13 @@ export async function getWorkshopForSale(
 
 	const chapterCandidates = workshop.resources.flatMap((link) => {
 		const resource = link.resource;
-		if (!resource) return [];
+		if (!resource || resource.deletedAt) return [];
 		const lessons =
 			resource.type === 'section'
 				? resource.resources.map((child) => child.resource)
 				: [resource];
 		return lessons
-			.filter((lesson) => lesson?.type === 'lesson')
+			.filter((lesson) => lesson?.type === 'lesson' && !lesson.deletedAt)
 			.map((lesson) => ({
 				lesson,
 				section: resource.type === 'section' ? resource : null,
@@ -223,7 +226,7 @@ export async function getWorkshopForSale(
 			typeof fields.seoDescription === 'string' ? fields.seoDescription : null,
 		outline: workshop.resources
 			.map((link) => link.resource)
-			.filter(Boolean)
+			.filter((resource) => resource && !resource.deletedAt)
 			.map((resource) => ({
 				id: resource.id,
 				type: resource.type,

@@ -1,7 +1,11 @@
 import { clerkMiddleware } from '@clerk/astro/server';
 import { defineMiddleware, sequence } from 'astro:middleware';
 import { guardWorkshopCache } from './coursebuilder/workshop-cache';
-import { guardAdminRequest, isAdminPath } from './server/admin-access';
+import {
+	guardAdminRequest,
+	isAdminPath,
+	isContentApiPath,
+} from './server/admin-access';
 import { findCourseBuilderUserForClerkUser } from './coursebuilder/users';
 import { getUserAbilityForRequest } from './server/ability';
 
@@ -57,9 +61,11 @@ const adminGuard = defineMiddleware(async (context, next) => {
 						(await context.locals.currentUser?.()) ?? null,
 					),
 		async (viewer) => {
-			context.locals.adminViewer = viewer;
+			context.locals.contentViewer = viewer;
+			if (viewer.role === 'admin') context.locals.adminViewer = viewer;
 			return next();
 		},
+		isContentApiPath(context.url.pathname) ? 'content' : 'admin',
 	);
 });
 
