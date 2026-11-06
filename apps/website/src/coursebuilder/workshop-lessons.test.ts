@@ -55,7 +55,7 @@ it('releases signed playback to buyers at the stored instant, never public playb
 	);
 	assert.equal(
 		chapterUnlockLabel('2026-11-10T08:00:00Z'),
-		'Unlocks Tue, Nov 10 (Pacific)',
+		'Unlocks Tue, Nov 10 at 12:00 AM PT',
 	);
 });
 

@@ -22,7 +22,11 @@ export function chapterUnlockLabel(startsAt: string | null) {
 		weekday: 'short',
 		month: 'short',
 		day: 'numeric',
-	}).format(new Date(startsAt))} (Pacific)`;
+	}).format(new Date(startsAt))} at ${new Intl.DateTimeFormat('en-US', {
+		timeZone: 'America/Los_Angeles',
+		hour: 'numeric',
+		minute: '2-digit',
+	}).format(new Date(startsAt))} PT`;
 }
 
 export const privateLessonHeaders = {
