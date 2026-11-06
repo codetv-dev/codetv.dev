@@ -16,7 +16,7 @@ export const prerender = false;
 	</div>
 
 	<div class="middle">
-		<nav class="links">
+		<nav class="links" aria-label="About CodeTV">
 			<a href="https://partners.codetv.dev">Become a partner / sponsor</a>
 			<a href="https://codetv.link/uses">Gear, software, & more we use</a>
 			<a href="mailto:info@codetv.dev">Send us an email</a>
@@ -25,7 +25,7 @@ export const prerender = false;
 		</nav>
 	</div>
 
-	<nav class="links">
+	<nav class="links" aria-label="Community">
 		<Search />
 		<Show when="signed-in">
 			<Fragment slot="fallback">

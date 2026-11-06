@@ -92,6 +92,7 @@ const path = `/workshops/${workshop.slug}`;
 		{
 			!hasTicket && !preview ? (
 				<p>
+					{chapterUnlockLabel(chapter.startsAt)}{' '}
 					<a href={`${path}#ticket`}>Get a ticket</a> to watch this workshop.{' '}
 					{!clerkUser && (
 						<a

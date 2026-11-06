@@ -13,11 +13,11 @@ const nav = [
 ---
 
 <header>
-	<a href="/" rel="home">
-		<CodeTVLogo />
+	<a href="/" rel="home" aria-label="CodeTV home">
+		<CodeTVLogo aria-hidden="true" />
 	</a>
 
-	<nav>
+	<nav id="primary-navigation" aria-label="Primary">
 		{nav.map(({ path, label }) => <a href={path}>{label}</a>)}
 
 		<Show when="signed-in">
@@ -71,8 +71,18 @@ const nav = [
 		</UserButton>
 	</nav>
 
-	<button class="menu-toggle">
-		<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+	<button
+		class="menu-toggle"
+		aria-label="Toggle navigation"
+		aria-expanded="false"
+		aria-controls="primary-navigation"
+	>
+		<svg
+			aria-hidden="true"
+			xmlns="http://www.w3.org/2000/svg"
+			fill="none"
+			viewBox="0 0 24 24"
+		>
 			<path
 				fill="#EDE9F6"
 				d="M0 1a1 1 0 0 1 1-1h22a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1H1a1 1 0 0 1-1-1V1ZM0 10a1 1 0 0 1 1-1h22a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1H1a1 1 0 0 1-1-1v-4Z"
@@ -92,12 +102,13 @@ const nav = [
 
 <script>
 	function setupNav() {
-		const nav = document.querySelector('nav');
+		const nav = document.querySelector('#primary-navigation');
 		const menuToggleBtn = document.querySelector('.menu-toggle');
 		const navSearchBtn = document.querySelector('[data-name="nav-search"]');
 
 		function handleToggle() {
-			nav?.classList.toggle('open');
+			const expanded = nav?.classList.toggle('open') ?? false;
+			menuToggleBtn?.setAttribute('aria-expanded', String(expanded));
 		}
 
 		function handleSearchClick(event: Event) {
