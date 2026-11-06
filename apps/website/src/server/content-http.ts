@@ -10,13 +10,21 @@ import { contentOperationsForUser } from './content-runtime';
 
 export const contentJson = (value: unknown, status = 200) =>
 	Response.json(value, { status, headers: privateLessonHeaders });
-export function contentFailure(error: unknown) {
+export function contentFailure(error: unknown, operation = 'mcp') {
 	if (error instanceof ContentError)
 		return contentJson(error.toJSON(), error.status);
-	console.error(
-		'Content operation failed',
-		error instanceof Error ? error.name : 'Unknown error',
-	);
+	// Do not log the error object: driver errors can carry SQL parameters.
+	const details =
+		error instanceof Error
+			? {
+					name: error.name,
+					message: error.message.slice(0, 300),
+					...(error.cause instanceof Error
+						? { cause: error.cause.message.slice(0, 300) }
+						: {}),
+				}
+			: { name: 'Unknown error' };
+	console.error('Content operation failed', { operation, ...details });
 	return contentJson(
 		{
 			error: 'Request failed',
@@ -99,6 +107,6 @@ export async function contentRoute(
 			status,
 		);
 	} catch (error) {
-		return contentFailure(error);
+		return contentFailure(error, operation);
 	}
 }

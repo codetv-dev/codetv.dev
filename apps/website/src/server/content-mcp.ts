@@ -3,13 +3,13 @@ import { WebStandardStreamableHTTPServerTransport } from '@modelcontextprotocol/
 import { getAbility, type AbilityUser } from './ability-rules';
 import { privateLessonHeaders } from '../coursebuilder/workshop-lessons';
 import {
-	ContentError,
 	contentInputs,
 	adminOperations,
 	readOperations,
 	type ContentOperation,
 } from './content-contract';
 import type { OperationRunner } from './content-operations';
+import { contentFailure } from './content-http';
 
 const descriptions: Record<ContentOperation, string> = {
 	list_sales:
@@ -118,14 +118,7 @@ export async function handleContentMcp(
 						structuredContent: result,
 					};
 				} catch (error) {
-					const result =
-						error instanceof ContentError
-							? error.toJSON()
-							: {
-									error: 'Request failed',
-									why: 'The content operation could not be completed.',
-									next: 'Reload the resource and try again.',
-								};
+					const result = await contentFailure(error, name).json();
 					return {
 						isError: true,
 						content: [{ type: 'text' as const, text: JSON.stringify(result) }],
