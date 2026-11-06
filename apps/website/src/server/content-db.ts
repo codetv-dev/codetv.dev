@@ -57,28 +57,31 @@ export function createContentStore(connection: Connection = db): ContentStore {
 		async ownership(id) {
 			const resource = await store.get(id);
 			if (!resource) return null;
-			const [contributions, parents, videos] = await Promise.all([
-				connection
-					.select({ userId: contentContributions.userId })
-					.from(contentContributions)
-					.where(
-						and(
-							eq(contentContributions.contentId, id),
-							eq(contentContributions.active, true),
-							isNull(contentContributions.deletedAt),
-						),
+			// Vitess rejects parallel queries in one transaction ("transaction ...
+			// in use"). Keep these fresh ownership reads sequential, including
+			// the reverse video-reference lookup, without dropping row locks.
+			const contributions = await connection
+				.select({ userId: contentContributions.userId })
+				.from(contentContributions)
+				.where(
+					and(
+						eq(contentContributions.contentId, id),
+						eq(contentContributions.active, true),
+						isNull(contentContributions.deletedAt),
 					),
-				connection
-					.select({ id: contentResourceResource.resourceOfId })
-					.from(contentResourceResource)
-					.where(
-						and(
-							eq(contentResourceResource.resourceId, id),
-							isNull(contentResourceResource.deletedAt),
-						),
+				);
+			const parents = await connection
+				.select({ id: contentResourceResource.resourceOfId })
+				.from(contentResourceResource)
+				.where(
+					and(
+						eq(contentResourceResource.resourceId, id),
+						isNull(contentResourceResource.deletedAt),
 					),
+				);
+			const videos =
 				resource.type === 'videoResource'
-					? connection
+					? await connection
 							.select({ id: contentResource.id })
 							.from(contentResource)
 							.where(
@@ -88,8 +91,7 @@ export function createContentStore(connection: Connection = db): ContentStore {
 									sql`JSON_UNQUOTE(JSON_EXTRACT(${contentResource.fields}, '$.videoResourceId')) = ${id}`,
 								),
 							)
-					: Promise.resolve([]),
-			]);
+					: [];
 			return {
 				id,
 				createdById: resource.createdById,

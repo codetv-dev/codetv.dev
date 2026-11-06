@@ -10,11 +10,7 @@ import { contentOperationsForUser } from './content-runtime';
 
 export const contentJson = (value: unknown, status = 200) =>
 	Response.json(value, { status, headers: privateLessonHeaders });
-export function contentFailure(
-	error: unknown,
-	operation = 'mcp',
-	adminDiagnostics = false,
-) {
+export function contentFailure(error: unknown, operation = 'mcp') {
 	if (error instanceof ContentError)
 		return contentJson(error.toJSON(), error.status);
 	// Do not log the error object: driver errors can carry SQL parameters.
@@ -34,7 +30,6 @@ export function contentFailure(
 			error: 'Request failed',
 			why: 'The content operation could not be completed.',
 			next: 'Reload the resource and try again.',
-			...(adminDiagnostics ? { diagnostic: details } : {}),
 		},
 		500,
 	);
@@ -112,10 +107,6 @@ export async function contentRoute(
 			status,
 		);
 	} catch (error) {
-		return contentFailure(
-			error,
-			operation,
-			getAbility({ user: viewer }).can('manage', 'all'),
-		);
+		return contentFailure(error, operation);
 	}
 }
