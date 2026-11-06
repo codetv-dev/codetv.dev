@@ -28,7 +28,7 @@ https://codetv-links.netlify.app/*		https://codetv.dev/:splat					301!
 
 # Web Dev Challenge
 /wdc/sponsor								https://codetv.notion.site/Web-Dev-Challenge-Sponsorship-Season-2-19822b3cab0280a5b3d2d7f5a5c064bb
-/wdc												https://codetv.dev/series/web-dev-challenge/s2
+/wdc												https://codetv.dev/series/web-dev-challenge/s3
 /wdc/casting-call						https://codetv.notion.site/Casting-Call-Web-Dev-Challenge-19b22b3cab028077b703d4916b20dfc1?pvs=4
 /wdc/aws-casting-call				https://learnwithjason.notion.site/33e22b3cab0280f7964fdb8912c6b3a2?pvs=105
 /wdc/s1e1										https://codetv.dev/series/web-dev-challenge/s1/dont-build-another-effin-chatbot
@@ -60,8 +60,9 @@ https://codetv-links.netlify.app/*		https://codetv.dev/:splat					301!
 /wdc/s3e4										https://codetv.dev/series/web-dev-challenge/s3/e4-rebuild-your-website-again
 /wdc/s3e5										https://codetv.dev/series/web-dev-challenge/s3/e5-best-landing-page-gsap
 /wdc/s3e6										https://codetv.dev/series/web-dev-challenge/s3/e6-app-works-while-away
+/wdc/s3e7										https://codetv.dev/series/web-dev-challenge/s3/e7-twilio-openai-phone-apps
 
-/wdc/hackathon							https://inngest.com/events/codetv-web-dev-challenge
+/wdc/hackathon							https://codetv.dev/hackathon/build-a-sci-fi-help-desk
 /wdc/hackathon/submit				/wdc/hackathon
 
 /wdc-giveaway								/wdc/hackathon
@@ -224,6 +225,8 @@ https://codetv-links.netlify.app/*		https://codetv.dev/:splat					301!
 /bluesky								https://atproto.com/blog/atmospheric-website?utm_source=codetv
 /webflow								https://webflow.com/feature/cloud?utm_source=codetv
 /inngest								https://www.inngest.com/?utm_medium=video&utm_source=youtube&utm_campaign=codetv2026
+/twilio-openai					https://twil.io/twilio-openai?utm_source=codetv&utm_medium=referral&utm_campaign=codetv
+/tiger-data							https://www.tigerdata.com/?utm_source=codetv&utm_medium=referral&utm_campaign=codetv
 
 /benq										https://www.benq.com/en-us/campaign/best-coding-monitor-for-programmers.html?utm_source=influencer_codetv&utm_medium=affiliate&utm_campaign=lcd_programming_rd280u_na_2025_us_awareness
 /uplift									https://www.upliftdesk.com/?utm_source=codetv&utm_medium=video&utm_campaign=web-dev-challenge
