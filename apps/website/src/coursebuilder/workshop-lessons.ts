@@ -14,10 +14,11 @@ export function isChapterUnlocked(startsAt: string | null, now = new Date()) {
 	);
 }
 
-export function chapterUnlockLabel(startsAt: string | null) {
+export function chapterUnlockLabel(startsAt: string | null, now = new Date()) {
 	if (!startsAt || !Number.isFinite(Date.parse(startsAt)))
 		return 'Release date to be announced';
-	return `Unlocks ${new Intl.DateTimeFormat('en-US', {
+	const label = isChapterUnlocked(startsAt, now) ? 'Unlocked' : 'Unlocks';
+	return `${label} ${new Intl.DateTimeFormat('en-US', {
 		timeZone: 'America/Los_Angeles',
 		weekday: 'short',
 		month: 'short',

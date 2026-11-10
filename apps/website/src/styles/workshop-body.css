@@ -1,0 +1,124 @@
+.workshop-body {
+	color: var(--text);
+	font-family: var(--font-family);
+	font-size: 1.0625rem;
+	line-height: 1.6;
+	max-inline-size: 68ch;
+	min-inline-size: 0;
+	overflow-wrap: anywhere;
+
+	> :first-child {
+		margin-block-start: 0;
+	}
+
+	> * + * {
+		margin-block-start: 1.25rem;
+	}
+
+	:is(h2, h3, h4) {
+		color: var(--text-emphasized);
+		font-family: var(--font-family-heading);
+		line-height: 1.2;
+	}
+
+	:is(h2, h3, h4):not(:first-child) {
+		margin-block-start: 2.5rem;
+	}
+
+	:is(h2, h3, h4) + * {
+		margin-block-start: 0.75rem;
+	}
+
+	h3 {
+		font-size: 1.25em;
+	}
+
+	:is(ul, ol) {
+		padding-inline-start: 1.5em;
+	}
+
+	li {
+		padding-inline-start: 0.25em;
+	}
+
+	li + li {
+		margin-block-start: 0.5rem;
+	}
+
+	li::marker {
+		color: var(--orange);
+	}
+
+	li > :is(ul, ol, p) + * {
+		margin-block-start: 0.75rem;
+	}
+
+	blockquote {
+		background: var(--bg);
+		border-inline-start: 0.25rem solid var(--orange);
+		color: var(--text-emphasized);
+		font-style: italic;
+		padding: 1rem 1.25rem;
+	}
+
+	blockquote > * + * {
+		margin-block-start: 1rem;
+	}
+
+	blockquote + p {
+		color: var(--text-muted);
+		font-size: 1rem;
+		margin-block-start: 0.5rem;
+	}
+
+	blockquote + p + * {
+		margin-block-start: 1rem;
+	}
+
+	a {
+		color: var(--text-link);
+		text-decoration: underline;
+		text-decoration-thickness: 0.08em;
+		text-underline-offset: 0.15em;
+	}
+
+	a:focus-visible {
+		outline: 3px solid var(--orange);
+		outline-offset: 4px;
+	}
+
+	code,
+	pre {
+		font-family:
+			'monaspace-argon', 'Operator Mono', Consolas, Monaco, 'Andale Mono',
+			'Ubuntu Mono', monospace;
+	}
+
+	code:not(pre code) {
+		background: var(--bg);
+		border-radius: 2.5px;
+		color: var(--text-emphasized);
+		font-size: 0.875em;
+		padding: 0.125em 0.25em;
+	}
+
+	blockquote code:not(pre code) {
+		background: var(--gray-200);
+	}
+
+	pre {
+		background: var(--gray-200);
+		border-radius: 2.5px;
+		color: var(--white);
+		font-size: 0.8em;
+		max-inline-size: 100%;
+		overflow-x: auto;
+		padding: 20px;
+	}
+}
+
+@media (min-width: 800px) {
+	.workshop-body {
+		font-size: 1.125rem;
+	}
+}
