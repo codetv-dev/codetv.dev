@@ -54,9 +54,21 @@ it('releases signed playback to buyers at the stored instant, never public playb
 		null,
 	);
 	assert.equal(
-		chapterUnlockLabel('2026-11-10T08:00:00Z'),
+		chapterUnlockLabel('2026-11-10T08:00:00Z', input.now),
 		'Unlocks Tue, Nov 10 at 12:00 AM PT',
 	);
+});
+
+it('labels released chapters as unlocked at and after their release time', () => {
+	for (const now of [
+		new Date('2026-11-10T08:00:00Z'),
+		new Date('2026-11-11T08:00:00Z'),
+	]) {
+		assert.equal(
+			chapterUnlockLabel('2026-11-10T08:00:00Z', now),
+			'Unlocked Tue, Nov 10 at 12:00 AM PT',
+		);
+	}
 });
 
 it('public content projections remove playback and exercises through nested resource/edge API shapes', () => {
