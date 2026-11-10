@@ -2,6 +2,7 @@
 import '../../../styles/workshop-body.css';
 import { and, eq, isNull } from 'drizzle-orm';
 import Layout from '../../../layouts/default.astro';
+import Block from '../../../components/design-system/block.astro';
 import MuxVideoPlayer from '../../../components/mux-video-player.astro';
 import {
 	getWorkshopForSale,
@@ -87,85 +88,182 @@ const path = `/workshops/${workshop.slug}`;
 ---
 
 <Layout title={`${chapter.title} | ${workshop.title}`}>
-	<main style="max-width: 72rem; margin: 3rem auto; padding: 1rem;">
-		<a href={path}>{workshop.title}</a>
-		<h1>{chapter.title}</h1>
-		{
-			!hasTicket && !preview ? (
-				<p>
-					{chapterUnlockLabel(chapter.startsAt)}{' '}
-					<a href={`${path}#ticket`}>Get a ticket</a> to watch this workshop.{' '}
-					{!clerkUser && (
-						<a
-							href={`/dashboard/sign-in?redirect_url=${encodeURIComponent(Astro.url.pathname)}`}
-						>
-							Sign in
+	<main class="workshop-lesson">
+		<Block variant="two-column-asymmetrical" name="lesson-hero">
+			<nav class="heading breadcrumb" aria-label="Breadcrumb">
+				<a href={path}>{workshop.title}</a>
+			</nav>
+			<div class="copy-block">
+				<h1>{chapter.title}</h1>
+			</div>
+		</Block>
+		<Block variant="two-column-asymmetrical" name="lesson-content">
+			{
+				!hasTicket && !preview ? (
+					<p class="copy-block lesson-notice">
+						{chapterUnlockLabel(chapter.startsAt)}{' '}
+						<a href={`${path}#ticket`}>Get a ticket</a> to watch this workshop.{' '}
+						{!clerkUser && (
+							<a
+								href={`/dashboard/sign-in?redirect_url=${encodeURIComponent(Astro.url.pathname)}`}
+							>
+								Sign in
+							</a>
+						)}
+					</p>
+				) : !unlocked && !preview ? (
+					<p class="copy-block lesson-notice">
+						{chapterUnlockLabel(chapter.startsAt)}
+					</p>
+				) : (
+					<>
+						{preview && !unlocked && (
+							<p class="copy-block lesson-notice">
+								<small>
+									Preview:{' '}
+									{chapterUnlockLabel(chapter.startsAt).replace(
+										'Unlocks',
+										'unlocks for buyers',
+									)}
+								</small>
+							</p>
+						)}
+						{playback ? (
+							<div class="lesson-video">
+								<MuxVideoPlayer
+									playback_ids={[playback]}
+									title={chapter.title}
+									publish_date={chapter.startsAt}
+									autoplay={false}
+									workshopAccess={true}
+								/>
+							</div>
+						) : (
+							<p class="copy-block lesson-notice">
+								The video is not available yet.
+							</p>
+						)}
+						<article class="copy-block lesson-body">
+							{sections.map((section) => (
+								<section class="workshop-body">
+									{section.headingHtml && <h2 set:html={section.headingHtml} />}
+									<div class="workshop-body" set:html={section.bodyHtml} />
+								</section>
+							))}
+						</article>
+					</>
+				)
+			}
+		</Block>
+		<Block variant="two-column-asymmetrical" name="lesson-navigation">
+			<nav class="copy-block lesson-navigation" aria-label="Lessons">
+				{
+					previous && (
+						<a class="button" rel="prev" href={`${path}/${previous.slug}`}>
+							Previous: {previous.title}
 						</a>
-					)}
-				</p>
-			) : !unlocked && !preview ? (
-				<p>{chapterUnlockLabel(chapter.startsAt)}</p>
-			) : (
-				<>
-					{preview && !unlocked && (
-						<p>
-							<small>
-								Preview:{' '}
-								{chapterUnlockLabel(chapter.startsAt).replace(
-									'Unlocks',
-									'unlocks for buyers',
-								)}
-							</small>
-						</p>
-					)}
-					{playback ? (
-						<div class="lesson-video">
-							<MuxVideoPlayer
-								playback_ids={[playback]}
-								title={chapter.title}
-								publish_date={chapter.startsAt}
-								autoplay={false}
-								workshopAccess={true}
-							/>
-						</div>
-					) : (
-						<p>The video is not available yet.</p>
-					)}
-					<article>
-						{sections.map((section) => (
-							<section class="workshop-body">
-								{section.headingHtml && <h2 set:html={section.headingHtml} />}
-								<div class="workshop-body" set:html={section.bodyHtml} />
-							</section>
-						))}
-					</article>
-				</>
-			)
-		}
-		<nav aria-label="Lessons">
-			{
-				previous && (
-					<a rel="prev" href={`${path}/${previous.slug}`}>
-						Previous: {previous.title}
-					</a>
-				)
-			}
-			{' '}
-			{
-				next && (
-					<a rel="next" href={`${path}/${next.slug}`}>
-						Next: {next.title}
-					</a>
-				)
-			}
-		</nav>
+					)
+				}
+				{
+					next && (
+						<a class="button" rel="next" href={`${path}/${next.slug}`}>
+							Next: {next.title}
+						</a>
+					)
+				}
+			</nav>
+		</Block>
 	</main>
 </Layout>
 
 <style>
+	.workshop-lesson {
+		background: var(--black);
+	}
+
+	h1 {
+		font-size: clamp(2rem, 6cqi, 3.5rem);
+		line-height: 1.05;
+		margin-block-start: 0;
+	}
+
+	.workshop-lesson :global([data-name='lesson-hero']) {
+		padding-block-end: 1.5rem;
+	}
+
+	.workshop-lesson :global([data-name='lesson-content']) {
+		padding-block-start: 1.5rem;
+	}
+
+	.breadcrumb {
+		justify-self: start;
+		min-inline-size: 0;
+	}
+
+	.breadcrumb a {
+		color: var(--text-link);
+		display: inline-block;
+		line-height: 1.5;
+		overflow-wrap: anywhere;
+		padding-block: 0.5rem;
+		text-underline-offset: 0.2em;
+	}
+
+	.breadcrumb a::before {
+		content: '← ';
+	}
+
 	.lesson-video {
 		aspect-ratio: 16 / 9;
 		container-type: size;
+		grid-column: 1 / -1;
 		inline-size: 100%;
+		min-inline-size: 0;
+	}
+
+	.lesson-body,
+	.lesson-notice,
+	.lesson-navigation {
+		min-inline-size: 0;
+	}
+
+	.lesson-body > section + section {
+		margin-block-start: 2.5rem;
+	}
+
+	.lesson-navigation {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 1rem;
+	}
+
+	.lesson-navigation .button {
+		line-height: 1.35;
+		margin-block-start: 0;
+		min-block-size: 44px;
+		max-inline-size: 100%;
+		overflow-wrap: anywhere;
+		padding: 0.75rem 1rem;
+	}
+
+	.breadcrumb a:focus-visible,
+	.lesson-navigation .button:focus-visible {
+		outline: 3px solid var(--orange);
+		outline-offset: 4px;
+	}
+
+	@media (min-width: 800px) {
+		.lesson-body,
+		.lesson-notice,
+		.lesson-navigation {
+			grid-column: 2;
+		}
+	}
+
+	@media (min-width: 1180px) {
+		.workshop-lesson :global([data-name='lesson-hero']) {
+			/* Match the landing hero below the fixed desktop header. */
+			padding-block-start: 5rem;
+		}
 	}
 </style>
