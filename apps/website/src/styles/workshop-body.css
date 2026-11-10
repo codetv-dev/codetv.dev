@@ -102,8 +102,12 @@
 		padding: 0.125em 0.25em;
 	}
 
+	blockquote code:not(pre code) {
+		background: var(--gray-200);
+	}
+
 	pre {
-		background: var(--black);
+		background: var(--gray-200);
 		border-radius: 2.5px;
 		color: var(--white);
 		font-size: 0.8em;
