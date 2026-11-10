@@ -4,6 +4,7 @@ import { eq } from 'drizzle-orm';
 
 import { db } from '../db';
 import { users } from '../db/schema';
+import { profileColumns } from './user-profile-fields';
 
 type ClerkEmailAddress = {
 	id?: string | null;
@@ -79,22 +80,17 @@ export async function getCourseBuilderUserForClerkUser(
 			...(existingByEmail.fields ?? {}),
 			externalId: clerkUser.id,
 		};
+		const profile = profileColumns({
+			name: existingByEmail.name ?? getDisplayName(clerkUser),
+			image: existingByEmail.image ?? clerkUser.imageUrl,
+		});
 
 		await db
 			.update(users)
-			.set({
-				fields,
-				name: existingByEmail.name ?? getDisplayName(clerkUser),
-				image: existingByEmail.image ?? clerkUser.imageUrl ?? null,
-			})
+			.set({ fields, ...profile })
 			.where(eq(users.id, existingByEmail.id));
 
-		return {
-			...existingByEmail,
-			fields,
-			name: existingByEmail.name ?? getDisplayName(clerkUser),
-			image: existingByEmail.image ?? clerkUser.imageUrl ?? null,
-		};
+		return { ...existingByEmail, fields, ...profile };
 	}
 
 	const id = `user_${randomUUID()}`;
@@ -102,8 +98,10 @@ export async function getCourseBuilderUserForClerkUser(
 	await db.insert(users).values({
 		id,
 		email,
-		name: getDisplayName(clerkUser),
-		image: clerkUser.imageUrl ?? null,
+		...profileColumns({
+			name: getDisplayName(clerkUser),
+			image: clerkUser.imageUrl,
+		}),
 		fields: {
 			externalId: clerkUser.id,
 		},
