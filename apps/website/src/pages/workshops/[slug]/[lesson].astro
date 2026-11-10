@@ -1,4 +1,5 @@
 ---
+import '../../../styles/workshop-body.css';
 import { and, eq, isNull } from 'drizzle-orm';
 import Layout from '../../../layouts/default.astro';
 import MuxVideoPlayer from '../../../components/mux-video-player.astro';
@@ -132,9 +133,9 @@ const path = `/workshops/${workshop.slug}`;
 					)}
 					<article>
 						{sections.map((section) => (
-							<section>
+							<section class="workshop-body">
 								{section.headingHtml && <h2 set:html={section.headingHtml} />}
-								<div set:html={section.bodyHtml} />
+								<div class="workshop-body" set:html={section.bodyHtml} />
 							</section>
 						))}
 					</article>
