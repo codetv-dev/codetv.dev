@@ -22,6 +22,38 @@ type ClerkCommerceUser = {
 	emailAddresses?: ClerkEmailAddress[];
 };
 
+// One fallback, not a retry loop: preserve legal utf8mb4 profiles, but never
+// let cosmetic values prevent linking on an older utf8mb3 table.
+async function writeWithProfileFallback(
+	profile: ReturnType<typeof profileColumns>,
+	write: (profile: ReturnType<typeof profileColumns>) => PromiseLike<unknown>,
+	fallback: ReturnType<typeof profileColumns> = { name: null, image: null },
+) {
+	try {
+		await write(profile);
+		return profile;
+	} catch (error) {
+		// mysql2 exposes errno; PlanetScale embeds it in the Vitess message.
+		const cause = error instanceof Error && error.cause ? error.cause : error;
+		const errno =
+			Number((cause as { errno?: number })?.errno) ||
+			Number(
+				(cause instanceof Error ? cause.message : '').match(
+					/\berrno\s*[:=]?\s*(1366|1406)\b/i,
+				)?.[1],
+			);
+		if (errno !== 1366 && errno !== 1406) throw error;
+		console.warn('Retrying Clerk user write without cosmetic profile fields', {
+			fields: Object.entries(profile)
+				.filter(([, value]) => value !== null)
+				.map(([field, value]) => ({ field, length: [...value!].length })),
+			errno,
+		});
+		await write(fallback);
+		return fallback;
+	}
+}
+
 function getDisplayName(user: ClerkCommerceUser) {
 	return (
 		user.fullName ??
@@ -61,17 +93,18 @@ export async function findCourseBuilderUserForClerkUser(
 
 export async function getCourseBuilderUserForClerkUser(
 	clerkUser: ClerkCommerceUser | null,
+	database = db,
 ) {
 	if (!clerkUser?.id) return null;
 
-	const existingByExternalId = await db.query.users.findFirst({
+	const existingByExternalId = await database.query.users.findFirst({
 		where: eq(users.externalId, clerkUser.id),
 	});
 
 	if (existingByExternalId) return existingByExternalId;
 
 	const email = getPrimaryEmail(clerkUser);
-	const existingByEmail = await db.query.users.findFirst({
+	const existingByEmail = await database.query.users.findFirst({
 		where: eq(users.email, email),
 	});
 
@@ -85,30 +118,45 @@ export async function getCourseBuilderUserForClerkUser(
 			image: existingByEmail.image ?? clerkUser.imageUrl,
 		});
 
-		await db
-			.update(users)
-			.set({ fields, ...profile })
-			.where(eq(users.id, existingByEmail.id));
+		const savedProfile = await writeWithProfileFallback(
+			profile,
+			(values) =>
+				database
+					.update(users)
+					.set({ fields, ...values })
+					.where(eq(users.id, existingByEmail.id)),
+			{
+				name: existingByEmail.name ?? null,
+				image: existingByEmail.image ?? null,
+			},
+		);
 
-		return { ...existingByEmail, fields, ...profile };
+		return {
+			...existingByEmail,
+			fields,
+			...savedProfile,
+			externalId: clerkUser.id,
+		};
 	}
 
 	const id = `user_${randomUUID()}`;
 
-	await db.insert(users).values({
-		id,
-		email,
-		...profileColumns({
+	await writeWithProfileFallback(
+		profileColumns({
 			name: getDisplayName(clerkUser),
 			image: clerkUser.imageUrl,
 		}),
-		fields: {
-			externalId: clerkUser.id,
-		},
-	});
+		(profile) =>
+			database.insert(users).values({
+				id,
+				email,
+				...profile,
+				fields: { externalId: clerkUser.id },
+			}),
+	);
 
 	return (
-		(await db.query.users.findFirst({
+		(await database.query.users.findFirst({
 			where: eq(users.id, id),
 		})) ?? null
 	);
