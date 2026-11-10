@@ -141,6 +141,8 @@ it(
 			];
 			assert.equal(cases[0].image!.length, 256);
 			for (const charset of ['utf8mb4', 'utf8mb3']) {
+				// Do not convert the previous pass's valid utf8mb4 emoji rows.
+				await db.delete(users);
 				await connection.query(
 					`ALTER TABLE ctv_User CONVERT TO CHARACTER SET ${charset}`,
 				);
