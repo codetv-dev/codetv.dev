@@ -27,6 +27,7 @@ type ClerkCommerceUser = {
 async function writeWithProfileFallback(
 	profile: ReturnType<typeof profileColumns>,
 	write: (profile: ReturnType<typeof profileColumns>) => PromiseLike<unknown>,
+	fallback: ReturnType<typeof profileColumns> = { name: null, image: null },
 ) {
 	try {
 		await write(profile);
@@ -48,7 +49,6 @@ async function writeWithProfileFallback(
 				.map(([field, value]) => ({ field, length: [...value!].length })),
 			errno,
 		});
-		const fallback = { name: null, image: null };
 		await write(fallback);
 		return fallback;
 	}
@@ -118,11 +118,17 @@ export async function getCourseBuilderUserForClerkUser(
 			image: existingByEmail.image ?? clerkUser.imageUrl,
 		});
 
-		const savedProfile = await writeWithProfileFallback(profile, (values) =>
-			database
-				.update(users)
-				.set({ fields, ...values })
-				.where(eq(users.id, existingByEmail.id)),
+		const savedProfile = await writeWithProfileFallback(
+			profile,
+			(values) =>
+				database
+					.update(users)
+					.set({ fields, ...values })
+					.where(eq(users.id, existingByEmail.id)),
+			{
+				name: existingByEmail.name ?? null,
+				image: existingByEmail.image ?? null,
+			},
 		);
 
 		return {

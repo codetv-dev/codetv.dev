@@ -87,6 +87,7 @@ it(
 				expectedName: string | null;
 				expectedImage: string | null;
 				existingImage?: string;
+				existingName?: string;
 			}[] = [
 				{
 					label: '256-char avatar',
@@ -132,6 +133,14 @@ it(
 					expectedImage: 'https://example.com/kept.png',
 				},
 				{
+					label: 'keep stored name when emoji avatar needs fallback',
+					name: 'Clerk Name',
+					existingName: 'Ada',
+					image: 'https://example.com/😀.png',
+					expectedName: 'Ada',
+					expectedImage: 'https://example.com/😀.png',
+				},
+				{
 					label: 'normal user',
 					name: 'Ada Lovelace',
 					image: 'https://example.com/avatar.png',
@@ -151,15 +160,13 @@ it(
 						const id = `guest_${randomUUID()}`;
 						const email = `${id}@example.test`;
 						const clerkId = `clerk_${randomUUID()}`;
-						await db
-							.insert(users)
-							.values({
-								id,
-								email,
-								name: null,
-								image: fixture.existingImage ?? null,
-								fields: { guest: true },
-							});
+						await db.insert(users).values({
+							id,
+							email,
+							name: fixture.existingName ?? null,
+							image: fixture.existingImage ?? null,
+							fields: { guest: true },
+						});
 						const guest = await db.query.users.findFirst({
 							where: eq(users.id, id),
 						});
@@ -173,11 +180,18 @@ it(
 							},
 							db,
 						);
-						const expectedName =
+						const needsCharsetFallback =
 							charset === 'utf8mb3' &&
-							/[\u{10000}-\u{10ffff}]/u.test(fixture.name)
-								? null
-								: fixture.expectedName;
+							[fixture.expectedName, fixture.expectedImage].some(
+								(value) =>
+									value !== null && /[\u{10000}-\u{10ffff}]/u.test(value),
+							);
+						const expectedName = needsCharsetFallback
+							? (fixture.existingName ?? null)
+							: fixture.expectedName;
+						const expectedImage = needsCharsetFallback
+							? (fixture.existingImage ?? null)
+							: fixture.expectedImage;
 						assert.equal(
 							user?.id,
 							id,
@@ -185,7 +199,7 @@ it(
 						);
 						assert.equal(user?.externalId, clerkId);
 						assert.equal(user?.name, expectedName);
-						assert.equal(user?.image, fixture.expectedImage);
+						assert.equal(user?.image, expectedImage);
 						const stored = await db.query.users.findFirst({
 							where: eq(users.id, id),
 						});
@@ -199,7 +213,7 @@ it(
 							externalId: clerkId,
 						});
 						assert.equal(stored?.name, expectedName);
-						assert.equal(stored?.image, fixture.expectedImage);
+						assert.equal(stored?.image, expectedImage);
 					});
 				}
 			}
