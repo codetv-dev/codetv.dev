@@ -118,13 +118,15 @@ const path = `/workshops/${workshop.slug}`;
 						</p>
 					)}
 					{playback ? (
-						<MuxVideoPlayer
-							playback_ids={[playback]}
-							title={chapter.title}
-							publish_date={chapter.startsAt}
-							autoplay={false}
-							workshopAccess={true}
-						/>
+						<div class="lesson-video">
+							<MuxVideoPlayer
+								playback_ids={[playback]}
+								title={chapter.title}
+								publish_date={chapter.startsAt}
+								autoplay={false}
+								workshopAccess={true}
+							/>
+						</div>
 					) : (
 						<p>The video is not available yet.</p>
 					)}
@@ -158,3 +160,11 @@ const path = `/workshops/${workshop.slug}`;
 		</nav>
 	</main>
 </Layout>
+
+<style>
+	.lesson-video {
+		aspect-ratio: 16 / 9;
+		container-type: size;
+		inline-size: 100%;
+	}
+</style>
